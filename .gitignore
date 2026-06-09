@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+*.local
+.DS_Store
+.vite
+
+# Banques d'images sources (non nécessaires au site — seules public/products sert)
+liquidarom-images/
+pulp-liquides-images/
+
+# Aperçus temporaires
+_*.jpg
+_*.png

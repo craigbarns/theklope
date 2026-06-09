@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --line: rgba(255, 255, 255, 0.1);
+    --line-strong: rgba(255, 255, 255, 0.16);
+  }
+
+  * {
+    /* Anneau de focus cohérent et visible sur tout le site (a11y) */
+    outline-color: theme('colors.neon');
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-noir text-ash font-sans antialiased;
+    background-image:
+      radial-gradient(900px 460px at 82% -8%, rgba(53, 255, 138, 0.07), transparent 60%),
+      radial-gradient(760px 520px at -5% 8%, rgba(59, 130, 246, 0.05), transparent 55%);
+    background-attachment: fixed;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Subtil grain pour la profondeur premium */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.025;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3 {
+    @apply tracking-tightest;
+  }
+
+  ::selection {
+    @apply bg-neon/30 text-white;
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.neon');
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a2a;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a3a;
+  }
+
+  /* Respect des préférences de réduction du mouvement */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply relative z-[1] mx-auto w-full max-w-7xl px-5 sm:px-8;
+  }
+
+  /* Lien d'évitement (skip to content) */
+  .skip-link {
+    @apply absolute left-4 top-4 z-[200] -translate-y-20 rounded-full bg-neon px-5 py-2.5 text-sm font-semibold text-noir transition-transform focus:translate-y-0;
+  }
+
+  .btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ease-premium active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn bg-neon text-noir hover:-translate-y-0.5 hover:shadow-glow;
+  }
+
+  .btn-ghost {
+    @apply btn border border-[color:var(--line-strong)] bg-white/[0.04] text-white hover:border-white/40 hover:bg-white/[0.08];
+  }
+
+  .btn-blue {
+    @apply btn bg-electric text-white hover:-translate-y-0.5 hover:shadow-glow-blue;
+  }
+
+  .card {
+    @apply rounded-2xl border border-[color:var(--line)] bg-anthracite/80 shadow-card backdrop-blur;
+  }
+
+  .input {
+    @apply min-h-11 w-full rounded-xl border border-[color:var(--line)] bg-carbon px-4 py-3 text-sm text-white placeholder-faint outline-none transition focus:border-neon/50 focus:ring-2 focus:ring-neon/25;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-[color:var(--line)] bg-white/5 px-3 py-1.5 text-xs font-medium text-muted transition hover:border-white/30 hover:text-ash;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.25em] text-neon;
+  }
+
+  /* Repère focus pour éléments cliquables custom (cartes, vignettes) */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/70 focus-visible:ring-offset-2 focus-visible:ring-offset-noir;
+  }
+}
+
+@layer utilities {
+  .text-muted {
+    color: theme('colors.muted');
+  }
+  .text-faint {
+    color: theme('colors.faint');
+  }
+}
