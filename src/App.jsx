@@ -6,6 +6,7 @@ import CookieBanner from './components/CookieBanner.jsx'
 import SearchOverlay from './components/SearchOverlay.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
+import CoachVape from './components/CoachVape.jsx'
 
 import Home from './pages/Home.jsx'
 import Shop from './pages/Shop.jsx'
@@ -53,6 +54,7 @@ export default function App() {
 
       <Footer />
       <CookieBanner />
+      <CoachVape />
     </div>
   )
 }
