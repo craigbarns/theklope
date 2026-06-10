@@ -12,16 +12,22 @@ const SHIPPING_METHODS = [
 ]
 
 export default function Checkout() {
-  const { cartDetailed, totals, clearCart } = useStore()
+  const { cartDetailed, totals, createOrder, promo } = useStore()
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('standard')
-  const [done, setDone] = useState(false)
-  const [orderId] = useState(() => 'TK-' + Math.floor(100000 + Math.random() * 899999))
+  const [completedOrder, setCompletedOrder] = useState(null)
+  const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
+  const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
 
-  const shippingCost = totals.subtotal >= totals.freeShippingThreshold ? 0 : SHIPPING_METHODS.find((m) => m.id === shipping).price
+  const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || SHIPPING_METHODS[0]
+  const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
+  const shippingCost = shippingIsFree ? 0 : selectedShipping.price
   const grandTotal = Math.max(0, totals.subtotal - totals.discount) + shippingCost
 
-  if (done) {
+  const updateCustomer = (key) => (e) => setCustomer((prev) => ({ ...prev, [key]: e.target.value }))
+  const updateAddress = (key) => (e) => setAddress((prev) => ({ ...prev, [key]: e.target.value }))
+
+  if (completedOrder) {
     return (
       <div className="container-page py-16">
         <Seo title="Commande confirmée" />
@@ -31,12 +37,12 @@ export default function Checkout() {
           </div>
           <h1 className="font-display text-2xl font-bold text-white">Merci pour votre commande !</h1>
           <p className="mt-3 text-muted">
-            Votre commande <strong className="text-neon">{orderId}</strong> a bien été enregistrée. Vous
-            recevrez un e-mail de confirmation avec le suivi de livraison.
+            Votre commande <strong className="text-neon">{completedOrder.id}</strong> a bien été enregistrée
+            et apparaît maintenant dans le dashboard admin.
           </p>
           <div className="mt-6 rounded-2xl border border-white/8 bg-white/5 p-4 text-left text-sm">
-            <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(grandTotal)}</span></div>
-            <div className="flex justify-between py-1"><span className="text-muted">Livraison estimée</span><span className="text-white">{shipping === 'express' ? '24h' : '2–4 jours'}</span></div>
+            <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(completedOrder.total)}</span></div>
+            <div className="flex justify-between py-1"><span className="text-muted">Livraison estimée</span><span className="text-white">{completedOrder.shipping.detail}</span></div>
           </div>
           <Link to="/boutique" className="btn-primary mt-7 w-full">Continuer mes achats</Link>
         </div>
@@ -58,8 +64,18 @@ export default function Checkout() {
     e.preventDefault()
     if (step < 3) setStep(step + 1)
     else {
-      clearCart()
-      setDone(true)
+      const order = createOrder({
+        customer: {
+          name: `${customer.firstName} ${customer.lastName}`.trim(),
+          email: customer.email,
+          phone: customer.phone,
+        },
+        address,
+        shipping: selectedShipping,
+        shippingCost,
+        total: grandTotal,
+      })
+      setCompletedOrder(order)
     }
   }
 
@@ -89,10 +105,10 @@ export default function Checkout() {
             {step === 1 && (
               <Section title="Coordonnées client">
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Field label="Prénom" required />
-                  <Field label="Nom" required />
-                  <Field label="E-mail" type="email" required className="sm:col-span-2" />
-                  <Field label="Téléphone" type="tel" className="sm:col-span-2" />
+                  <Field label="Prénom" value={customer.firstName} onChange={updateCustomer('firstName')} required />
+                  <Field label="Nom" value={customer.lastName} onChange={updateCustomer('lastName')} required />
+                  <Field label="E-mail" type="email" value={customer.email} onChange={updateCustomer('email')} required className="sm:col-span-2" />
+                  <Field label="Téléphone" type="tel" value={customer.phone} onChange={updateCustomer('phone')} className="sm:col-span-2" />
                 </div>
               </Section>
             )}
@@ -101,11 +117,11 @@ export default function Checkout() {
               <>
                 <Section title="Adresse de livraison">
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <Field label="Adresse" required className="sm:col-span-2" />
-                    <Field label="Complément" className="sm:col-span-2" />
-                    <Field label="Code postal" required />
-                    <Field label="Ville" required />
-                    <Field label="Pays" defaultValue="France" required className="sm:col-span-2" />
+                    <Field label="Adresse" value={address.street} onChange={updateAddress('street')} required className="sm:col-span-2" />
+                    <Field label="Complément" value={address.extra} onChange={updateAddress('extra')} className="sm:col-span-2" />
+                    <Field label="Code postal" value={address.zip} onChange={updateAddress('zip')} required />
+                    <Field label="Ville" value={address.city} onChange={updateAddress('city')} required />
+                    <Field label="Pays" value={address.country} onChange={updateAddress('country')} required className="sm:col-span-2" />
                   </div>
                 </Section>
                 <Section title="Mode de livraison">
@@ -121,7 +137,7 @@ export default function Checkout() {
                           <p className="text-xs text-faint">{m.detail}</p>
                         </div>
                         <span className="text-sm font-semibold text-white">
-                          {totals.subtotal >= totals.freeShippingThreshold ? 'Offerte' : formatPrice(m.price)}
+                          {shippingIsFree ? 'Offerte' : formatPrice(m.price)}
                         </span>
                       </label>
                     ))}

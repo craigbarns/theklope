@@ -1481,6 +1481,47 @@ function padList(base, extra, n) {
   }
   return out
 }
+
+export const getProductFrom = (products, id) => products.find((p) => p.id === id)
+
+export const getCatalogMeta = (products = PRODUCTS) => ({
+  brands: [...new Set(products.map((p) => p.brand).filter(Boolean))].sort(),
+  types: [...new Set(products.map((p) => p.type).filter(Boolean))].sort(),
+  flavors: [...new Set(products.flatMap((p) => p.flavors || []))].sort(),
+  nicotineLevels: [...new Set(products.flatMap((p) => p.nicotine || []))].sort((a, b) => a - b),
+  maxPrice: Math.ceil(Math.max(1, ...products.map((p) => Number(p.price) || 0))),
+})
+
+export const featuredProducts = (products = PRODUCTS) => {
+  const byReviews = [...products].sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+  return {
+    bestSellers: padList(
+      products.filter((p) => p.badge === 'best-seller'),
+      byReviews,
+      8,
+    ),
+    newArrivals: padList(
+      products.filter((p) => p.badge === 'nouveau'),
+      byReviews.filter((p) => p.oldPrice == null),
+      8,
+    ),
+    starterPacks: padList(
+      products.filter((p) => p.category === 'pack'),
+      products.filter((p) => p.category === 'ecig'),
+      6,
+    ),
+  }
+}
+
+export function productsByCategorySlugFrom(products = PRODUCTS, slug) {
+  const featured = featuredProducts(products)
+  if (slug === 'nouveautes') return featured.newArrivals
+  if (slug === 'meilleures-ventes') return featured.bestSellers
+  const cat = CATEGORIES.find((c) => c.slug === slug)
+  if (!cat) return []
+  return products.filter((p) => p.category === cat.key)
+}
+
 const byReviews = [...PRODUCTS].sort((a, b) => b.reviews - a.reviews)
 
 export const BEST_SELLERS = padList(

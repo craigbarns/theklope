@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES, productsByCategorySlug } from '../data/products.js'
+import { CATEGORIES, productsByCategorySlugFrom } from '../data/products.js'
 import { IconChevronDown } from '../components/icons.jsx'
 import NotFound from './NotFound.jsx'
 
@@ -15,16 +16,17 @@ const SORTS = [
 
 export default function CategoryPage() {
   const { slug } = useParams()
+  const { products: allProducts } = useStore()
   const [sort, setSort] = useState('popularite')
 
   const category = CATEGORIES.find((c) => c.slug === slug)
   const products = useMemo(() => {
-    let list = productsByCategorySlug(slug)
+    let list = productsByCategorySlugFrom(allProducts, slug)
     if (sort === 'prix-asc') list = [...list].sort((a, b) => a.price - b.price)
     if (sort === 'prix-desc') list = [...list].sort((a, b) => b.price - a.price)
     if (sort === 'popularite') list = [...list].sort((a, b) => b.reviews - a.reviews)
     return list
-  }, [slug, sort])
+  }, [allProducts, slug, sort])
 
   if (!category) return <NotFound />
 

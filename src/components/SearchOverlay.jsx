@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { PRODUCTS } from '../data/products.js'
 import { IconSearch, IconClose } from './icons.jsx'
 
 export default function SearchOverlay() {
-  const { searchOpen, setSearchOpen } = useStore()
+  const { searchOpen, setSearchOpen, products } = useStore()
   const [q, setQ] = useState('')
   const navigate = useNavigate()
 
@@ -19,14 +18,14 @@ export default function SearchOverlay() {
   const results = useMemo(() => {
     const term = q.trim().toLowerCase()
     if (!term) return []
-    return PRODUCTS.filter(
+    return products.filter(
       (p) =>
         p.name.toLowerCase().includes(term) ||
         p.type.toLowerCase().includes(term) ||
         p.brand.toLowerCase().includes(term) ||
         p.short.toLowerCase().includes(term),
     ).slice(0, 6)
-  }, [q])
+  }, [q, products])
 
   if (!searchOpen) return null
 

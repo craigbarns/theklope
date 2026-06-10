@@ -1,14 +1,10 @@
 import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import Newsletter from '../components/Newsletter.jsx'
-import {
-  BEST_SELLERS,
-  NEW_ARRIVALS,
-  STARTER_PACKS,
-  PRODUCTS,
-  CATEGORIES,
-} from '../data/products.js'
+import { featuredProducts } from '../data/products.js'
 import {
   IconArrowRight,
   IconShield,
@@ -33,8 +29,10 @@ const heroCats = [
 ]
 
 export default function Home() {
-  const heroProduct = BEST_SELLERS[0] || PRODUCTS[0]
-  const featuredProduct = STARTER_PACKS[0] || BEST_SELLERS[1] || PRODUCTS[1]
+  const { products } = useStore()
+  const { bestSellers, newArrivals, starterPacks } = useMemo(() => featuredProducts(products), [products])
+  const heroProduct = bestSellers[0] || products[0]
+  const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
   return (
     <>
       <Seo
@@ -109,7 +107,7 @@ export default function Home() {
             >
               <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/20" />
               <img
-                src={catThumb(c.key)}
+                src={catThumb(c.key, products)}
                 alt=""
                 className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90"
               />
@@ -149,7 +147,7 @@ export default function Home() {
         eyebrow="Plébiscités"
         title="Meilleures ventes"
         link="/categorie/meilleures-ventes"
-        products={BEST_SELLERS}
+        products={bestSellers}
       />
 
       {/* PACKS DÉBUTANTS */}
@@ -168,7 +166,7 @@ export default function Home() {
               </Link>
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
-              {STARTER_PACKS.slice(0, 2).map((p) => (
+              {starterPacks.slice(0, 2).map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>
@@ -181,7 +179,7 @@ export default function Home() {
         eyebrow="Tout juste arrivés"
         title="Nouveautés"
         link="/categorie/nouveautes"
-        products={NEW_ARRIVALS.length ? NEW_ARRIVALS : PRODUCTS.slice(-4)}
+        products={newArrivals.length ? newArrivals : products.slice(-4)}
       />
 
       {/* BANNIÈRE 18+ */}
@@ -226,11 +224,11 @@ function ProductRow({ eyebrow, title, link, products }) {
   )
 }
 
-function catThumb(key) {
+function catThumb(key, products = []) {
   const map = {
-    ecig: PRODUCTS.find((p) => p.category === 'ecig'),
-    eliquide: PRODUCTS.find((p) => p.category === 'eliquide'),
-    accessoire: PRODUCTS.find((p) => p.category === 'accessoire'),
+    ecig: products.find((p) => p.category === 'ecig'),
+    eliquide: products.find((p) => p.category === 'eliquide'),
+    accessoire: products.find((p) => p.category === 'accessoire'),
   }
-  return (map[key] || PRODUCTS[0]).image
+  return (map[key] || products[0])?.image || '/products/product-placeholder.svg'
 }

@@ -1,7 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { getProduct, PRODUCTS, categoryName } from '../data/products.js'
+import { categoryName } from '../data/products.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -27,8 +27,8 @@ const REVIEWS = [
 
 export default function Product() {
   const { id } = useParams()
+  const { products, getProduct, addToCart, toggleFavorite, isFavorite } = useStore()
   const product = getProduct(id)
-  const { addToCart, toggleFavorite, isFavorite } = useStore()
 
   const [activeImg, setActiveImg] = useState(0)
   const [qty, setQty] = useState(1)
@@ -39,7 +39,16 @@ export default function Product() {
 
   const similar = useMemo(() => {
     if (!product) return []
-    return PRODUCTS.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+    return products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
+  }, [product, products])
+
+  useEffect(() => {
+    if (!product) return
+    setActiveImg(0)
+    setQty(1)
+    setColor(product.colors?.[0] || null)
+    setFlavor(product.flavors?.[0] || null)
+    setNicotine(product.nicotine?.[0] ?? null)
   }, [product])
 
   if (!product) return <NotFound />

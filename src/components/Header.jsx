@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Logo from './Logo.jsx'
-import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconChevronDown } from './icons.jsx'
+import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser } from './icons.jsx'
 import { CATEGORIES } from '../data/products.js'
 
 const NAV = [
@@ -92,6 +92,13 @@ export default function Header() {
                 </span>
               )}
             </Link>
+            <Link
+              to="/admin"
+              aria-label="Admin"
+              className="relative focus-ring hidden h-10 w-10 place-items-center rounded-xl text-ash/80 transition hover:bg-white/5 hover:text-white sm:grid"
+            >
+              <IconUser />
+            </Link>
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Panier"
@@ -131,6 +138,10 @@ export default function Header() {
                   {c.name}
                 </Link>
               ))}
+              <div className="my-2 h-px bg-white/10" />
+              <Link to="/admin" className="px-3 py-2.5 text-sm font-medium text-neon">
+                Dashboard admin
+              </Link>
             </nav>
           </div>
         )}

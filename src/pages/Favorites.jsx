@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
-import { getProduct } from '../data/products.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { IconHeart } from '../components/icons.jsx'
 
 export default function Favorites() {
-  const { favorites } = useStore()
+  const { favorites, getProduct } = useStore()
   const products = favorites.map(getProduct).filter(Boolean)
 
   return (

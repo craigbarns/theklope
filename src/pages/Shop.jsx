@@ -1,18 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
+import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import {
-  PRODUCTS,
-  CATEGORIES,
-  BRANDS,
-  TYPES,
-  FLAVORS,
-  NICOTINE_LEVELS,
-  MAX_PRICE,
-  categoryName,
-} from '../data/products.js'
+import { CATEGORIES } from '../data/products.js'
 import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
 
 const SORTS = [
@@ -25,8 +17,10 @@ const SORTS = [
 const PRODUCT_CATEGORIES = CATEGORIES.filter((c) => !['nouveautes', 'meilleures-ventes'].includes(c.slug))
 
 export default function Shop() {
+  const { products, catalogMeta } = useStore()
   const [params] = useSearchParams()
   const initialQ = params.get('q') || ''
+  const maxAvailablePrice = catalogMeta.maxPrice
 
   const [search, setSearch] = useState(initialQ)
   const [cats, setCats] = useState([])
@@ -34,9 +28,13 @@ export default function Shop() {
   const [types, setTypes] = useState([])
   const [nicotine, setNicotine] = useState([])
   const [flavors, setFlavors] = useState([])
-  const [maxPrice, setMaxPrice] = useState(MAX_PRICE)
+  const [maxPrice, setMaxPrice] = useState(maxAvailablePrice)
   const [sort, setSort] = useState('popularite')
   const [mobileFilters, setMobileFilters] = useState(false)
+
+  useEffect(() => {
+    setMaxPrice((value) => Math.min(value || maxAvailablePrice, maxAvailablePrice))
+  }, [maxAvailablePrice])
 
   const toggle = (setter, value) =>
     setter((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
@@ -48,11 +46,11 @@ export default function Shop() {
     setTypes([])
     setNicotine([])
     setFlavors([])
-    setMaxPrice(MAX_PRICE)
+    setMaxPrice(maxAvailablePrice)
   }
 
   const filtered = useMemo(() => {
-    let list = PRODUCTS.filter((p) => {
+    let list = products.filter((p) => {
       if (search) {
         const t = search.toLowerCase()
         if (
@@ -86,9 +84,9 @@ export default function Shop() {
         list = [...list].sort((a, b) => b.reviews - a.reviews)
     }
     return list
-  }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort])
+  }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort, products])
 
-  const activeCount = cats.length + brands.length + types.length + nicotine.length + flavors.length + (maxPrice < MAX_PRICE ? 1 : 0)
+  const activeCount = cats.length + brands.length + types.length + nicotine.length + flavors.length + (maxPrice < maxAvailablePrice ? 1 : 0)
 
   const filtersPanel = (
     <div className="space-y-6">
@@ -102,7 +100,7 @@ export default function Shop() {
         <input
           type="range"
           min={1}
-          max={MAX_PRICE}
+          max={maxAvailablePrice}
           value={maxPrice}
           onChange={(e) => setMaxPrice(Number(e.target.value))}
           className="w-full accent-neon"
@@ -111,20 +109,20 @@ export default function Shop() {
       </FilterGroup>
 
       <FilterGroup title="Marque">
-        {BRANDS.map((b) => (
+        {catalogMeta.brands.map((b) => (
           <CheckRow key={b} checked={brands.includes(b)} onChange={() => toggle(setBrands, b)} label={b} />
         ))}
       </FilterGroup>
 
       <FilterGroup title="Type de produit">
-        {TYPES.map((t) => (
+        {catalogMeta.types.map((t) => (
           <CheckRow key={t} checked={types.includes(t)} onChange={() => toggle(setTypes, t)} label={t} />
         ))}
       </FilterGroup>
 
       <FilterGroup title="Taux de nicotine">
         <div className="flex flex-wrap gap-2">
-          {NICOTINE_LEVELS.map((n) => (
+          {catalogMeta.nicotineLevels.map((n) => (
             <button
               key={n}
               onClick={() => toggle(setNicotine, n)}
@@ -141,7 +139,7 @@ export default function Shop() {
       </FilterGroup>
 
       <FilterGroup title="Saveur">
-        {FLAVORS.map((f) => (
+        {catalogMeta.flavors.map((f) => (
           <CheckRow key={f} checked={flavors.includes(f)} onChange={() => toggle(setFlavors, f)} label={f} />
         ))}
       </FilterGroup>

@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
-import { CATEGORIES, PRODUCTS, productsByCategorySlug } from '../data/products.js'
+import { CATEGORIES, productsByCategorySlugFrom } from '../data/products.js'
 import { IconArrowRight } from '../components/icons.jsx'
 
 export default function Categories() {
+  const { products } = useStore()
   return (
     <div className="container-page py-8">
       <Seo title="Catégories" description="Toutes les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, accessoires, packs débutants, nouveautés et meilleures ventes." />
@@ -14,8 +16,8 @@ export default function Categories() {
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {CATEGORIES.map((c) => {
-          const items = productsByCategorySlug(c.slug)
-          const thumb = (items[0] || PRODUCTS[0]).image
+          const items = productsByCategorySlugFrom(products, c.slug)
+          const thumb = (items[0] || products[0])?.image || '/products/product-placeholder.svg'
           return (
             <Link
               key={c.slug}
