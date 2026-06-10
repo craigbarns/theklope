@@ -77,6 +77,8 @@ export default function Home() {
 
           <div className="animate-fade-up [animation-delay:120ms]">
             <div className="relative mx-auto max-w-md">
+              {/* Halos de fond colorés et dynamiques */}
+              <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
               <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card">
                 <img src={heroProduct.image} alt={heroProduct.name} className="w-full rounded-2xl" />
               </div>
@@ -98,18 +100,18 @@ export default function Home() {
 
       {/* CATÉGORIES MISES EN AVANT */}
       <section className="container-page py-10">
-        <div className="grid gap-5 md:grid-cols-3">
+        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
           {heroCats.map((c) => (
             <Link
               key={c.slug}
               to={`/categorie/${c.slug}`}
-              className="card group relative flex h-44 items-end overflow-hidden p-6 transition hover:border-neon/30"
+              className="card-interactive group relative flex h-44 items-end overflow-hidden p-6"
             >
-              <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/20" />
+              <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/25" />
               <img
                 src={catThumb(c.key, products)}
                 alt=""
-                className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90"
+                className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
               />
               <div className="relative">
                 <h3 className="font-display text-xl font-semibold text-white">{c.name}</h3>
@@ -130,8 +132,8 @@ export default function Home() {
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f) => (
-            <div key={f.title} className="card p-6 transition hover:border-neon/30">
-              <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-neon/30 bg-neon/10 text-neon">
+            <div key={f.title} className="card-interactive group p-6">
+              <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-neon/30 bg-neon/10 text-neon transition-all duration-300 group-hover:scale-110 group-hover:bg-neon/20">
                 <f.icon />
               </div>
               <h3 className="font-display text-base font-semibold text-white">{f.title}</h3>

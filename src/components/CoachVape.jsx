@@ -12,6 +12,18 @@ export default function CoachVape() {
   const [answers, setAnswers] = useState({ smoking: '', flavor: '', type: '' })
   const chatEndRef = useRef(null)
 
+  // Bloquer le défilement du corps de page en version mobile quand le chat est ouvert
+  useEffect(() => {
+    if (isOpen && window.innerWidth < 640) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'unset'
+    }
+    return () => {
+      document.body.style.overflow = 'unset'
+    }
+  }, [isOpen])
+
   // Initialiser les messages de bienvenue
   useEffect(() => {
     if (messages.length === 0) {
@@ -358,7 +370,7 @@ export default function CoachVape() {
 
       {/* Fenêtre de chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 z-40 flex h-[500px] w-[360px] flex-col overflow-hidden rounded-3xl border border-white/10 bg-carbon/90 backdrop-blur-xl shadow-card animate-fade-up sm:w-[400px]">
+        <div className="fixed inset-x-0 bottom-0 top-0 z-40 flex flex-col overflow-hidden bg-carbon/95 backdrop-blur-2xl animate-fade-up sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[500px] sm:w-[400px] sm:rounded-3xl sm:border sm:border-white/10 sm:bg-carbon/90 sm:backdrop-blur-xl sm:shadow-card">
           {/* Header */}
           <div className="flex items-center gap-3 bg-gradient-to-r from-noir/80 to-carbon/80 px-5 py-4 border-b border-white/8">
             <div className="relative h-10 w-10 shrink-0 rounded-full bg-neon/10 border border-neon/30 flex items-center justify-center text-neon">

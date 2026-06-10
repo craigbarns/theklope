@@ -21,8 +21,9 @@
   body {
     @apply bg-noir text-ash font-sans antialiased;
     background-image:
-      radial-gradient(900px 460px at 82% -8%, rgba(53, 255, 138, 0.07), transparent 60%),
-      radial-gradient(760px 520px at -5% 8%, rgba(59, 130, 246, 0.05), transparent 55%);
+      radial-gradient(1000px 600px at 80% -10%, rgba(53, 255, 138, 0.09), transparent 65%),
+      radial-gradient(800px 500px at 10% 20%, rgba(59, 130, 246, 0.07), transparent 60%),
+      radial-gradient(800px 600px at 50% 80%, rgba(139, 92, 246, 0.04), transparent 50%);
     background-attachment: fixed;
     text-rendering: optimizeLegibility;
   }
@@ -83,7 +84,7 @@
 
 @layer components {
   .container-page {
-    @apply relative z-[1] mx-auto w-full max-w-7xl px-5 sm:px-8;
+    @apply relative z-[1] mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
   /* Lien d'évitement (skip to content) */
@@ -92,31 +93,35 @@
   }
 
   .btn {
-    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ease-premium active:translate-y-0 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-11 items-center justify-center gap-2.5 rounded-full px-6 py-3 text-sm font-semibold transition-all duration-300 ease-premium active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-neon/60 focus-visible:ring-offset-2 focus-visible:ring-offset-noir;
   }
 
   .btn-primary {
-    @apply btn bg-neon text-noir hover:-translate-y-0.5 hover:shadow-glow;
+    @apply btn bg-neon text-noir hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-glow;
   }
 
   .btn-ghost {
-    @apply btn border border-[color:var(--line-strong)] bg-white/[0.04] text-white hover:border-white/40 hover:bg-white/[0.08];
+    @apply btn border border-white/10 bg-white/[0.03] text-white hover:border-white/20 hover:bg-white/[0.06] hover:-translate-y-0.5 hover:scale-[1.01];
   }
 
   .btn-blue {
-    @apply btn bg-electric text-white hover:-translate-y-0.5 hover:shadow-glow-blue;
+    @apply btn bg-electric text-white hover:-translate-y-0.5 hover:scale-[1.02] hover:shadow-glow-blue;
   }
 
   .card {
-    @apply rounded-2xl border border-[color:var(--line)] bg-anthracite/80 shadow-card backdrop-blur;
+    @apply rounded-2xl border border-white/10 bg-anthracite/70 shadow-card backdrop-blur-xl transition-all duration-300;
+  }
+
+  .card-interactive {
+    @apply card hover:border-neon/30 hover:-translate-y-1 hover:shadow-glow hover:bg-anthracite/85;
   }
 
   .input {
-    @apply min-h-11 w-full rounded-xl border border-[color:var(--line)] bg-carbon px-4 py-3 text-sm text-white placeholder-faint outline-none transition focus:border-neon/50 focus:ring-2 focus:ring-neon/25;
+    @apply min-h-11 w-full rounded-xl border border-white/10 bg-carbon/60 px-4 py-3 text-sm text-white placeholder-faint outline-none transition-all duration-200 focus:border-neon/50 focus:ring-2 focus:ring-neon/15;
   }
 
   .chip {
-    @apply inline-flex items-center gap-1.5 rounded-full border border-[color:var(--line)] bg-white/5 px-3 py-1.5 text-xs font-medium text-muted transition hover:border-white/30 hover:text-ash;
+    @apply inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-muted transition hover:border-white/30 hover:text-ash;
   }
 
   .eyebrow {
@@ -135,5 +140,14 @@
   }
   .text-faint {
     color: theme('colors.faint');
+  }
+  
+  /* Slow pulsing animations for decorative glow blobs */
+  @keyframes pulse-slow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.05); }
+  }
+  .animate-pulse-slow {
+    animation: pulse-slow 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
   }
 }

@@ -21,7 +21,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/produit/${product.id}`}
-      className="card focus-ring group relative flex flex-col overflow-hidden transition-all duration-300 ease-premium hover:-translate-y-1.5 hover:border-neon/30 hover:shadow-card-hover"
+      className="card-interactive focus-ring group relative flex flex-col overflow-hidden"
     >
       <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white/[0.03] to-transparent">
         <img
