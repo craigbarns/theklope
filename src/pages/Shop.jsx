@@ -88,6 +88,69 @@ export default function Shop() {
 
   const activeCount = cats.length + brands.length + types.length + nicotine.length + flavors.length + (maxPrice < maxAvailablePrice ? 1 : 0)
 
+  const activeChips = useMemo(() => {
+    const chips = []
+    
+    if (search) {
+      chips.push({
+        id: 'search',
+        label: `Recherche: "${search}"`,
+        onRemove: () => setSearch(''),
+      })
+    }
+    
+    cats.forEach((cat) => {
+      const catObj = PRODUCT_CATEGORIES.find((c) => c.key === cat)
+      chips.push({
+        id: `cat-${cat}`,
+        label: catObj ? catObj.name : cat,
+        onRemove: () => toggle(setCats, cat),
+      })
+    })
+
+    if (maxPrice < maxAvailablePrice) {
+      chips.push({
+        id: 'price',
+        label: `Max: ${maxPrice} €`,
+        onRemove: () => setMaxPrice(maxAvailablePrice),
+      })
+    }
+
+    brands.forEach((brand) => {
+      chips.push({
+        id: `brand-${brand}`,
+        label: brand,
+        onRemove: () => toggle(setBrands, brand),
+      })
+    })
+
+    types.forEach((type) => {
+      chips.push({
+        id: `type-${type}`,
+        label: type,
+        onRemove: () => toggle(setTypes, type),
+      })
+    })
+
+    nicotine.forEach((n) => {
+      chips.push({
+        id: `nicotine-${n}`,
+        label: `${n} mg`,
+        onRemove: () => toggle(setNicotine, n),
+      })
+    })
+
+    flavors.forEach((f) => {
+      chips.push({
+        id: `flavor-${f}`,
+        label: f,
+        onRemove: () => toggle(setFlavors, f),
+      })
+    })
+
+    return chips
+  }, [search, cats, maxPrice, maxAvailablePrice, brands, types, nicotine, flavors])
+
   const filtersPanel = (
     <div className="space-y-6">
       <FilterGroup title="Catégorie">
@@ -183,6 +246,31 @@ export default function Shop() {
             </div>
           </div>
         </div>
+
+        {/* CONTENEUR DES CHIPS ACTIFS */}
+        {activeChips.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center gap-2 rounded-xl bg-white/[0.02] border border-white/5 p-3">
+            <span className="text-xs text-muted font-medium mr-1">Filtres actifs :</span>
+            {activeChips.map((chip) => (
+              <button
+                key={chip.id}
+                onClick={chip.onRemove}
+                className="group flex items-center gap-1.5 rounded-full bg-white/[0.04] border border-white/10 hover:border-neon/40 hover:bg-neon/5 pl-3 pr-2 py-1 text-xs text-ash/85 hover:text-neon transition"
+              >
+                <span>{chip.label}</span>
+                <span className="text-muted group-hover:text-neon text-[10px] bg-white/5 group-hover:bg-neon/10 rounded-full p-0.5">
+                  <IconClose width={10} height={10} />
+                </span>
+              </button>
+            ))}
+            <button
+              onClick={reset}
+              className="text-xs text-neon hover:underline ml-auto pl-2 font-medium"
+            >
+              Tout effacer
+            </button>
+          </div>
+        )}
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[260px_1fr]">
           <aside className="hidden lg:block">

@@ -4,6 +4,7 @@ import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.j
 import { CATEGORIES, BADGES } from '../data/products.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
+import GalleryUploader from '../components/GalleryUploader.jsx'
 import {
   IconArrowRight,
   IconBolt,
@@ -554,7 +555,12 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
             productId={form.id}
             productName={form.name}
           />
-          <Field label="Galerie images" value={form.images} onChange={update('images')} placeholder="URLs séparées par des virgules" />
+          <GalleryUploader
+            value={form.images}
+            onChange={(urls) => setForm((prev) => ({ ...prev, images: urls }))}
+            productId={form.id}
+            productName={form.name}
+          />
           <Field label="Nicotine" value={form.nicotine} onChange={update('nicotine')} placeholder="0, 3, 6, 12" />
           <Field label="Saveurs" value={form.flavors} onChange={update('flavors')} placeholder="Menthe, Classic, Fruits rouges" />
           <Field label="Couleurs" value={form.colors} onChange={update('colors')} placeholder="Noir, Argent, Bleu" />

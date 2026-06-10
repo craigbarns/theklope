@@ -19,6 +19,20 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
 
+  const [animateCart, setAnimateCart] = useState(false)
+  const [prevCartCount, setPrevCartCount] = useState(cartCount)
+
+  useEffect(() => {
+    if (cartCount > prevCartCount) {
+      setAnimateCart(true)
+      const timer = setTimeout(() => setAnimateCart(false), 450)
+      setPrevCartCount(cartCount)
+      return () => clearTimeout(timer)
+    } else if (cartCount !== prevCartCount) {
+      setPrevCartCount(cartCount)
+    }
+  }, [cartCount, prevCartCount])
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
     onScroll()
@@ -117,7 +131,7 @@ export default function Header() {
             >
               <IconCart />
               {cartCount > 0 && (
-                <span className="absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-neon px-1 text-[10px] font-bold text-noir">
+                <span className={`absolute right-0.5 top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-neon px-1 text-[10px] font-bold text-noir transition-all duration-300 ${animateCart ? 'animate-badge-pulse shadow-[0_0_12px_#35FF8A]' : ''}`}>
                   {cartCount}
                 </span>
               )}
