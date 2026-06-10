@@ -190,3 +190,41 @@ create policy "Authenticated admins can read order items"
 on public.order_items for select
 to authenticated
 using (true);
+
+-- =========================================================================
+-- THEKLOPE Storage Configuration for Product Images
+-- =========================================================================
+
+-- Create a bucket for product images if it doesn't exist
+insert into storage.buckets (id, name, public)
+values ('products', 'products', true)
+on conflict (id) do nothing;
+
+-- Allow public read access to product images
+drop policy if exists "Public Access for products bucket" on storage.objects;
+create policy "Public Access for products bucket"
+on storage.objects for select
+using ( bucket_id = 'products' );
+
+-- Allow authenticated admins to upload new image files
+drop policy if exists "Admins can insert product images" on storage.objects;
+create policy "Admins can insert product images"
+on storage.objects for insert
+to authenticated
+with check ( bucket_id = 'products' );
+
+-- Allow authenticated admins to update existing image files
+drop policy if exists "Admins can update product images" on storage.objects;
+create policy "Admins can update product images"
+on storage.objects for update
+to authenticated
+using ( bucket_id = 'products' )
+with check ( bucket_id = 'products' );
+
+-- Allow authenticated admins to delete image files
+drop policy if exists "Admins can delete product images" on storage.objects;
+create policy "Admins can delete product images"
+on storage.objects for delete
+to authenticated
+using ( bucket_id = 'products' );
+
