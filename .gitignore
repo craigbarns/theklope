@@ -12,3 +12,4 @@ pulp-liquides-images/
 # Aperçus temporaires
 _*.jpg
 _*.png
+.vercel
