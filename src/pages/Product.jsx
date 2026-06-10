@@ -85,10 +85,14 @@ export default function Product() {
                 {product.badge && <Badge type={product.badge} />}
                 {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
-              <img src={product.images[activeImg]} alt={product.name} className="w-full rounded-2xl" />
+              <img 
+                src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'} 
+                alt={product.name} 
+                className="w-full rounded-2xl" 
+              />
             </div>
             <div className="mt-3 flex gap-3">
-              {product.images.map((img, i) => (
+              {(product.images || []).map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
@@ -190,7 +194,7 @@ export default function Product() {
           <div className="card p-6">
             <h3 className="font-display text-lg font-semibold text-white">Caractéristiques techniques</h3>
             <dl className="mt-4 divide-y divide-white/8">
-              {Object.entries(product.specs).map(([k, v]) => (
+              {Object.entries(product.specs || {}).map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between py-3 text-sm">
                   <dt className="text-muted">{k}</dt>
                   <dd className="text-right font-medium text-white">{v}</dd>
