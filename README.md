@@ -12,6 +12,7 @@ Shopify, WooCommerce, Supabase…).
 - **React 18** + **Vite** (build rapide)
 - **React Router 6** (navigation multi-pages)
 - **Tailwind CSS 3** (design system, palette de marque)
+- **Supabase** optionnel pour le catalogue, les commandes, les stocks et l'auth admin
 - State global via **Context API** (panier, favoris, vérification d'âge, code promo) avec
   persistance `localStorage`
 - Aucune dépendance d'images externes : visuels produits générés en SVG (placeholders premium)
@@ -27,6 +28,42 @@ npm run preview  # prévisualise le build de production
 
 > Node 18+ recommandé.
 
+## Configuration Supabase
+
+Le site fonctionne en local sans Supabase. Dès que les variables ci-dessous sont présentes,
+le catalogue, les commandes, le stock et la connexion admin passent par Supabase.
+
+1. Créez `.env.local` à partir de `.env.example` :
+
+```bash
+VITE_SUPABASE_URL=https://votre-projet.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=votre_publishable_key
+```
+
+2. Dans Supabase, ouvrez **SQL Editor** et exécutez `supabase/schema.sql`.
+
+Ce fichier crée les tables `products`, `orders`, `order_items`, les règles RLS et la fonction
+`submit_order` qui enregistre une commande avec ses lignes puis décrémente le stock.
+
+3. Dans Supabase, créez un utilisateur admin :
+
+```text
+Authentication > Users > Add user
+```
+
+4. Lancez le site, ouvrez `/admin`, connectez-vous avec cet utilisateur, puis allez dans
+`Pilotage` et cliquez sur `Réinitialiser le catalogue` pour publier les produits initiaux
+dans Supabase.
+
+5. Sur Vercel, ajoutez les mêmes variables d'environnement :
+
+```bash
+VITE_SUPABASE_URL
+VITE_SUPABASE_PUBLISHABLE_KEY
+```
+
+Ne mettez jamais de `service_role_key` dans Vite ou dans le navigateur.
+
 ## Structure du projet
 
 ```
@@ -35,7 +72,7 @@ src/
 ├── App.jsx                  # routes + layout global
 ├── index.css                # styles de base + classes utilitaires (boutons, cartes…)
 ├── context/
-│   └── StoreContext.jsx     # panier, favoris, âge, cookies, codes promo, totaux
+│   └── StoreContext.jsx     # panier, favoris, commandes, Supabase, âge, cookies, codes promo
 ├── data/
 │   ├── products.js          # 12 produits de démonstration + catégories + helpers
 │   └── productImage.js      # générateur d'images placeholder SVG
@@ -55,6 +92,7 @@ src/
     ├── Product.jsx          # fiche produit (galerie, variantes, avis, similaires)
     ├── Cart.jsx             # panier + code promo
     ├── Checkout.jsx         # tunnel d'achat en 3 étapes (simulé)
+    ├── Admin.jsx            # dashboard admin catalogue, ventes, commandes, stock
     ├── Categories.jsx       # grille des catégories
     ├── CategoryPage.jsx     # page d'une catégorie
     ├── Favorites.jsx        # favoris
@@ -71,6 +109,9 @@ src/
 - **Badges** produits : Nouveau, Best-seller, Promo, Stock limité
 - **Panier** complet : quantités, code promo, livraison offerte dès 49€, totaux
 - **Checkout** en 3 étapes (coordonnées → livraison → paiement) avec confirmation
+- **Dashboard admin** `/admin` : création produit, édition catalogue, suivi des ventes,
+  commandes, statuts, stock faible, export JSON
+- Connexion **Supabase Auth** pour protéger l'admin quand Supabase est configuré
 - **Newsletter**, **bandeau cookies**, **footer** complet, pages **légales**
 - **SEO** : titres et meta description par page, balises Open Graph, langue `fr`
 - Design **mobile-first** et responsive

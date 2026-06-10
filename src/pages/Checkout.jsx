@@ -16,6 +16,8 @@ export default function Checkout() {
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('standard')
   const [completedOrder, setCompletedOrder] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+  const [checkoutError, setCheckoutError] = useState('')
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
   const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
 
@@ -60,22 +62,30 @@ export default function Checkout() {
     )
   }
 
-  const next = (e) => {
+  const next = async (e) => {
     e.preventDefault()
+    setCheckoutError('')
     if (step < 3) setStep(step + 1)
     else {
-      const order = createOrder({
-        customer: {
-          name: `${customer.firstName} ${customer.lastName}`.trim(),
-          email: customer.email,
-          phone: customer.phone,
-        },
-        address,
-        shipping: selectedShipping,
-        shippingCost,
-        total: grandTotal,
-      })
-      setCompletedOrder(order)
+      try {
+        setSubmitting(true)
+        const order = await createOrder({
+          customer: {
+            name: `${customer.firstName} ${customer.lastName}`.trim(),
+            email: customer.email,
+            phone: customer.phone,
+          },
+          address,
+          shipping: selectedShipping,
+          shippingCost,
+          total: grandTotal,
+        })
+        setCompletedOrder(order)
+      } catch (error) {
+        setCheckoutError(error.message || "Impossible d'enregistrer la commande.")
+      } finally {
+        setSubmitting(false)
+      }
     }
   }
 
@@ -166,12 +176,18 @@ export default function Checkout() {
               </Section>
             )}
 
+            {checkoutError && (
+              <div className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+                {checkoutError}
+              </div>
+            )}
+
             <div className="mt-6 flex gap-3">
               {step > 1 && (
                 <button type="button" onClick={() => setStep(step - 1)} className="btn-ghost">Retour</button>
               )}
-              <button type="submit" className="btn-primary flex-1">
-                {step < 3 ? 'Continuer' : `Payer ${formatPrice(grandTotal)}`}
+              <button type="submit" disabled={submitting} className="btn-primary flex-1">
+                {step < 3 ? 'Continuer' : submitting ? 'Enregistrement...' : `Payer ${formatPrice(grandTotal)}`}
               </button>
             </div>
           </form>

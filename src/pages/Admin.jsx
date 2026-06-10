@@ -12,6 +12,7 @@ import {
   IconPlus,
   IconShield,
   IconTrash,
+  IconUser,
 } from '../components/icons.jsx'
 
 const PRODUCT_CATEGORIES = CATEGORIES.filter((category) => !['nouveautes', 'meilleures-ventes'].includes(category.slug))
@@ -54,11 +55,20 @@ export default function Admin() {
     deleteProduct,
     resetProducts,
     updateOrderStatus,
+    supabaseEnabled,
+    adminSession,
+    adminUser,
+    signInAdmin,
+    signOutAdmin,
+    syncStatus,
+    syncError,
+    refreshRemoteData,
   } = useStore()
   const [params, setParams] = useSearchParams()
   const tab = params.get('tab') || 'overview'
   const [editing, setEditing] = useState(null)
   const [query, setQuery] = useState('')
+  const [actionError, setActionError] = useState('')
 
   const filteredProducts = useMemo(() => {
     const term = query.trim().toLowerCase()
@@ -75,8 +85,18 @@ export default function Admin() {
     if (nextTab !== 'products') setEditing(null)
   }
 
-  const handleDelete = (product) => {
-    if (window.confirm(`Supprimer "${product.name}" du catalogue ?`)) deleteProduct(product.id)
+  const handleDelete = async (product) => {
+    if (!window.confirm(`Supprimer "${product.name}" du catalogue ?`)) return
+    try {
+      setActionError('')
+      await deleteProduct(product.id)
+    } catch (error) {
+      setActionError(error.message || 'Suppression impossible.')
+    }
+  }
+
+  if (supabaseEnabled && !adminSession) {
+    return <AdminLogin signInAdmin={signInAdmin} syncError={syncError} />
   }
 
   return (
@@ -94,10 +114,33 @@ export default function Admin() {
               Gérez le catalogue, suivez les commandes, surveillez le stock et gardez une vision claire des ventes.
             </p>
           </div>
-          <Link to="/boutique" className="btn-ghost shrink-0">
-            Voir la boutique <IconArrowRight width={18} height={18} />
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button onClick={refreshRemoteData} className="btn-ghost shrink-0">
+              Synchroniser
+            </button>
+            {supabaseEnabled && (
+              <button onClick={signOutAdmin} className="btn-ghost shrink-0">
+                Déconnexion
+              </button>
+            )}
+            <Link to="/boutique" className="btn-ghost shrink-0">
+              Voir la boutique <IconArrowRight width={18} height={18} />
+            </Link>
+          </div>
         </div>
+
+        <div className="mt-6 flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-muted">
+            Source: <strong className="text-white">{supabaseEnabled ? 'Supabase' : 'Local'}</strong> · statut: <strong className="text-neon">{syncStatus}</strong>
+          </span>
+          {adminUser && <span className="text-faint">{adminUser.email}</span>}
+        </div>
+
+        {(syncError || actionError) && (
+          <div className="mt-3 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+            {actionError || syncError}
+          </div>
+        )}
 
         <div className="mt-8 flex gap-2 overflow-x-auto pb-1">
           {TABS.map((item) => (
@@ -127,21 +170,98 @@ export default function Admin() {
           setEditing={setEditing}
           setQuery={setQuery}
           onDelete={handleDelete}
-          onSave={(product) => {
-            upsertProduct(product)
-            setEditing(null)
+          onSave={async (product) => {
+            try {
+              setActionError('')
+              await upsertProduct(product)
+              setEditing(null)
+            } catch (error) {
+              setActionError(error.message || 'Enregistrement impossible.')
+            }
           }}
         />
       )}
-      {tab === 'orders' && <OrdersPanel orders={orders} updateOrderStatus={updateOrderStatus} />}
+      {tab === 'orders' && (
+        <OrdersPanel
+          orders={orders}
+          updateOrderStatus={async (orderId, status) => {
+            try {
+              setActionError('')
+              await updateOrderStatus(orderId, status)
+            } catch (error) {
+              setActionError(error.message || 'Mise à jour impossible.')
+            }
+          }}
+        />
+      )}
       {tab === 'settings' && (
         <SettingsPanel
           products={products}
           orders={orders}
-          resetProducts={resetProducts}
+          resetProducts={async () => {
+            try {
+              setActionError('')
+              await resetProducts()
+            } catch (error) {
+              setActionError(error.message || 'Réinitialisation impossible.')
+            }
+          }}
           setTab={setTab}
+          supabaseEnabled={supabaseEnabled}
         />
       )}
+    </div>
+  )
+}
+
+function AdminLogin({ signInAdmin, syncError }) {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const submit = async (e) => {
+    e.preventDefault()
+    try {
+      setLoading(true)
+      setError('')
+      await signInAdmin({ email, password })
+    } catch (err) {
+      setError(err.message || 'Connexion impossible.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="container-page grid min-h-[70vh] place-items-center py-12">
+      <Seo title="Connexion admin" />
+      <div className="w-full max-w-md card p-8">
+        <div className="mx-auto mb-6 grid h-14 w-14 place-items-center rounded-2xl border border-neon/30 bg-neon/10 text-neon">
+          <IconUser width={28} height={28} />
+        </div>
+        <h1 className="text-center font-display text-2xl font-bold text-white">Connexion admin</h1>
+        <p className="mt-2 text-center text-sm text-muted">
+          Connectez-vous avec un utilisateur créé dans Supabase Auth pour gérer THEKLOPE.
+        </p>
+
+        <form onSubmit={submit} className="mt-7 space-y-4">
+          <Field label="E-mail admin" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Field label="Mot de passe" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          {(error || syncError) && (
+            <div className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+              {error || syncError}
+            </div>
+          )}
+          <button type="submit" disabled={loading} className="btn-primary w-full">
+            {loading ? 'Connexion...' : 'Entrer dans le dashboard'}
+          </button>
+        </form>
+
+        <p className="mt-5 text-xs leading-relaxed text-faint">
+          Si vous n’avez pas encore de compte admin, créez un utilisateur dans Supabase Dashboard, rubrique Authentication, puis Users.
+        </p>
+      </div>
     </div>
   )
 }
@@ -515,7 +635,7 @@ function OrdersPanel({ orders, updateOrderStatus }) {
   )
 }
 
-function SettingsPanel({ products, orders, resetProducts, setTab }) {
+function SettingsPanel({ products, orders, resetProducts, setTab, supabaseEnabled }) {
   const exportData = () => {
     const payload = JSON.stringify({ products, orders, exportedAt: new Date().toISOString() }, null, 2)
     const blob = new Blob([payload], { type: 'application/json' })
@@ -550,7 +670,7 @@ function SettingsPanel({ products, orders, resetProducts, setTab }) {
         <p className="eyebrow mb-2">Maintenance</p>
         <h2 className="font-display text-xl font-bold text-white">Catalogue</h2>
         <p className="mt-3 text-sm text-muted">
-          Le catalogue local contient {products.length} produits. La réinitialisation restaure les références initiales.
+          Le catalogue {supabaseEnabled ? 'Supabase' : 'local'} contient {products.length} produits. La réinitialisation restaure les références initiales.
         </p>
         <button
           onClick={() => window.confirm('Restaurer le catalogue initial ?') && resetProducts()}
@@ -562,9 +682,9 @@ function SettingsPanel({ products, orders, resetProducts, setTab }) {
 
       <section className="card border-amber-400/20 bg-amber-400/5 p-6 lg:col-span-3">
         <p className="text-sm leading-relaxed text-muted">
-          <strong className="text-ash/90">Avant production :</strong> cet admin persiste en local dans le navigateur.
-          Pour un vrai site marchand, il faut brancher une base de données, une authentification admin, Stripe, les e-mails,
-          les factures, la vérification d’âge renforcée et la conformité légale complète.
+          <strong className="text-ash/90">Avant production :</strong> {supabaseEnabled ? 'le catalogue et les commandes sont connectés à Supabase.' : 'cet admin persiste en local dans le navigateur.'}
+          Pour un vrai site marchand, ajoutez Stripe, les e-mails transactionnels, les factures, la vérification d’âge renforcée
+          et la conformité légale complète.
         </p>
       </section>
     </div>

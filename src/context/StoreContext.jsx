@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { PRODUCTS as INITIAL_PRODUCTS, getCatalogMeta, getProductFrom } from '../data/products.js'
+import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -81,6 +82,101 @@ const normalizeProduct = (product) => {
   }
 }
 
+const productToRow = (product) => ({
+  id: product.id,
+  name: product.name,
+  category: product.category,
+  brand: product.brand,
+  type: product.type,
+  price: product.price,
+  old_price: product.oldPrice,
+  rating: product.rating,
+  reviews: product.reviews,
+  stock: product.stock,
+  badge: product.badge,
+  nicotine: product.nicotine,
+  flavors: product.flavors,
+  colors: product.colors,
+  short: product.short,
+  long: product.long,
+  specs: product.specs,
+  images: product.images,
+  image: product.image,
+})
+
+const productFromRow = (row) =>
+  normalizeProduct({
+    id: row.id,
+    name: row.name,
+    category: row.category,
+    brand: row.brand,
+    type: row.type,
+    price: row.price,
+    oldPrice: row.old_price,
+    rating: row.rating,
+    reviews: row.reviews,
+    stock: row.stock,
+    badge: row.badge,
+    nicotine: row.nicotine,
+    flavors: row.flavors,
+    colors: row.colors,
+    short: row.short,
+    long: row.long,
+    specs: row.specs,
+    images: row.images,
+    image: row.image,
+  })
+
+const orderToRow = (order) => ({
+  id: order.id,
+  created_at: order.createdAt,
+  status: order.status,
+  payment_status: order.paymentStatus,
+  customer: order.customer,
+  address: order.address,
+  shipping: order.shipping,
+  subtotal: order.subtotal,
+  discount: order.discount,
+  shipping_cost: order.shippingCost,
+  total: order.total,
+  promo: order.promo,
+})
+
+const orderItemToRow = (orderId, item) => ({
+  order_id: orderId,
+  product_id: item.productId,
+  name: item.name,
+  image: item.image,
+  price: item.price,
+  qty: item.qty,
+  variant: item.variant,
+  line_total: item.lineTotal,
+})
+
+const orderFromRow = (row) => ({
+  id: row.id,
+  createdAt: row.created_at,
+  status: row.status,
+  paymentStatus: row.payment_status,
+  customer: row.customer || {},
+  address: row.address || {},
+  shipping: row.shipping || {},
+  subtotal: Number(row.subtotal || 0),
+  discount: Number(row.discount || 0),
+  shippingCost: Number(row.shipping_cost || 0),
+  total: Number(row.total || 0),
+  promo: row.promo,
+  items: (row.order_items || []).map((item) => ({
+    productId: item.product_id,
+    name: item.name,
+    image: item.image,
+    price: Number(item.price || 0),
+    qty: Number(item.qty || 0),
+    variant: item.variant || {},
+    lineTotal: Number(item.line_total || 0),
+  })),
+})
+
 export function StoreProvider({ children }) {
   // Vérification d'âge — null = pas encore répondu
   const [ageVerified, setAgeVerified] = useState(() => read('tk_age', null))
@@ -96,6 +192,9 @@ export function StoreProvider({ children }) {
   const [cart, setCart] = useState(() => read('tk_cart', []))
   const [favorites, setFavorites] = useState(() => read('tk_favorites', []))
   const [promo, setPromo] = useState(() => read('tk_promo', null))
+  const [adminSession, setAdminSession] = useState(null)
+  const [syncStatus, setSyncStatus] = useState(isSupabaseConfigured ? 'connecting' : 'local')
+  const [syncError, setSyncError] = useState(null)
 
   // UI
   const [searchOpen, setSearchOpen] = useState(false)
@@ -109,11 +208,88 @@ export function StoreProvider({ children }) {
   useEffect(() => localStorage.setItem('tk_favorites', JSON.stringify(favorites)), [favorites])
   useEffect(() => localStorage.setItem('tk_promo', JSON.stringify(promo)), [promo])
 
+  useEffect(() => {
+    if (!isSupabaseConfigured) return undefined
+    let active = true
+    supabase.auth.getSession().then(({ data }) => {
+      if (active) setAdminSession(data.session)
+    })
+    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAdminSession(session)
+    })
+    return () => {
+      active = false
+      data.subscription.unsubscribe()
+    }
+  }, [])
+
+  const refreshRemoteData = useCallback(async () => {
+    if (!isSupabaseConfigured) {
+      setSyncStatus('local')
+      return
+    }
+
+    try {
+      setSyncStatus('syncing')
+      setSyncError(null)
+
+      const productsResult = await supabase
+        .from('products')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (productsResult.error) throw productsResult.error
+      if (productsResult.data?.length) setProducts(productsResult.data.map(productFromRow))
+
+      if (adminSession) {
+        const ordersResult = await supabase
+          .from('orders')
+          .select('*, order_items(*)')
+          .order('created_at', { ascending: false })
+
+        if (ordersResult.error) throw ordersResult.error
+        setOrders((ordersResult.data || []).map(orderFromRow))
+      }
+
+      setSyncStatus('online')
+    } catch (error) {
+      setSyncStatus('error')
+      setSyncError(error.message || 'Synchronisation Supabase impossible.')
+    }
+  }, [adminSession])
+
+  useEffect(() => {
+    refreshRemoteData()
+  }, [refreshRemoteData])
+
   const getProduct = useCallback((id) => getProductFrom(products, id), [products])
 
+  const signInAdmin = useCallback(async ({ email, password }) => {
+    if (!isSupabaseConfigured) throw new Error('Supabase n’est pas configuré.')
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    setAdminSession(data.session)
+    return data
+  }, [])
+
+  const signOutAdmin = useCallback(async () => {
+    if (!isSupabaseConfigured) return
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
+    setAdminSession(null)
+    setOrders([])
+  }, [])
+
   // ----- Catalogue admin -----
-  const upsertProduct = useCallback((input) => {
+  const upsertProduct = useCallback(async (input) => {
     const nextProduct = normalizeProduct(input)
+    if (isSupabaseConfigured) {
+      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+      const { error } = await supabase.from('products').upsert(productToRow(nextProduct))
+      if (error) throw error
+      setSyncStatus('online')
+      setSyncError(null)
+    }
     setProducts((prev) => {
       const exists = prev.some((p) => p.id === nextProduct.id)
       return exists
@@ -121,17 +297,28 @@ export function StoreProvider({ children }) {
         : [nextProduct, ...prev]
     })
     return nextProduct
-  }, [])
+  }, [adminSession])
 
-  const deleteProduct = useCallback((productId) => {
+  const deleteProduct = useCallback(async (productId) => {
+    if (isSupabaseConfigured) {
+      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+      const { error } = await supabase.from('products').delete().eq('id', productId)
+      if (error) throw error
+    }
     setProducts((prev) => prev.filter((p) => p.id !== productId))
     setCart((prev) => prev.filter((item) => item.productId !== productId))
     setFavorites((prev) => prev.filter((id) => id !== productId))
-  }, [])
+  }, [adminSession])
 
-  const resetProducts = useCallback(() => {
-    setProducts(INITIAL_PRODUCTS.map(normalizeProduct))
-  }, [])
+  const resetProducts = useCallback(async () => {
+    const defaults = INITIAL_PRODUCTS.map(normalizeProduct)
+    if (isSupabaseConfigured) {
+      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+      const { error } = await supabase.from('products').upsert(defaults.map(productToRow))
+      if (error) throw error
+    }
+    setProducts(defaults)
+  }, [adminSession])
 
   // ----- Cart -----
   const addToCart = useCallback((productId, qty = 1, variant = {}) => {
@@ -211,7 +398,7 @@ export function StoreProvider({ children }) {
 
   // ----- Commandes admin -----
   const createOrder = useCallback(
-    ({ customer, address, shipping, shippingCost, total }) => {
+    async ({ customer, address, shipping, shippingCost, total }) => {
       const now = new Date().toISOString()
       const order = {
         id: 'TK-' + Math.floor(100000 + Math.random() * 899999),
@@ -237,6 +424,16 @@ export function StoreProvider({ children }) {
         promo: promo ? { code: promo.code, label: promo.label, type: promo.type, value: promo.value } : null,
       }
 
+      if (isSupabaseConfigured) {
+        const { error } = await supabase.rpc('submit_order', {
+          order_payload: orderToRow(order),
+          items_payload: order.items.map((item) => orderItemToRow(order.id, item)),
+        })
+        if (error) throw error
+        setSyncStatus('online')
+        setSyncError(null)
+      }
+
       setOrders((prev) => [order, ...prev])
       setProducts((prev) =>
         prev.map((product) => {
@@ -248,12 +445,17 @@ export function StoreProvider({ children }) {
       clearCart()
       return order
     },
-    [cartDetailed, clearCart, promo, totals.discount, totals.subtotal],
+    [cartDetailed, clearCart, products, promo, totals.discount, totals.subtotal],
   )
 
-  const updateOrderStatus = useCallback((orderId, status) => {
+  const updateOrderStatus = useCallback(async (orderId, status) => {
+    if (isSupabaseConfigured) {
+      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+      const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
+      if (error) throw error
+    }
     setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status } : order)))
-  }, [])
+  }, [adminSession])
 
   const catalogMeta = useMemo(() => getCatalogMeta(products), [products])
 
@@ -291,6 +493,14 @@ export function StoreProvider({ children }) {
     setAgeVerified,
     cookiesChoice,
     setCookiesChoice,
+    supabaseEnabled: isSupabaseConfigured,
+    adminSession,
+    adminUser: adminSession?.user || null,
+    signInAdmin,
+    signOutAdmin,
+    syncStatus,
+    syncError,
+    refreshRemoteData,
     products,
     catalogMeta,
     getProduct,
