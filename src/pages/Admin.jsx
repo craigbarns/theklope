@@ -56,6 +56,7 @@ export default function Admin() {
     upsertProduct,
     deleteProduct,
     resetProducts,
+    clearAllProducts,
     updateOrderStatus,
     supabaseEnabled,
     adminSession,
@@ -206,6 +207,14 @@ export default function Admin() {
               await resetProducts()
             } catch (error) {
               setActionError(error.message || 'Réinitialisation impossible.')
+            }
+          }}
+          clearAllProducts={async () => {
+            try {
+              setActionError('')
+              await clearAllProducts()
+            } catch (error) {
+              setActionError(error.message || 'Suppression impossible.')
             }
           }}
           setTab={setTab}
@@ -647,7 +656,7 @@ function OrdersPanel({ orders, updateOrderStatus }) {
   )
 }
 
-function SettingsPanel({ products, orders, resetProducts, setTab, supabaseEnabled }) {
+function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setTab, supabaseEnabled }) {
   const exportData = () => {
     const payload = JSON.stringify({ products, orders, exportedAt: new Date().toISOString() }, null, 2)
     const blob = new Blob([payload], { type: 'application/json' })
@@ -682,13 +691,19 @@ function SettingsPanel({ products, orders, resetProducts, setTab, supabaseEnable
         <p className="eyebrow mb-2">Maintenance</p>
         <h2 className="font-display text-xl font-bold text-white">Catalogue</h2>
         <p className="mt-3 text-sm text-muted">
-          Le catalogue {supabaseEnabled ? 'Supabase' : 'local'} contient {products.length} produits. La réinitialisation restaure les références initiales.
+          Le catalogue {supabaseEnabled ? 'Supabase' : 'local'} contient {products.length} produits.
         </p>
         <button
           onClick={() => window.confirm('Restaurer le catalogue initial ?') && resetProducts()}
           className="btn-ghost mt-5 w-full"
         >
-          Réinitialiser le catalogue
+          Réinitialiser le catalogue (démo)
+        </button>
+        <button
+          onClick={() => window.confirm('⚠️ Supprimer TOUS les produits du catalogue ? Cette action est irréversible.') && clearAllProducts()}
+          className="btn bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:border-rose-400/50 mt-3 w-full active:scale-[0.97] transition-all duration-300"
+        >
+          Tout supprimer du catalogue
         </button>
       </section>
 

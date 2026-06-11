@@ -76,24 +76,39 @@ export default function Home() {
           </div>
 
           <div className="animate-fade-up [animation-delay:120ms]">
-            <div className="relative mx-auto max-w-md">
-              {/* Halos de fond colorés et dynamiques */}
-              <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
-              <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card">
-                <img src={heroProduct.image} alt={heroProduct.name} className="w-full rounded-2xl" />
-              </div>
-              <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
-                <img src={featuredProduct.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
-                <div>
-                  <p className="text-xs text-muted">Best-seller</p>
-                  <p className="max-w-[10rem] truncate text-sm font-semibold text-white">{featuredProduct.name}</p>
+            {heroProduct ? (
+              <div className="relative mx-auto max-w-md">
+                {/* Halos de fond colorés et dynamiques */}
+                <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
+                <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card">
+                  <img src={heroProduct.image} alt={heroProduct.name} className="w-full rounded-2xl animate-fade-in" />
+                </div>
+                {featuredProduct && (
+                  <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
+                    <img src={featuredProduct.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                    <div>
+                      <p className="text-xs text-muted">Best-seller</p>
+                      <p className="max-w-[10rem] truncate text-sm font-semibold text-white">{featuredProduct.name}</p>
+                    </div>
+                  </div>
+                )}
+                <div className="card absolute -right-3 top-6 hidden rounded-2xl px-4 py-3 shadow-card md:block">
+                  <p className="font-display text-2xl font-bold text-neon">4,7★</p>
+                  <p className="text-[11px] text-muted">409 avis Google</p>
                 </div>
               </div>
-              <div className="card absolute -right-3 top-6 hidden rounded-2xl px-4 py-3 shadow-card md:block">
-                <p className="font-display text-2xl font-bold text-neon">4,7★</p>
-                <p className="text-[11px] text-muted">409 avis Google</p>
+            ) : (
+              <div className="relative mx-auto max-w-md">
+                <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
+                <div className="card overflow-hidden rounded-3xl border-white/10 p-6 shadow-card aspect-[4/3] flex items-center justify-center bg-anthracite/50 text-center">
+                  <div>
+                    <span className="text-neon text-4xl block mb-3 animate-bounce">💨</span>
+                    <p className="text-sm font-semibold text-white">Votre boutique THEKLOPE</p>
+                    <p className="text-xs text-muted mt-1">Ajoutez vos premiers produits dans le tableau de bord.</p>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>
@@ -145,44 +160,50 @@ export default function Home() {
       </section>
 
       {/* MEILLEURES VENTES */}
-      <ProductRow
-        eyebrow="Plébiscités"
-        title="Meilleures ventes"
-        link="/categorie/meilleures-ventes"
-        products={bestSellers}
-      />
+      {bestSellers.length > 0 && (
+        <ProductRow
+          eyebrow="Plébiscités"
+          title="Meilleures ventes"
+          link="/categorie/meilleures-ventes"
+          products={bestSellers}
+        />
+      )}
 
       {/* PACKS DÉBUTANTS */}
-      <section className="container-page py-8">
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon to-anthracite">
-          <div className="grid items-center gap-8 p-8 lg:grid-cols-2 lg:p-12">
-            <div>
-              <p className="eyebrow mb-3">Bien démarrer</p>
-              <h2 className="font-display text-3xl font-bold text-white">Packs débutants</h2>
-              <p className="mt-3 max-w-md text-muted">
-                Tout ce qu'il faut pour commencer sereinement : kit, e-liquides et accessoires réunis dans une
-                sélection avantageuse, pensée pour la première vape.
-              </p>
-              <Link to="/categorie/packs-debutants" className="btn-primary mt-6">
-                Voir les packs <IconArrowRight width={18} height={18} />
-              </Link>
-            </div>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {starterPacks.slice(0, 2).map((p) => (
-                <ProductCard key={p.id} product={p} />
-              ))}
+      {starterPacks.length > 0 && (
+        <section className="container-page py-8">
+          <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon to-anthracite">
+            <div className="grid items-center gap-8 p-8 lg:grid-cols-2 lg:p-12">
+              <div>
+                <p className="eyebrow mb-3">Bien démarrer</p>
+                <h2 className="font-display text-3xl font-bold text-white">Packs débutants</h2>
+                <p className="mt-3 max-w-md text-muted">
+                  Tout ce qu'il faut pour commencer sereinement : kit, e-liquides et accessoires réunis dans une
+                  sélection avantageuse, pensée pour la première vape.
+                </p>
+                <Link to="/categorie/packs-debutants" className="btn-primary mt-6">
+                  Voir les packs <IconArrowRight width={18} height={18} />
+                </Link>
+              </div>
+              <div className="grid gap-5 sm:grid-cols-2">
+                {starterPacks.slice(0, 2).map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* NOUVEAUTÉS */}
-      <ProductRow
-        eyebrow="Tout juste arrivés"
-        title="Nouveautés"
-        link="/categorie/nouveautes"
-        products={newArrivals.length ? newArrivals : products.slice(-4)}
-      />
+      {products.length > 0 && (
+        <ProductRow
+          eyebrow="Tout juste arrivés"
+          title="Nouveautés"
+          link="/categorie/nouveautes"
+          products={newArrivals.length ? newArrivals : products.slice(-4)}
+        />
+      )}
 
       {/* BANNIÈRE 18+ */}
       <section className="container-page py-10">

@@ -239,7 +239,7 @@ export function StoreProvider({ children }) {
         .order('created_at', { ascending: false })
 
       if (productsResult.error) throw productsResult.error
-      if (productsResult.data?.length) setProducts(productsResult.data.map(productFromRow))
+      setProducts((productsResult.data || []).map(productFromRow))
 
       if (adminSession) {
         const ordersResult = await supabase
@@ -318,6 +318,17 @@ export function StoreProvider({ children }) {
       if (error) throw error
     }
     setProducts(defaults)
+  }, [adminSession])
+
+  const clearAllProducts = useCallback(async () => {
+    if (isSupabaseConfigured) {
+      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+      const { error } = await supabase.from('products').delete().neq('id', '')
+      if (error) throw error
+    }
+    setProducts([])
+    setCart([])
+    setFavorites([])
   }, [adminSession])
 
   // ----- Cart -----
@@ -507,6 +518,7 @@ export function StoreProvider({ children }) {
     upsertProduct,
     deleteProduct,
     resetProducts,
+    clearAllProducts,
     cart,
     cartDetailed,
     cartCount,
