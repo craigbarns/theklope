@@ -140,49 +140,49 @@ export default function Header() {
             </button>
           </div>
         </div>
-
-        {/* Menu mobile plein écran */}
-        {mobileOpen && (
-          <div className="fixed inset-0 top-16 z-30 animate-fade-in bg-noir/95 backdrop-blur-2xl lg:hidden overflow-y-auto">
-            <nav className="container-page flex flex-col py-6 space-y-1">
-              <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Navigation</p>
-              {NAV.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `rounded-2xl px-4 py-3 text-base font-semibold transition-all ${
-                      isActive ? 'bg-neon/10 text-neon' : 'text-ash hover:bg-white/5'
-                    }`
-                  }
-                >
-                  {item.label}
-                </NavLink>
-              ))}
-              <div className="my-4 h-px bg-white/10" />
-              <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Catégories</p>
-              <div className="grid grid-cols-2 gap-2 px-2">
-                {CATEGORIES.map((c) => (
-                  <Link
-                    key={c.slug}
-                    to={`/categorie/${c.slug}`}
-                    className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3 text-sm text-ash hover:text-white hover:border-white/15 transition-all"
-                  >
-                    {c.name}
-                  </Link>
-                ))}
-              </div>
-              <div className="my-4 h-px bg-white/10" />
-              <Link
-                to="/admin"
-                className="rounded-2xl bg-gradient-to-r from-neon/15 to-transparent border border-neon/30 px-4 py-3 text-base font-semibold text-neon hover:from-neon/20 transition-all text-center"
-              >
-                Dashboard administrateur
-              </Link>
-            </nav>
-          </div>
-        )}
       </header>
+      
+      {/* Menu mobile plein écran */}
+      {mobileOpen && (
+        <div className="fixed inset-x-0 bottom-0 top-16 z-50 animate-fade-in bg-noir/95 backdrop-blur-2xl lg:hidden overflow-y-auto">
+          <nav className="container-page flex flex-col py-6 space-y-1">
+            <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Navigation</p>
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `rounded-2xl px-4 py-3 text-base font-semibold transition-all ${
+                    isActive ? 'bg-neon/10 text-neon' : 'text-ash hover:bg-white/5'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+            <div className="my-4 h-px bg-white/10" />
+            <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Catégories</p>
+            <div className="grid grid-cols-2 gap-2 px-2">
+              {CATEGORIES.map((c) => (
+                <Link
+                  key={c.slug}
+                  to={`/categorie/${c.slug}`}
+                  className="rounded-xl bg-white/[0.03] border border-white/5 px-4 py-3 text-sm text-ash hover:text-white hover:border-white/15 transition-all"
+                >
+                  {c.name}
+                </Link>
+              ))}
+            </div>
+            <div className="my-4 h-px bg-white/10" />
+            <Link
+              to="/admin"
+              className="rounded-2xl bg-gradient-to-r from-neon/15 to-transparent border border-neon/30 px-4 py-3 text-base font-semibold text-neon hover:from-neon/20 transition-all text-center"
+            >
+              Dashboard administrateur
+            </Link>
+          </nav>
+        </div>
+      )}
     </>
   )
 }
