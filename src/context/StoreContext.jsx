@@ -184,7 +184,8 @@ export function StoreProvider({ children }) {
   const [cookiesChoice, setCookiesChoice] = useState(() => read('tk_cookies', null))
   const [products, setProducts] = useState(() => {
     const saved = read('tk_products', null)
-    return Array.isArray(saved) && saved.length ? saved.map(normalizeProduct) : INITIAL_PRODUCTS.map(normalizeProduct)
+    const hasPacks = Array.isArray(saved) && saved.some(p => p.category === 'pack')
+    return Array.isArray(saved) && saved.length && hasPacks ? saved.map(normalizeProduct) : INITIAL_PRODUCTS.map(normalizeProduct)
   })
   const [orders, setOrders] = useState(() => {
     const saved = read('tk_orders', [])

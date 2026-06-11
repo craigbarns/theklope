@@ -10601,6 +10601,63 @@ export const PRODUCTS = [
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+PRODUCTS.forEach((p) => {
+  const nameLower = p.name.toLowerCase();
+
+  // Category classification: ecig/pod kits become packs
+  if ((p.category === 'ecig' || p.category === 'pod') && (nameLower.includes('kit') || ['aegis-boost-3', 'aegis-max-4', 'aegis-mini-5-5', 'aegis-mini-6', 'armour-ultra-11'].includes(p.id))) {
+    p.category = 'pack';
+  }
+
+  // Brand classification based on keywords in name
+  if (nameLower.includes('geekvape') || nameLower.includes('geek-vape') || nameLower.includes('aegis') || nameLower.includes('obelisk') || nameLower.includes('wenax') || nameLower.includes('zeus')) {
+    p.brand = 'Geekvape';
+  } else if (nameLower.includes('vaporesso') || nameLower.includes('armour') || nameLower.includes('xros') || nameLower.includes('gt core') || nameLower.includes('luxe q') || nameLower.includes('target') || nameLower.includes('eco nano') || nameLower.includes('gen se') || nameLower.includes('gen 80s') || nameLower.includes('luxe 2') || nameLower.includes('luxe ii') || nameLower.includes('gtx')) {
+    p.brand = 'Vaporesso';
+  } else if (nameLower.includes('voopoo') || nameLower.includes('doric') || nameLower.includes('vinci') || nameLower.includes('spark') || nameLower.includes('drag') || nameLower.includes('argus') || nameLower.includes('tpp') || nameLower.includes('pnp')) {
+    p.brand = 'Voopoo';
+  } else if (nameLower.includes('innokin') || nameLower.includes('coolfire') || nameLower.includes('kroma') || nameLower.includes('zenith') || nameLower.includes('adept') || nameLower.includes('sensis')) {
+    p.brand = 'Innokin';
+  } else if (nameLower.includes('justfog') || nameLower.includes('q16')) {
+    p.brand = 'Justfog';
+  } else if (nameLower.includes('alfaliquid') || nameLower.includes('alfa') || nameLower.includes('california') || nameLower.includes('fr-k') || nameLower.includes('fr-m') || nameLower.includes('fr-w') || nameLower.includes('fr4') || nameLower.includes('fr5') || nameLower.includes('malawia') || nameLower.includes('usa mix') || nameLower.includes('fraicheur') || nameLower.includes('classico')) {
+    p.brand = 'Alfaliquid';
+  } else if (nameLower.includes('liquideo') || nameLower.includes('evolution') || nameLower.includes('waptaler') || nameLower.includes('amy') || nameLower.includes('jolie blond') || nameLower.includes('mblue') || nameLower.includes('sherwood') || nameLower.includes('blue alien') || nameLower.includes('manhattan') || nameLower.includes('lucky boy')) {
+    p.brand = 'Liquideo';
+  } else if (nameLower.includes('aspire') || nameLower.includes('nautilus') || nameLower.includes('bvc') || nameLower.includes('pocke x') || nameLower.includes('pockex') || nameLower.includes('flexus') || nameLower.includes('gotek') || nameLower.includes('meche t2') || nameLower.includes('k-lite') || nameLower.includes('klite') || nameLower.includes('zelos') || nameLower.includes('resistance') || nameLower.includes('coil')) {
+    p.brand = 'Aspire';
+  } else if (nameLower.includes('pulp') || nameLower.includes('cult') || nameLower.includes('miel') || nameLower.includes('gazelle') || nameLower.includes('peche') || nameLower.includes('tanzanie') || nameLower.includes('mozambique') || nameLower.includes('alabama') || nameLower.includes('tennessee') || nameLower.includes('boston') || nameLower.includes('chrysalide') || nameLower.includes('thing') || nameLower.includes('verveine') || nameLower.includes('patisserie') || nameLower.includes('breakfast') || nameLower.includes('fraise') || nameLower.includes('framboise') || nameLower.includes('cassis') || nameLower.includes('myrtille') || nameLower.includes('noisette') || nameLower.includes('vanille')) {
+    p.brand = 'Pulp';
+  } else if (nameLower.includes('french liquide') || nameLower.includes('french-liquide') || nameLower.includes('la chose') || nameLower.includes('reanimator') || nameLower.includes('sensation') || nameLower.includes('spartacus') || nameLower.includes('relax') || nameLower.includes('supreme') || nameLower.includes('player') || nameLower.includes('acid') || nameLower.includes('la petite chose')) {
+    p.brand = 'Le French Liquide';
+  } else if (nameLower.includes('petit nuage') || nameLower.includes('petit-nuage') || nameLower.includes('le dessert') || nameLower.includes('flocon') || nameLower.includes('paris-brest') || nameLower.includes('paris brest') || nameLower.includes('tiramisu') || nameLower.includes('mille-feuille') || nameLower.includes('mille feuille') || nameLower.includes('grenade') || nameLower.includes('pins') || nameLower.includes('sienne')) {
+    p.brand = 'Petit Nuage';
+  } else if (nameLower.includes('liquidarom') || nameLower.includes('ice cool') || nameLower.includes('le flamant gourmand') || nameLower.includes('le-flamant-gourmand') || nameLower.includes('selad') || nameLower.includes('tropikoo') || nameLower.includes('bairy') || nameLower.includes('framboise rubis') || nameLower.includes('citron lime') || nameLower.includes('caffe latte') || nameLower.includes('eclats de noisettes') || nameLower.includes('softy') || nameLower.includes('friskoo') || nameLower.includes('dragoo') || nameLower.includes('mintoo') || nameLower.includes('blondy') || nameLower.includes('anis 51') || nameLower.includes('cerise griotte') || nameLower.includes('fraise gariguette') || nameLower.includes('mangue carabao') || nameLower.includes('melon de cavaillon') || nameLower.includes('pasteque melon') || nameLower.includes('pommes reinettes') || nameLower.includes('caramel toffee') || nameLower.includes('fraise fruit du dragon')) {
+    p.brand = 'Liquidarom';
+  } else if (nameLower.includes('xtar') || nameLower.includes('mc') || nameLower.includes('vc') || nameLower.includes('charger') || nameLower.includes('chargeur')) {
+    p.brand = 'Xtar';
+  } else if (nameLower.includes('dotmod') || nameLower.includes('dotstick') || nameLower.includes('dotaio')) {
+    p.brand = 'Dotmod';
+  } else if (nameLower.includes('high creek') || nameLower.includes('the dragoon') || nameLower.includes('fafnir') || nameLower.includes('the rebel')) {
+    p.brand = 'High Creek';
+  } else if (nameLower.includes('flamant gourmand') || nameLower.includes('flamant-gourmand')) {
+    p.brand = 'Le Flamant Gourmand';
+  } else if (nameLower.includes('selad')) {
+    p.brand = 'Selad';
+  }
+
+  // Fallback brand mapping if still default "THEKLOPE"
+  if (p.brand === 'THEKLOPE') {
+    if (p.category === 'eliquide') {
+      p.brand = 'Liquidarom';
+    } else if (p.category === 'ecig' || p.category === 'pod' || p.category === 'pack') {
+      p.brand = 'Geekvape';
+    } else if (p.category === 'accessoire') {
+      p.brand = 'Aspire';
+    }
+  }
+});
+
 export const BRANDS = [...new Set(PRODUCTS.map((p) => p.brand).filter(Boolean))].sort();
 export const TYPES = [...new Set(PRODUCTS.map((p) => p.type).filter(Boolean))].sort();
 export const FLAVORS = [...new Set(PRODUCTS.flatMap((p) => p.flavors || []))].sort();
