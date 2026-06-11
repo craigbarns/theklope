@@ -119,13 +119,6 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link
-              to="/admin"
-              aria-label="Admin"
-              className="relative focus-ring hidden h-10 w-10 place-items-center rounded-xl text-ash/80 transition hover:bg-white/5 hover:text-white sm:grid"
-            >
-              <IconUser />
-            </Link>
             <button
               onClick={() => setCartOpen(true)}
               aria-label="Panier"
@@ -173,13 +166,6 @@ export default function Header() {
                 </Link>
               ))}
             </div>
-            <div className="my-4 h-px bg-white/10" />
-            <Link
-              to="/admin"
-              className="rounded-2xl bg-gradient-to-r from-neon/15 to-transparent border border-neon/30 px-4 py-3 text-base font-semibold text-neon hover:from-neon/20 transition-all text-center"
-            >
-              Dashboard administrateur
-            </Link>
           </nav>
         </div>
       )}
