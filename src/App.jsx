@@ -22,6 +22,10 @@ import FAQ from './pages/FAQ.jsx'
 import Legal from './pages/Legal.jsx'
 import Admin from './pages/Admin.jsx'
 import NotFound from './pages/NotFound.jsx'
+import Configurateur from './pages/Configurateur.jsx'
+import CalculetteDiy from './pages/CalculetteDiy.jsx'
+import Blog from './pages/Blog.jsx'
+import BlogPost from './pages/BlogPost.jsx'
 
 export default function App() {
   return (
@@ -37,6 +41,10 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/boutique" element={<Shop />} />
+          <Route path="/configurateur" element={<Configurateur />} />
+          <Route path="/calculette-diy" element={<CalculetteDiy />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/produit/:id" element={<Product />} />
           <Route path="/panier" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />

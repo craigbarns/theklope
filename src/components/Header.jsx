@@ -7,10 +7,12 @@ import { CATEGORIES } from '../data/products.js'
 
 const NAV = [
   { to: '/boutique', label: 'Boutique' },
+  { to: '/configurateur', label: 'Configurateur 🛠️' },
+  { to: '/calculette-diy', label: 'Calculette DIY 🧮' },
+  { to: '/blog', label: 'Blog 📝' },
   { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
   { to: '/categorie/e-liquides', label: 'E-liquides' },
   { to: '/categorie/accessoires', label: 'Accessoires' },
-  { to: '/categorie/packs-debutants', label: 'Packs débutants' },
 ]
 
 export default function Header() {

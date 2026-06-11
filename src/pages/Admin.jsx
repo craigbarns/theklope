@@ -523,7 +523,7 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
           </button>
         </div>
 
-        <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+        <div className="max-h-[calc(100vh-300px)] space-y-4 overflow-y-auto pr-1">
           <Field label="Nom" value={form.name} onChange={update('name')} required />
           <Field label="Identifiant URL" value={form.id} onChange={update('id')} placeholder="auto si vide" />
           <div className="grid grid-cols-2 gap-3">

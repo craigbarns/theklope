@@ -4,6 +4,10 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import { IconLock, IconCheck, IconTruck, IconBolt } from '../components/icons.jsx'
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51PK2zF2NDy892749z8319f0748182471y23901y24901')
 
 const SHIPPING_METHODS = [
   { id: 'standard', label: 'Standard', detail: '2–3 jours ouvrés', price: 4.9, icon: IconTruck },
@@ -11,8 +15,29 @@ const SHIPPING_METHODS = [
   { id: 'pickup', label: 'Point relais', detail: '2–4 jours ouvrés', price: 2.9, icon: IconTruck },
 ]
 
-export default function Checkout() {
+const CARD_ELEMENT_OPTIONS = {
+  style: {
+    base: {
+      color: '#ffffff',
+      fontFamily: '"Outfit", "Inter", sans-serif',
+      fontSmoothing: 'antialiased',
+      fontSize: '15px',
+      '::placeholder': {
+        color: '#94a3b8',
+      },
+    },
+    invalid: {
+      color: '#f87171',
+      iconColor: '#f87171',
+    },
+  },
+}
+
+function CheckoutForm() {
   const { cartDetailed, totals, createOrder, promo } = useStore()
+  const stripe = useStripe()
+  const elements = useElements()
+
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('standard')
   const [completedOrder, setCompletedOrder] = useState(null)
@@ -20,6 +45,7 @@ export default function Checkout() {
   const [checkoutError, setCheckoutError] = useState('')
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
   const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
+  const [cardHolder, setCardHolder] = useState('')
 
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || SHIPPING_METHODS[0]
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
@@ -28,6 +54,88 @@ export default function Checkout() {
 
   const updateCustomer = (key) => (e) => setCustomer((prev) => ({ ...prev, [key]: e.target.value }))
   const updateAddress = (key) => (e) => setAddress((prev) => ({ ...prev, [key]: e.target.value }))
+
+  const handlePaySubmit = async (e) => {
+    e.preventDefault()
+    setCheckoutError('')
+
+    if (step < 3) {
+      setStep(step + 1)
+      return
+    }
+
+    if (!stripe || !elements) {
+      setCheckoutError("Le système de paiement n'est pas encore initialisé. Veuillez réessayer.")
+      return
+    }
+
+    try {
+      setSubmitting(true)
+
+      // 1. Contacter le backend pour créer le Payment Intent
+      const response = await fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          amount: grandTotal,
+          email: customer.email,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.error) {
+        throw new Error(data.error || 'Erreur lors de la création de la transaction Stripe.')
+      }
+
+      const { clientSecret } = data
+
+      // 2. Confirmer le paiement avec l'élément de carte
+      const cardElement = elements.getElement(CardElement)
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: {
+            name: cardHolder || `${customer.firstName} ${customer.lastName}`.trim(),
+            email: customer.email,
+            phone: customer.phone,
+            address: {
+              line1: address.street,
+              line2: address.extra,
+              postal_code: address.zip,
+              city: address.city,
+              country: 'FR',
+            },
+          },
+        },
+      })
+
+      if (result.error) {
+        throw new Error(result.error.message)
+      }
+
+      if (result.paymentIntent.status === 'succeeded') {
+        // 3. Enregistrer la commande finale dans Supabase
+        const order = await createOrder({
+          customer: {
+            name: `${customer.firstName} ${customer.lastName}`.trim(),
+            email: customer.email,
+            phone: customer.phone,
+          },
+          address,
+          shipping: selectedShipping,
+          shippingCost,
+          total: grandTotal,
+        })
+        setCompletedOrder(order)
+      } else {
+        throw new Error("La validation Stripe n'a pas pu aboutir.")
+      }
+    } catch (error) {
+      setCheckoutError(error.message || 'Le paiement a échoué. Veuillez vérifier vos coordonnées.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   if (completedOrder) {
     return (
@@ -40,7 +148,7 @@ export default function Checkout() {
           <h1 className="font-display text-2xl font-bold text-white">Merci pour votre commande !</h1>
           <p className="mt-3 text-muted">
             Votre commande <strong className="text-neon">{completedOrder.id}</strong> a bien été enregistrée
-            et apparaît maintenant dans le dashboard admin.
+            et validée avec Stripe.
           </p>
           <div className="mt-6 rounded-2xl border border-white/8 bg-white/5 p-4 text-left text-sm">
             <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(completedOrder.total)}</span></div>
@@ -60,33 +168,6 @@ export default function Checkout() {
         <Link to="/boutique" className="btn-primary mt-6">Découvrir la boutique</Link>
       </div>
     )
-  }
-
-  const next = async (e) => {
-    e.preventDefault()
-    setCheckoutError('')
-    if (step < 3) setStep(step + 1)
-    else {
-      try {
-        setSubmitting(true)
-        const order = await createOrder({
-          customer: {
-            name: `${customer.firstName} ${customer.lastName}`.trim(),
-            email: customer.email,
-            phone: customer.phone,
-          },
-          address,
-          shipping: selectedShipping,
-          shippingCost,
-          total: grandTotal,
-        })
-        setCompletedOrder(order)
-      } catch (error) {
-        setCheckoutError(error.message || "Impossible d'enregistrer la commande.")
-      } finally {
-        setSubmitting(false)
-      }
-    }
   }
 
   return (
@@ -111,7 +192,7 @@ export default function Checkout() {
             ))}
           </div>
 
-          <form onSubmit={next}>
+          <form onSubmit={handlePaySubmit}>
             {step === 1 && (
               <Section title="Coordonnées client">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -157,27 +238,29 @@ export default function Checkout() {
             )}
 
             {step === 3 && (
-              <Section title="Paiement">
-                <div className="mb-4 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/5 px-4 py-3 text-sm text-ash/75">
-                  <IconLock width={16} height={16} className="text-neon" /> Paiement chiffré — démonstration, aucune transaction réelle.
+              <Section title="Paiement Stripe sécurisé">
+                <div className="mb-6 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/5 px-4 py-3 text-xs text-ash/80">
+                  <IconLock width={14} height={14} className="text-neon shrink-0" />
+                  <span>Saisissez vos informations de carte. Pour les tests, utilisez : <strong className="text-white">4242 4242 4242 4242</strong></span>
                 </div>
                 <div className="grid gap-4">
-                  <Field label="Nom sur la carte" required />
-                  <Field label="Numéro de carte" placeholder="4242 4242 4242 4242" required />
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Expiration" placeholder="MM/AA" required />
-                    <Field label="CVC" placeholder="123" required />
+                  <Field label="Nom complet du titulaire" value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} required />
+                  <div>
+                    <span className="mb-1.5 block text-xs font-medium text-muted">Numéro, date d'expiration & CVC</span>
+                    <div className="input-field rounded-2xl bg-white/[0.03] border border-white/10 p-4 focus-within:border-neon focus-within:ring-1 focus-within:ring-neon transition duration-200">
+                      <CardElement options={CARD_ELEMENT_OPTIONS} />
+                    </div>
                   </div>
                 </div>
-                <label className="mt-4 flex items-start gap-2.5 text-xs text-muted">
-                  <input type="checkbox" required className="mt-0.5 accent-neon" />
-                  Je certifie être majeur (+18 ans) et j'accepte les conditions générales de vente.
+                <label className="mt-5 flex items-start gap-2.5 text-xs text-muted">
+                  <input type="checkbox" required className="mt-0.5 accent-neon rounded border-white/20 bg-white/5" />
+                  <span>Je certifie être majeur (+18 ans) et j'accepte les conditions générales de vente.</span>
                 </label>
               </Section>
             )}
 
             {checkoutError && (
-              <div className="rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+              <div className="mt-4 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
                 {checkoutError}
               </div>
             )}
@@ -186,8 +269,8 @@ export default function Checkout() {
               {step > 1 && (
                 <button type="button" onClick={() => setStep(step - 1)} className="btn-ghost">Retour</button>
               )}
-              <button type="submit" disabled={submitting} className="btn-primary flex-1">
-                {step < 3 ? 'Continuer' : submitting ? 'Enregistrement...' : `Payer ${formatPrice(grandTotal)}`}
+              <button type="submit" disabled={submitting} className="btn-primary flex-1 py-3 font-semibold">
+                {step < 3 ? 'Continuer' : submitting ? 'Traitement en cours...' : `Payer ${formatPrice(grandTotal)}`}
               </button>
             </div>
           </form>
@@ -219,6 +302,14 @@ export default function Checkout() {
         </aside>
       </div>
     </div>
+  )
+}
+
+export default function Checkout() {
+  return (
+    <Elements stripe={stripePromise}>
+      <CheckoutForm />
+    </Elements>
   )
 }
 

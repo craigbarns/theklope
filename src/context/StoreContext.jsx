@@ -18,6 +18,7 @@ const PROMO_CODES = {
   THEKLOPE10: { type: 'percent', value: 10, label: '-10%' },
   BIENVENUE: { type: 'percent', value: 15, label: '-15% première commande' },
   LIVRAISON: { type: 'shipping', value: 0, label: 'Livraison offerte' },
+  PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure' },
 }
 
 const FREE_SHIPPING_THRESHOLD = 49
@@ -394,14 +395,17 @@ export function StoreProvider({ children }) {
   )
 
   const totals = useMemo(() => {
-    const subtotal = cartDetailed.reduce((s, i) => s + i.lineTotal, 0)
+    const rawSubtotal = cartDetailed.reduce((s, i) => s + i.lineTotal, 0)
+    const subtotal = Math.round(rawSubtotal * 100) / 100
     let discount = 0
     let shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
     if (promo) {
-      if (promo.type === 'percent') discount = (subtotal * promo.value) / 100
+      if (promo.type === 'percent') {
+        discount = Math.round(((subtotal * promo.value) / 100) * 100) / 100
+      }
       if (promo.type === 'shipping') shipping = 0
     }
-    const total = Math.max(0, subtotal - discount) + shipping
+    const total = Math.round((Math.max(0, subtotal - discount) + shipping) * 100) / 100
     return { subtotal, discount, shipping, total, freeShippingThreshold: FREE_SHIPPING_THRESHOLD }
   }, [cartDetailed, promo])
 

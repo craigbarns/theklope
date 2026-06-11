@@ -18,14 +18,16 @@ const COLUMNS = [
     links: [
       { to: '/faq', label: 'FAQ' },
       { to: '/contact', label: 'Contact' },
+      { to: '/configurateur', label: 'Configurateur de Pack' },
+      { to: '/calculette-diy', label: 'Calculette DIY & Booster' },
       { to: '/legal/retour', label: 'Livraison & retours' },
-      { to: '/faq', label: 'Choisir son matériel' },
     ],
   },
   {
     title: 'Marque',
     links: [
       { to: '/a-propos', label: 'À propos' },
+      { to: '/blog', label: 'Notre Blog & Guides' },
       { to: '/categorie/nouveautes', label: 'Nouveautés' },
       { to: '/categorie/meilleures-ventes', label: 'Meilleures ventes' },
     ],
