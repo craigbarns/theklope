@@ -274,7 +274,9 @@ export default function Shop() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[260px_1fr]">
           <aside className="hidden lg:block">
-            <div className="sticky top-24 card p-5">{filtersPanel}</div>
+            <div className="sticky top-24 card p-5 max-h-[calc(100vh-120px)] overflow-y-auto scrollbar-thin">
+              {filtersPanel}
+            </div>
           </aside>
 
           <div>
