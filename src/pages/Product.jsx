@@ -42,6 +42,32 @@ export default function Product() {
     return products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
   }, [product, products])
 
+  const productSchema = useMemo(() => {
+    if (!product) return null
+    return {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": product.name,
+      "image": [
+        product.image.startsWith('http') ? product.image : `https://theklope.vercel.app${product.image}`
+      ],
+      "description": product.long || product.short,
+      "sku": product.id,
+      "brand": {
+        "@type": "Brand",
+        "name": product.brand
+      },
+      "offers": {
+        "@type": "Offer",
+        "url": window.location.href,
+        "priceCurrency": "EUR",
+        "price": product.price,
+        "itemCondition": "https://schema.org/NewCondition",
+        "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+      }
+    }
+  }, [product])
+
   useEffect(() => {
     if (!product) return
     setActiveImg(0)
@@ -67,7 +93,7 @@ export default function Product() {
 
   return (
     <>
-      <Seo title={product.name} description={product.short} />
+      <Seo title={product.name} description={product.short} schema={productSchema} />
       <div className="container-page py-8 pb-28 lg:pb-8">
         <Breadcrumbs
           items={[

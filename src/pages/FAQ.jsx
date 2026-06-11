@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
@@ -58,9 +58,29 @@ const SECTIONS = [
 ]
 
 export default function FAQ() {
+  const faqSchema = useMemo(() => {
+    const questions = SECTIONS.flatMap(s => s.items).map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": item.a
+      }
+    }))
+    return {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": questions
+    }
+  }, [])
+
   return (
     <div className="container-page py-8">
-      <Seo title="FAQ" description="Questions fréquentes THEKLOPE : livraison, retours, paiement, choix de la cigarette électronique et du e-liquide, taux de nicotine, garantie." />
+      <Seo
+        title="FAQ"
+        description="Questions fréquentes THEKLOPE : livraison, retours, paiement, choix de la cigarette électronique et du e-liquide, taux de nicotine, garantie."
+        schema={faqSchema}
+      />
       <Breadcrumbs items={[{ label: 'FAQ' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Foire aux questions</h1>
       <p className="mt-2 max-w-xl text-muted">Tout ce qu'il faut savoir avant et après votre commande.</p>

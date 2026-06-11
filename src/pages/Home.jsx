@@ -33,11 +33,52 @@ export default function Home() {
   const { bestSellers, newArrivals, starterPacks } = useMemo(() => featuredProducts(products), [products])
   const heroProduct = bestSellers[0] || products[0]
   const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
+
+  const localBusinessSchema = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "THEKLOPE",
+    "image": "https://theklope.vercel.app/logo.png",
+    "@id": "https://theklope.vercel.app/#store",
+    "url": "https://theklope.vercel.app",
+    "telephone": "+33100000000",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "124 Rue Augustin Aubert",
+      "addressLocality": "Marseille",
+      "postalCode": "13009",
+      "addressCountry": "FR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 43.2563,
+      "longitude": 5.4124
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "opens": "09:00",
+      "closes": "19:00"
+    },
+    "sameAs": [
+      "https://github.com/craigbarns/theklope"
+    ]
+  }), [])
+
   return (
     <>
       <Seo
         title="La vape nouvelle génération"
         description="THEKLOPE — Cigarettes électroniques, e-liquides et accessoires sélectionnés pour une expérience premium. Livraison rapide, paiement sécurisé. +18 uniquement."
+        schema={localBusinessSchema}
       />
 
       {/* HERO */}
