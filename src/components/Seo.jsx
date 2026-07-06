@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 // Met à jour le titre, les balises OpenGraph et injecte le JSON-LD structuré pour le SEO/GEO.
-export default function Seo({ title, description, schema }) {
+export default function Seo({ title, description, schema, canonical }) {
   useEffect(() => {
     // 1. Titre de la page
     if (title) document.title = `${title} — THEKLOPE`
@@ -14,8 +14,12 @@ export default function Seo({ title, description, schema }) {
     if (title) {
       updateMeta('og:title', `${title} — THEKLOPE`)
     }
+
+    // 3. URL canonique (par défaut : origine + chemin, sans query/hash)
+    const canonicalUrl = canonical || `${window.location.origin}${window.location.pathname}`
+    updateLink('canonical', canonicalUrl)
     updateMeta('og:type', 'website')
-    updateMeta('og:url', window.location.href)
+    updateMeta('og:url', canonicalUrl)
 
     // 3. Structured Data Schema (JSON-LD)
     let scriptTag = document.getElementById('jsonld-schema')
@@ -32,7 +36,7 @@ export default function Seo({ title, description, schema }) {
         scriptTag.remove()
       }
     }
-  }, [title, description, schema])
+  }, [title, description, schema, canonical])
 
   return null
 }
@@ -49,4 +53,14 @@ function updateMeta(name, content) {
     document.head.appendChild(tag)
   }
   tag.setAttribute('content', content)
+}
+
+function updateLink(rel, href) {
+  let tag = document.querySelector(`link[rel="${rel}"]`)
+  if (!tag) {
+    tag = document.createElement('link')
+    tag.setAttribute('rel', rel)
+    document.head.appendChild(tag)
+  }
+  tag.setAttribute('href', href)
 }

@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES } from '../data/products.js'
+import { CATEGORIES } from '../data/catalog.js'
 import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
 
 const SORTS = [

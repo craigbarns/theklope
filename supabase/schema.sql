@@ -28,8 +28,9 @@ create table if not exists public.products (
 create table if not exists public.orders (
   id text primary key,
   created_at timestamptz not null default now(),
-  status text not null default 'processing',
-  payment_status text not null default 'paid',
+  status text not null default 'pending_payment',
+  payment_status text not null default 'unpaid',
+  payment_id text,
   customer jsonb not null default '{}'::jsonb,
   address jsonb not null default '{}'::jsonb,
   shipping jsonb not null default '{}'::jsonb,
@@ -39,6 +40,10 @@ create table if not exists public.orders (
   total numeric(10,2) not null default 0,
   promo jsonb
 );
+
+-- Pour les bases déjà créées (migration) : ajoute la colonne si absente.
+alter table public.orders add column if not exists payment_id text;
+create index if not exists orders_payment_id_idx on public.orders (payment_id);
 
 create table if not exists public.order_items (
   id bigint generated always as identity primary key,
@@ -67,82 +72,13 @@ create trigger products_set_updated_at
 before update on public.products
 for each row execute function public.set_updated_at();
 
-create or replace function public.submit_order(order_payload jsonb, items_payload jsonb)
-returns void
-language plpgsql
-security definer
-set search_path = public
-as $$
-declare
-  item jsonb;
-  order_id text := order_payload->>'id';
-begin
-  if order_id is null or order_id = '' then
-    raise exception 'order id is required';
-  end if;
-
-  insert into public.orders (
-    id,
-    created_at,
-    status,
-    payment_status,
-    customer,
-    address,
-    shipping,
-    subtotal,
-    discount,
-    shipping_cost,
-    total,
-    promo
-  )
-  values (
-    order_id,
-    coalesce((order_payload->>'created_at')::timestamptz, now()),
-    coalesce(order_payload->>'status', 'processing'),
-    coalesce(order_payload->>'payment_status', 'paid'),
-    coalesce(order_payload->'customer', '{}'::jsonb),
-    coalesce(order_payload->'address', '{}'::jsonb),
-    coalesce(order_payload->'shipping', '{}'::jsonb),
-    coalesce((order_payload->>'subtotal')::numeric, 0),
-    coalesce((order_payload->>'discount')::numeric, 0),
-    coalesce((order_payload->>'shipping_cost')::numeric, 0),
-    coalesce((order_payload->>'total')::numeric, 0),
-    order_payload->'promo'
-  );
-
-  for item in
-    select value from jsonb_array_elements(coalesce(items_payload, '[]'::jsonb)) as items(value)
-  loop
-    insert into public.order_items (
-      order_id,
-      product_id,
-      name,
-      image,
-      price,
-      qty,
-      variant,
-      line_total
-    )
-    values (
-      order_id,
-      item->>'product_id',
-      coalesce(item->>'name', 'Produit'),
-      item->>'image',
-      coalesce((item->>'price')::numeric, 0),
-      coalesce((item->>'qty')::integer, 1),
-      coalesce(item->'variant', '{}'::jsonb),
-      coalesce((item->>'line_total')::numeric, 0)
-    );
-
-    update public.products
-    set stock = greatest(0, stock - coalesce((item->>'qty')::integer, 1))
-    where id = item->>'product_id';
-  end loop;
-end;
-$$;
-
-revoke all on function public.submit_order(jsonb, jsonb) from public;
-grant execute on function public.submit_order(jsonb, jsonb) to anon, authenticated;
+-- SÉCURITÉ : l'ancienne RPC `submit_order` (exécutable par `anon`) permettait à
+-- n'importe qui d'insérer des commandes « payées » sans paiement réel. Elle est
+-- supprimée. Les commandes sont désormais créées UNIQUEMENT côté serveur :
+--   - api/create-payment-intent insère la commande « en attente » (service role)
+--   - api/stripe-webhook la passe à « payée » après preuve de paiement Stripe
+-- Le service role contourne la RLS, donc aucune policy d'insertion publique.
+drop function if exists public.submit_order(jsonb, jsonb);
 
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
@@ -160,11 +96,10 @@ to authenticated
 using (true)
 with check (true);
 
+-- Plus aucune insertion de commande par anon/authenticated : seul le service role
+-- (côté serveur) écrit dans orders / order_items. On retire les anciennes policies.
 drop policy if exists "Anyone can create orders" on public.orders;
-create policy "Anyone can create orders"
-on public.orders for insert
-to anon, authenticated
-with check (true);
+drop policy if exists "Anyone can create order items" on public.order_items;
 
 drop policy if exists "Authenticated admins can read orders" on public.orders;
 create policy "Authenticated admins can read orders"
@@ -177,12 +112,6 @@ create policy "Authenticated admins can update orders"
 on public.orders for update
 to authenticated
 using (true)
-with check (true);
-
-drop policy if exists "Anyone can create order items" on public.order_items;
-create policy "Anyone can create order items"
-on public.order_items for insert
-to anon, authenticated
 with check (true);
 
 drop policy if exists "Authenticated admins can read order items" on public.order_items;

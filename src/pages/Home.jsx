@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import Newsletter from '../components/Newsletter.jsx'
-import { featuredProducts } from '../data/products.js'
+import { featuredProducts } from '../data/catalog.js'
 import {
   IconArrowRight,
   IconShield,
@@ -38,9 +38,9 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "THEKLOPE",
-    "image": "https://theklope.vercel.app/logo.png",
-    "@id": "https://theklope.vercel.app/#store",
-    "url": "https://theklope.vercel.app",
+    "image": "https://theklope.com/logo.png",
+    "@id": "https://theklope.com/#store",
+    "url": "https://theklope.com",
     "telephone": "+33100000000",
     "priceRange": "$$",
     "address": {

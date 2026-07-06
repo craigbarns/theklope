@@ -41,11 +41,11 @@ export default function BlogPost() {
       '@type': 'BlogPosting',
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': `https://theklope.vercel.app/blog/${post.slug}`,
+        '@id': `https://theklope.com/blog/${post.slug}`,
       },
       headline: post.title,
       description: post.description,
-      image: `https://theklope.vercel.app${post.image}`,
+      image: `https://theklope.com${post.image}`,
       datePublished: '2026-06-10T08:00:00+02:00',
       author: {
         '@type': 'Person',
@@ -56,7 +56,7 @@ export default function BlogPost() {
         name: 'THEKLOPE',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://theklope.vercel.app/logo.png',
+          url: 'https://theklope.com/logo.png',
         },
       },
     }

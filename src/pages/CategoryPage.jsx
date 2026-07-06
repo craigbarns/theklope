@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES, productsByCategorySlugFrom } from '../data/products.js'
+import { CATEGORIES, productsByCategorySlugFrom } from '../data/catalog.js'
 import { IconChevronDown } from '../components/icons.jsx'
 import NotFound from './NotFound.jsx'
 

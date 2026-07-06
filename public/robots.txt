@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://theklope.vercel.app/sitemap.xml
+Sitemap: https://theklope.com/sitemap.xml

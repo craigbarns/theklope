@@ -64,6 +64,42 @@ VITE_SUPABASE_PUBLISHABLE_KEY
 
 Ne mettez jamais de `service_role_key` dans Vite ou dans le navigateur.
 
+## Paiement — Mollie
+
+Le paiement utilise **Mollie** (checkout hébergé, par redirection). Le montant
+est **toujours recalculé côté serveur** à partir des identifiants produits : le
+navigateur n'envoie jamais de prix. Le statut « payé » est confirmé uniquement
+par le **webhook Mollie** (source de vérité), impossible à falsifier côté client.
+
+### Variables d'environnement (Vercel → Settings → Environment Variables)
+
+| Variable | Portée | Rôle |
+|---|---|---|
+| `MOLLIE_API_KEY` | serveur | Clé API Mollie (`test_…` puis `live_…`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | serveur | Le serveur crée/finalise les commandes (contourne la RLS) |
+| `SUPABASE_URL` | serveur | (optionnel) si l'URL n'est pas déjà fournie |
+| `PUBLIC_BASE_URL` | serveur | URL publique du site (redirect + webhook Mollie) |
+| `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | client | Catalogue + auth admin |
+
+> Aucune clé Mollie ni service_role ne doit être exposée au navigateur.
+
+### Flux
+
+1. `POST /api/create-payment` : relit les prix, recalcule le total, crée le
+   paiement Mollie **et** une commande « en attente » dans Supabase, renvoie
+   l'URL de checkout.
+2. Le client est redirigé vers Mollie pour payer.
+3. Retour sur `/checkout/retour?order=…` : la page interroge
+   `GET /api/payment-status` qui relit le vrai statut auprès de Mollie.
+4. `POST /api/mollie-webhook` : confirme le paiement, passe la commande à
+   « payée » et décrémente le stock.
+
+### Tester en local
+
+Le webhook Mollie ne peut pas joindre `localhost` : utilisez un tunnel (ngrok)
+et mettez son URL dans `PUBLIC_BASE_URL`. Lancez les fonctions `api/` avec
+`vercel dev` (le simple `vite` ne sert pas les routes `/api`).
+
 ## Structure du projet
 
 ```
@@ -141,7 +177,7 @@ src/
 - **Vraies photos** : renseignez le champ `images` de chaque produit (URL ou import)
 - **Couleurs / typographie** : `tailwind.config.js`
 - **Mentions légales / CGV** : `src/pages/Legal.jsx` (champs entre crochets à compléter)
-- **Paiement réel** : brancher Stripe / un prestataire dans `src/pages/Checkout.jsx`
+- **Paiement** : Mollie (voir section « Paiement — Mollie ») — `api/create-payment.js`, `api/mollie-webhook.js`, `src/pages/Checkout.jsx`
 
 ## Déploiement
 

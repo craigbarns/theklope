@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
-import { CATEGORIES, BADGES } from '../data/products.js'
+import { CATEGORIES, BADGES } from '../data/catalog.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
 import GalleryUploader from '../components/GalleryUploader.jsx'
@@ -710,8 +710,8 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
       <section className="card border-amber-400/20 bg-amber-400/5 p-6 lg:col-span-3">
         <p className="text-sm leading-relaxed text-muted">
           <strong className="text-ash/90">Avant production :</strong> {supabaseEnabled ? 'le catalogue et les commandes sont connectés à Supabase.' : 'cet admin persiste en local dans le navigateur.'}
-          Pour un vrai site marchand, ajoutez Stripe, les e-mails transactionnels, les factures, la vérification d’âge renforcée
-          et la conformité légale complète.
+          Le paiement Mollie est branché ; pensez aux e-mails transactionnels, aux factures, à la vérification d’âge renforcée
+          et à la conformité légale complète.
         </p>
       </section>
     </div>

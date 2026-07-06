@@ -1,4 +1,4 @@
-import { BADGES } from '../data/products.js'
+import { BADGES } from '../data/catalog.js'
 
 export default function Badge({ type, className = '' }) {
   const b = BADGES[type]

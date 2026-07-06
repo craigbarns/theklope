@@ -4,48 +4,23 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import { IconLock, IconCheck, IconTruck, IconBolt } from '../components/icons.jsx'
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
+import { SHIPPING_METHODS as SHARED_SHIPPING_METHODS } from '../lib/pricing.js'
 
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51PK2zF2NDy892749z8319f0748182471y23901y24901')
+// Méthodes de livraison : prix/labels viennent du module partagé (source de
+// vérité, identique au serveur), on n'ajoute ici que l'icône d'affichage.
+const SHIPPING_ICONS = { standard: IconTruck, express: IconBolt, pickup: IconTruck }
+const SHIPPING_METHODS = SHARED_SHIPPING_METHODS.map((m) => ({ ...m, icon: SHIPPING_ICONS[m.id] || IconTruck }))
 
-const SHIPPING_METHODS = [
-  { id: 'standard', label: 'Standard', detail: '2–3 jours ouvrés', price: 4.9, icon: IconTruck },
-  { id: 'express', label: 'Express', detail: '24h en France', price: 8.9, icon: IconBolt },
-  { id: 'pickup', label: 'Point relais', detail: '2–4 jours ouvrés', price: 2.9, icon: IconTruck },
-]
-
-const CARD_ELEMENT_OPTIONS = {
-  style: {
-    base: {
-      color: '#ffffff',
-      fontFamily: '"Outfit", "Inter", sans-serif',
-      fontSmoothing: 'antialiased',
-      fontSize: '15px',
-      '::placeholder': {
-        color: '#94a3b8',
-      },
-    },
-    invalid: {
-      color: '#f87171',
-      iconColor: '#f87171',
-    },
-  },
-}
-
-function CheckoutForm() {
-  const { cartDetailed, totals, createOrder, promo } = useStore()
-  const stripe = useStripe()
-  const elements = useElements()
+export default function Checkout() {
+  const { cartDetailed, totals, promo } = useStore()
 
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('standard')
-  const [completedOrder, setCompletedOrder] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
   const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
-  const [cardHolder, setCardHolder] = useState('')
+  const [ageAccepted, setAgeAccepted] = useState(false)
 
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || SHIPPING_METHODS[0]
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
@@ -55,7 +30,7 @@ function CheckoutForm() {
   const updateCustomer = (key) => (e) => setCustomer((prev) => ({ ...prev, [key]: e.target.value }))
   const updateAddress = (key) => (e) => setAddress((prev) => ({ ...prev, [key]: e.target.value }))
 
-  const handlePaySubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setCheckoutError('')
 
@@ -64,100 +39,42 @@ function CheckoutForm() {
       return
     }
 
-    if (!stripe || !elements) {
-      setCheckoutError("Le système de paiement n'est pas encore initialisé. Veuillez réessayer.")
-      return
-    }
-
     try {
       setSubmitting(true)
 
-      // 1. Contacter le backend pour créer le Payment Intent
-      const response = await fetch('/api/create-payment-intent', {
+      // On envoie les IDENTIFIANTS produits + quantités, JAMAIS le montant.
+      // Le serveur recalcule le total et crée le paiement Mollie.
+      const response = await fetch('/api/create-payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          amount: grandTotal,
-          email: customer.email,
-        }),
-      })
-
-      const data = await response.json()
-      if (!response.ok || data.error) {
-        throw new Error(data.error || 'Erreur lors de la création de la transaction Stripe.')
-      }
-
-      const { clientSecret } = data
-
-      // 2. Confirmer le paiement avec l'élément de carte
-      const cardElement = elements.getElement(CardElement)
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: cardHolder || `${customer.firstName} ${customer.lastName}`.trim(),
-            email: customer.email,
-            phone: customer.phone,
-            address: {
-              line1: address.street,
-              line2: address.extra,
-              postal_code: address.zip,
-              city: address.city,
-              country: 'FR',
-            },
-          },
-        },
-      })
-
-      if (result.error) {
-        throw new Error(result.error.message)
-      }
-
-      if (result.paymentIntent.status === 'succeeded') {
-        // 3. Enregistrer la commande finale dans Supabase
-        const order = await createOrder({
+          items: cartDetailed.map((item) => ({
+            id: item.product.id,
+            qty: item.qty,
+            variant: item.variant,
+          })),
+          shippingMethodId: shipping,
+          promoCode: promo?.code || null,
           customer: {
             name: `${customer.firstName} ${customer.lastName}`.trim(),
             email: customer.email,
             phone: customer.phone,
           },
           address,
-          shipping: selectedShipping,
-          shippingCost,
-          total: grandTotal,
-        })
-        setCompletedOrder(order)
-      } else {
-        throw new Error("La validation Stripe n'a pas pu aboutir.")
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.error || !data.checkoutUrl) {
+        throw new Error(data.error || 'Impossible de créer le paiement.')
       }
+
+      // Redirection vers le checkout hébergé Mollie.
+      window.location.href = data.checkoutUrl
     } catch (error) {
-      setCheckoutError(error.message || 'Le paiement a échoué. Veuillez vérifier vos coordonnées.')
-    } finally {
+      setCheckoutError(error.message || 'Le paiement a échoué. Veuillez réessayer.')
       setSubmitting(false)
     }
-  }
-
-  if (completedOrder) {
-    return (
-      <div className="container-page py-16">
-        <Seo title="Commande confirmée" />
-        <div className="mx-auto max-w-lg card p-10 text-center">
-          <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-neon/30 bg-neon/10 text-neon">
-            <IconCheck width={32} height={32} />
-          </div>
-          <h1 className="font-display text-2xl font-bold text-white">Merci pour votre commande !</h1>
-          <p className="mt-3 text-muted">
-            Votre commande <strong className="text-neon">{completedOrder.id}</strong> a bien été enregistrée
-            et validée avec Stripe.
-          </p>
-          <div className="mt-6 rounded-2xl border border-white/8 bg-white/5 p-4 text-left text-sm">
-            <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(completedOrder.total)}</span></div>
-            <div className="flex justify-between py-1"><span className="text-muted">Livraison estimée</span><span className="text-white">{completedOrder.shipping.detail}</span></div>
-          </div>
-          <Link to="/boutique" className="btn-primary mt-7 w-full">Continuer mes achats</Link>
-        </div>
-      </div>
-    )
   }
 
   if (cartDetailed.length === 0) {
@@ -192,7 +109,7 @@ function CheckoutForm() {
             ))}
           </div>
 
-          <form onSubmit={handlePaySubmit}>
+          <form onSubmit={handleSubmit}>
             {step === 1 && (
               <Section title="Coordonnées client">
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -238,22 +155,19 @@ function CheckoutForm() {
             )}
 
             {step === 3 && (
-              <Section title="Paiement Stripe sécurisé">
+              <Section title="Paiement sécurisé">
                 <div className="mb-6 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/5 px-4 py-3 text-xs text-ash/80">
                   <IconLock width={14} height={14} className="text-neon shrink-0" />
-                  <span>Saisissez vos informations de carte. Pour les tests, utilisez : <strong className="text-white">4242 4242 4242 4242</strong></span>
+                  <span>Vous allez être redirigé vers <strong className="text-white">Mollie</strong> pour régler en toute sécurité (carte, Bancontact, etc.). Aucune donnée de carte ne transite par THEKLOPE.</span>
                 </div>
-                <div className="grid gap-4">
-                  <Field label="Nom complet du titulaire" value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} required />
-                  <div>
-                    <span className="mb-1.5 block text-xs font-medium text-muted">Numéro, date d'expiration & CVC</span>
-                    <div className="input-field rounded-2xl bg-white/[0.03] border border-white/10 p-4 focus-within:border-neon focus-within:ring-1 focus-within:ring-neon transition duration-200">
-                      <CardElement options={CARD_ELEMENT_OPTIONS} />
-                    </div>
-                  </div>
+
+                <div className="rounded-2xl border border-white/8 bg-white/5 p-4 text-sm">
+                  <div className="flex justify-between py-1"><span className="text-muted">Livraison</span><span className="text-white">{selectedShipping.label} — {selectedShipping.detail}</span></div>
+                  <div className="flex justify-between py-1"><span className="text-muted">Montant à payer</span><span className="font-semibold text-white">{formatPrice(grandTotal)}</span></div>
                 </div>
+
                 <label className="mt-5 flex items-start gap-2.5 text-xs text-muted">
-                  <input type="checkbox" required className="mt-0.5 accent-neon rounded border-white/20 bg-white/5" />
+                  <input type="checkbox" required checked={ageAccepted} onChange={(e) => setAgeAccepted(e.target.checked)} className="mt-0.5 accent-neon rounded border-white/20 bg-white/5" />
                   <span>Je certifie être majeur (+18 ans) et j'accepte les conditions générales de vente.</span>
                 </label>
               </Section>
@@ -270,7 +184,7 @@ function CheckoutForm() {
                 <button type="button" onClick={() => setStep(step - 1)} className="btn-ghost">Retour</button>
               )}
               <button type="submit" disabled={submitting} className="btn-primary flex-1 py-3 font-semibold">
-                {step < 3 ? 'Continuer' : submitting ? 'Traitement en cours...' : `Payer ${formatPrice(grandTotal)}`}
+                {step < 3 ? 'Continuer' : submitting ? 'Redirection...' : `Payer ${formatPrice(grandTotal)}`}
               </button>
             </div>
           </form>
@@ -302,14 +216,6 @@ function CheckoutForm() {
         </aside>
       </div>
     </div>
-  )
-}
-
-export default function Checkout() {
-  return (
-    <Elements stripe={stripePromise}>
-      <CheckoutForm />
-    </Elements>
   )
 }
 

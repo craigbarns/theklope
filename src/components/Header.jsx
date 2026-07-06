@@ -3,7 +3,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Logo from './Logo.jsx'
 import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser } from './icons.jsx'
-import { CATEGORIES } from '../data/products.js'
+import { CATEGORIES } from '../data/catalog.js'
 
 const NAV = [
   { to: '/boutique', label: 'Boutique' },

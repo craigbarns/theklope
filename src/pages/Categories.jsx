@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
-import { CATEGORIES, productsByCategorySlugFrom } from '../data/products.js'
+import { CATEGORIES, productsByCategorySlugFrom } from '../data/catalog.js'
 import { IconArrowRight } from '../components/icons.jsx'
 
 export default function Categories() {

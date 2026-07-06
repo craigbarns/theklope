@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { categoryName } from '../data/products.js'
+import { categoryName } from '../data/catalog.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -49,7 +49,7 @@ export default function Product() {
       "@type": "Product",
       "name": product.name,
       "image": [
-        product.image.startsWith('http') ? product.image : `https://theklope.vercel.app${product.image}`
+        product.image.startsWith('http') ? product.image : `https://theklope.com${product.image}`
       ],
       "description": product.long || product.short,
       "sku": product.id,

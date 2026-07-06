@@ -1,9 +1,17 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
-import { PRODUCTS as INITIAL_PRODUCTS, getCatalogMeta, getProductFrom } from '../data/products.js'
+import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
 import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals } from '../lib/pricing.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
+
+// Le catalogue statique (~300 produits) est lourd : on ne le charge qu'à la
+// demande, en fallback, pour ne pas l'embarquer dans le bundle initial.
+const loadStaticCatalog = async () => {
+  const mod = await import('../data/products.js')
+  return mod.PRODUCTS
+}
 
 const read = (key, fallback) => {
   try {
@@ -13,16 +21,6 @@ const read = (key, fallback) => {
     return fallback
   }
 }
-
-const PROMO_CODES = {
-  THEKLOPE10: { type: 'percent', value: 10, label: '-10%' },
-  BIENVENUE: { type: 'percent', value: 15, label: '-15% première commande' },
-  LIVRAISON: { type: 'shipping', value: 0, label: 'Livraison offerte' },
-  PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure' },
-}
-
-const FREE_SHIPPING_THRESHOLD = 49
-const SHIPPING_COST = 4.9
 
 export const ORDER_STATUSES = [
   { value: 'processing', label: 'En préparation' },
@@ -128,32 +126,6 @@ const productFromRow = (row) =>
     image: row.image,
   })
 
-const orderToRow = (order) => ({
-  id: order.id,
-  created_at: order.createdAt,
-  status: order.status,
-  payment_status: order.paymentStatus,
-  customer: order.customer,
-  address: order.address,
-  shipping: order.shipping,
-  subtotal: order.subtotal,
-  discount: order.discount,
-  shipping_cost: order.shippingCost,
-  total: order.total,
-  promo: order.promo,
-})
-
-const orderItemToRow = (orderId, item) => ({
-  order_id: orderId,
-  product_id: item.productId,
-  name: item.name,
-  image: item.image,
-  price: item.price,
-  qty: item.qty,
-  variant: item.variant,
-  line_total: item.lineTotal,
-})
-
 const orderFromRow = (row) => ({
   id: row.id,
   createdAt: row.created_at,
@@ -184,8 +156,10 @@ export function StoreProvider({ children }) {
   const [cookiesChoice, setCookiesChoice] = useState(() => read('tk_cookies', null))
   const [products, setProducts] = useState(() => {
     const saved = read('tk_products', null)
-    const hasPacks = Array.isArray(saved) && saved.some(p => p.category === 'pack')
-    return Array.isArray(saved) && saved.length && hasPacks ? saved.map(normalizeProduct) : INITIAL_PRODUCTS.map(normalizeProduct)
+    const hasPacks = Array.isArray(saved) && saved.some((p) => p.category === 'pack')
+    // Si un catalogue valide est déjà en cache local, on l'utilise (zéro téléchargement).
+    // Sinon on démarre vide et on charge le catalogue de référence en différé.
+    return Array.isArray(saved) && saved.length && hasPacks ? saved.map(normalizeProduct) : []
   })
   const [orders, setOrders] = useState(() => {
     const saved = read('tk_orders', [])
@@ -225,6 +199,16 @@ export function StoreProvider({ children }) {
     }
   }, [])
 
+  // Charge le catalogue de référence (statique) en fallback, sans bloquer le bundle initial.
+  const loadFallbackCatalog = useCallback(async () => {
+    try {
+      const catalog = await loadStaticCatalog()
+      setProducts((prev) => (prev.length ? prev : catalog.map(normalizeProduct)))
+    } catch {
+      /* ignore — le catalogue restera vide */
+    }
+  }, [])
+
   const refreshRemoteData = useCallback(async () => {
     if (!isSupabaseConfigured) {
       setSyncStatus('local')
@@ -241,7 +225,10 @@ export function StoreProvider({ children }) {
         .order('created_at', { ascending: false })
 
       if (productsResult.error) throw productsResult.error
-      setProducts((productsResult.data || []).map(productFromRow))
+      const remoteProducts = (productsResult.data || []).map(productFromRow)
+      // Si Supabase est vide (catalogue pas encore publié), on garde le fallback statique.
+      if (remoteProducts.length) setProducts(remoteProducts)
+      else await loadFallbackCatalog()
 
       if (adminSession) {
         const ordersResult = await supabase
@@ -257,8 +244,17 @@ export function StoreProvider({ children }) {
     } catch (error) {
       setSyncStatus('error')
       setSyncError(error.message || 'Synchronisation Supabase impossible.')
+      await loadFallbackCatalog()
     }
-  }, [adminSession])
+  }, [adminSession, loadFallbackCatalog])
+
+  // En mode local (sans Supabase), on charge le catalogue de référence si rien en cache.
+  useEffect(() => {
+    if (!isSupabaseConfigured && products.length === 0) {
+      loadFallbackCatalog()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     refreshRemoteData()
@@ -313,7 +309,8 @@ export function StoreProvider({ children }) {
   }, [adminSession])
 
   const resetProducts = useCallback(async () => {
-    const defaults = INITIAL_PRODUCTS.map(normalizeProduct)
+    const catalog = await loadStaticCatalog()
+    const defaults = catalog.map(normalizeProduct)
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const { error } = await supabase.from('products').upsert(defaults.map(productToRow))
@@ -396,28 +393,32 @@ export function StoreProvider({ children }) {
   )
 
   const totals = useMemo(() => {
-    const rawSubtotal = cartDetailed.reduce((s, i) => s + i.lineTotal, 0)
-    const subtotal = Math.round(rawSubtotal * 100) / 100
-    let discount = 0
-    let shipping = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : SHIPPING_COST
-    if (promo) {
-      if (promo.type === 'percent') {
-        discount = Math.round(((subtotal * promo.value) / 100) * 100) / 100
-      }
-      if (promo.type === 'shipping') shipping = 0
+    const t = computeTotals({
+      lines: cartDetailed.map((i) => ({ price: i.product.price, qty: i.qty })),
+      promoCode: promo?.code,
+    })
+    return {
+      subtotal: t.subtotal,
+      discount: t.discount,
+      shipping: t.shipping,
+      total: t.total,
+      freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
     }
-    const total = Math.round((Math.max(0, subtotal - discount) + shipping) * 100) / 100
-    return { subtotal, discount, shipping, total, freeShippingThreshold: FREE_SHIPPING_THRESHOLD }
   }, [cartDetailed, promo])
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
 
-  // ----- Commandes admin -----
+  // ----- Commandes -----
+  // NB : la persistance Supabase + le statut « payé » sont gérés CÔTÉ SERVEUR
+  // (api/create-payment crée la commande en attente, le webhook Mollie la
+  // confirme). Ici on ne fait qu'un enregistrement LOCAL optimiste pour l'UI
+  // (confirmation, décrément de stock affiché, vidage du panier). Aucune écriture
+  // Supabase n'est faite depuis le navigateur.
   const createOrder = useCallback(
-    async ({ customer, address, shipping, shippingCost, total }) => {
+    async ({ id, customer, address, shipping, shippingCost, total }) => {
       const now = new Date().toISOString()
       const order = {
-        id: 'TK-' + Math.floor(100000 + Math.random() * 899999),
+        id: id || 'TK-' + Math.floor(100000 + Math.random() * 899999),
         createdAt: now,
         status: 'processing',
         paymentStatus: 'paid',
@@ -440,16 +441,6 @@ export function StoreProvider({ children }) {
         promo: promo ? { code: promo.code, label: promo.label, type: promo.type, value: promo.value } : null,
       }
 
-      if (isSupabaseConfigured) {
-        const { error } = await supabase.rpc('submit_order', {
-          order_payload: orderToRow(order),
-          items_payload: order.items.map((item) => orderItemToRow(order.id, item)),
-        })
-        if (error) throw error
-        setSyncStatus('online')
-        setSyncError(null)
-      }
-
       setOrders((prev) => [order, ...prev])
       setProducts((prev) =>
         prev.map((product) => {
@@ -461,7 +452,7 @@ export function StoreProvider({ children }) {
       clearCart()
       return order
     },
-    [cartDetailed, clearCart, products, promo, totals.discount, totals.subtotal],
+    [cartDetailed, clearCart, promo, totals.discount, totals.subtotal],
   )
 
   const updateOrderStatus = useCallback(async (orderId, status) => {
