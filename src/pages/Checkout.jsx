@@ -80,7 +80,7 @@ export default function Checkout() {
   if (cartDetailed.length === 0) {
     return (
       <div className="container-page py-16 text-center">
-        <Seo title="Checkout" />
+        <Seo title="Checkout" noindex />
         <p className="text-muted">Votre panier est vide.</p>
         <Link to="/boutique" className="btn-primary mt-6">Découvrir la boutique</Link>
       </div>
@@ -89,7 +89,7 @@ export default function Checkout() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Paiement" description="Finalisez votre commande THEKLOPE en toute sécurité." />
+      <Seo title="Paiement" description="Finalisez votre commande THEKLOPE en toute sécurité." noindex />
       <Breadcrumbs items={[{ label: 'Panier', to: '/panier' }, { label: 'Paiement' }]} />
 
       <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_360px]">

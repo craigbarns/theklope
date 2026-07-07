@@ -30,7 +30,7 @@ export default function Cart() {
   if (cartDetailed.length === 0) {
     return (
       <div className="container-page py-8">
-        <Seo title="Panier" />
+        <Seo title="Panier" noindex />
         <Breadcrumbs items={[{ label: 'Panier' }]} />
         <div className="mt-10 card grid place-items-center p-16 text-center">
           <h1 className="font-display text-2xl font-bold text-white">Votre panier est vide</h1>
@@ -45,7 +45,7 @@ export default function Cart() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Panier" />
+      <Seo title="Panier" noindex />
       <Breadcrumbs items={[{ label: 'Panier' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Votre panier</h1>
 

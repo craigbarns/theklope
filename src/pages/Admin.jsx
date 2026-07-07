@@ -104,7 +104,7 @@ export default function Admin() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Admin" description="Dashboard THEKLOPE pour piloter le catalogue, les commandes et les ventes." />
+      <Seo title="Admin" description="Dashboard THEKLOPE." noindex />
 
       <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon via-anthracite to-noir p-6 shadow-card sm:p-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
@@ -246,7 +246,7 @@ function AdminLogin({ signInAdmin, syncError }) {
 
   return (
     <div className="container-page grid min-h-[70vh] place-items-center py-12">
-      <Seo title="Connexion admin" />
+      <Seo title="Connexion admin" noindex />
       <div className="w-full max-w-md card p-8">
         <div className="mx-auto mb-6 grid h-14 w-14 place-items-center rounded-2xl border border-neon/30 bg-neon/10 text-neon">
           <IconUser width={28} height={28} />

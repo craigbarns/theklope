@@ -11,7 +11,7 @@ export default function Favorites() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Mes favoris" />
+      <Seo title="Mes favoris" noindex />
       <Breadcrumbs items={[{ label: 'Favoris' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Mes favoris</h1>
 

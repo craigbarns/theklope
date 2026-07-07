@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /panier
+Disallow: /favoris
 
 Sitemap: https://theklope.com/sitemap.xml

@@ -127,10 +127,12 @@ export default function Product() {
                 {product.badge && <Badge type={product.badge} />}
                 {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
-              <img 
-                src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'} 
-                alt={product.name} 
-                className="w-full rounded-2xl" 
+              <img
+                src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
+                alt={product.name}
+                fetchpriority="high"
+                decoding="async"
+                className="w-full rounded-2xl"
               />
             </div>
             <div className="mt-3 flex gap-3">
