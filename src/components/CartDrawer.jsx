@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
+import ProductImage from './ProductImage.jsx'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
 export default function CartDrawer() {
@@ -58,7 +59,7 @@ export default function CartDrawer() {
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
                 <div key={item.index} className="flex gap-3">
-                  <img src={item.product.image} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                  <ProductImage src={item.product.image} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <Link

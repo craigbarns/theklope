@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Badge from './Badge.jsx'
 import Stars from './Stars.jsx'
+import ProductImage from './ProductImage.jsx'
 import { IconHeart, IconCart } from './icons.jsx'
 
 export default function ProductCard({ product }) {
@@ -26,7 +27,7 @@ export default function ProductCard({ product }) {
       className="card-interactive focus-ring group relative flex flex-col overflow-hidden"
     >
       <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white/[0.03] to-transparent">
-        <img
+        <ProductImage
           src={product.image}
           alt={`${product.name} — ${product.type} ${product.brand}`}
           loading="lazy"
