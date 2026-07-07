@@ -39,22 +39,22 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "THEKLOPE",
-    "image": "https://theklope.com/logo.png",
+    "image": "https://theklope.com/og-image.jpg",
     "@id": "https://theklope.com/#store",
     "url": "https://theklope.com",
-    "telephone": "+33100000000",
+    "telephone": "+33491555555",
     "priceRange": "$$",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "124 Rue Augustin Aubert",
+      "streetAddress": "188 rue de Rome",
       "addressLocality": "Marseille",
-      "postalCode": "13009",
+      "postalCode": "13006",
       "addressCountry": "FR"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 43.2563,
-      "longitude": 5.4124
+      "latitude": 43.2905,
+      "longitude": 5.3801
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
@@ -68,10 +68,7 @@ export default function Home() {
       ],
       "opens": "09:00",
       "closes": "19:00"
-    },
-    "sameAs": [
-      "https://github.com/craigbarns/theklope"
-    ]
+    }
   }), [])
 
   return (
