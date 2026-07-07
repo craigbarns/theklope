@@ -121,6 +121,41 @@ to authenticated
 using (true);
 
 -- =========================================================================
+-- Newsletter & Contact — alimentées côté serveur (service role) par
+-- api/newsletter.js et api/contact.js.
+-- =========================================================================
+create table if not exists public.newsletter_subscribers (
+  email text primary key,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.contact_messages (
+  id bigint generated always as identity primary key,
+  name text not null,
+  email text not null,
+  subject text not null,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.newsletter_subscribers enable row level security;
+alter table public.contact_messages enable row level security;
+
+-- Aucune policy publique : seul le service role (serveur) insère. Les admins
+-- authentifiés peuvent lire pour consultation dans le back-office.
+drop policy if exists "Authenticated admins can read subscribers" on public.newsletter_subscribers;
+create policy "Authenticated admins can read subscribers"
+on public.newsletter_subscribers for select
+to authenticated
+using (true);
+
+drop policy if exists "Authenticated admins can read messages" on public.contact_messages;
+create policy "Authenticated admins can read messages"
+on public.contact_messages for select
+to authenticated
+using (true);
+
+-- =========================================================================
 -- THEKLOPE Storage Configuration for Product Images
 -- =========================================================================
 

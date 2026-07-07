@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 
 export default function CoachVape() {
   const { products, addToCart } = useStore()
+  const navigate = useNavigate()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -159,6 +160,20 @@ export default function CoachVape() {
         })
         break;
 
+      case 'ask_promos':
+        setStep('chat')
+        addMessage({
+          isBot: true,
+          content: 'Voici les codes promotionnels du moment :\n\n- 🏷️ **BIENVENUE** : -15% sur votre première commande.\n- 🏷️ **THEKLOPE10** : -10% sur toute la boutique.\n- 🏷️ **LIVRAISON** : Livraison offerte dès 49€ d\'achat.',
+          options: [{ text: 'Voir toute la boutique 🛒', action: 'go_shop' }]
+        })
+        break;
+
+      case 'go_shop':
+        setIsOpen(false)
+        navigate('/boutique')
+        break;
+
       default:
         setStep('chat')
         addMessage({
@@ -307,7 +322,7 @@ export default function CoachVape() {
     } else if (/(contact|telephone|mail|adresse|magasin|conseiller|service client)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.fr\n- **Téléphone** : 01 23 45 67 89 (du lundi au vendredi de 9h à 18h)\n- **Adresse** : Espace THEKLOPE, Paris, France'
+        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.com\n- **Téléphone** : 04 91 55 55 55 (du lundi au samedi de 9h à 19h)\n- **Boutique** : 188 rue de Rome, 13006 Marseille'
       })
     } else if (/(pod|kit|clearomiseur|clearomiseur|resistance|box|batterie)/i.test(clean)) {
       addMessage({

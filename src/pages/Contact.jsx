@@ -12,6 +12,33 @@ const MINI_FAQ = [
 
 export default function Contact() {
   const [sent, setSent] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+
+  const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (loading) return
+    setError('')
+    setLoading(true)
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data.error) throw new Error(data.error || "Envoi impossible.")
+      setSent(true)
+      setForm({ name: '', email: '', subject: '', message: '' })
+    } catch (err) {
+      setError(err.message || "Envoi impossible. Réessayez.")
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="container-page py-8">
@@ -35,21 +62,24 @@ export default function Contact() {
               <button onClick={() => setSent(false)} className="btn-ghost mt-6">Envoyer un autre message</button>
             </div>
           ) : (
-            <form onSubmit={(e) => { e.preventDefault(); setSent(true) }} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom" required />
-                <Field label="E-mail" type="email" required />
+                <Field label="Nom" required value={form.name} onChange={update('name')} />
+                <Field label="E-mail" type="email" required value={form.email} onChange={update('email')} />
               </div>
-              <Field label="Sujet" required />
+              <Field label="Sujet" required value={form.subject} onChange={update('subject')} />
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-muted">Message</span>
-                <textarea rows={5} required className="input resize-none" />
+                <textarea rows={5} required value={form.message} onChange={update('message')} className="input resize-none" />
               </label>
               <label className="flex items-start gap-2.5 text-xs text-muted">
                 <input type="checkbox" required className="mt-0.5 accent-neon" />
                 J'accepte que mes données soient utilisées pour traiter ma demande.
               </label>
-              <button type="submit" className="btn-primary w-full">Envoyer le message</button>
+              {error && <p className="text-xs text-rose-300">{error}</p>}
+              <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
+                {loading ? 'Envoi…' : 'Envoyer le message'}
+              </button>
             </form>
           )}
         </div>
