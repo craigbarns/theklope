@@ -1,14 +1,24 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
+import ProductCard from '../components/ProductCard.jsx'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
-  const { cartDetailed, updateQty, removeItem, totals, promo, applyPromo, removePromo } = useStore()
+  const { cartDetailed, updateQty, removeItem, totals, promo, applyPromo, removePromo, products } = useStore()
   const [code, setCode] = useState('')
   const [feedback, setFeedback] = useState(null)
+
+  // Cross-sell : consommables/accessoires en stock, absents du panier.
+  const suggestions = useMemo(() => {
+    const inCart = new Set(cartDetailed.map((i) => i.product.id))
+    const complementary = products.filter(
+      (p) => !inCart.has(p.id) && p.stock > 0 && ['accessoire', 'eliquide'].includes(p.category),
+    )
+    return complementary.slice(0, 4)
+  }, [products, cartDetailed])
 
   const submitPromo = (e) => {
     e.preventDefault()
@@ -84,6 +94,17 @@ export default function Cart() {
               </div>
             </div>
           ))}
+
+          {suggestions.length > 0 && (
+            <div className="pt-6">
+              <h2 className="mb-4 font-display text-lg font-bold text-white">Complétez votre commande</h2>
+              <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                {suggestions.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Récap */}
@@ -106,7 +127,6 @@ export default function Cart() {
               {feedback && !promo && (
                 <p className={`mt-2 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-400'}`}>{feedback.message}</p>
               )}
-              <p className="mt-2 text-[11px] text-faint">Essayez : THEKLOPE10, BIENVENUE, LIVRAISON</p>
             </form>
 
             <dl className="mt-5 space-y-3 border-t border-white/8 pt-5 text-sm">

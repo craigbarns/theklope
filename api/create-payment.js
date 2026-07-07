@@ -61,6 +61,23 @@ export default async function handler(req, res) {
       })
     }
 
+    // 1bis. Le code BIENVENUE est réservé à la première commande : on vérifie
+    // qu'aucune commande payée n'existe déjà pour cet e-mail.
+    const email = String(customer?.email || '').trim().toLowerCase()
+    const normalizedPromo = String(promoCode || '').trim().toUpperCase()
+    if (normalizedPromo === 'BIENVENUE' && email) {
+      const { data: prior, error: priorErr } = await supabaseAdmin
+        .from('orders')
+        .select('id')
+        .eq('payment_status', 'paid')
+        .eq('customer->>email', email)
+        .limit(1)
+      if (priorErr) throw priorErr
+      if (prior && prior.length) {
+        return res.status(400).json({ error: 'Le code BIENVENUE est réservé à la première commande.' })
+      }
+    }
+
     // 2. Recalculer les totaux de façon déterministe
     const totals = computeTotals({
       lines: lines.map((l) => ({ price: l.price, qty: l.qty })),

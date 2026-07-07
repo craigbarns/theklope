@@ -98,7 +98,7 @@ export default function Configurateur() {
     // (color / nicotine) pour qu'elles s'affichent dans le panier et la commande.
     addToCart(selectedBox.id, 1, selectedBoxColor ? { color: selectedBoxColor } : {})
     addToCart(selectedClearomizer.id, 1)
-    addToCart(selectedEliquid.id, 1, { nicotine: `${selectedNicotine} mg/ml` })
+    addToCart(selectedEliquid.id, 1, { nicotine: selectedNicotine })
 
     // Appliquer la promotion -15% automatiquement
     applyPromo('PACK15')

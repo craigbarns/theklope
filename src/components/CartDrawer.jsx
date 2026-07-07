@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { IconClose, IconMinus, IconPlus, IconTrash, IconLock } from './icons.jsx'
+import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
 export default function CartDrawer() {
   const { cartOpen, setCartOpen, cartDetailed, updateQty, removeItem, totals, cartCount } = useStore()
+
+  const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
+  const freeShippingPct = Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))
 
   return (
     <>
@@ -37,6 +40,21 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
+            <div className="border-b border-white/10 px-5 py-3">
+              {remainingForFreeShipping > 0 ? (
+                <p className="flex items-center gap-2 text-xs text-ash/80">
+                  <IconTruck width={16} height={16} className="text-neon shrink-0" />
+                  Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte
+                </p>
+              ) : (
+                <p className="flex items-center gap-2 text-xs text-neon">
+                  <IconTruck width={16} height={16} className="shrink-0" /> Livraison offerte débloquée&nbsp;!
+                </p>
+              )}
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-neon transition-all duration-500" style={{ width: `${freeShippingPct}%` }} />
+              </div>
+            </div>
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
                 <div key={item.index} className="flex gap-3">
