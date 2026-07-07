@@ -7,6 +7,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
 import Stars from '../components/Stars.jsx'
 import ProductCard from '../components/ProductCard.jsx'
+import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
 import {
   IconHeart,
@@ -127,7 +128,7 @@ export default function Product() {
                 {product.badge && <Badge type={product.badge} />}
                 {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
-              <img
+              <ProductImage
                 src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
                 alt={product.name}
                 fetchpriority="high"
@@ -144,7 +145,7 @@ export default function Product() {
                     activeImg === i ? 'border-neon' : 'border-white/10 hover:border-white/30'
                   }`}
                 >
-                  <img src={img} alt="" className="h-20 w-20 object-cover" />
+                  <ProductImage src={img} alt="" loading="lazy" className="h-20 w-20 object-cover" />
                 </button>
               ))}
             </div>

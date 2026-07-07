@@ -4,6 +4,7 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
+import ProductImage from '../components/ProductImage.jsx'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
@@ -62,7 +63,7 @@ export default function Cart() {
           {cartDetailed.map((item) => (
             <div key={item.index} className="card flex gap-4 p-4">
               <Link to={`/produit/${item.product.id}`} className="shrink-0">
-                <img src={item.product.image} alt="" className="h-24 w-24 rounded-xl object-cover" />
+                <ProductImage src={item.product.image} alt="" loading="lazy" className="h-24 w-24 rounded-xl object-cover" />
               </Link>
               <div className="flex flex-1 flex-col">
                 <div className="flex items-start justify-between gap-3">

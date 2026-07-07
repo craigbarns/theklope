@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
+import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
 
 export default function Configurateur() {
@@ -220,9 +221,10 @@ export default function Configurateur() {
                         }`}
                       >
                         <div className="relative aspect-square overflow-hidden rounded-xl bg-carbon/50 p-2">
-                          <img
+                          <ProductImage
                             src={p.image}
                             alt=""
+                            loading="lazy"
                             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                           />
                         </div>
@@ -270,7 +272,7 @@ export default function Configurateur() {
                 <div className="mt-4 space-y-4">
                   {/* Box */}
                   <div className="flex items-center gap-4 rounded-xl bg-white/[0.02] border border-white/5 p-4">
-                    <img src={selectedBox.image} alt="" className="h-16 w-16 object-cover bg-carbon rounded-lg p-1" />
+                    <ProductImage src={selectedBox.image} alt="" className="h-16 w-16 object-cover bg-carbon rounded-lg p-1" />
                     <div className="flex-1">
                       <p className="text-xs text-neon uppercase font-semibold">Étape 1 · Box/Batterie</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedBox.name}</h3>
@@ -297,7 +299,7 @@ export default function Configurateur() {
 
                   {/* Clearomizer */}
                   <div className="flex items-center gap-4 rounded-xl bg-white/[0.02] border border-white/5 p-4">
-                    <img
+                    <ProductImage
                       src={selectedClearomizer.image}
                       alt=""
                       className="h-16 w-16 object-cover bg-carbon rounded-lg p-1"
@@ -312,7 +314,7 @@ export default function Configurateur() {
 
                   {/* Eliquid */}
                   <div className="flex items-center gap-4 rounded-xl bg-white/[0.02] border border-white/5 p-4">
-                    <img src={selectedEliquid.image} alt="" className="h-16 w-16 object-cover bg-carbon rounded-lg p-1" />
+                    <ProductImage src={selectedEliquid.image} alt="" className="h-16 w-16 object-cover bg-carbon rounded-lg p-1" />
                     <div className="flex-1">
                       <p className="text-xs text-neon uppercase font-semibold">Étape 3 · E-liquide</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedEliquid.name}</h3>

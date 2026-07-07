@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
 
 export default function ImageUploader({ value, onChange, productId, productName }) {
   const [uploading, setUploading] = useState(false)
@@ -77,8 +77,11 @@ export default function ImageUploader({ value, onChange, productId, productName 
 
       setProgress(30)
 
+      const sb = await getSupabase()
+      if (!sb) throw new Error('Supabase n’est pas configuré.')
+
       // Upload du fichier sur Supabase Storage
-      const { data, error: uploadError } = await supabase.storage
+      const { data, error: uploadError } = await sb.storage
         .from('products')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -90,7 +93,7 @@ export default function ImageUploader({ value, onChange, productId, productName 
       setProgress(80)
 
       // Récupération de l'URL publique
-      const { data: urlData } = supabase.storage
+      const { data: urlData } = sb.storage
         .from('products')
         .getPublicUrl(filePath)
 

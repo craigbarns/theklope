@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
-import { isSupabaseConfigured, supabase } from '../lib/supabase.js'
+import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
 import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals } from '../lib/pricing.js'
 
 const StoreContext = createContext(null)
@@ -187,15 +187,20 @@ export function StoreProvider({ children }) {
   useEffect(() => {
     if (!isSupabaseConfigured) return undefined
     let active = true
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) setAdminSession(data.session)
-    })
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAdminSession(session)
+    let subscription = null
+    getSupabase().then((sb) => {
+      if (!sb || !active) return
+      sb.auth.getSession().then(({ data }) => {
+        if (active) setAdminSession(data.session)
+      })
+      const { data } = sb.auth.onAuthStateChange((_event, session) => {
+        setAdminSession(session)
+      })
+      subscription = data.subscription
     })
     return () => {
       active = false
-      data.subscription.unsubscribe()
+      subscription?.unsubscribe()
     }
   }, [])
 
@@ -219,7 +224,14 @@ export function StoreProvider({ children }) {
       setSyncStatus('syncing')
       setSyncError(null)
 
-      const productsResult = await supabase
+      const sb = await getSupabase()
+      if (!sb) {
+        setSyncStatus('local')
+        await loadFallbackCatalog()
+        return
+      }
+
+      const productsResult = await sb
         .from('products')
         .select('*')
         .order('created_at', { ascending: false })
@@ -231,7 +243,7 @@ export function StoreProvider({ children }) {
       else await loadFallbackCatalog()
 
       if (adminSession) {
-        const ordersResult = await supabase
+        const ordersResult = await sb
           .from('orders')
           .select('*, order_items(*)')
           .order('created_at', { ascending: false })
@@ -263,16 +275,18 @@ export function StoreProvider({ children }) {
   const getProduct = useCallback((id) => getProductFrom(products, id), [products])
 
   const signInAdmin = useCallback(async ({ email, password }) => {
-    if (!isSupabaseConfigured) throw new Error('Supabase n’est pas configuré.')
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const sb = await getSupabase()
+    if (!sb) throw new Error('Supabase n’est pas configuré.')
+    const { data, error } = await sb.auth.signInWithPassword({ email, password })
     if (error) throw error
     setAdminSession(data.session)
     return data
   }, [])
 
   const signOutAdmin = useCallback(async () => {
-    if (!isSupabaseConfigured) return
-    const { error } = await supabase.auth.signOut()
+    const sb = await getSupabase()
+    if (!sb) return
+    const { error } = await sb.auth.signOut()
     if (error) throw error
     setAdminSession(null)
     setOrders([])
@@ -283,7 +297,8 @@ export function StoreProvider({ children }) {
     const nextProduct = normalizeProduct(input)
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const { error } = await supabase.from('products').upsert(productToRow(nextProduct))
+      const sb = await getSupabase()
+      const { error } = await sb.from('products').upsert(productToRow(nextProduct))
       if (error) throw error
       setSyncStatus('online')
       setSyncError(null)
@@ -300,7 +315,8 @@ export function StoreProvider({ children }) {
   const deleteProduct = useCallback(async (productId) => {
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const { error } = await supabase.from('products').delete().eq('id', productId)
+      const sb = await getSupabase()
+      const { error } = await sb.from('products').delete().eq('id', productId)
       if (error) throw error
     }
     setProducts((prev) => prev.filter((p) => p.id !== productId))
@@ -313,7 +329,8 @@ export function StoreProvider({ children }) {
     const defaults = catalog.map(normalizeProduct)
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const { error } = await supabase.from('products').upsert(defaults.map(productToRow))
+      const sb = await getSupabase()
+      const { error } = await sb.from('products').upsert(defaults.map(productToRow))
       if (error) throw error
     }
     setProducts(defaults)
@@ -322,7 +339,8 @@ export function StoreProvider({ children }) {
   const clearAllProducts = useCallback(async () => {
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const { error } = await supabase.from('products').delete().neq('id', '')
+      const sb = await getSupabase()
+      const { error } = await sb.from('products').delete().neq('id', '')
       if (error) throw error
     }
     setProducts([])
@@ -458,7 +476,8 @@ export function StoreProvider({ children }) {
   const updateOrderStatus = useCallback(async (orderId, status) => {
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const { error } = await supabase.from('orders').update({ status }).eq('id', orderId)
+      const sb = await getSupabase()
+      const { error } = await sb.from('orders').update({ status }).eq('id', orderId)
       if (error) throw error
     }
     setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status } : order)))

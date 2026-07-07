@@ -3,6 +3,7 @@ import { useMemo } from 'react'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
+import ProductImage from '../components/ProductImage.jsx'
 import Newsletter from '../components/Newsletter.jsx'
 import { featuredProducts } from '../data/catalog.js'
 import {
@@ -38,22 +39,22 @@ export default function Home() {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "THEKLOPE",
-    "image": "https://theklope.com/logo.png",
+    "image": "https://theklope.com/og-image.jpg",
     "@id": "https://theklope.com/#store",
     "url": "https://theklope.com",
-    "telephone": "+33100000000",
+    "telephone": "+33491555555",
     "priceRange": "$$",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "124 Rue Augustin Aubert",
+      "streetAddress": "188 rue de Rome",
       "addressLocality": "Marseille",
-      "postalCode": "13009",
+      "postalCode": "13006",
       "addressCountry": "FR"
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": 43.2563,
-      "longitude": 5.4124
+      "latitude": 43.2905,
+      "longitude": 5.3801
     },
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
@@ -67,10 +68,7 @@ export default function Home() {
       ],
       "opens": "09:00",
       "closes": "19:00"
-    },
-    "sameAs": [
-      "https://github.com/craigbarns/theklope"
-    ]
+    }
   }), [])
 
   return (
@@ -122,11 +120,11 @@ export default function Home() {
                 {/* Halos de fond colorés et dynamiques */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
                 <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card">
-                  <img src={heroProduct.image} alt={heroProduct.name} className="w-full rounded-2xl animate-fade-in" />
+                  <ProductImage src={heroProduct.image} alt={heroProduct.name} fetchpriority="high" className="w-full rounded-2xl animate-fade-in" />
                 </div>
                 {featuredProduct && (
                   <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
-                    <img src={featuredProduct.image} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                    <ProductImage src={featuredProduct.image} alt="" loading="lazy" className="h-14 w-14 rounded-xl object-cover" />
                     <div>
                       <p className="text-xs text-muted">Best-seller</p>
                       <p className="max-w-[10rem] truncate text-sm font-semibold text-white">{featuredProduct.name}</p>
@@ -164,9 +162,10 @@ export default function Home() {
               className="card-interactive group relative flex h-44 items-end overflow-hidden p-6"
             >
               <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/25" />
-              <img
+              <ProductImage
                 src={catThumb(c.key, products)}
                 alt=""
+                loading="lazy"
                 className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
               />
               <div className="relative">
