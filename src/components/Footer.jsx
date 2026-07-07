@@ -55,7 +55,7 @@ export default function Footer() {
               pour une expérience simple, élégante et performante.
             </p>
             <address className="mt-4 not-italic text-sm leading-relaxed text-muted">
-              188 Rue de Rome, 13006 Marseille<br />
+              Boutique THEKLOPE — 188 Rue de Rome, 13006 Marseille<br />
               <a href="tel:+33491555555" className="hover:text-neon">04 91 55 55 55</a> ·{' '}
               <a href="mailto:contact@theklope.com" className="hover:text-neon">contact@theklope.com</a>
             </address>
@@ -92,8 +92,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
-          <p className="text-xs text-faint">© {new Date().getFullYear()} THEKLOPE. Tous droits réservés.</p>
-          <p className="text-xs text-faint">Site de démonstration — produits et prix fictifs.</p>
+          <p className="text-xs text-faint">© {new Date().getFullYear()} THEKLOPE — édité par SEVEN SEVENTY (SASU). Tous droits réservés.</p>
+          <p className="text-xs text-faint">RCS Marseille 815&nbsp;155&nbsp;973 · TVA FR58&nbsp;815&nbsp;155&nbsp;973</p>
         </div>
       </div>
     </footer>

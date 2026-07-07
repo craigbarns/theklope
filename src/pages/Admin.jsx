@@ -697,7 +697,7 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
           onClick={() => window.confirm('Restaurer le catalogue initial ?') && resetProducts()}
           className="btn-ghost mt-5 w-full"
         >
-          Réinitialiser le catalogue (démo)
+          Réinitialiser le catalogue par défaut
         </button>
         <button
           onClick={() => window.confirm('⚠️ Supprimer TOUS les produits du catalogue ? Cette action est irréversible.') && clearAllProducts()}
