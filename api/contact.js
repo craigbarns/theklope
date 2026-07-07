@@ -3,6 +3,7 @@
 // Table attendue : contact_messages (name, email, subject, message, created_at).
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { sendEmail, emailLayout, escapeHtml, FROM_CONTACT, INBOX_CONTACT } from './_lib/email.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const clip = (v, max) => String(v || '').trim().slice(0, max)
@@ -38,6 +39,22 @@ export default async function handler(req, res) {
       .insert({ name, email, subject, message })
 
     if (error) throw error
+
+    // Notification e-mail (non bloquante : le message est déjà enregistré).
+    try {
+      await sendEmail({
+        from: FROM_CONTACT,
+        to: INBOX_CONTACT,
+        replyTo: email,
+        subject: `Nouveau message de contact : ${subject}`,
+        html: emailLayout({
+          title: 'Nouveau message via le formulaire de contact',
+          bodyHtml: `<p style="font-size:14px;color:#cfcfcf"><strong>De :</strong> ${escapeHtml(name)} — ${escapeHtml(email)}</p><p style="font-size:14px;color:#cfcfcf"><strong>Sujet :</strong> ${escapeHtml(subject)}</p><p style="font-size:14px;color:#cfcfcf;white-space:pre-wrap;border-top:1px solid #262626;padding-top:12px;margin-top:12px">${escapeHtml(message)}</p>`,
+        }),
+      })
+    } catch (mailErr) {
+      console.error('contact email error:', mailErr)
+    }
 
     return res.status(200).json({ ok: true })
   } catch (err) {
