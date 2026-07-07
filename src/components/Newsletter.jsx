@@ -4,13 +4,29 @@ import { IconMail, IconCheck } from './icons.jsx'
 export default function Newsletter() {
   const [email, setEmail] = useState('')
   const [done, setDone] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault()
-    if (!email) return
-    setDone(true)
-    setEmail('')
-    setTimeout(() => setDone(false), 4000)
+    if (!email || loading) return
+    setError('')
+    setLoading(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || data.error) throw new Error(data.error || "Inscription impossible.")
+      setDone(true)
+      setEmail('')
+    } catch (err) {
+      setError(err.message || "Inscription impossible. Réessayez.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -30,28 +46,34 @@ export default function Newsletter() {
           </div>
           <div>
             {done ? (
-              <div className="flex items-center gap-3 rounded-2xl border border-neon/30 bg-neon/10 px-5 py-4 text-neon">
-                <IconCheck /> Merci ! Votre inscription est confirmée.
+              <div className="rounded-2xl border border-neon/30 bg-neon/10 px-5 py-4 text-neon">
+                <p className="flex items-center gap-3 font-medium"><IconCheck /> Merci, votre inscription est confirmée !</p>
+                <p className="mt-2 text-sm text-ash/80">
+                  Votre code de bienvenue : <strong className="text-neon">BIENVENUE</strong> — -15% sur votre première commande.
+                </p>
               </div>
             ) : (
-              <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
-                <div className="relative flex-1">
-                  <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-faint">
-                    <IconMail />
-                  </span>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Votre adresse e-mail"
-                    className="input pl-11"
-                  />
-                </div>
-                <button type="submit" className="btn-primary shrink-0">
-                  S'inscrire
-                </button>
-              </form>
+              <>
+                <form onSubmit={submit} className="flex flex-col gap-3 sm:flex-row">
+                  <div className="relative flex-1">
+                    <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-faint">
+                      <IconMail />
+                    </span>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="Votre adresse e-mail"
+                      className="input pl-11"
+                    />
+                  </div>
+                  <button type="submit" disabled={loading} className="btn-primary shrink-0 disabled:opacity-60">
+                    {loading ? '...' : "S'inscrire & recevoir -15%"}
+                  </button>
+                </form>
+                {error && <p className="mt-2 text-xs text-rose-300">{error}</p>}
+              </>
             )}
             <p className="mt-3 text-[11px] text-faint">
               En vous inscrivant, vous confirmez être majeur et acceptez notre politique de confidentialité.

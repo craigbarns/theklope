@@ -10,7 +10,7 @@ const SECTIONS = [
     items: [
       { q: 'Quels sont les délais de livraison ?', a: 'Les commandes sont expédiées sous 24 à 48h. La réception intervient généralement sous 2 à 4 jours ouvrés en France métropolitaine.' },
       { q: 'La livraison est-elle offerte ?', a: 'Oui, la livraison standard est offerte dès 49€ d\'achat. En dessous, elle est facturée à partir de 2,90€ selon le mode choisi.' },
-      { q: 'Livrez-vous à l\'étranger ?', a: 'Pour cette version de démonstration, la livraison est présentée pour la France. Les zones peuvent être étendues selon votre configuration.' },
+      { q: 'Livrez-vous à l\'étranger ?', a: 'Nous livrons actuellement en France métropolitaine. Contactez-nous pour toute demande de livraison hors métropole.' },
     ],
   },
   {

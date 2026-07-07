@@ -12,7 +12,10 @@ import { getProductsByIds } from './_lib/catalog.js'
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { mollie, hasMollie, baseUrlFromRequest } from './_lib/mollie.js'
 
-const newOrderId = () => 'TK-' + Math.floor(100000 + Math.random() * 899999)
+// Identifiant lisible (TK-XXXXXX) + suffixe aléatoire pour empêcher l'énumération
+// de l'endpoint public /api/payment-status.
+const rand = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 36).toString(36)).join('').toUpperCase()
+const newOrderId = () => 'TK-' + Math.floor(100000 + Math.random() * 899999) + '-' + rand(5)
 const toMollieAmount = (n) => (Math.round(Number(n) * 100) / 100).toFixed(2)
 
 export default async function handler(req, res) {
@@ -59,6 +62,23 @@ export default async function handler(req, res) {
         variant: it?.variant || {},
         lineTotal: Math.round((Number(product.price) || 0) * qty * 100) / 100,
       })
+    }
+
+    // 1bis. Le code BIENVENUE est réservé à la première commande : on vérifie
+    // qu'aucune commande payée n'existe déjà pour cet e-mail.
+    const email = String(customer?.email || '').trim().toLowerCase()
+    const normalizedPromo = String(promoCode || '').trim().toUpperCase()
+    if (normalizedPromo === 'BIENVENUE' && email) {
+      const { data: prior, error: priorErr } = await supabaseAdmin
+        .from('orders')
+        .select('id')
+        .eq('payment_status', 'paid')
+        .eq('customer->>email', email)
+        .limit(1)
+      if (priorErr) throw priorErr
+      if (prior && prior.length) {
+        return res.status(400).json({ error: 'Le code BIENVENUE est réservé à la première commande.' })
+      }
     }
 
     // 2. Recalculer les totaux de façon déterministe

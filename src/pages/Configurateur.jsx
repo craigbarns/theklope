@@ -24,19 +24,14 @@ export default function Configurateur() {
     )
   }, [products])
 
-  // 2. Filtrer les clearomiseurs (tous les accessoires qui ressemblent à un clearomiseur ou réservoir)
+  // 2. Filtrer les clearomiseurs (accessoires type réservoir/cartouche/pod). Si
+  // aucun ne correspond aux mots-clés, on retombe sur tous les accessoires pour
+  // ne jamais bloquer l'utilisateur avec une étape vide.
   const clearomizers = useMemo(() => {
-    return products.filter(
-      (p) =>
-        p.category === 'accessoire' &&
-        (p.name.toLowerCase().includes('nautilus') ||
-          p.name.toLowerCase().includes('ce5') ||
-          p.name.toLowerCase().includes('apex') ||
-          p.name.toLowerCase().includes('tpp') ||
-          p.name.toLowerCase().includes('luxe') ||
-          p.name.toLowerCase().includes('cartouche') ||
-          p.name.toLowerCase().includes('pod'))
-    )
+    const accessoires = products.filter((p) => p.category === 'accessoire')
+    const keywords = ['nautilus', 'ce5', 'apex', 'tpp', 'luxe', 'cartouche', 'pod', 'clearomiseur', 'reservoir', 'réservoir', 'resistance', 'résistance']
+    const matched = accessoires.filter((p) => keywords.some((k) => p.name.toLowerCase().includes(k)))
+    return matched.length ? matched : accessoires
   }, [products])
 
   // 3. Filtrer les e-liquides
@@ -69,6 +64,13 @@ export default function Configurateur() {
   const discount = Math.round((subtotal * 0.15) * 100) / 100
   const finalPrice = Math.round((subtotal - discount) * 100) / 100
 
+  const configComplete = Boolean(selectedBox && selectedClearomizer && selectedEliquid)
+  // Empêche de valider « Étape suivante » sans avoir choisi le produit de l'étape.
+  const nextDisabled =
+    (step === 1 && !selectedBox) ||
+    (step === 2 && !selectedClearomizer) ||
+    (step === 3 && !selectedEliquid)
+
   const handleSelectBox = (box) => {
     setSelectedBox(box)
     setSelectedBoxColor(box.colors?.[0] || '')
@@ -92,10 +94,11 @@ export default function Configurateur() {
   const handleAddToCart = () => {
     if (!selectedBox || !selectedClearomizer || !selectedEliquid) return
 
-    // Ajouter les trois produits au panier
-    addToCart(selectedBox.id, 1, selectedBoxColor ? { Couleur: selectedBoxColor } : {})
+    // Ajouter les trois produits au panier — clés de variantes normalisées
+    // (color / nicotine) pour qu'elles s'affichent dans le panier et la commande.
+    addToCart(selectedBox.id, 1, selectedBoxColor ? { color: selectedBoxColor } : {})
     addToCart(selectedClearomizer.id, 1)
-    addToCart(selectedEliquid.id, 1, { Nicotine: `${selectedNicotine} mg/ml` })
+    addToCart(selectedEliquid.id, 1, { nicotine: selectedNicotine })
 
     // Appliquer la promotion -15% automatiquement
     applyPromo('PACK15')
@@ -250,6 +253,12 @@ export default function Configurateur() {
                 </div>
               )}
             </>
+          ) : !configComplete ? (
+            /* Sécurité : configuration incomplète, on renvoie au choix */
+            <div className="card p-10 text-center text-muted text-sm">
+              Votre configuration est incomplète.
+              <button onClick={() => setStep(1)} className="btn-ghost mt-4 mx-auto block">Recommencer le pack</button>
+            </div>
           ) : (
             /* Étape 4 : Récapitulatif */
             <div className="space-y-6">
@@ -389,8 +398,8 @@ export default function Configurateur() {
               </button>
             ) : (
               <button
-                disabled={step === 1 && !selectedBox}
-                onClick={() => setStep(step + 1)}
+                disabled={nextDisabled}
+                onClick={() => !nextDisabled && setStep(step + 1)}
                 className="btn-ghost mt-6 w-full py-3 text-center text-xs disabled:opacity-30 disabled:hover:scale-100"
               >
                 Étape suivante

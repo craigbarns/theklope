@@ -44,7 +44,9 @@ export default function Product() {
 
   const productSchema = useMemo(() => {
     if (!product) return null
-    return {
+    // priceValidUntil : Google recommande une date de validité du prix (≈ fin de l'année suivante).
+    const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`
+    const schema = {
       "@context": "https://schema.org",
       "@type": "Product",
       "name": product.name,
@@ -59,13 +61,23 @@ export default function Product() {
       },
       "offers": {
         "@type": "Offer",
-        "url": window.location.href,
+        "url": `https://theklope.com/produit/${product.id}`,
         "priceCurrency": "EUR",
-        "price": product.price,
+        "price": (Number(product.price) || 0).toFixed(2),
+        "priceValidUntil": priceValidUntil,
         "itemCondition": "https://schema.org/NewCondition",
         "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
       }
     }
+    // On n'expose des données d'avis structurées QUE si des avis réels existent.
+    if (product.reviews > 0) {
+      schema.aggregateRating = {
+        "@type": "AggregateRating",
+        "ratingValue": (Number(product.rating) || 0).toFixed(1),
+        "reviewCount": product.reviews,
+      }
+    }
+    return schema
   }, [product])
 
   useEffect(() => {
@@ -80,13 +92,17 @@ export default function Product() {
   if (!product) return <NotFound />
 
   const fav = isFavorite(product.id)
+  const outOfStock = product.stock <= 0
+  const maxQty = product.stock > 0 ? product.stock : 1
+  const hasNicotine = Array.isArray(product.nicotine) && product.nicotine.some((n) => Number(n) > 0)
 
   const handleAdd = () => {
+    if (outOfStock) return
     const variant = {}
     if (color) variant.color = color
     if (flavor) variant.flavor = flavor
     if (nicotine != null) variant.nicotine = nicotine
-    addToCart(product.id, qty, variant)
+    addToCart(product.id, Math.min(qty, maxQty), variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
@@ -111,10 +127,12 @@ export default function Product() {
                 {product.badge && <Badge type={product.badge} />}
                 {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
-              <img 
-                src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'} 
-                alt={product.name} 
-                className="w-full rounded-2xl" 
+              <img
+                src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
+                alt={product.name}
+                fetchpriority="high"
+                decoding="async"
+                className="w-full rounded-2xl"
               />
             </div>
             <div className="mt-3 flex gap-3">
@@ -178,12 +196,12 @@ export default function Product() {
                   <IconMinus width={16} height={16} />
                 </button>
                 <span className="w-10 text-center font-semibold text-white">{qty}</span>
-                <button onClick={() => setQty((q) => q + 1)} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Augmenter">
+                <button onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white disabled:opacity-30" aria-label="Augmenter">
                   <IconPlus width={16} height={16} />
                 </button>
               </div>
-              <button onClick={handleAdd} className="btn-primary flex-1 sm:flex-none sm:px-10">
-                {added ? <><IconCheck width={18} height={18} /> Ajouté !</> : <><IconCart width={18} height={18} /> Ajouter au panier</>}
+              <button onClick={handleAdd} disabled={outOfStock} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-10">
+                {outOfStock ? 'Rupture de stock' : added ? <><IconCheck width={18} height={18} /> Ajouté !</> : <><IconCart width={18} height={18} /> Ajouter au panier</>}
               </button>
               <button
                 onClick={() => toggleFavorite(product.id)}
@@ -196,18 +214,28 @@ export default function Product() {
               </button>
             </div>
 
-            <p className="mt-3 text-sm text-muted">
-              {product.stock > 10
-                ? 'En stock — expédié sous 24/48h'
-                : `Plus que ${product.stock} en stock — commandez vite`}
+            <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : 'text-muted'}`}>
+              {outOfStock
+                ? 'Rupture de stock — bientôt de retour'
+                : product.stock > 10
+                  ? 'En stock — expédié sous 24/48h'
+                  : `Plus que ${product.stock} en stock — commandez vite`}
             </p>
 
             {/* Réassurance */}
-            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Reassure icon={IconLock} text="Paiement 100% sécurisé" />
               <Reassure icon={IconTruck} text="Livraison 24/48h en France" />
+              <Reassure icon={IconShield} text="Retours sous 14 jours" />
               <Reassure icon={IconShield} text="Vente réservée aux +18" />
             </div>
+
+            {hasNicotine && (
+              <p className="mt-4 rounded-xl border border-amber-400/20 bg-amber-400/5 px-3 py-2.5 text-xs leading-relaxed text-ash/70">
+                <strong className="text-ash/80">Avertissement —</strong> Produit contenant de la nicotine, substance
+                qui crée une forte dépendance. Vente interdite aux mineurs (−18&nbsp;ans) et déconseillée aux non-fumeurs.
+              </p>
+            )}
           </div>
         </div>
 
@@ -267,8 +295,8 @@ export default function Product() {
             <p className="truncate text-sm font-medium text-white">{product.name}</p>
             <p className="font-display text-base font-bold text-neon">{formatPrice(product.price)}</p>
           </div>
-          <button onClick={handleAdd} className="btn-primary shrink-0 px-6">
-            {added ? <><IconCheck width={18} height={18} /> Ajouté</> : <><IconCart width={18} height={18} /> Ajouter</>}
+          <button onClick={handleAdd} disabled={outOfStock} className="btn-primary shrink-0 px-6 disabled:cursor-not-allowed disabled:opacity-50">
+            {outOfStock ? 'Rupture' : added ? <><IconCheck width={18} height={18} /> Ajouté</> : <><IconCart width={18} height={18} /> Ajouter</>}
           </button>
         </div>
       </div>

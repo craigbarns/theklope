@@ -8,8 +8,8 @@ const PAGES = {
     title: 'Mentions légales',
     intro: "Informations légales relatives à l'éditeur et à l'hébergement du site THEKLOPE.",
     blocks: [
-      ['Éditeur du site', "The Klope (THEKLOPE) — [Forme juridique], au capital de [montant] €. Établissement : 188 Rue de Rome, 13006 Marseille. Téléphone : 04 91 55 55 55. RCS Marseille [numéro]. N° TVA intracommunautaire : [FRXX XXXXXXXXX]. Directeur de la publication : [nom]."],
-      ['Hébergement', "Le site est hébergé par [nom de l'hébergeur], [adresse], [téléphone]."],
+      ['Éditeur du site', "Le site THEKLOPE est édité par SEVEN SEVENTY, SASU (société par actions simplifiée unipersonnelle) au capital de 770 €. Siège social : 44 rue des Forges, 13010 Marseille. Boutique : 188 rue de Rome, 13006 Marseille — 04 91 55 55 55. RCS Marseille 815 155 973 — SIRET 815 155 973 00044. N° TVA intracommunautaire : FR58 815 155 973. Code APE : 46.90Z. Directeur de la publication : Ralph Ohayon. Contact : contact@theklope.com."],
+      ['Hébergement', "Le site est hébergé par Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, États-Unis — vercel.com."],
       ['Propriété intellectuelle', "L'ensemble des contenus du site (textes, visuels, logos, charte graphique) est la propriété de THEKLOPE ou de ses partenaires et est protégé par le droit de la propriété intellectuelle. Toute reproduction sans autorisation est interdite."],
       ['Vente réglementée', "La vente de produits de vapotage est strictement réservée aux personnes majeures (+18 ans). Les produits contenant de la nicotine créent une forte dépendance et sont déconseillés aux non-fumeurs."],
       ['Contact', "Pour toute question : contact@theklope.com."],
@@ -84,7 +84,7 @@ export default function Legal() {
         </div>
 
         <p className="mt-8 text-xs text-faint">
-          Document de démonstration à compléter avec les informations légales réelles de THEKLOPE.{' '}
+          Une question sur ces conditions ?{' '}
           <Link to="/contact" className="text-neon hover:underline">Nous contacter</Link>
         </p>
       </div>

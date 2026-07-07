@@ -7,10 +7,12 @@ import { IconHeart, IconCart } from './icons.jsx'
 export default function ProductCard({ product }) {
   const { addToCart, toggleFavorite, isFavorite } = useStore()
   const fav = isFavorite(product.id)
-  const lowStock = product.stock <= 10
+  const outOfStock = product.stock <= 0
+  const lowStock = product.stock > 0 && product.stock <= 10
 
   const handleAdd = (e) => {
     e.preventDefault()
+    if (outOfStock) return
     const variant = {}
     if (product.colors?.length) variant.color = product.colors[0]
     if (product.flavors?.length) variant.flavor = product.flavors[0]
@@ -72,17 +74,20 @@ export default function ProductCard({ product }) {
           <button
             type="button"
             onClick={handleAdd}
-            aria-label={`Ajouter ${product.name} au panier`}
-            className="focus-ring grid h-10 w-10 place-items-center rounded-full bg-neon text-noir transition hover:scale-105 hover:shadow-glow active:scale-90"
+            disabled={outOfStock}
+            aria-label={outOfStock ? `${product.name} en rupture de stock` : `Ajouter ${product.name} au panier`}
+            className="focus-ring grid h-10 w-10 place-items-center rounded-full bg-neon text-noir transition hover:scale-105 hover:shadow-glow active:scale-90 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-faint disabled:hover:scale-100 disabled:hover:shadow-none"
           >
             <IconCart width={18} height={18} />
           </button>
         </div>
-        {lowStock && (
+        {outOfStock ? (
+          <p className="mt-2 text-[11px] font-medium text-rose-400">Rupture de stock</p>
+        ) : lowStock ? (
           <p className="mt-2 text-[11px] font-medium text-amber-400">
             Plus que {product.stock} en stock
           </p>
-        )}
+        ) : null}
       </div>
     </Link>
   )

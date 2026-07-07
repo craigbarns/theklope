@@ -61,7 +61,7 @@ export default function CheckoutReturn() {
 
   return (
     <div className="container-page py-16">
-      <Seo title="Confirmation de commande" />
+      <Seo title="Confirmation de commande" noindex />
       <div className="mx-auto max-w-lg card p-10 text-center">
         {state === 'paid' && (
           <>

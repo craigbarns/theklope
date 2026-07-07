@@ -1,8 +1,11 @@
 import { useEffect } from 'react'
 
 // Met à jour le titre, les balises OpenGraph et injecte le JSON-LD structuré pour le SEO/GEO.
-export default function Seo({ title, description, schema, canonical }) {
+export default function Seo({ title, description, schema, canonical, noindex = false }) {
   useEffect(() => {
+    // 0. Indexation : les pages back-office / tunnel ne doivent pas être indexées.
+    updateMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow')
+
     // 1. Titre de la page
     if (title) document.title = `${title} — THEKLOPE`
 
@@ -36,7 +39,7 @@ export default function Seo({ title, description, schema, canonical }) {
         scriptTag.remove()
       }
     }
-  }, [title, description, schema, canonical])
+  }, [title, description, schema, canonical, noindex])
 
   return null
 }
