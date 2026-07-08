@@ -483,6 +483,28 @@ export function StoreProvider({ children }) {
     setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status } : order)))
   }, [adminSession])
 
+  // Marque une commande « expédiée », enregistre le suivi et notifie le client
+  // par e-mail (côté serveur, via le jeton admin).
+  const markShipped = useCallback(async (orderId, { tracking = '', carrier = '' } = {}) => {
+    const token = adminSession?.access_token
+    if (!token) throw new Error('Connexion admin requise.')
+    const res = await fetch('/api/mark-shipped', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ orderId, tracking, carrier }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || data.error) throw new Error(data.error || "Envoi de l'e-mail d'expédition impossible.")
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId
+          ? { ...order, status: 'shipped', shipping: { ...order.shipping, tracking, carrier } }
+          : order,
+      ),
+    )
+    return data
+  }, [adminSession])
+
   const catalogMeta = useMemo(() => getCatalogMeta(products), [products])
 
   const dashboard = useMemo(() => {
@@ -551,6 +573,7 @@ export function StoreProvider({ children }) {
     orders,
     createOrder,
     updateOrderStatus,
+    markShipped,
     dashboard,
     searchOpen,
     setSearchOpen,

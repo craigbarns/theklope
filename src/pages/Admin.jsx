@@ -58,6 +58,7 @@ export default function Admin() {
     resetProducts,
     clearAllProducts,
     updateOrderStatus,
+    markShipped,
     supabaseEnabled,
     adminSession,
     adminUser,
@@ -195,6 +196,7 @@ export default function Admin() {
               setActionError(error.message || 'Mise à jour impossible.')
             }
           }}
+          markShipped={markShipped}
         />
       )}
       {tab === 'settings' && (
@@ -586,7 +588,7 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
   )
 }
 
-function OrdersPanel({ orders, updateOrderStatus }) {
+function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
   return (
     <section className="card mt-8 p-5 sm:p-6">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -646,6 +648,8 @@ function OrdersPanel({ orders, updateOrderStatus }) {
                 <MiniTotal label="Livraison" value={order.shippingCost === 0 ? 'Offerte' : formatPrice(order.shippingCost)} />
                 <MiniTotal label="Paiement" value={order.paymentStatus === 'paid' ? 'Payé' : order.paymentStatus} />
               </dl>
+
+              <ShipControl order={order} markShipped={markShipped} />
             </article>
           ))}
         </div>
@@ -653,6 +657,49 @@ function OrdersPanel({ orders, updateOrderStatus }) {
         <EmptyState title="Aucune vente enregistrée" text="Passez une commande depuis le checkout pour alimenter ce tableau." />
       )}
     </section>
+  )
+}
+
+// Saisie du numéro de suivi + envoi de l'e-mail « expédiée » au client.
+function ShipControl({ order, markShipped }) {
+  const [tracking, setTracking] = useState(order.shipping?.tracking || '')
+  const [carrier, setCarrier] = useState(order.shipping?.carrier || '')
+  const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+
+  const shipped = order.status === 'shipped' || order.status === 'delivered'
+
+  const submit = async () => {
+    if (loading) return
+    setFeedback(null)
+    setLoading(true)
+    try {
+      await markShipped(order.id, { tracking: tracking.trim(), carrier: carrier.trim() })
+      setFeedback({ ok: true, message: 'Commande marquée expédiée — e-mail envoyé au client.' })
+    } catch (err) {
+      setFeedback({ ok: false, message: err.message || 'Échec de l’envoi.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="mt-4 flex flex-col gap-3 rounded-xl border border-white/8 bg-noir/30 p-4 sm:flex-row sm:items-end">
+      <label className="block flex-1">
+        <span className="mb-1.5 block text-xs font-medium text-muted">N° de suivi</span>
+        <input value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Ex : 6A12345678901" className="input" />
+      </label>
+      <label className="block sm:w-40">
+        <span className="mb-1.5 block text-xs font-medium text-muted">Transporteur</span>
+        <input value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="Colissimo, Mondial Relay…" className="input" />
+      </label>
+      <button onClick={submit} disabled={loading} className="btn-primary shrink-0 disabled:opacity-60">
+        {loading ? 'Envoi…' : shipped ? 'Renvoyer le suivi' : 'Marquer expédiée & notifier'}
+      </button>
+      {feedback && (
+        <p className={`text-xs ${feedback.ok ? 'text-neon' : 'text-rose-400'} sm:ml-2 sm:self-center`}>{feedback.message}</p>
+      )}
+    </div>
   )
 }
 
