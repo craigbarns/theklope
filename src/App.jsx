@@ -1,5 +1,6 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import AgeGate from './components/AgeGate.jsx'
@@ -77,6 +78,7 @@ export default function App() {
       <Footer />
       <CookieBanner />
       <CoachVape />
+      <Analytics />
     </div>
   )
 }
