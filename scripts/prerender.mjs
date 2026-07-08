@@ -16,6 +16,7 @@
 import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { loadProducts } from './load-catalog.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
@@ -23,7 +24,7 @@ const dist = resolve(root, 'dist')
 const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://theklope.com').replace(/\/$/, '')
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
-const { PRODUCTS } = await import(resolve(root, 'src/data/products.js'))
+const PRODUCTS = await loadProducts()
 const { CATEGORIES, categoryName } = await import(resolve(root, 'src/data/catalog.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 

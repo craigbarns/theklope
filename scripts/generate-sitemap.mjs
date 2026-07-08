@@ -7,7 +7,8 @@ import { dirname, resolve } from 'node:path'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 
-const { PRODUCTS } = await import(resolve(root, 'src/data/products.js'))
+const { loadProducts } = await import(resolve(root, 'scripts/load-catalog.mjs'))
+const PRODUCTS = await loadProducts()
 const { CATEGORIES } = await import(resolve(root, 'src/data/catalog.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 
