@@ -54,13 +54,6 @@ export default function AgeGate() {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-noir/95 px-5 backdrop-blur-md">
       <div className="w-full max-w-md animate-fade-up rounded-3xl border border-white/10 bg-anthracite p-8 text-center shadow-card sm:p-10">
-        <div className="mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-left">
-          <p className="text-sm font-bold uppercase tracking-wide text-amber-300">Site en maintenance</p>
-          <p className="mt-1 text-xs leading-relaxed text-ash/80">
-            Pour toute commande, veuillez nous contacter par téléphone au{' '}
-            <a href="tel:+33491555555" className="font-semibold text-amber-200 underline">04 91 55 55 55</a>.
-          </p>
-        </div>
         <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl border border-neon/30 bg-neon/10 text-neon">
           <IconShield width={30} height={30} />
         </div>
