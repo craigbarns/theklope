@@ -6,7 +6,7 @@ import { sendEmail, emailLayout, escapeHtml, euro, FROM_CHECKOUT, INBOX_CHECKOUT
 
 // Envoie la confirmation client + la notification interne (checkout@).
 // Tolérant aux erreurs : ne doit jamais faire échouer la finalisation de commande.
-async function sendOrderConfirmationEmails(orderId) {
+export async function sendOrderConfirmationEmails(orderId) {
   const { data: order } = await supabaseAdmin
     .from('orders')
     .select('id, customer, address, subtotal, discount, shipping_cost, total, order_items(name, qty, price, line_total)')
