@@ -4,6 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
+import GoogleReviews from '../components/GoogleReviews.jsx'
 import Newsletter from '../components/Newsletter.jsx'
 import { featuredProducts } from '../data/catalog.js'
 import {
@@ -261,6 +262,7 @@ export default function Home() {
         </div>
       </section>
 
+      <GoogleReviews />
       <Newsletter />
     </>
   )
