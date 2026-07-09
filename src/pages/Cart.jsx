@@ -133,6 +133,9 @@ export default function Cart() {
             <dl className="mt-5 space-y-3 border-t border-white/8 pt-5 text-sm">
               <Row label="Sous-total" value={formatPrice(totals.subtotal)} />
               {totals.discount > 0 && <Row label="Remise" value={`- ${formatPrice(totals.discount)}`} accent />}
+              {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
+                <p key={d.key} className="-mt-1 text-[11px] text-neon/80">✓ {d.label}</p>
+              ))}
               <Row label="Livraison" value={totals.shipping === 0 ? 'Offerte' : formatPrice(totals.shipping)} />
               <div className="flex items-center justify-between border-t border-white/8 pt-4">
                 <dt className="font-semibold text-white">Total</dt>

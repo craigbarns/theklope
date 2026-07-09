@@ -7,6 +7,8 @@ create table if not exists public.products (
   category text not null default 'eliquide',
   brand text not null default 'THEKLOPE',
   type text not null default 'Produit',
+  volume text,
+  ohm text,
   price numeric(10,2) not null default 0,
   old_price numeric(10,2),
   rating numeric(3,2) not null default 4.70,
@@ -24,6 +26,10 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Migration : volume (10ml/50ml, pour les remises auto) + ohm (résistances).
+alter table public.products add column if not exists volume text;
+alter table public.products add column if not exists ohm text;
 
 create table if not exists public.orders (
   id text primary key,

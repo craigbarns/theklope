@@ -31,6 +31,8 @@ const emptyProduct = {
   category: 'eliquide',
   brand: 'THEKLOPE',
   type: 'E-liquide',
+  volume: '',
+  ohm: '',
   price: '',
   oldPrice: '',
   stock: 24,
@@ -579,6 +581,17 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
           <Field label="Nicotine" value={form.nicotine} onChange={update('nicotine')} placeholder="0, 3, 6, 12" />
           <Field label="Saveurs" value={form.flavors} onChange={update('flavors')} placeholder="Menthe, Classic, Fruits rouges" />
           <Field label="Couleurs" value={form.colors} onChange={update('colors')} placeholder="Noir, Argent, Bleu" />
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted">Volume (e-liquide)</span>
+              <select value={form.volume || ''} onChange={update('volume')} className="input">
+                <option value="">—</option>
+                <option value="10ml">10 ml</option>
+                <option value="50ml">50 ml</option>
+              </select>
+            </label>
+            <Field label="Ohm (résistance)" value={form.ohm || ''} onChange={update('ohm')} placeholder="0.8Ω, 1.2Ω…" />
+          </div>
           <TextArea label="Résumé court" value={form.short} onChange={update('short')} rows={3} required />
           <TextArea label="Description longue" value={form.long} onChange={update('long')} rows={5} />
           <TextArea label="Caractéristiques" value={form.specsText} onChange={update('specsText')} rows={4} />

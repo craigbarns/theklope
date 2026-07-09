@@ -89,6 +89,9 @@ export default async function handler(req, res) {
         image: product.image,
         price: Number(product.price) || 0,
         qty,
+        brand: product.brand,
+        volume: product.volume,
+        category: product.category,
         variant: it?.variant || {},
         lineTotal: Math.round((Number(product.price) || 0) * qty * 100) / 100,
       })
@@ -113,7 +116,7 @@ export default async function handler(req, res) {
 
     // 2. Recalculer les totaux de façon déterministe
     const totals = computeTotals({
-      lines: lines.map((l) => ({ price: l.price, qty: l.qty })),
+      lines: lines.map((l) => ({ price: l.price, qty: l.qty, brand: l.brand, volume: l.volume, category: l.category })),
       shippingMethodId,
       promoCode,
     })

@@ -66,6 +66,8 @@ const normalizeProduct = (product) => {
     category: product.category || 'eliquide',
     brand: product.brand?.trim() || 'THEKLOPE',
     type: product.type?.trim() || 'Produit',
+    volume: (product.volume || '').toString().trim(),
+    ohm: (product.ohm || '').toString().trim(),
     price: Math.max(0, toNumber(product.price)),
     oldPrice: product.oldPrice ? Math.max(0, toNumber(product.oldPrice)) : null,
     rating: Math.min(5, Math.max(0, toNumber(product.rating, 4.7))),
@@ -89,6 +91,8 @@ const productToRow = (product) => ({
   category: product.category,
   brand: product.brand,
   type: product.type,
+  volume: product.volume || null,
+  ohm: product.ohm || null,
   price: product.price,
   old_price: product.oldPrice,
   rating: product.rating,
@@ -112,6 +116,8 @@ const productFromRow = (row) =>
     category: row.category,
     brand: row.brand,
     type: row.type,
+    volume: row.volume,
+    ohm: row.ohm,
     price: row.price,
     oldPrice: row.old_price,
     rating: row.rating,
@@ -414,12 +420,20 @@ export function StoreProvider({ children }) {
 
   const totals = useMemo(() => {
     const t = computeTotals({
-      lines: cartDetailed.map((i) => ({ price: i.product.price, qty: i.qty })),
+      lines: cartDetailed.map((i) => ({
+        price: i.product.price,
+        qty: i.qty,
+        brand: i.product.brand,
+        volume: i.product.volume,
+        category: i.product.category,
+      })),
       promoCode: promo?.code,
     })
     return {
       subtotal: t.subtotal,
       discount: t.discount,
+      discountSource: t.discountSource,
+      autoDiscount: t.autoDiscount,
       shipping: t.shipping,
       total: t.total,
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,

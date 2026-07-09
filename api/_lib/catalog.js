@@ -11,7 +11,7 @@ export async function getProductsByIds(ids) {
   if (hasSupabaseAdmin) {
     const { data, error } = await supabaseAdmin
       .from('products')
-      .select('id,name,price,image,stock')
+      .select('id,name,price,image,stock,brand,volume,category')
       .in('id', unique)
     if (error) throw error
     return new Map((data || []).map((p) => [p.id, p]))
@@ -22,7 +22,7 @@ export async function getProductsByIds(ids) {
   const mod = await import('../../src/data/products.js')
   const map = new Map()
   for (const p of mod.PRODUCTS) {
-    if (unique.includes(p.id)) map.set(p.id, { id: p.id, name: p.name, price: p.price, image: p.image, stock: p.stock })
+    if (unique.includes(p.id)) map.set(p.id, { id: p.id, name: p.name, price: p.price, image: p.image, stock: p.stock, brand: p.brand, volume: p.volume, category: p.category })
   }
   return map
 }
