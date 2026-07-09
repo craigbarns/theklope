@@ -217,7 +217,7 @@ export default function Shop() {
 
   return (
     <>
-      <Seo title="Boutique vape en ligne" description="Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, résistances et accessoires pour adultes. Filtres par marque, prix, nicotine et saveur." />
+      <Seo title="Boutique vape en ligne | THEKLOPE" description="Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, résistances et accessoires pour adultes. Filtres par marque, prix, nicotine et saveur." />
       <div className="container-page py-8">
         <Breadcrumbs items={[{ label: 'Boutique' }]} />
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

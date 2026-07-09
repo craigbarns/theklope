@@ -87,7 +87,7 @@ export default function CategoryPage() {
   return (
     <div className="container-page py-8">
       <Seo
-        title={seo?.seoTitle || category.name}
+        title={`${seo?.seoTitle || category.name} | THEKLOPE`}
         description={seo?.metaDescription || `${category.name} — ${category.tagline}. Sélection THEKLOPE.`}
         schema={schema}
       />

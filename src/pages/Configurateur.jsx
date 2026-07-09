@@ -111,7 +111,7 @@ export default function Configurateur() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="Configurateur de Pack Cigarette Électronique"
+        title="Configurateur de pack sur mesure (-15%) | THEKLOPE"
         description="Composez un pack cigarette électronique compatible et bénéficiez de -15% sur le pack complet."
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Configurateur' }]} />

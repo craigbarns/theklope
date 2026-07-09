@@ -1,5 +1,5 @@
 import { Suspense, lazy } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams } from 'react-router-dom'
 import { Analytics } from '@vercel/analytics/react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
@@ -32,6 +32,11 @@ const Blog = lazy(() => import('./pages/Blog.jsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'))
 const StaticSeoPage = lazy(() => import('./pages/StaticSeoPage.jsx'))
 
+function BlogRedirect() {
+  const { slug } = useParams()
+  return <Navigate to={`/guides/${slug}`} replace />
+}
+
 function PageFallback() {
   return (
     <div className="container-page flex min-h-[50vh] items-center justify-center py-20">
@@ -59,8 +64,8 @@ export default function App() {
             <Route path="/calculette-diy" element={<CalculetteDiy />} />
             <Route path="/guides" element={<Blog />} />
             <Route path="/guides/:slug" element={<BlogPost />} />
-            <Route path="/blog" element={<Blog />} />
-            <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/blog" element={<Navigate to="/guides" replace />} />
+            <Route path="/blog/:slug" element={<BlogRedirect />} />
             <Route path="/boutique-vape-marseille" element={<StaticSeoPage />} />
             <Route path="/conformite-vape" element={<StaticSeoPage />} />
             <Route path="/livraison-retours" element={<StaticSeoPage />} />

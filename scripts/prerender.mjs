@@ -30,6 +30,7 @@ const { CATEGORIES, categoryName, productMatchesCategory } = await import(resolv
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
+const { STORE_REVIEW_SUMMARY } = await import(resolve(root, 'src/data/reviews.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -53,16 +54,16 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
   const image = ogImage || DEFAULT_OG
   let html = template
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(fullTitle)}</title>`)
-  html = replaceAttr(html, /(<meta name="description" content=")[^"]*(")/, description)
-  html = replaceAttr(html, /(<meta property="og:title" content=")[^"]*(")/, fullTitle)
-  html = replaceAttr(html, /(<meta property="og:description" content=")[^"]*(")/, description)
-  html = replaceAttr(html, /(<meta property="og:type" content=")[^"]*(")/, ogType)
-  html = replaceAttr(html, /(<meta property="og:url" content=")[^"]*(")/, canonical)
-  html = replaceAttr(html, /(<meta property="og:image" content=")[^"]*(")/, image)
-  html = replaceAttr(html, /(<meta name="twitter:title" content=")[^"]*(")/, fullTitle)
-  html = replaceAttr(html, /(<meta name="twitter:description" content=")[^"]*(")/, description)
-  html = replaceAttr(html, /(<meta name="twitter:image" content=")[^"]*(")/, image)
-  html = replaceAttr(html, /(<link rel="canonical" href=")[^"]*(")/, canonical)
+  html = replaceAttr(html, /(<meta\s+name="description"\s+content=")[^"]*(")/, description)
+  html = replaceAttr(html, /(<meta\s+property="og:title"\s+content=")[^"]*(")/, fullTitle)
+  html = replaceAttr(html, /(<meta\s+property="og:description"\s+content=")[^"]*(")/, description)
+  html = replaceAttr(html, /(<meta\s+property="og:type"\s+content=")[^"]*(")/, ogType)
+  html = replaceAttr(html, /(<meta\s+property="og:url"\s+content=")[^"]*(")/, canonical)
+  html = replaceAttr(html, /(<meta\s+property="og:image"\s+content=")[^"]*(")/, image)
+  html = replaceAttr(html, /(<meta\s+name="twitter:title"\s+content=")[^"]*(")/, fullTitle)
+  html = replaceAttr(html, /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, description)
+  html = replaceAttr(html, /(<meta\s+name="twitter:image"\s+content=")[^"]*(")/, image)
+  html = replaceAttr(html, /(<link\s+rel="canonical"\s+href=")[^"]*(")/, canonical)
 
   if (jsonLd) {
     const json = JSON.stringify(jsonLd).replace(/</g, '\\u003c')
@@ -284,4 +285,89 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
   count++
 }
 
-console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length + Object.keys(STATIC_SEO_PAGES).length} pages statiques).`)
+// ---- Page d'accueil (/) ----
+const homeTitle = 'THEKLOPE — Boutique vape en ligne pour adultes'
+const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
+const homeSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'LocalBusiness',
+      name: 'THEKLOPE',
+      image: `${BASE_URL}/og-image.jpg`,
+      '@id': 'https://theklope.com/#store',
+      url: 'https://theklope.com',
+      telephone: '+33491555555',
+      priceRange: '$$',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: '188 rue de Rome',
+        addressLocality: 'Marseille',
+        postalCode: '13006',
+        addressCountry: 'FR',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 43.2905,
+        longitude: 5.3801,
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: STORE_REVIEW_SUMMARY.rating.toFixed(1),
+        reviewCount: STORE_REVIEW_SUMMARY.count,
+      },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://theklope.com/#website',
+      url: 'https://theklope.com',
+      name: 'THEKLOPE',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://theklope.com/boutique?q={search_term_string}',
+        'query-input': 'required name=search_term_string',
+      },
+    },
+    {
+      '@type': 'Organization',
+      '@id': 'https://theklope.com/#organization',
+      name: 'THEKLOPE',
+      url: 'https://theklope.com',
+      logo: `${BASE_URL}/logo.png`,
+    },
+  ],
+}
+
+const homeContent = `
+  <h1>THEKLOPE — Boutique vape en ligne pour adultes</h1>
+  <p>Cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.</p>
+  
+  <h2>Nos Catégories de Produits Vape</h2>
+  <ul>
+    ${CATEGORIES.map(c => `<li><a href="/categorie/${esc(c.slug)}">${esc(c.name)} — ${esc(c.tagline)}</a></li>`).join('\n')}
+  </ul>
+  
+  <h2>Nos Engagements & Services</h2>
+  <ul>
+    <li><strong>Produits testés et sélectionnés :</strong> Chaque référence est choisie pour sa fiabilité et sa qualité.</li>
+    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 49€.</li>
+    <li><strong>Paiement 100% sécurisé :</strong> Transactions chiffrées avec Mollie, vos données sont protégées.</li>
+    <li><strong>Service client réactif :</strong> Une équipe disponible pour vous accompagner.</li>
+  </ul>
+  
+  <h2>Boutique de vape physique à Marseille</h2>
+  <p>Retrouvez-nous également dans notre boutique physique au 188 rue de Rome, 13006 Marseille.</p>
+  <p><a href="/boutique-vape-marseille">En savoir plus sur notre boutique de Marseille</a></p>
+  
+  <h2>Guides & Conseils Vape</h2>
+  <ul>
+    <li><a href="/guides/quelle-cigarette-electronique-choisir">Comment choisir sa cigarette électronique</a></li>
+    <li><a href="/guides/choisir-taux-nicotine-e-liquide">Comprendre les taux de nicotine</a></li>
+    <li><a href="/guides/quand-changer-resistance">Quand changer sa résistance de cigarette électronique</a></li>
+  </ul>
+`
+
+writePage('/', buildPage({ title: homeTitle, description: homeDescription, canonicalPath: '/', jsonLd: homeSchema, content: homeContent }))
+count++
+
+console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length + Object.keys(STATIC_SEO_PAGES).length + 1} pages statiques).`)

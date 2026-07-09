@@ -35,7 +35,7 @@ export default function Blog() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="Guides vape responsables"
+        title="Guides vape responsables | THEKLOPE"
         description="Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes."
         canonical="https://theklope.com/guides"
         schema={schema}

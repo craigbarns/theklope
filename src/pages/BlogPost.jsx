@@ -88,7 +88,7 @@ export default function BlogPost() {
 
       <div className="container-page py-8">
         <Seo
-          title={post.title}
+          title={`${post.title} | THEKLOPE`}
           description={post.description}
           canonical={`https://theklope.com/guides/${post.slug}`}
           schema={schema}

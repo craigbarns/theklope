@@ -14,7 +14,7 @@ const VALUES = [
 export default function About() {
   return (
     <>
-      <Seo title="À propos" description="THEKLOPE, une boutique moderne qui sélectionne des produits de vape fiables, design et accessibles." />
+      <Seo title="À propos | THEKLOPE" description="THEKLOPE, boutique de vape née à Marseille (188 rue de Rome). Une sélection premium, un conseil d’expert et une expérience simple et élégante." />
       <div className="container-page py-8">
         <Breadcrumbs items={[{ label: 'À propos' }]} />
 

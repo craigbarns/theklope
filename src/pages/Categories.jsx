@@ -9,7 +9,7 @@ export default function Categories() {
   const { products } = useStore()
   return (
     <div className="container-page py-8">
-      <Seo title="Catégories" description="Toutes les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, accessoires, packs débutants, nouveautés et meilleures ventes." />
+      <Seo title="Catégories | THEKLOPE" description="Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, accessoires et packs débutants." />
       <Breadcrumbs items={[{ label: 'Catégories' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Catégories</h1>
       <p className="mt-2 text-muted">Explorez notre sélection par univers.</p>

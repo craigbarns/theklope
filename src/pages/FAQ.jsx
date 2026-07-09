@@ -163,7 +163,7 @@ export default function FAQ() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="FAQ vape, livraison, nicotine et conformité"
+        title="FAQ vape, livraison, nicotine et conformité | THEKLOPE"
         description="Questions fréquentes THEKLOPE : livraison, retours, paiement Mollie, produits vape réservés aux adultes, nicotine, résistances, e-liquides et alternatives aux puffs."
         schema={faqSchema}
       />

@@ -139,7 +139,11 @@ export default function Product() {
 
   return (
     <>
-      <Seo title={product.name} description={product.short} schema={productSchema} />
+      <Seo
+        title={`${product.name} — ${categoryName(product.category)} | THEKLOPE`}
+        description={product.short}
+        schema={productSchema}
+      />
       <div className="container-page py-8 pb-28 lg:pb-8">
         <Breadcrumbs
           items={[

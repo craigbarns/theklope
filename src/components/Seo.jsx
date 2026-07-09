@@ -7,7 +7,13 @@ export default function Seo({ title, description, schema, canonical, noindex = f
     updateMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow')
 
     // 1. Titre de la page
-    if (title) document.title = `${title} — THEKLOPE`
+    if (title) {
+      if (title.endsWith('THEKLOPE')) {
+        document.title = title
+      } else {
+        document.title = `${title} — THEKLOPE`
+      }
+    }
 
     // 2. Balises meta description & OpenGraph
     if (description) {

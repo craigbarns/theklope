@@ -42,7 +42,7 @@ export default function Contact() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Contact" description="Contactez l'équipe THEKLOPE : formulaire, e-mail et téléphone. Service client réactif." />
+      <Seo title="Contact | THEKLOPE" description="Contactez l’équipe THEKLOPE : formulaire, e-mail et boutique à Marseille. Service client réactif." />
       <Breadcrumbs items={[{ label: 'Contact' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Contact</h1>
       <p className="mt-2 max-w-xl text-muted">

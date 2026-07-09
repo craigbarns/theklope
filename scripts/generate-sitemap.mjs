@@ -26,6 +26,10 @@ const staticRoutes = [
   { loc: '/a-propos', changefreq: 'monthly', priority: '0.6' },
   { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5' },
+  { loc: '/legal/mentions-legales', changefreq: 'monthly', priority: '0.4' },
+  { loc: '/legal/cgv', changefreq: 'monthly', priority: '0.4' },
+  { loc: '/legal/confidentialite', changefreq: 'monthly', priority: '0.4' },
+  { loc: '/legal/retour', changefreq: 'monthly', priority: '0.4' },
   ...Object.keys(STATIC_SEO_PAGES).map((slug) => ({ loc: `/${slug}`, changefreq: 'monthly', priority: '0.7' })),
 ]
 
