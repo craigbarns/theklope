@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState, useCallback } 
 import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
 import { enrichProductCopy } from '../data/productCopy.js'
 import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
-import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals } from '../lib/pricing.js'
+import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals, computeBundleProgress, resolveVolume } from '../lib/pricing.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -422,16 +422,14 @@ export function StoreProvider({ children }) {
   )
 
   const totals = useMemo(() => {
-    const t = computeTotals({
-      lines: cartDetailed.map((i) => ({
-        price: i.product.price,
-        qty: i.qty,
-        brand: i.product.brand,
-        volume: i.product.volume,
-        category: i.product.category,
-      })),
-      promoCode: promo?.code,
-    })
+    const lines = cartDetailed.map((i) => ({
+      price: i.product.price,
+      qty: i.qty,
+      brand: i.product.brand,
+      volume: resolveVolume(i.product),
+      category: i.product.category,
+    }))
+    const t = computeTotals({ lines, promoCode: promo?.code })
     return {
       subtotal: t.subtotal,
       discount: t.discount,
@@ -440,6 +438,7 @@ export function StoreProvider({ children }) {
       shipping: t.shipping,
       total: t.total,
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
+      bundleProgress: computeBundleProgress(lines),
     }
   }, [cartDetailed, promo])
 

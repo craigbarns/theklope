@@ -30,14 +30,16 @@ export const PROMO_CODES = {
 // Les marques sont comparées en minuscules/sans espaces superflus.
 // -----------------------------------------------------------------------------
 export const BUNDLE_TIERS_10ML = [
-  { key: 'A', brands: ['liquidarom', 'freaks'], packSize: 20, packPrice: 59, label: '20 e-liquides Liquidarom / Freaks' },
-  { key: 'B', brands: ['alfaliquid', 'pulp'], packSize: 20, packPrice: 88.5, label: '20 e-liquides Alfaliquid / Pulp' },
+  { key: 'A', brands: ['liquidarom', 'freaks'], packSize: 20, packPrice: 59, label: '20 e-liquides Liquidarom / Freaks', progressLabel: 'Liquidarom / Freaks', promoLabel: '-50%' },
+  { key: 'B', brands: ['alfaliquid', 'pulp'], packSize: 20, packPrice: 88.5, label: '20 e-liquides Alfaliquid / Pulp', progressLabel: 'Alfaliquid / Pulp', promoLabel: '-25%' },
 ]
 export const BUNDLE_50ML = {
   brands: ['liquidarom', 'freaks', 'alfaliquid', 'pulp'],
   minQty: 4,
   rate: 0.25,
   label: '4 e-liquides 50ml ou +',
+  progressLabel: 'en 50ml',
+  promoLabel: '-25%',
 }
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100
@@ -46,6 +48,18 @@ const normVolume = (v) => String(v || '').trim().toLowerCase().replace(/\s+/g, '
 const is10ml = (l) => normVolume(l.volume) === '10ml'
 const is50ml = (l) => normVolume(l.volume) === '50ml'
 const isEliquid = (l) => (l.category || 'eliquide') === 'eliquide'
+
+// Volume effectif d'un produit pour les remises : champ `volume` s'il est
+// renseigné, sinon dérivé de `specs.Contenance` (ex. « 10 ml »). Indispensable :
+// le catalogue stocke souvent la contenance uniquement dans les specs, sans quoi
+// aucune remise dégressive ne se déclencherait. Utilisé CÔTÉ CLIENT ET SERVEUR.
+export const resolveVolume = (p = {}) => {
+  const raw = p?.volume || p?.specs?.Contenance || p?.specs?.contenance || ''
+  const n = normVolume(raw)
+  if (n.includes('50ml')) return '50ml'
+  if (n.includes('10ml')) return '10ml'
+  return n
+}
 
 export const getShippingMethod = (id) =>
   SHIPPING_METHODS.find((m) => m.id === id) || SHIPPING_METHODS[0]
@@ -91,6 +105,45 @@ export function computeAutoDiscount(lines = []) {
   }
 
   return { total: round2(total), details }
+}
+
+// Progression vers les paliers de remise NON encore atteints, pour inciter le
+// client au panier (« plus que N e-liquides pour -50 % »). Renvoie une entrée par
+// palier éligible entamé mais pas complet ; vide sinon.
+export function computeBundleProgress(lines = []) {
+  const hints = []
+
+  for (const tier of BUNDLE_TIERS_10ML) {
+    const units = lines
+      .filter((l) => isEliquid(l) && is10ml(l) && tier.brands.includes(normBrand(l.brand)))
+      .reduce((s, l) => s + (Number(l.qty) || 0), 0)
+    if (units > 0 && units < tier.packSize) {
+      hints.push({
+        key: tier.key,
+        progressLabel: tier.progressLabel,
+        promoLabel: tier.promoLabel,
+        current: units,
+        target: tier.packSize,
+        remaining: tier.packSize - units,
+      })
+    }
+  }
+
+  const units50 = lines
+    .filter((l) => isEliquid(l) && is50ml(l) && BUNDLE_50ML.brands.includes(normBrand(l.brand)))
+    .reduce((s, l) => s + (Number(l.qty) || 0), 0)
+  if (units50 > 0 && units50 < BUNDLE_50ML.minQty) {
+    hints.push({
+      key: '50ml',
+      progressLabel: BUNDLE_50ML.progressLabel,
+      promoLabel: BUNDLE_50ML.promoLabel,
+      current: units50,
+      target: BUNDLE_50ML.minQty,
+      remaining: BUNDLE_50ML.minQty - units50,
+    })
+  }
+
+  return hints
 }
 
 // Calcule les totaux de façon déterministe.

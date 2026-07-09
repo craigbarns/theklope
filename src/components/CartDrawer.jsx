@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useMemo } from 'react'
 import { featuredProducts } from '../data/catalog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
+import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
@@ -94,6 +95,11 @@ export default function CartDrawer() {
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full rounded-full bg-neon transition-all duration-500" style={{ width: `${freeShippingPct}%` }} />
               </div>
+              {totals.bundleProgress?.length > 0 && (
+                <div className="mt-3">
+                  <BundleProgress hints={totals.bundleProgress} compact />
+                </div>
+              )}
             </div>
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (

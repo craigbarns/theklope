@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { featuredProducts } from '../data/catalog.js'
 import ProductImage from '../components/ProductImage.jsx'
+import BundleProgress from '../components/BundleProgress.jsx'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
@@ -74,6 +75,8 @@ export default function Cart() {
               Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte !
             </div>
           )}
+
+          <BundleProgress hints={totals.bundleProgress} />
 
           {cartDetailed.map((item) => (
             <div key={item.index} className="card flex gap-4 p-4">
