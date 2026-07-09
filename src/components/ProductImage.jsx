@@ -16,7 +16,7 @@ export default function ProductImage({ src, alt = '', className = '', ...props }
   const webp = src.replace(/\.(jpe?g|png)$/i, '.webp')
   return (
     <picture style={{ display: 'contents' }}>
-      <source srcSet={webp} type="image/webp" />
+      <source srcSet={webp} type="image/webp" width={props.width} height={props.height} />
       <img src={src} alt={alt} className={className} {...props} />
     </picture>
   )

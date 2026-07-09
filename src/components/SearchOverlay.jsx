@@ -69,7 +69,7 @@ export default function SearchOverlay() {
                     onClick={() => go(p.id)}
                     className="flex w-full items-center gap-4 border-b border-white/5 px-4 py-3 text-left transition last:border-0 hover:bg-white/5"
                   >
-                    <img src={p.image} alt="" className="h-12 w-12 rounded-lg object-cover" />
+                    <img src={p.image} alt="" className="h-12 w-12 rounded-lg object-cover" width={48} height={48} />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-white">{p.name}</p>
                       <p className="truncate text-xs text-faint">{p.type}</p>

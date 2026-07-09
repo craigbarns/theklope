@@ -63,7 +63,7 @@ export default function CartDrawer() {
                 <div className="grid grid-cols-2 gap-3">
                   {emptyCartInspirations.map((p) => (
                     <div key={p.id} className="card p-3 flex flex-col justify-between hover:border-neon/30 transition">
-                      <ProductImage src={p.image} alt="" className="aspect-square rounded-xl object-cover bg-carbon p-1" />
+                      <ProductImage src={p.image} alt="" className="aspect-square rounded-xl object-cover bg-carbon p-1" width={150} height={150} />
                       <h3 className="mt-2 truncate text-xs font-semibold text-white">{p.name}</h3>
                       <p className="text-[10px] text-faint mt-0.5">{formatPrice(p.price)}</p>
                       <button
@@ -98,7 +98,7 @@ export default function CartDrawer() {
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
                 <div key={item.index} className="flex gap-3">
-                  <ProductImage src={item.product.image} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+                  <ProductImage src={item.product.image} alt="" loading="lazy" className="h-20 w-20 shrink-0 rounded-xl object-cover" width={80} height={80} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
                       <Link
@@ -147,7 +147,7 @@ export default function CartDrawer() {
                   <div className="space-y-3">
                     {crossSellSuggestions.map((p) => (
                       <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.01] p-3 hover:border-neon/30 transition">
-                        <ProductImage src={p.image} alt="" className="h-12 w-12 rounded-xl object-cover bg-carbon p-1 shrink-0" />
+                        <ProductImage src={p.image} alt="" className="h-12 w-12 rounded-xl object-cover bg-carbon p-1 shrink-0" width={48} height={48} />
                         <div className="min-w-0 flex-1">
                           <Link
                             to={`/produit/${p.id}`}

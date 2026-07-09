@@ -189,6 +189,8 @@ export default function Home() {
                 alt=""
                 loading="lazy"
                 className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
+                width={112}
+                height={112}
               />
               <div className="relative">
                 <h2 className="font-display text-xl font-semibold text-white">{c.name}</h2>
