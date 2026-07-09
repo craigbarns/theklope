@@ -178,10 +178,31 @@ export default function CartDrawer() {
             </div>
 
             <footer className="border-t border-white/10 px-5 py-5">
-              <div className="mb-3 flex items-center justify-between text-sm">
-                <span className="text-muted">Sous-total</span>
-                <span className="font-semibold text-white">{formatPrice(totals.subtotal)}</span>
-              </div>
+              <dl className="mb-3 space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Sous-total</dt>
+                  <dd className="font-semibold text-white">{formatPrice(totals.subtotal)}</dd>
+                </div>
+                {totals.discount > 0 && (
+                  <>
+                    <div className="flex items-center justify-between text-neon">
+                      <dt>Remise</dt>
+                      <dd className="font-semibold">- {formatPrice(totals.discount)}</dd>
+                    </div>
+                    {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
+                      <p key={d.key} className="-mt-1 text-[11px] text-neon/80">✓ {d.label}</p>
+                    ))}
+                  </>
+                )}
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted">Livraison</dt>
+                  <dd className="font-semibold text-white">{totals.shipping === 0 ? 'Offerte' : formatPrice(totals.shipping)}</dd>
+                </div>
+                <div className="flex items-center justify-between border-t border-white/8 pt-2">
+                  <dt className="font-semibold text-white">Total</dt>
+                  <dd className="font-display text-lg font-bold text-white">{formatPrice(totals.total)}</dd>
+                </div>
+              </dl>
               <Link to="/panier" className="btn-ghost mb-2 w-full" onClick={() => setCartOpen(false)}>
                 Voir le panier
               </Link>
