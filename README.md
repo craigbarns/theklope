@@ -4,8 +4,8 @@ Site e-commerce moderne et premium pour **THEKLOPE**, spécialisé dans la vente
 électroniques, pods, e-liquides et accessoires de vape.
 
 Univers visuel sombre et haut de gamme (inspiration Apple / Nothing / Tesla), responsive
-mobile / tablette / desktop, prêt à être connecté à une vraie solution e-commerce (Stripe,
-Shopify, WooCommerce, Supabase…).
+mobile / tablette / desktop, branché à Supabase pour le catalogue/les commandes et à Mollie
+pour le paiement sécurisé.
 
 ## Stack technique
 
@@ -13,9 +13,10 @@ Shopify, WooCommerce, Supabase…).
 - **React Router 6** (navigation multi-pages)
 - **Tailwind CSS 3** (design system, palette de marque)
 - **Supabase** optionnel pour le catalogue, les commandes, les stocks et l'auth admin
+- **Mollie** pour le checkout hébergé et la confirmation serveur par webhook
 - State global via **Context API** (panier, favoris, vérification d'âge, code promo) avec
   persistance `localStorage`
-- Aucune dépendance d'images externes : visuels produits générés en SVG (placeholders premium)
+- Visuels produits locaux, avec fallback placeholder si une image manque
 
 ## Démarrer en local
 
@@ -26,7 +27,7 @@ npm run build    # build de production dans /dist
 npm run preview  # prévisualise le build de production
 ```
 
-> Node 18+ recommandé.
+> Node 20.19+ recommandé (ou Node 22.12+), requis par Vite 8.
 
 ## Configuration Supabase
 
@@ -43,7 +44,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=votre_publishable_key
 2. Dans Supabase, ouvrez **SQL Editor** et exécutez `supabase/schema.sql`.
 
 Ce fichier crée les tables `products`, `orders`, `order_items`, les règles RLS et la fonction
-`submit_order` qui enregistre une commande avec ses lignes puis décrémente le stock.
+`finalize_paid_order` qui finalise une commande payée et décrémente le stock de façon atomique.
 
 3. Dans Supabase, créez un utilisateur admin :
 
@@ -79,6 +80,7 @@ par le **webhook Mollie** (source de vérité), impossible à falsifier côté c
 | `SUPABASE_SERVICE_ROLE_KEY` | serveur | Le serveur crée/finalise les commandes (contourne la RLS) |
 | `SUPABASE_URL` | serveur | (optionnel) si l'URL n'est pas déjà fournie |
 | `PUBLIC_BASE_URL` | serveur | URL publique du site (redirect + webhook Mollie) |
+| `RESEND_API_KEY` | serveur | (optionnel) e-mails transactionnels via Resend |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | client | Catalogue + auth admin |
 
 > Aucune clé Mollie ni service_role ne doit être exposée au navigateur.
@@ -92,7 +94,8 @@ par le **webhook Mollie** (source de vérité), impossible à falsifier côté c
 3. Retour sur `/checkout/retour?order=…` : la page interroge
    `GET /api/payment-status` qui relit le vrai statut auprès de Mollie.
 4. `POST /api/mollie-webhook` : confirme le paiement, passe la commande à
-   « payée » et décrémente le stock.
+   « payée », décrémente le stock de façon atomique ou marque un incident stock
+   à traiter manuellement si le stock a bougé entre le panier et le paiement.
 
 ### Tester en local
 
@@ -110,8 +113,9 @@ src/
 ├── context/
 │   └── StoreContext.jsx     # panier, favoris, commandes, Supabase, âge, cookies, codes promo
 ├── data/
-│   ├── products.js          # 12 produits de démonstration + catégories + helpers
-│   └── productImage.js      # générateur d'images placeholder SVG
+│   ├── products.js          # catalogue produits de référence
+│   ├── productCopy.js       # enrichissement des descriptions produit
+│   └── reviews.js           # note Google et extraits d'avis boutique
 ├── components/
 │   ├── Header.jsx           # menu sticky, recherche, panier, favoris, menu mobile
 │   ├── Footer.jsx           # liens utiles + avertissement légal
@@ -127,7 +131,7 @@ src/
     ├── Shop.jsx             # boutique + filtres (catégorie, prix, marque, type, nicotine, saveur) + tri
     ├── Product.jsx          # fiche produit (galerie, variantes, avis, similaires)
     ├── Cart.jsx             # panier + code promo
-    ├── Checkout.jsx         # tunnel d'achat en 3 étapes (simulé)
+    ├── Checkout.jsx         # tunnel d'achat en 3 étapes vers Mollie
     ├── Admin.jsx            # dashboard admin catalogue, ventes, commandes, stock
     ├── Categories.jsx       # grille des catégories
     ├── CategoryPage.jsx     # page d'une catégorie
@@ -144,7 +148,7 @@ src/
 - **Filtres** boutique (catégorie, prix, marque, type, taux de nicotine, saveur) et **tri**
 - **Badges** produits : Nouveau, Best-seller, Promo, Stock limité
 - **Panier** complet : quantités, code promo, livraison offerte dès 49€, totaux
-- **Checkout** en 3 étapes (coordonnées → livraison → paiement) avec confirmation
+- **Checkout** en 3 étapes (coordonnées → livraison → paiement Mollie)
 - **Dashboard admin** `/admin` : création produit, édition catalogue, suivi des ventes,
   commandes, statuts, stock faible, export JSON
 - Connexion **Supabase Auth** pour protéger l'admin quand Supabase est configuré
@@ -152,7 +156,7 @@ src/
 - **SEO** : titres et meta description par page, balises Open Graph, langue `fr`
 - Design **mobile-first** et responsive
 
-### Codes promo de démonstration
+### Codes promo disponibles
 
 | Code         | Effet                       |
 |--------------|-----------------------------|
@@ -193,4 +197,4 @@ npm run build      # génère /dist
 
 ⚠️ **Avertissement légal** — La vente de produits de vapotage est interdite aux mineurs. Les
 produits contenant de la nicotine créent une forte dépendance. Leur utilisation est déconseillée
-aux non-fumeurs. Les produits, prix et visuels de cette version sont **fictifs** (démonstration).
+aux non-fumeurs.

@@ -75,10 +75,119 @@ for each row execute function public.set_updated_at();
 -- SÉCURITÉ : l'ancienne RPC `submit_order` (exécutable par `anon`) permettait à
 -- n'importe qui d'insérer des commandes « payées » sans paiement réel. Elle est
 -- supprimée. Les commandes sont désormais créées UNIQUEMENT côté serveur :
---   - api/create-payment-intent insère la commande « en attente » (service role)
---   - api/stripe-webhook la passe à « payée » après preuve de paiement Stripe
+--   - api/create-payment insère la commande « en attente » (service role)
+--   - api/mollie-webhook la passe à « payée » après preuve de paiement Mollie
 -- Le service role contourne la RLS, donc aucune policy d'insertion publique.
 drop function if exists public.submit_order(jsonb, jsonb);
+
+-- Finalise une commande payée de façon atomique :
+--   - verrouille la commande pendant la finalisation ;
+--   - verrouille les lignes produits avant le contrôle de stock ;
+--   - additionne les quantités par produit pour gérer plusieurs variantes ;
+--   - empêche les stocks négatifs ;
+--   - marque un incident stock si le paiement est confirmé mais le stock a bougé.
+create or replace function public.finalize_paid_order(p_order_id text)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order record;
+  v_product record;
+  v_insufficient jsonb;
+begin
+  select id, payment_status
+  into v_order
+  from public.orders
+  where id = p_order_id
+  for update;
+
+  if not found then
+    return jsonb_build_object('ok', false, 'status', 'unknown', 'reason', 'order_not_found');
+  end if;
+
+  if v_order.payment_status = 'paid' then
+    return jsonb_build_object('ok', true, 'status', 'already_paid');
+  end if;
+
+  -- Sérialise les finalisations concurrentes sur les mêmes produits. Sans ce
+  -- verrou, deux paiements simultanés pourraient lire le même stock disponible
+  -- puis le décrémenter deux fois.
+  for v_product in
+    with qty_by_product as (
+      select product_id, sum(qty)::integer as requested
+      from public.order_items
+      where order_id = p_order_id
+        and product_id is not null
+      group by product_id
+    )
+    select p.id
+    from public.products p
+    join qty_by_product q on q.product_id = p.id
+    order by p.id
+    for update of p
+  loop
+    null;
+  end loop;
+
+  with qty_by_product as (
+    select
+      oi.product_id,
+      min(oi.name) as name,
+      sum(oi.qty)::integer as requested
+    from public.order_items oi
+    where oi.order_id = p_order_id
+      and oi.product_id is not null
+    group by oi.product_id
+  )
+  select jsonb_agg(
+    jsonb_build_object(
+      'productId', q.product_id,
+      'name', q.name,
+      'requested', q.requested,
+      'available', coalesce(p.stock, 0)
+    )
+  )
+  into v_insufficient
+  from qty_by_product q
+  left join public.products p on p.id = q.product_id
+  where p.id is null or coalesce(p.stock, 0) < q.requested;
+
+  if v_insufficient is not null then
+    update public.orders
+    set payment_status = 'paid',
+        status = 'stock_issue'
+    where id = p_order_id;
+
+    return jsonb_build_object('ok', false, 'status', 'stock_issue', 'items', v_insufficient);
+  end if;
+
+  with qty_by_product as (
+    select product_id, sum(qty)::integer as requested
+    from public.order_items
+    where order_id = p_order_id
+      and product_id is not null
+    group by product_id
+  )
+  update public.products p
+  set stock = p.stock - q.requested
+  from qty_by_product q
+  where p.id = q.product_id;
+
+  update public.orders
+  set payment_status = 'paid',
+      status = 'processing'
+  where id = p_order_id;
+
+  return jsonb_build_object('ok', true, 'status', 'processing');
+end;
+$$;
+
+revoke all on function public.finalize_paid_order(text) from public;
+revoke all on function public.finalize_paid_order(text) from anon;
+revoke all on function public.finalize_paid_order(text) from authenticated;
+grant execute on function public.finalize_paid_order(text) to service_role;
 
 alter table public.products enable row level security;
 alter table public.orders enable row level security;
@@ -191,4 +300,3 @@ create policy "Admins can delete product images"
 on storage.objects for delete
 to authenticated
 using ( bucket_id = 'products' );
-

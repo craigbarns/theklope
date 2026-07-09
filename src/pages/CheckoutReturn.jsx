@@ -72,6 +72,11 @@ export default function CheckoutReturn() {
             <p className="mt-3 text-muted">
               Votre commande <strong className="text-neon">{order?.id || orderId}</strong> a bien été payée et confirmée.
             </p>
+            {order?.status === 'stock_issue' && (
+              <p className="mt-3 rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
+                Une vérification manuelle est en cours sur la disponibilité d'un produit. L'équipe THEKLOPE vous contacte rapidement si une adaptation est nécessaire.
+              </p>
+            )}
             {order?.total != null && (
               <div className="mt-6 rounded-2xl border border-white/8 bg-white/5 p-4 text-left text-sm">
                 <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(order.total)}</span></div>

@@ -24,7 +24,8 @@ const dist = resolve(root, 'dist')
 const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://theklope.com').replace(/\/$/, '')
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
-const PRODUCTS = await loadProducts()
+const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
+const PRODUCTS = (await loadProducts()).map(enrichProductCopy)
 const { CATEGORIES, categoryName } = await import(resolve(root, 'src/data/catalog.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 

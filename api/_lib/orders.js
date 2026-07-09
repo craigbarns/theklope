@@ -59,24 +59,29 @@ async function sendOrderConfirmationEmails(orderId) {
   })
 }
 
-async function decrementStock(orderId) {
-  const { data: orderItems } = await supabaseAdmin
-    .from('order_items')
-    .select('product_id, qty')
-    .eq('order_id', orderId)
+async function sendStockIssueEmail(orderId, items = []) {
+  const details = items
+    .map((item) => {
+      const name = escapeHtml(item.name || item.productId || 'Produit')
+      return `<li>${name} — demandé : ${Number(item.requested || 0)}, disponible : ${Number(item.available || 0)}</li>`
+    })
+    .join('')
 
-  for (const item of orderItems || []) {
-    if (!item.product_id) continue
-    const { data: product } = await supabaseAdmin
-      .from('products')
-      .select('stock')
-      .eq('id', item.product_id)
-      .maybeSingle()
-    if (product) {
-      const nextStock = Math.max(0, (Number(product.stock) || 0) - (Number(item.qty) || 0))
-      await supabaseAdmin.from('products').update({ stock: nextStock }).eq('id', item.product_id)
-    }
-  }
+  await sendEmail({
+    from: FROM_CHECKOUT,
+    to: INBOX_CHECKOUT,
+    subject: `Incident stock sur commande payée ${orderId}`,
+    html: emailLayout({
+      title: `Incident stock ${escapeHtml(orderId)}`,
+      bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">La commande <strong style="color:#35FF8A">${escapeHtml(orderId)}</strong> est payée, mais le stock disponible ne permet pas une préparation automatique.</p><ul style="font-size:14px;color:#e5e5e5;line-height:1.7">${details}</ul><p style="font-size:13px;color:#9aa0a6">Action requise : contacter le client, expédier une alternative ou rembourser.</p>`,
+    }),
+  })
+}
+
+async function finalizePaidOrder(orderId) {
+  const { data, error } = await supabaseAdmin.rpc('finalize_paid_order', { p_order_id: orderId })
+  if (error) throw error
+  return data || { ok: false, status: 'unknown' }
 }
 
 // Récupère le paiement Mollie, met à jour la commande correspondante et renvoie
@@ -90,21 +95,36 @@ export async function syncOrderFromMolliePayment(paymentId) {
 
   const { data: order } = await supabaseAdmin
     .from('orders')
-    .select('id, payment_status')
+    .select('id, payment_status, payment_id')
     .eq('id', orderId)
     .maybeSingle()
   if (!order) return { status: 'unknown' }
+
+  if (order.payment_id !== paymentId) {
+    const { error: linkErr } = await supabaseAdmin
+      .from('orders')
+      .update({ payment_id: paymentId })
+      .eq('id', orderId)
+    if (linkErr) console.error('payment_id link error:', linkErr)
+  }
 
   const isPaid = typeof payment.isPaid === 'function' ? payment.isPaid() : payment.status === 'paid'
 
   if (isPaid) {
     if (order.payment_status !== 'paid') {
-      await supabaseAdmin
-        .from('orders')
-        .update({ payment_status: 'paid', status: 'processing' })
-        .eq('id', orderId)
-      await decrementStock(orderId)
-      // E-mails de confirmation (client + interne). Non bloquant.
+      const finalization = await finalizePaidOrder(orderId)
+
+      if (finalization.status === 'stock_issue') {
+        try {
+          await sendStockIssueEmail(orderId, finalization.items || [])
+        } catch (err) {
+          console.error('stock issue email error:', err)
+        }
+        return { status: 'paid', orderId, orderStatus: 'stock_issue' }
+      }
+
+      // E-mails de confirmation (client + interne). Non bloquant. On les envoie
+      // seulement quand la commande peut réellement passer en préparation.
       try {
         await sendOrderConfirmationEmails(orderId)
       } catch (err) {

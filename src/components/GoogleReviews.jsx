@@ -1,3 +1,5 @@
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+
 // Widget d'avis Google (Elfsight). Le script platform.js est chargé dans
 // index.html ; il détecte ce conteneur et monte le widget automatiquement.
 // data-elfsight-app-lazy => chargement différé quand le bloc devient visible.
@@ -10,7 +12,7 @@ export default function GoogleReviews() {
           Les avis de nos clients
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-          Note moyenne 4,7★ sur Google — merci à nos vapoteurs pour leur confiance.
+          {STORE_REVIEW_SUMMARY.sentence}
         </p>
       </div>
       <div

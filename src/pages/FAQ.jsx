@@ -23,8 +23,8 @@ const SECTIONS = [
   {
     title: 'Paiement',
     items: [
-      { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Carte bancaire (Visa, Mastercard) via un paiement chiffré et sécurisé. D\'autres moyens peuvent être ajoutés lors de la connexion à un prestataire de paiement.' },
-      { q: 'Mes données bancaires sont-elles protégées ?', a: 'Oui. Les transactions sont chiffrées et nous ne stockons jamais vos données de carte. Le paiement est traité par un prestataire certifié.' },
+      { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Le paiement est traité par Mollie, via un checkout sécurisé. Les moyens disponibles peuvent inclure carte bancaire, Bancontact et autres options activées dans le compte Mollie.' },
+      { q: 'Mes données bancaires sont-elles protégées ?', a: 'Oui. THEKLOPE ne stocke jamais vos données de carte. Le paiement est saisi sur le checkout hébergé Mollie, puis confirmé côté serveur par webhook.' },
     ],
   },
   {

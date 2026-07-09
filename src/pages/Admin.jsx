@@ -290,7 +290,11 @@ function Overview({ dashboard, orders, products }) {
         <StatCard label="Chiffre d’affaires" value={formatPrice(dashboard.revenue)} detail={`${dashboard.ordersCount} commande${dashboard.ordersCount > 1 ? 's' : ''}`} />
         <StatCard label="Panier moyen" value={formatPrice(dashboard.avgOrder)} detail={`${dashboard.units} article${dashboard.units > 1 ? 's' : ''} vendu${dashboard.units > 1 ? 's' : ''}`} />
         <StatCard label="Produits actifs" value={products.length} detail={`${dashboard.lowStock.length} alerte${dashboard.lowStock.length > 1 ? 's' : ''} stock`} />
-        <StatCard label="À préparer" value={dashboard.pendingOrders} detail="Commandes ouvertes" />
+        <StatCard
+          label={dashboard.stockIssues > 0 ? 'À traiter' : 'À préparer'}
+          value={dashboard.stockIssues > 0 ? dashboard.stockIssues : dashboard.pendingOrders}
+          detail={dashboard.stockIssues > 0 ? 'Incident stock payé' : 'Commandes ouvertes'}
+        />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.35fr_1fr]">

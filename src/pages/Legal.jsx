@@ -23,7 +23,7 @@ const PAGES = {
       ['Article 2 — Produits', "Les produits proposés sont décrits avec la plus grande exactitude. Les photographies sont non contractuelles. La vente est réservée aux personnes majeures."],
       ['Article 3 — Prix', "Les prix sont indiqués en euros toutes taxes comprises (TTC), hors frais de livraison. THEKLOPE se réserve le droit de modifier ses prix à tout moment, le tarif applicable étant celui en vigueur au moment de la commande."],
       ['Article 4 — Commande', "Le client valide sa commande après vérification du panier. Un e-mail de confirmation récapitule la commande."],
-      ['Article 5 — Paiement', "Le paiement s'effectue par carte bancaire via un prestataire sécurisé. La commande est traitée après validation du paiement."],
+      ['Article 5 — Paiement', "Le paiement s'effectue via Mollie, prestataire de paiement sécurisé. La commande est traitée après confirmation effective du paiement par le prestataire."],
       ['Article 6 — Livraison', "Les produits sont livrés à l'adresse indiquée par le client, dans les délais annoncés. THEKLOPE ne saurait être tenue responsable des retards imputables au transporteur."],
       ['Article 7 — Droit de rétractation', "Conformément à la loi, le client dispose de 14 jours pour se rétracter. Pour des raisons d'hygiène et de sécurité, les e-liquides ouverts et résistances utilisées ne peuvent être repris."],
       ['Article 8 — Service client', "Pour toute réclamation : contact@theklope.com."],

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 
 const COLUMNS = [
   {
@@ -61,7 +62,7 @@ export default function Footer() {
             </address>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">Boutique à Marseille</span>
-              <span className="chip">4,7★ · 409 avis</span>
+              <span className="chip">{STORE_REVIEW_SUMMARY.compactLabel}</span>
               <span className="chip">Paiement sécurisé</span>
               <span className="chip">+18 uniquement</span>
             </div>

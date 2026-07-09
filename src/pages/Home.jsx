@@ -7,6 +7,7 @@ import ProductImage from '../components/ProductImage.jsx'
 import GoogleReviews from '../components/GoogleReviews.jsx'
 import Newsletter from '../components/Newsletter.jsx'
 import { featuredProducts } from '../data/catalog.js'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import {
   IconArrowRight,
   IconShield,
@@ -69,6 +70,11 @@ export default function Home() {
       ],
       "opens": "09:00",
       "closes": "19:00"
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": STORE_REVIEW_SUMMARY.rating.toFixed(1),
+      "reviewCount": STORE_REVIEW_SUMMARY.count
     }
   }), [])
 
@@ -133,8 +139,8 @@ export default function Home() {
                   </div>
                 )}
                 <div className="card absolute -right-3 top-6 hidden rounded-2xl px-4 py-3 shadow-card md:block">
-                  <p className="font-display text-2xl font-bold text-neon">4,7★</p>
-                  <p className="text-[11px] text-muted">409 avis Google</p>
+                  <p className="font-display text-2xl font-bold text-neon">{STORE_REVIEW_SUMMARY.ratingLabel}</p>
+                  <p className="text-[11px] text-muted">{STORE_REVIEW_SUMMARY.countLabel}</p>
                 </div>
               </div>
             ) : (

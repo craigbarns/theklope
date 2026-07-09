@@ -3,6 +3,7 @@ import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Newsletter from '../components/Newsletter.jsx'
 import { IconCheck, IconLeaf, IconShield, IconArrowRight } from '../components/icons.jsx'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 
 const VALUES = [
   { icon: IconCheck, title: 'Sélection exigeante', text: 'Nous ne référençons que des produits fiables, testés et reconnus pour leur qualité.' },
@@ -62,7 +63,7 @@ export default function About() {
         <div className="mt-16 grid gap-6 rounded-3xl border border-white/10 bg-anthracite/60 p-8 text-center sm:grid-cols-3">
           <Stat value="300+" label="Produits sélectionnés" />
           <Stat value="24/48h" label="Livraison en France" />
-          <Stat value="4,7★" label="409 avis Google" />
+          <Stat value={STORE_REVIEW_SUMMARY.ratingLabel} label={STORE_REVIEW_SUMMARY.countLabel} />
         </div>
       </div>
       <Newsletter />

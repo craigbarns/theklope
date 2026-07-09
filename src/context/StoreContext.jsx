@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
+import { enrichProductCopy } from '../data/productCopy.js'
 import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
 import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals } from '../lib/pricing.js'
 
@@ -26,6 +27,7 @@ export const ORDER_STATUSES = [
   { value: 'processing', label: 'En préparation' },
   { value: 'shipped', label: 'Expédiée' },
   { value: 'delivered', label: 'Livrée' },
+  { value: 'stock_issue', label: 'Incident stock' },
   { value: 'cancelled', label: 'Annulée' },
 ]
 
@@ -58,7 +60,7 @@ const normalizeProduct = (product) => {
   const id = product.id?.trim() || slugify(product.name)
   const images = normalizeArray(product.images)
   const image = product.image || images[0] || DEFAULT_PRODUCT_IMAGE
-  return {
+  return enrichProductCopy({
     id,
     name: product.name?.trim() || 'Nouveau produit',
     category: product.category || 'eliquide',
@@ -78,7 +80,7 @@ const normalizeProduct = (product) => {
     specs: product.specs && typeof product.specs === 'object' ? product.specs : {},
     images: images.length ? images : [image],
     image,
-  }
+  })
 }
 
 const productToRow = (product) => ({
@@ -533,6 +535,7 @@ export function StoreProvider({ children }) {
       lowStock,
       bestProducts,
       pendingOrders: orders.filter((order) => order.status === 'processing').length,
+      stockIssues: orders.filter((order) => order.status === 'stock_issue').length,
     }
   }, [orders, products])
 

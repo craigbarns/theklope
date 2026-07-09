@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName } from '../data/catalog.js'
+import { STORE_REVIEW_SUMMARY, STORE_REVIEW_SNIPPETS } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -19,12 +20,6 @@ import {
   IconShield,
   IconCheck,
 } from '../components/icons.jsx'
-
-const REVIEWS = [
-  { name: 'Julien M.', rating: 5, date: 'Mai 2026', text: "Très bon produit, finition impeccable et autonomie au rendez-vous. Je recommande." },
-  { name: 'Sarah L.', rating: 5, date: 'Avril 2026', text: 'Livraison rapide et emballage soigné. Exactement ce que je cherchais.' },
-  { name: 'Karim B.', rating: 4, date: 'Avril 2026', text: 'Bon rapport qualité-prix. Le rendu des saveurs est très correct.' },
-]
 
 export default function Product() {
   const { id } = useParams()
@@ -261,16 +256,17 @@ export default function Product() {
 
         {/* Avis */}
         <div className="mt-14">
-          <div className="mb-6 flex items-center gap-4">
-            <h2 className="font-display text-2xl font-bold text-white">Avis clients</h2>
-            <Stars rating={product.rating} reviews={product.reviews} size={16} />
+          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+            <h2 className="font-display text-2xl font-bold text-white">Avis clients Google</h2>
+            <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
+            <p className="text-sm text-muted">Avis boutique THEKLOPE réels, collectés sur Google.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
-            {REVIEWS.map((r) => (
+            {STORE_REVIEW_SNIPPETS.map((r) => (
               <div key={r.name} className="card p-5">
                 <Stars rating={r.rating} showCount={false} />
                 <p className="mt-3 text-sm leading-relaxed text-ash/70">“{r.text}”</p>
-                <p className="mt-4 text-xs text-faint">{r.name} · {r.date}</p>
+                <p className="mt-4 text-xs text-faint">{r.name} · {r.date} · {r.source}</p>
               </div>
             ))}
           </div>

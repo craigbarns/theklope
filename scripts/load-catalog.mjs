@@ -30,8 +30,13 @@ export async function loadProducts() {
           rating: row.rating,
           reviews: row.reviews,
           stock: row.stock,
+          nicotine: row.nicotine,
+          flavors: row.flavors,
+          colors: row.colors,
           short: row.short,
           long: row.long,
+          specs: row.specs,
+          images: row.images,
           image: row.image,
         }))
       }

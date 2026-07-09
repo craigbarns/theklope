@@ -31,14 +31,16 @@ export default async function handler(req, res) {
     let status = order.payment_status === 'paid' ? 'paid' : order.payment_status === 'failed' ? 'failed' : 'pending'
 
     // Si pas encore payée, on interroge Mollie pour rafraîchir (et finaliser).
+    let orderStatus = order.status
     if (status === 'pending' && order.payment_id) {
       const synced = await syncOrderFromMolliePayment(order.payment_id)
       if (synced.status !== 'unknown') status = synced.status
+      if (synced.orderStatus) orderStatus = synced.orderStatus
     }
 
     return res.status(200).json({
       status,
-      order: { id: order.id, total: order.total, shipping: order.shipping },
+      order: { id: order.id, total: order.total, shipping: order.shipping, status: orderStatus },
     })
   } catch (err) {
     console.error('payment-status error:', err)
