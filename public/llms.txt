@@ -1,0 +1,28 @@
+# THEKLOPE
+
+THEKLOPE est une boutique vape en ligne ciblant la France, associee a Marseille. Le site vend des produits de vapotage reserves aux adultes : cigarettes electroniques, pods rechargeables, e-liquides, resistances, accessoires et consommables compatibles.
+
+Important: les produits de vapotage sont reserves aux personnes majeures. Les produits contenant de la nicotine creent une forte dependance. THEKLOPE ne presente pas la vape comme totalement sans risque, ne fait pas de promesse medicale et ne cible pas les mineurs.
+
+Pages principales:
+- Accueil: https://theklope.com/
+- Boutique: https://theklope.com/boutique
+- Cigarettes electroniques: https://theklope.com/categorie/cigarettes-electroniques
+- Pods rechargeables: https://theklope.com/categorie/pods
+- E-liquides: https://theklope.com/categorie/e-liquides
+- Resistances: https://theklope.com/categorie/resistances
+- Accessoires: https://theklope.com/categorie/accessoires
+- Alternatives aux puffs jetables: https://theklope.com/categorie/alternatives-puffs
+- Guides responsables: https://theklope.com/guides
+- FAQ: https://theklope.com/faq
+- Boutique vape Marseille: https://theklope.com/boutique-vape-marseille
+- Conformite vape: https://theklope.com/conformite-vape
+- Livraison et retours: https://theklope.com/livraison-retours
+- Contact: https://theklope.com/contact
+
+Informations utiles:
+- Paiement securise via Mollie.
+- Vente reservee aux adultes de 18 ans et plus.
+- Livraison ciblee France.
+- Avis boutique reels lorsqu'ils sont affiches, notamment avis Google.
+- Les conseils du site portent sur le choix produit, la compatibilite, l'entretien et les precautions d'usage. Ils ne remplacent pas un avis medical.

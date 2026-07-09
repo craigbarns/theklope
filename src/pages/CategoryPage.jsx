@@ -5,6 +5,7 @@ import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { CATEGORIES, productsByCategorySlugFrom } from '../data/catalog.js'
+import { CATEGORY_SEO } from '../data/categorySeo.js'
 import { IconChevronDown } from '../components/icons.jsx'
 import NotFound from './NotFound.jsx'
 
@@ -20,6 +21,7 @@ export default function CategoryPage() {
   const [sort, setSort] = useState('popularite')
 
   const category = CATEGORIES.find((c) => c.slug === slug)
+  const seo = CATEGORY_SEO[slug]
   const products = useMemo(() => {
     let list = productsByCategorySlugFrom(allProducts, slug)
     if (sort === 'prix-asc') list = [...list].sort((a, b) => a.price - b.price)
@@ -28,18 +30,85 @@ export default function CategoryPage() {
     return list
   }, [allProducts, slug, sort])
 
+  const schema = useMemo(() => {
+    if (!category) return null
+    const path = `https://theklope.com/categorie/${slug}`
+    const graph = [
+      {
+        '@type': 'CollectionPage',
+        '@id': path,
+        url: path,
+        name: seo?.h1 || category.name,
+        description: seo?.metaDescription || category.tagline,
+        isPartOf: { '@id': 'https://theklope.com/#website' },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://theklope.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Catégories', item: 'https://theklope.com/categories' },
+          { '@type': 'ListItem', position: 3, name: category.name, item: path },
+        ],
+      },
+      {
+        '@type': 'ItemList',
+        name: category.name,
+        itemListElement: products.slice(0, 24).map((p, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          url: `https://theklope.com/produit/${p.id}`,
+          name: p.name,
+        })),
+      },
+    ]
+
+    if (seo?.faq?.length) {
+      graph.push({
+        '@type': 'FAQPage',
+        mainEntity: seo.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.a,
+          },
+        })),
+      })
+    }
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': graph,
+    }
+  }, [category, products, seo, slug])
+
   if (!category) return <NotFound />
 
   return (
     <div className="container-page py-8">
-      <Seo title={category.name} description={`${category.name} — ${category.tagline}. Sélection THEKLOPE.`} />
+      <Seo
+        title={seo?.seoTitle || category.name}
+        description={seo?.metaDescription || `${category.name} — ${category.tagline}. Sélection THEKLOPE.`}
+        schema={schema}
+      />
       <Breadcrumbs items={[{ label: 'Catégories', to: '/categories' }, { label: category.name }]} />
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon to-anthracite p-8 sm:p-10">
         <p className="eyebrow mb-2">Catégorie</p>
-        <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">{category.name}</h1>
-        <p className="mt-2 max-w-xl text-muted">{category.tagline}</p>
+        <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">{seo?.h1 || category.name}</h1>
+        <p className="mt-2 max-w-2xl text-muted">{seo?.intro || category.tagline}</p>
       </div>
+
+      {seo?.sections?.length > 0 && (
+        <section className="mt-8 grid gap-4 md:grid-cols-2">
+          {seo.sections.map((section) => (
+            <article key={section.title} className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+              <h2 className="font-display text-lg font-semibold text-white">{section.title}</h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{section.text}</p>
+            </article>
+          ))}
+        </section>
+      )}
 
       <div className="mt-8 flex items-center justify-between">
         <p className="text-sm text-muted">{products.length} produit{products.length > 1 ? 's' : ''}</p>
@@ -69,6 +138,26 @@ export default function CategoryPage() {
           ))}
         </div>
       )}
+
+      {seo?.faq?.length > 0 && (
+        <section className="mt-14">
+          <p className="eyebrow mb-2">Questions fréquentes</p>
+          <h2 className="font-display text-2xl font-bold text-white">À savoir avant de commander</h2>
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            {seo.faq.map((item) => (
+              <article key={item.q} className="rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+                <h3 className="text-sm font-semibold text-white">{item.q}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{item.a}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <p className="mt-10 rounded-2xl border border-amber-400/20 bg-amber-400/5 px-5 py-4 text-xs leading-relaxed text-muted">
+        Produits de vapotage réservés aux personnes majeures. Les produits contenant de la nicotine créent une forte
+        dépendance. La vape ne doit pas être présentée comme totalement sans risque et ne remplace pas un avis médical.
+      </p>
     </div>
   )
 }

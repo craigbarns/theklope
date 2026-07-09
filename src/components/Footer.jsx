@@ -10,6 +10,8 @@ const COLUMNS = [
       { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
       { to: '/categorie/pods', label: 'Pods' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
+      { to: '/categorie/resistances', label: 'Résistances' },
+      { to: '/categorie/alternatives-puffs', label: 'Alternatives aux puffs' },
       { to: '/categorie/accessoires', label: 'Accessoires' },
       { to: '/categorie/packs-debutants', label: 'Packs débutants' },
     ],
@@ -21,14 +23,16 @@ const COLUMNS = [
       { to: '/contact', label: 'Contact' },
       { to: '/configurateur', label: 'Configurateur de Pack' },
       { to: '/calculette-diy', label: 'Calculette DIY & Booster' },
-      { to: '/legal/retour', label: 'Livraison & retours' },
+      { to: '/livraison-retours', label: 'Livraison & retours' },
     ],
   },
   {
     title: 'Marque',
     links: [
       { to: '/a-propos', label: 'À propos' },
-      { to: '/blog', label: 'Notre Blog & Guides' },
+      { to: '/guides', label: 'Guides vape responsables' },
+      { to: '/boutique-vape-marseille', label: 'Boutique vape Marseille' },
+      { to: '/conformite-vape', label: 'Conformité vape' },
       { to: '/categorie/nouveautes', label: 'Nouveautés' },
       { to: '/categorie/meilleures-ventes', label: 'Meilleures ventes' },
     ],
@@ -52,8 +56,8 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              La vape nouvelle génération. Cigarettes électroniques, e-liquides et accessoires sélectionnés
-              pour une expérience simple, élégante et performante.
+              Cigarettes électroniques, e-liquides et accessoires sélectionnés pour une expérience simple,
+              fiable et responsable, réservée aux adultes.
             </p>
             <address className="mt-4 not-italic text-sm leading-relaxed text-muted">
               Boutique THEKLOPE — 188 Rue de Rome, 13006 Marseille<br />

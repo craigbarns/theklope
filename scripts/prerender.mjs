@@ -26,8 +26,10 @@ const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
 const PRODUCTS = (await loadProducts()).map(enrichProductCopy)
-const { CATEGORIES, categoryName } = await import(resolve(root, 'src/data/catalog.js'))
+const { CATEGORIES, categoryName, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
+const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -104,6 +106,24 @@ for (const p of PRODUCTS) {
       priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
       itemCondition: 'https://schema.org/NewCondition',
       availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: { '@type': 'Organization', name: 'THEKLOPE' },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'FR',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 14,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      },
     },
     ...(p.reviews > 0
       ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (Number(p.rating) || 0).toFixed(1), reviewCount: p.reviews } }
@@ -122,17 +142,44 @@ for (const p of PRODUCTS) {
 
 // ---- Catégories ----
 for (const c of CATEGORIES) {
-  const inCat = PRODUCTS.filter((p) => p.category === c.key).slice(0, 40)
-  const title = `${c.name} — ${c.tagline} | THEKLOPE`
-  const description = `${c.name} : ${c.tagline}. Sélection THEKLOPE, livraison 24/48h en France, paiement sécurisé. Vente réservée aux +18.`.slice(0, 160)
+  const seo = CATEGORY_SEO[c.slug]
+  const inCat = PRODUCTS.filter((p) => productMatchesCategory(p, c.key)).slice(0, 40)
+  const title = `${seo?.seoTitle || c.name} | THEKLOPE`
+  const description = (seo?.metaDescription || `${c.name} : ${c.tagline}. Sélection THEKLOPE, livraison France, paiement sécurisé. Vente réservée aux +18.`).slice(0, 160)
   const path = `/categorie/${c.slug}`
   const links = inCat.map((p) => `<li><a href="/produit/${esc(p.id)}">${esc(p.name)} — ${esc(fmtPrice(p.price))}</a></li>`).join('')
+  const sections = (seo?.sections || []).map((s) => `<h2>${esc(s.title)}</h2><p>${esc(s.text)}</p>`).join('')
+  const faq = (seo?.faq || []).map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'CollectionPage',
+        '@id': abs(path),
+        url: abs(path),
+        name: seo?.h1 || c.name,
+        description,
+      },
+      ...(seo?.faq?.length
+        ? [{
+            '@type': 'FAQPage',
+            mainEntity: seo.faq.map((item) => ({
+              '@type': 'Question',
+              name: item.q,
+              acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+          }]
+        : []),
+    ],
+  }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/categories">Catégories</a> › <span>${esc(c.name)}</span></nav>
-    <h1>${esc(c.name)}</h1>
-    <p>${esc(c.tagline)}</p>
+    <h1>${esc(seo?.h1 || c.name)}</h1>
+    <p>${esc(seo?.intro || c.tagline)}</p>
+    ${sections}
     <ul>${links}</ul>`
-  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd: null, content }))
+    + faq
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
   count++
 }
 
@@ -140,35 +187,38 @@ for (const c of CATEGORIES) {
 for (const b of BLOG_POSTS) {
   const title = `${b.title} | THEKLOPE`
   const description = (b.description || b.title).slice(0, 160)
-  const path = `/blog/${b.slug}`
+  const path = `/guides/${b.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Article',
+    '@type': 'BlogPosting',
     headline: b.title,
     description: b.description || b.title,
-    image: DEFAULT_OG,
+    image: absImg(b.image),
+    datePublished: b.isoDate,
+    dateModified: b.isoDate,
     author: { '@type': 'Organization', name: 'THEKLOPE' },
     publisher: { '@type': 'Organization', name: 'THEKLOPE' },
     mainEntityOfPage: abs(path),
   }
   const content = `
-    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › <span>${esc(b.title)}</span></nav>
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/guides">Guides</a> › <span>${esc(b.title)}</span></nav>
     <h1>${esc(b.title)}</h1>
-    <p>${esc(b.description || '')}</p>`
-  writePage(path, buildPage({ title, description, canonicalPath: path, ogType: 'article', jsonLd, content }))
+    <p>${esc(b.description || '')}</p>
+    ${b.content}`
+  writePage(path, buildPage({ title, description, canonicalPath: path, ogImage: absImg(b.image), ogType: 'article', jsonLd, content }))
   count++
 }
 
 // ---- Pages statiques clés ----
 const STATIC_PAGES = [
-  { path: '/boutique', title: 'Boutique — Cigarettes électroniques, e-liquides & accessoires | THEKLOPE', description: 'Toute la boutique THEKLOPE : cigarettes électroniques, pods, e-liquides et accessoires sélectionnés. Livraison 24/48h, paiement sécurisé, +18.' },
+  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, résistances et accessoires pour adultes. Livraison France.' },
   { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, accessoires et packs débutants.' },
-  { path: '/configurateur', title: 'Configurateur de pack sur mesure (-15%) | THEKLOPE', description: 'Composez votre cigarette électronique idéale (batterie + réservoir + e-liquide) et profitez de -15% sur le pack complet.' },
+  { path: '/configurateur', title: 'Configurateur de pack sur mesure (-15%) | THEKLOPE', description: 'Composez un pack cigarette électronique compatible (batterie + réservoir + e-liquide) et profitez de -15% sur le pack complet.' },
   { path: '/calculette-diy', title: 'Calculette DIY & booster de nicotine | THEKLOPE', description: 'Calculez facilement vos dosages pour fabriquer votre e-liquide maison (base, boosters, arômes) avec la calculette DIY THEKLOPE.' },
-  { path: '/blog', title: 'Blog & guides vape | THEKLOPE', description: 'Conseils, guides et actualités sur la vape : choix du taux de nicotine, DIY, entretien du matériel et plus encore.' },
+  { path: '/guides', title: 'Guides vape responsables | THEKLOPE', description: 'Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes.' },
   { path: '/a-propos', title: 'À propos | THEKLOPE', description: 'THEKLOPE, boutique de vape née à Marseille (188 rue de Rome). Une sélection premium, un conseil d’expert et une expérience simple et élégante.' },
   { path: '/contact', title: 'Contact | THEKLOPE', description: 'Contactez l’équipe THEKLOPE : formulaire, e-mail et boutique à Marseille. Service client réactif.' },
-  { path: '/faq', title: 'FAQ — Livraison, retours, paiement | THEKLOPE', description: 'Questions fréquentes THEKLOPE : délais de livraison, retours, paiement sécurisé, taux de nicotine et matériel.' },
+  { path: '/faq', title: 'FAQ vape, livraison, nicotine et conformité | THEKLOPE', description: 'Questions fréquentes THEKLOPE : livraison, retours, paiement Mollie, produits vape réservés aux adultes, nicotine, résistances et e-liquides.' },
   { path: '/legal/mentions-legales', title: 'Mentions légales | THEKLOPE', description: 'Mentions légales du site THEKLOPE, édité par SEVEN SEVENTY (SASU).' },
   { path: '/legal/cgv', title: 'Conditions générales de vente | THEKLOPE', description: 'Conditions générales de vente du site THEKLOPE.' },
   { path: '/legal/confidentialite', title: 'Politique de confidentialité | THEKLOPE', description: 'Politique de confidentialité et gestion des données personnelles (RGPD) de THEKLOPE.' },
@@ -180,4 +230,58 @@ for (const s of STATIC_PAGES) {
   count++
 }
 
-console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length} pages statiques).`)
+for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
+  const path = `/${slug}`
+  const title = `${page.title} | THEKLOPE`
+  const description = page.metaDescription
+  const sections = page.sections.map((s) => `<h2>${esc(s.title)}</h2><p>${esc(s.text)}</p>`).join('')
+  const faq = page.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')
+  const links = page.links.map((l) => `<li><a href="${esc(l.to)}">${esc(l.label)}</a></li>`).join('')
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': abs(path),
+        url: abs(path),
+        name: page.h1,
+        description,
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: page.faq.map((item) => ({
+          '@type': 'Question',
+          name: item.q,
+          acceptedAnswer: { '@type': 'Answer', text: item.a },
+        })),
+      },
+      ...(page.localBusiness
+        ? [{
+            '@type': 'LocalBusiness',
+            '@id': 'https://theklope.com/#store',
+            name: 'THEKLOPE',
+            url: 'https://theklope.com',
+            address: {
+              '@type': 'PostalAddress',
+              streetAddress: '188 rue de Rome',
+              addressLocality: 'Marseille',
+              postalCode: '13006',
+              addressCountry: 'FR',
+            },
+            priceRange: '$$',
+          }]
+        : []),
+    ],
+  }
+  const content = `
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <span>${esc(page.h1)}</span></nav>
+    <h1>${esc(page.h1)}</h1>
+    <p>${esc(page.intro)}</p>
+    ${sections}
+    <ul>${links}</ul>
+    ${faq}`
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
+  count++
+}
+
+console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length + Object.keys(STATIC_SEO_PAGES).length} pages statiques).`)

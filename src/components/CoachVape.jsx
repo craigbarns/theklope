@@ -37,9 +37,9 @@ export default function CoachVape() {
         {
           id: 'welcome-2',
           isBot: true,
-          content: 'Je suis là pour vous aider à trouver la cigarette électronique ou le e-liquide idéal selon votre profil. Voulez-vous faire notre diagnostic personnalisé en 3 questions rapides ?',
+          content: 'Je peux vous aider à comparer le matériel, les e-liquides et les consommables compatibles. Voulez-vous faire une aide au choix en 3 questions rapides ?',
           options: [
-            { text: 'Oui, avec plaisir !', action: 'start_quiz' },
+            { text: 'Oui, commencer', action: 'start_quiz' },
             { text: 'Non merci, je préfère chatter', action: 'start_chat' }
           ]
         }
@@ -78,7 +78,7 @@ export default function CoachVape() {
         setStep('smoking')
         addMessage({
           isBot: true,
-          content: 'Excellent ! Commençons. 🚭 **Fumez-vous actuellement des cigarettes traditionnelles ?**',
+          content: 'Commençons. **Quel est votre contexte d’usage adulte ?** Cette question sert uniquement à donner un repère indicatif sur les taux de nicotine.',
           options: [
             { text: 'Oui, beaucoup (+ de 15/jour)', action: 'smoking_heavy' },
             { text: 'Oui, moyennement (5 à 15/jour)', action: 'smoking_medium' },
@@ -149,7 +149,7 @@ export default function CoachVape() {
         setStep('smoking')
         addMessage({
           isBot: true,
-          content: 'C\'est reparti ! 🚭 **Fumez-vous actuellement des cigarettes traditionnelles ?**',
+          content: 'C\'est reparti. **Quel est votre contexte d’usage adulte ?**',
           options: [
             { text: 'Oui, beaucoup (+ de 15/jour)', action: 'smoking_heavy' },
             { text: 'Oui, moyennement (5 à 15/jour)', action: 'smoking_medium' },
@@ -190,30 +190,30 @@ export default function CoachVape() {
   const generateRecommendations = (currentAnswers) => {
     setStep('recommended')
     
-    // 1. Calculer le taux de nicotine conseillé
+    // 1. Proposer un repère indicatif de nicotine, sans promesse médicale.
     let nicotineAdvice = '0'
     let nicotineExplanation = ''
     switch (currentAnswers.smoking) {
       case 'smoking_heavy':
         nicotineAdvice = '12 à 16'
-        nicotineExplanation = 'Un taux élevé pour vous procurer le hit nécessaire et faciliter votre transition.'
+        nicotineExplanation = 'Repère indicatif pour un besoin élevé. À confirmer selon votre matériel, votre ressenti et, si besoin, avec un professionnel de santé.'
         break
       case 'smoking_medium':
         nicotineAdvice = '6 à 12'
-        nicotineExplanation = 'Un dosage moyen équilibré pour combler le manque sans être trop agressif en gorge.'
+        nicotineExplanation = 'Repère indicatif intermédiaire. Le bon choix dépend aussi du type de cigarette électronique et du tirage.'
         break
       case 'smoking_light':
         nicotineAdvice = '3 à 6'
-        nicotineExplanation = 'Un taux léger parfait pour les petits fumeurs ou vapoteurs occasionnels.'
+        nicotineExplanation = 'Repère indicatif plus modéré. Les produits nicotinés restent réservés aux adultes.'
         break
       case 'smoking_vape':
         nicotineAdvice = '3 à 6'
-        nicotineExplanation = 'Conservez votre dosage habituel, ou ajustez selon votre ressenti.'
+        nicotineExplanation = 'Repère indicatif. Vous pouvez aussi conserver votre taux habituel si votre usage actuel vous convient.'
         break
       case 'smoking_none':
       default:
         nicotineAdvice = '0'
-        nicotineExplanation = 'Sans nicotine, afin de ne pas développer de dépendance.'
+        nicotineExplanation = 'Les produits nicotinés créent une dépendance et sont déconseillés aux non-fumeurs.'
         break
     }
 
@@ -264,11 +264,11 @@ export default function CoachVape() {
     // 3. Envoyer la réponse du coach
     addMessage({
       isBot: true,
-      content: `D'après vos réponses, voici mes recommandations :\n\n⚡ **Taux de nicotine suggéré : ${nicotineAdvice} mg/ml**\n_${nicotineExplanation}_\n\nVoici une sélection de produits configurés pour vous :`,
+      content: `D'après vos réponses, voici une sélection produit et un repère prudent :\n\n**Repère nicotine indicatif : ${nicotineAdvice} mg/ml**\n_${nicotineExplanation}_\n\nCe repère ne remplace pas un avis médical. Voici des produits à comparer :`,
       products: matchedProducts,
       options: [
-        { text: 'Recommencer le diagnostic 🔄', action: 'reset_quiz' },
-        { text: 'Poser une question libre 💬', action: 'start_chat' }
+        { text: 'Recommencer l’aide au choix', action: 'reset_quiz' },
+        { text: 'Poser une question libre', action: 'start_chat' }
       ]
     })
   }
@@ -299,7 +299,7 @@ export default function CoachVape() {
         isBot: true,
         content: 'Bonjour ! Comment puis-je vous renseigner aujourd\'hui ? 😊',
         options: [
-          { text: 'Lancer le diagnostic 📋', action: 'reset_quiz' },
+          { text: 'Lancer l’aide au choix', action: 'reset_quiz' },
           { text: 'Quels sont les codes promos ? 🎁', action: 'ask_promos' }
         ]
       })
@@ -316,8 +316,8 @@ export default function CoachVape() {
     } else if (/(nicotine|taux|dosage|mg)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'Le dosage idéal dépend de votre consommation de cigarettes :\n\n- 🚬 **+15 cig/jour** : 12 à 16 mg/ml\n- 🚬 **5 à 15 cig/jour** : 6 à 12 mg/ml\n- 🚬 **Moins de 5 cig/jour** : 3 mg/ml\n- 🚫 **Non-fumeur** : 0 mg/ml (sans nicotine)\n\nN\'hésitez pas à lancer le diagnostic pour calculer votre taux personnalisé !',
-        options: [{ text: 'Lancer le diagnostic 📋', action: 'reset_quiz' }]
+        content: 'Le taux de nicotine dépend du matériel, du tirage, du ressenti et de l’usage. Repères indicatifs pour adultes :\n\n- **Besoin élevé** : 12 à 16 mg/ml\n- **Besoin intermédiaire** : 6 à 12 mg/ml\n- **Besoin modéré** : 3 à 6 mg/ml\n- **Non-fumeur** : produits nicotinés déconseillés\n\nLa nicotine crée une dépendance. En cas de doute ou d’objectif d’arrêt du tabac, demandez conseil à un professionnel de santé.',
+        options: [{ text: 'Lancer l’aide au choix', action: 'reset_quiz' }]
       })
     } else if (/(contact|telephone|mail|adresse|magasin|conseiller|service client)/i.test(clean)) {
       addMessage({
@@ -327,7 +327,7 @@ export default function CoachVape() {
     } else if (/(pod|kit|clearomiseur|clearomiseur|resistance|box|batterie)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: '🔌 **Petit lexique de la vape :**\n\n- **Pod** : Format pocket, ultra simple, idéal pour les sels de nicotine et débutants.\n- **Kit** : Ensemble batterie (box) et réservoir (clearomiseur), offrant des réglages plus avancés.\n- **Résistance** : La pièce chauffante à remplacer toutes les 2-3 semaines.',
+        content: '**Petit lexique de la vape :**\n\n- **Pod** : format compact, simple, souvent compatible avec des e-liquides fluides.\n- **Kit** : ensemble batterie et réservoir, avec davantage de réglages.\n- **Résistance** : consommable chauffant à remplacer dès que le goût, la vapeur ou l’étanchéité se dégradent.',
         options: [
           { text: 'Recommander un Pod', action: 'type_pod' },
           { text: 'Recommander un Kit complet', action: 'type_kit' }
@@ -336,8 +336,8 @@ export default function CoachVape() {
     } else if (/(liquide|eliquide|juice|saveur|gout|pg|vg)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'Tous nos e-liquides sont sélectionnés rigoureusement. Nous proposons des saveurs **Classic** (tabac), **Frais/Menthe**, **Fruités** (fruits rouges, pomme...) et **Gourmands** (vanille, cookie...).',
-        options: [{ text: 'Trouver un e-liquide 🧪', action: 'type_eliquide' }]
+        content: 'Nos e-liquides sont présentés avec leurs informations utiles : saveur, taux de nicotine, ratio PG/VG, contenance et compatibilité. Les produits nicotinés sont réservés aux adultes.',
+        options: [{ text: 'Trouver un e-liquide', action: 'type_eliquide' }]
       })
     } else if (/(merci|super|genial|cool|thx)/i.test(clean)) {
       addMessage({
@@ -345,13 +345,13 @@ export default function CoachVape() {
         content: 'Avec plaisir ! C\'est un plaisir de vous accompagner. N\'hésitez pas si vous avez d\'autres questions ! 💨'
       })
     } else {
-      // Cas par défaut : offre de lancer le diagnostic
+      // Cas par défaut : offre de lancer l'aide au choix
       addMessage({
         isBot: true,
-        content: 'Je n\'ai pas trouvé de réponse exacte pour cela. 😅 Je suis programmé pour vous guider. Souhaitez-vous lancer notre diagnostic personnalisé de vape ?',
+        content: 'Je n\'ai pas trouvé de réponse exacte pour cela. Souhaitez-vous lancer l’aide au choix ou voir toute la boutique ?',
         options: [
-          { text: 'Lancer le diagnostic 📋', action: 'reset_quiz' },
-          { text: 'Voir toute la boutique 🛒', action: 'go_shop' }
+          { text: 'Lancer l’aide au choix', action: 'reset_quiz' },
+          { text: 'Voir toute la boutique', action: 'go_shop' }
         ]
       })
     }

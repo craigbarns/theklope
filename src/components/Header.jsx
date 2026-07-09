@@ -7,12 +7,11 @@ import { CATEGORIES } from '../data/catalog.js'
 
 const NAV = [
   { to: '/boutique', label: 'Boutique' },
-  { to: '/configurateur', label: 'Configurateur 🛠️' },
-  { to: '/calculette-diy', label: 'Calculette DIY 🧮' },
-  { to: '/blog', label: 'Blog 📝' },
-  { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
   { to: '/categorie/e-liquides', label: 'E-liquides' },
-  { to: '/categorie/accessoires', label: 'Accessoires' },
+  { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
+  { to: '/categorie/resistances', label: 'Résistances' },
+  { to: '/guides', label: 'Guides' },
+  { to: '/boutique-vape-marseille', label: 'Marseille' },
 ]
 
 export default function Header() {

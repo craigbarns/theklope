@@ -28,7 +28,16 @@ const FEATURES = [
 const heroCats = [
   { slug: 'cigarettes-electroniques', name: 'Cigarettes électroniques', key: 'ecig' },
   { slug: 'e-liquides', name: 'E-liquides', key: 'eliquide' },
+  { slug: 'resistances', name: 'Résistances', key: 'resistance' },
   { slug: 'accessoires', name: 'Accessoires', key: 'accessoire' },
+  { slug: 'alternatives-puffs', name: 'Alternatives puffs', key: 'alternative-puff' },
+]
+
+const GUIDE_LINKS = [
+  { to: '/guides/quelle-cigarette-electronique-choisir', label: 'Choisir une cigarette électronique' },
+  { to: '/guides/choisir-taux-nicotine-e-liquide', label: 'Comprendre les taux de nicotine' },
+  { to: '/guides/quand-changer-resistance', label: 'Changer une résistance' },
+  { to: '/guides/alternatives-puffs-jetables', label: 'Alternatives aux puffs' },
 ]
 
 export default function Home() {
@@ -37,74 +46,80 @@ export default function Home() {
   const heroProduct = bestSellers[0] || products[0]
   const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
 
-  const localBusinessSchema = useMemo(() => ({
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "THEKLOPE",
-    "image": "https://theklope.com/og-image.jpg",
-    "@id": "https://theklope.com/#store",
-    "url": "https://theklope.com",
-    "telephone": "+33491555555",
-    "priceRange": "$$",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "188 rue de Rome",
-      "addressLocality": "Marseille",
-      "postalCode": "13006",
-      "addressCountry": "FR"
-    },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 43.2905,
-      "longitude": 5.3801
-    },
-    "openingHoursSpecification": {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-      ],
-      "opens": "09:00",
-      "closes": "19:00"
-    },
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": STORE_REVIEW_SUMMARY.rating.toFixed(1),
-      "reviewCount": STORE_REVIEW_SUMMARY.count
-    }
+  const homeSchema = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'LocalBusiness',
+        name: 'THEKLOPE',
+        image: 'https://theklope.com/og-image.jpg',
+        '@id': 'https://theklope.com/#store',
+        url: 'https://theklope.com',
+        telephone: '+33491555555',
+        priceRange: '$$',
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: '188 rue de Rome',
+          addressLocality: 'Marseille',
+          postalCode: '13006',
+          addressCountry: 'FR',
+        },
+        geo: {
+          '@type': 'GeoCoordinates',
+          latitude: 43.2905,
+          longitude: 5.3801,
+        },
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: STORE_REVIEW_SUMMARY.rating.toFixed(1),
+          reviewCount: STORE_REVIEW_SUMMARY.count,
+        },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': 'https://theklope.com/#website',
+        url: 'https://theklope.com',
+        name: 'THEKLOPE',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: 'https://theklope.com/boutique?q={search_term_string}',
+          'query-input': 'required name=search_term_string',
+        },
+      },
+      {
+        '@type': 'Organization',
+        '@id': 'https://theklope.com/#organization',
+        name: 'THEKLOPE',
+        url: 'https://theklope.com',
+        logo: 'https://theklope.com/logo.png',
+      },
+    ],
   }), [])
 
   return (
     <>
       <Seo
-        title="La vape nouvelle génération"
-        description="THEKLOPE — Cigarettes électroniques, e-liquides et accessoires sélectionnés pour une expérience premium. Livraison rapide, paiement sécurisé. +18 uniquement."
-        schema={localBusinessSchema}
+        title="Boutique vape en ligne pour adultes"
+        description="THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé."
+        schema={homeSchema}
       />
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -left-32 top-10 h-96 w-96 rounded-full bg-neon/10 blur-3xl" />
-          <div className="absolute right-0 top-40 h-96 w-96 rounded-full bg-electric/10 blur-3xl" />
-        </div>
         <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
           <div className="animate-fade-up">
             <span className="chip mb-6 border-neon/30 text-neon">
-              <IconLeaf width={14} height={14} /> Nouvelle collection 2026
+              <IconLeaf width={14} height={14} /> Boutique vape française · +18
             </span>
             <h1 className="font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
               THEKLOPE
               <span className="mt-2 block bg-gradient-to-r from-neon to-electric bg-clip-text text-transparent">
-                La vape nouvelle génération
+                Boutique vape en ligne pour adultes
               </span>
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-ash/70 sm:text-lg">
-              Cigarettes électroniques, e-liquides et accessoires sélectionnés pour une expérience premium.
+              Cigarettes électroniques, e-liquides, pods, résistances et accessoires sélectionnés pour leur
+              fiabilité, leur compatibilité et la clarté des informations produit.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link to="/boutique" className="btn-primary">
@@ -161,7 +176,7 @@ export default function Home() {
 
       {/* CATÉGORIES MISES EN AVANT */}
       <section className="container-page py-10">
-        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
           {heroCats.map((c) => (
             <Link
               key={c.slug}
@@ -183,6 +198,36 @@ export default function Home() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      <section className="container-page py-10">
+        <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+            <p className="eyebrow mb-3">Guides responsables</p>
+            <h2 className="font-display text-2xl font-bold text-white">Comprendre avant de commander</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+              Des guides courts pour comparer les cigarettes électroniques, choisir un e-liquide compatible,
+              entretenir une résistance et connaître les précautions liées à la nicotine.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {GUIDE_LINKS.map((guide) => (
+                <Link key={guide.to} to={guide.to} className="rounded-2xl border border-white/8 px-4 py-3 text-sm text-ash transition hover:border-neon/40 hover:text-neon">
+                  {guide.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+            <p className="eyebrow mb-3">Local</p>
+            <h2 className="font-display text-2xl font-bold text-white">Boutique vape Marseille</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              THEKLOPE est associé à Marseille et sert les clients adultes en France via la boutique en ligne.
+            </p>
+            <Link to="/boutique-vape-marseille" className="btn-primary mt-5">
+              Voir la page Marseille <IconArrowRight width={18} height={18} />
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -299,7 +344,9 @@ function catThumb(key, products = []) {
   const map = {
     ecig: products.find((p) => p.category === 'ecig'),
     eliquide: products.find((p) => p.category === 'eliquide'),
+    resistance: products.find((p) => p.category === 'accessoire' && /\b(r[eé]sistance|mesh|coil|bvc|nautilus|ito|gti)\b/i.test(p.name)),
     accessoire: products.find((p) => p.category === 'accessoire'),
+    'alternative-puff': products.find((p) => p.category === 'pod') || products.find((p) => p.category === 'ecig'),
   }
   return (map[key] || products[0])?.image || '/products/product-placeholder.svg'
 }

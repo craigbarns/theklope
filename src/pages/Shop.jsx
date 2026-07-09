@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES } from '../data/catalog.js'
+import { CATEGORIES, productMatchesCategory } from '../data/catalog.js'
 import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
 
 const SORTS = [
@@ -61,7 +61,7 @@ export default function Shop() {
         )
           return false
       }
-      if (cats.length && !cats.includes(p.category)) return false
+      if (cats.length && !cats.some((cat) => productMatchesCategory(p, cat))) return false
       if (brands.length && !brands.includes(p.brand)) return false
       if (types.length && !types.includes(p.type)) return false
       if (p.price > maxPrice) return false
@@ -217,7 +217,7 @@ export default function Shop() {
 
   return (
     <>
-      <Seo title="Boutique" description="Tous nos produits de vape : cigarettes électroniques, pods, e-liquides et accessoires. Filtrez par catégorie, marque, prix, taux de nicotine et saveur." />
+      <Seo title="Boutique vape en ligne" description="Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, résistances et accessoires pour adultes. Filtres par marque, prix, nicotine et saveur." />
       <div className="container-page py-8">
         <Breadcrumbs items={[{ label: 'Boutique' }]} />
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">

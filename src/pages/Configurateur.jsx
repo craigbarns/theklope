@@ -112,7 +112,7 @@ export default function Configurateur() {
     <div className="container-page py-8">
       <Seo
         title="Configurateur de Pack Cigarette Électronique"
-        description="Créez votre cigarette électronique idéale et bénéficiez de -15% sur le pack complet."
+        description="Composez un pack cigarette électronique compatible et bénéficiez de -15% sur le pack complet."
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Configurateur' }]} />
 
@@ -122,7 +122,7 @@ export default function Configurateur() {
         <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-blue-500/5 blur-[80px]" />
         <span className="eyebrow">Pack sur mesure</span>
         <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mt-2">
-          Configurez votre Vape idéale
+          Configurez un pack compatible
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
           Choisissez votre batterie, votre réservoir et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble !

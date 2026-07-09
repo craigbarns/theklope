@@ -4,7 +4,7 @@ import { BLOG_POSTS } from '../data/blog.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 
-const CATEGORIES = ['Tous', 'Guides & Santé', 'DIY', 'Matériel']
+const CATEGORIES = ['Tous', 'Guides responsables', 'Matériel', 'E-liquides', 'Entretien', 'Réglementation']
 
 export default function Blog() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -20,24 +20,38 @@ export default function Blog() {
     })
   }, [searchQuery, selectedCategory])
 
+  const schema = useMemo(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Guides vape responsables THEKLOPE',
+    itemListElement: BLOG_POSTS.map((post, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      url: `https://theklope.com/guides/${post.slug}`,
+      name: post.title,
+    })),
+  }), [])
+
   return (
     <div className="container-page py-8">
       <Seo
-        title="Conseils & Guides Vape"
-        description="Retrouvez nos articles de blog pour bien choisir votre matériel, apprendre le DIY e-liquide et réussir votre sevrage tabagique."
+        title="Guides vape responsables"
+        description="Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes."
+        canonical="https://theklope.com/guides"
+        schema={schema}
       />
-      <Breadcrumbs items={[{ label: 'Blog' }]} />
+      <Breadcrumbs items={[{ label: 'Guides' }]} />
 
       {/* Titre héro */}
       <div className="relative overflow-hidden rounded-3xl border border-white/8 bg-gradient-to-r from-carbon/40 to-noir/80 px-6 py-12 text-center shadow-card sm:px-12 mt-4">
         <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-neon/5 blur-[80px]" />
         <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-electric/5 blur-[80px]" />
-        <span className="eyebrow">Le coin des conseils</span>
+        <span className="eyebrow">Guides responsables</span>
         <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mt-2">
-          Le Blog de la Vape
+          Guides vape THEKLOPE
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-          Guides pratiques, astuces d'entretien et dossiers d'experts pour maîtriser votre matériel et vos e-liquides.
+          Conseils pratiques pour comparer le matériel, comprendre les e-liquides et entretenir une cigarette électronique, sans promesse médicale.
         </p>
       </div>
 
@@ -102,7 +116,7 @@ export default function Blog() {
                     <span className="text-[10px] text-muted">{post.readTime} de lecture</span>
                   </div>
                   <h2 className="mt-2 font-display text-base font-bold text-white group-hover:text-neon transition line-clamp-2">
-                    <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                    <Link to={`/guides/${post.slug}`}>{post.title}</Link>
                   </h2>
                   <p className="mt-2 text-xs text-muted leading-relaxed line-clamp-3">
                     {post.summary}
@@ -112,10 +126,10 @@ export default function Blog() {
                 <div className="mt-4 flex items-center justify-between">
                   <span className="text-[10px] text-faint font-semibold">Par {post.author}</span>
                   <Link
-                    to={`/blog/${post.slug}`}
+                    to={`/guides/${post.slug}`}
                     className="text-xs text-neon hover:underline font-semibold"
                   >
-                    Lire l'article &rarr;
+                    Lire le guide &rarr;
                   </Link>
                 </div>
               </div>

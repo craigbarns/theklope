@@ -41,14 +41,15 @@ export default function BlogPost() {
       '@type': 'BlogPosting',
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': `https://theklope.com/blog/${post.slug}`,
+        '@id': `https://theklope.com/guides/${post.slug}`,
       },
       headline: post.title,
       description: post.description,
       image: `https://theklope.com${post.image}`,
-      datePublished: '2026-06-10T08:00:00+02:00',
+      datePublished: post.isoDate,
+      dateModified: post.isoDate,
       author: {
-        '@type': 'Person',
+        '@type': 'Organization',
         name: post.author,
       },
       publisher: {
@@ -68,8 +69,8 @@ export default function BlogPost() {
         <Seo title="Article non trouvé" />
         <h1 className="text-xl font-bold text-white">Article introuvable</h1>
         <p className="mt-2 text-muted">Ce guide de vape n'existe pas ou a été déplacé.</p>
-        <Link to="/blog" className="btn-primary mt-6">
-          Retour au blog
+        <Link to="/guides" className="btn-primary mt-6">
+          Retour aux guides
         </Link>
       </div>
     )
@@ -86,8 +87,13 @@ export default function BlogPost() {
       </div>
 
       <div className="container-page py-8">
-        <Seo title={post.title} description={post.description} schema={schema} />
-        <Breadcrumbs items={[{ label: 'Blog', to: '/blog' }, { label: post.title }]} />
+        <Seo
+          title={post.title}
+          description={post.description}
+          canonical={`https://theklope.com/guides/${post.slug}`}
+          schema={schema}
+        />
+        <Breadcrumbs items={[{ label: 'Guides', to: '/guides' }, { label: post.title }]} />
 
         <div className="mt-6 grid gap-10 lg:grid-cols-[1fr_360px]">
           {/* Article principal */}
@@ -181,21 +187,17 @@ export default function BlogPost() {
             {/* Newsletter ou Box CTA */}
             <div className="card p-5 border-white/8 bg-white/[0.01] text-center">
               <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2">
-                Besoin de conseils personnalisés ?
+                Besoin de vérifier une compatibilité ?
               </h4>
               <p className="text-[11px] text-muted mb-4 leading-relaxed">
-                Notre coach virtuel est disponible 24/7 pour vous orienter vers le matériel et le dosage idéaux.
+                Notre équipe peut vous aider à vérifier matériel, résistance, cartouche et e-liquide avant commande.
               </p>
-              <button
-                onClick={() => {
-                  // Simuler le clic sur le Coach Vape flottant en appelant l'action d'ouverture
-                  const coachButton = document.querySelector('button[aria-label="Ouvrir le Coach Vape"]')
-                  if (coachButton) coachButton.click()
-                }}
+              <Link
+                to="/contact"
                 className="btn-primary py-2 px-4 text-center text-[10px] min-h-0 w-full text-noir"
               >
-                Parler à notre Coach Vape 💬
-              </button>
+                Contacter THEKLOPE
+              </Link>
             </div>
           </aside>
         </div>

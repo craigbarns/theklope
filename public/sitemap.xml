@@ -31,7 +31,7 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://theklope.com/blog</loc>
+    <loc>https://theklope.com/guides</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -55,6 +55,24 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://theklope.com/boutique-vape-marseille</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/conformite-vape</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/livraison-retours</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://theklope.com/categorie/cigarettes-electroniques</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
@@ -73,7 +91,19 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://theklope.com/categorie/resistances</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://theklope.com/categorie/accessoires</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/categorie/alternatives-puffs</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -1945,25 +1975,121 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://theklope.com/blog/comment-choisir-son-taux-de-nicotine</loc>
+    <loc>https://theklope.com/guides/quelle-cigarette-electronique-choisir</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://theklope.com/blog/guide-pratique-diy-e-liquide-maison</loc>
+    <loc>https://theklope.com/guides/pod-ou-cigarette-electronique</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://theklope.com/blog/cigarette-electronique-qui-fuit-solutions</loc>
+    <loc>https://theklope.com/guides/choisir-taux-nicotine-e-liquide</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://theklope.com/blog/pod-vs-box-mod-comparatif</loc>
+    <loc>https://theklope.com/guides/comprendre-ratio-pg-vg</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/quand-changer-resistance</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/comment-amorcer-resistance</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/cigarette-electronique-qui-fuit</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/gout-brule-cigarette-electronique</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/eliquide-sans-nicotine</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/saveurs-eliquide-comment-choisir</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/alternatives-puffs-jetables</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/entretenir-pod-rechargeable</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/tirage-serre-cigarette-electronique</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/autonomie-cigarette-electronique</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/lexique-vape</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/lire-fiche-eliquide</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/livraison-produits-vape-france</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/reglementation-vape-france</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/erreurs-frequentes-debutant-vape</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://theklope.com/guides/compatibilite-resistances-cartouches</loc>
     <lastmod>2026-07-09</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

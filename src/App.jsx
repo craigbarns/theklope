@@ -30,6 +30,7 @@ const Configurateur = lazy(() => import('./pages/Configurateur.jsx'))
 const CalculetteDiy = lazy(() => import('./pages/CalculetteDiy.jsx'))
 const Blog = lazy(() => import('./pages/Blog.jsx'))
 const BlogPost = lazy(() => import('./pages/BlogPost.jsx'))
+const StaticSeoPage = lazy(() => import('./pages/StaticSeoPage.jsx'))
 
 function PageFallback() {
   return (
@@ -56,8 +57,13 @@ export default function App() {
             <Route path="/boutique" element={<Shop />} />
             <Route path="/configurateur" element={<Configurateur />} />
             <Route path="/calculette-diy" element={<CalculetteDiy />} />
+            <Route path="/guides" element={<Blog />} />
+            <Route path="/guides/:slug" element={<BlogPost />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/boutique-vape-marseille" element={<StaticSeoPage />} />
+            <Route path="/conformite-vape" element={<StaticSeoPage />} />
+            <Route path="/livraison-retours" element={<StaticSeoPage />} />
             <Route path="/produit/:id" element={<Product />} />
             <Route path="/panier" element={<Cart />} />
             <Route path="/checkout" element={<Checkout />} />

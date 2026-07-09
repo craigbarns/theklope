@@ -11,6 +11,7 @@ const { loadProducts } = await import(resolve(root, 'scripts/load-catalog.mjs'))
 const PRODUCTS = await loadProducts()
 const { CATEGORIES } = await import(resolve(root, 'src/data/catalog.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
+const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 
 const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://theklope.com').replace(/\/$/, '')
 const today = new Date().toISOString().slice(0, 10)
@@ -21,17 +22,18 @@ const staticRoutes = [
   { loc: '/categories', changefreq: 'monthly', priority: '0.8' },
   { loc: '/configurateur', changefreq: 'monthly', priority: '0.6' },
   { loc: '/calculette-diy', changefreq: 'monthly', priority: '0.5' },
-  { loc: '/blog', changefreq: 'weekly', priority: '0.7' },
+  { loc: '/guides', changefreq: 'weekly', priority: '0.7' },
   { loc: '/a-propos', changefreq: 'monthly', priority: '0.6' },
   { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
   { loc: '/faq', changefreq: 'monthly', priority: '0.5' },
+  ...Object.keys(STATIC_SEO_PAGES).map((slug) => ({ loc: `/${slug}`, changefreq: 'monthly', priority: '0.7' })),
 ]
 
 const urls = [
   ...staticRoutes,
   ...CATEGORIES.map((c) => ({ loc: `/categorie/${c.slug}`, changefreq: 'weekly', priority: '0.7' })),
   ...PRODUCTS.map((p) => ({ loc: `/produit/${p.id}`, changefreq: 'weekly', priority: '0.6' })),
-  ...BLOG_POSTS.map((b) => ({ loc: `/blog/${b.slug}`, changefreq: 'monthly', priority: '0.5' })),
+  ...BLOG_POSTS.map((b) => ({ loc: `/guides/${b.slug}`, changefreq: 'monthly', priority: '0.5' })),
 ]
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>

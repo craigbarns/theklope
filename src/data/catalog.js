@@ -10,7 +10,9 @@ export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
   { slug: 'e-liquides', key: 'eliquide', name: 'E-liquides', tagline: 'Saveurs sélectionnées, dosage maîtrisé' },
+  { slug: 'resistances', key: 'resistance', name: 'Résistances', tagline: 'Consommables compatibles pour entretenir votre matériel' },
   { slug: 'accessoires', key: 'accessoire', name: 'Accessoires', tagline: 'Résistances, batteries, chargeurs & étuis' },
+  { slug: 'alternatives-puffs', key: 'alternative-puff', name: 'Alternatives aux puffs jetables', tagline: 'Pods et modèles rechargeables conformes pour adultes' },
   { slug: 'packs-debutants', key: 'pack', name: 'Packs débutants', tagline: 'Tout pour bien démarrer' },
   { slug: 'nouveautes', key: 'new', name: 'Nouveautés', tagline: 'Les dernières arrivées' },
   { slug: 'meilleures-ventes', key: 'best', name: 'Meilleures ventes', tagline: 'Les préférés de la communauté' },
@@ -29,6 +31,25 @@ export const categoryName = (key) => {
 }
 
 export const getProductFrom = (products, id) => (products || []).find((p) => p.id === id)
+
+const normalizedProductText = (p = {}) =>
+  [p.name, p.brand, p.type, p.description, ...(p.flavors || [])].filter(Boolean).join(' ').toLowerCase()
+
+export const isResistanceProduct = (p = {}) => {
+  if (p.category !== 'accessoire') return false
+  return /\b(r[eé]sistance|mesh|coil|bvc|nautilus|ito|gti)\b/i.test(normalizedProductText(p))
+}
+
+export const isAlternativePuffProduct = (p = {}) => {
+  if (!['pod', 'ecig', 'pack'].includes(p.category)) return false
+  return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target)\b/i.test(normalizedProductText(p))
+}
+
+export const productMatchesCategory = (product, categoryKey) => {
+  if (categoryKey === 'resistance') return isResistanceProduct(product)
+  if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
+  return product?.category === categoryKey
+}
 
 export const getCatalogMeta = (products = []) => ({
   brands: [...new Set(products.map((p) => p.brand).filter(Boolean))].sort(),
@@ -63,5 +84,5 @@ export function productsByCategorySlugFrom(products = [], slug) {
   if (slug === 'meilleures-ventes') return featured.bestSellers
   const cat = CATEGORIES.find((c) => c.slug === slug)
   if (!cat) return []
-  return products.filter((p) => p.category === cat.key)
+  return products.filter((p) => productMatchesCategory(p, cat.key))
 }

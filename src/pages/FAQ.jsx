@@ -6,84 +6,172 @@ import { IconChevronDown } from '../components/icons.jsx'
 
 const SECTIONS = [
   {
-    title: 'Livraison',
+    title: 'Livraison et retours',
     items: [
-      { q: 'Quels sont les délais de livraison ?', a: 'Les commandes sont expédiées sous 24 à 48h. La réception intervient généralement sous 2 à 4 jours ouvrés en France métropolitaine.' },
-      { q: 'La livraison est-elle offerte ?', a: 'Oui, la livraison standard est offerte dès 49€ d\'achat. En dessous, elle est facturée à partir de 2,90€ selon le mode choisi.' },
-      { q: 'Livrez-vous à l\'étranger ?', a: 'Nous livrons actuellement en France métropolitaine. Contactez-nous pour toute demande de livraison hors métropole.' },
+      {
+        q: 'Quels sont les délais de livraison THEKLOPE ?',
+        a: 'Les commandes sont préparées selon le stock disponible et les délais indiqués sur le site. La livraison dépend ensuite du transporteur et de l’adresse de destination en France.',
+      },
+      {
+        q: 'La livraison est-elle offerte ?',
+        a: 'La livraison standard peut être offerte à partir d’un montant indiqué sur le site. Les conditions exactes s’affichent dans le panier et au checkout.',
+      },
+      {
+        q: 'Puis-je retourner un produit ?',
+        a: 'Un produit non ouvert et dans son emballage d’origine peut être retourné selon les conditions indiquées. Les e-liquides ouverts, résistances utilisées et consommables ouverts ne sont généralement pas repris pour des raisons d’hygiène.',
+      },
     ],
   },
   {
-    title: 'Retours',
+    title: 'Paiement sécurisé',
     items: [
-      { q: 'Puis-je retourner un produit ?', a: 'Vous disposez de 14 jours pour retourner un produit non ouvert et dans son emballage d\'origine. Pour des raisons d\'hygiène, les e-liquides ouverts et les résistances utilisées ne sont pas repris.' },
-      { q: 'Comment effectuer un retour ?', a: 'Contactez notre service client à contact@theklope.com avec votre numéro de commande. Nous vous communiquons la procédure et l\'adresse de retour.' },
+      {
+        q: 'Quels moyens de paiement acceptez-vous ?',
+        a: 'Le paiement est traité par Mollie via un checkout sécurisé. Les moyens disponibles peuvent inclure carte bancaire et autres options activées dans le compte Mollie.',
+      },
+      {
+        q: 'THEKLOPE stocke-t-il mes données bancaires ?',
+        a: 'Non. THEKLOPE ne stocke pas les données de carte bancaire. La saisie et la validation du paiement se font dans l’environnement sécurisé Mollie.',
+      },
+      {
+        q: 'Que se passe-t-il si le paiement échoue ?',
+        a: 'Si le paiement n’est pas confirmé, la commande n’est pas finalisée comme payée. Vous pouvez réessayer ou contacter le service client avec les informations de commande.',
+      },
     ],
   },
   {
-    title: 'Paiement',
+    title: 'Achat responsable',
     items: [
-      { q: 'Quels moyens de paiement acceptez-vous ?', a: 'Le paiement est traité par Mollie, via un checkout sécurisé. Les moyens disponibles peuvent inclure carte bancaire, Bancontact et autres options activées dans le compte Mollie.' },
-      { q: 'Mes données bancaires sont-elles protégées ?', a: 'Oui. THEKLOPE ne stocke jamais vos données de carte. Le paiement est saisi sur le checkout hébergé Mollie, puis confirmé côté serveur par webhook.' },
+      {
+        q: 'Les produits THEKLOPE sont-ils vendus aux mineurs ?',
+        a: 'Non. La vente de produits de vapotage est strictement réservée aux personnes majeures de 18 ans et plus.',
+      },
+      {
+        q: 'La cigarette électronique est-elle sans risque ?',
+        a: 'Non. La vape ne doit pas être présentée comme totalement sans risque. Les produits contenant de la nicotine créent une forte dépendance et sont déconseillés aux non-fumeurs.',
+      },
+      {
+        q: 'THEKLOPE peut-il me conseiller pour arrêter de fumer ?',
+        a: 'THEKLOPE donne des informations produit et compatibilité. Pour une démarche d’arrêt du tabac ou un doute médical, demandez conseil à un professionnel de santé.',
+      },
     ],
   },
   {
-    title: 'Choisir sa cigarette électronique',
+    title: 'Choisir son matériel',
     items: [
-      { q: 'Pod ou kit : que choisir ?', a: 'Le pod est idéal pour débuter : compact, simple, tirage serré proche de la cigarette. Le kit offre plus de réglages et de puissance pour personnaliser sa vape.' },
-      { q: 'Quel produit pour arrêter de fumer ?', a: 'Un pod ou un pack débutant avec un e-liquide en tirage serré est souvent recommandé. Le taux de nicotine se choisit selon votre consommation actuelle.' },
+      {
+        q: 'Pod ou cigarette électronique classique : que choisir ?',
+        a: 'Un pod rechargeable est compact et simple. Un kit classique offre souvent plus d’autonomie et de réglages. Le choix dépend du tirage, du e-liquide et des consommables compatibles.',
+      },
+      {
+        q: 'Quel matériel choisir pour une première utilisation ?',
+        a: 'Un matériel simple, avec peu de réglages et des consommables faciles à trouver, est généralement plus accessible. Vérifiez toujours la compatibilité avec le e-liquide choisi.',
+      },
+      {
+        q: 'Comment savoir si une cartouche ou une résistance est compatible ?',
+        a: 'Comparez la marque, la série, la valeur en ohm et les recommandations du fabricant. En cas de doute, contactez THEKLOPE avant commande.',
+      },
     ],
   },
   {
-    title: 'Choisir son e-liquide',
+    title: 'E-liquides et nicotine',
     items: [
-      { q: 'Comment choisir une saveur ?', a: 'Les saveurs mentholées et tabac sont conseillées pour la transition depuis la cigarette ; les saveurs fruitées et gourmandes pour varier les plaisirs. Commencez par 2-3 saveurs pour trouver vos préférées.' },
-      { q: 'Qu\'est-ce que le ratio PG/VG ?', a: 'Le PG porte les saveurs et le hit, la VG produit la vapeur. Un ratio 50/50 convient à la plupart des pods et petits kits.' },
+      {
+        q: 'Comment choisir son taux de nicotine ?',
+        a: 'Le taux dépend du matériel, du ressenti recherché et de l’usage. Les produits nicotinés sont réservés aux adultes et créent une dépendance. En cas de doute, demandez un avis professionnel.',
+      },
+      {
+        q: 'Que signifie le ratio PG/VG ?',
+        a: 'Le PG favorise la fluidité, les saveurs et la sensation en gorge. La VG produit une vapeur plus dense. Le ratio doit être compatible avec la résistance utilisée.',
+      },
+      {
+        q: 'Un e-liquide sans nicotine est-il réservé aux adultes ?',
+        a: 'Oui. Même sans nicotine, un e-liquide reste un produit de vapotage et doit être utilisé uniquement par des adultes.',
+      },
     ],
   },
   {
-    title: 'Taux de nicotine',
+    title: 'Résistances et entretien',
     items: [
-      { q: 'Quel taux de nicotine choisir ?', a: 'Repère indicatif : gros fumeur (>20 cig/jour) → 16-20 mg ; fumeur moyen → 10-12 mg ; petit fumeur → 3-6 mg. L\'objectif est de réduire progressivement.' },
-      { q: 'Sels de nicotine ou nicotine classique ?', a: 'Les sels de nicotine procurent un hit plus doux à taux élevé, adaptés aux pods. La nicotine classique convient à des taux plus faibles.' },
+      {
+        q: 'Quand changer une résistance ?',
+        a: 'Changez la résistance en cas de goût de brûlé, baisse de vapeur, fuite persistante ou saveur altérée. La durée de vie dépend du liquide, de la puissance et de l’usage.',
+      },
+      {
+        q: 'Comment amorcer une résistance neuve ?',
+        a: 'Imbibez le coton visible avec quelques gouttes de e-liquide, remplissez le réservoir, attendez plusieurs minutes puis commencez à puissance modérée.',
+      },
+      {
+        q: 'Pourquoi ma cigarette électronique fuit-elle ?',
+        a: 'Les fuites peuvent venir d’une résistance usée, d’un joint déplacé, d’un mauvais remplissage, d’un e-liquide trop fluide ou d’une incompatibilité matérielle.',
+      },
     ],
   },
   {
-    title: 'Garantie',
+    title: 'Puffs et alternatives',
     items: [
-      { q: 'Le matériel est-il garanti ?', a: 'Le matériel électronique bénéficie d\'une garantie contre les défauts de fabrication. Les consommables (résistances, e-liquides) n\'entrent pas dans la garantie.' },
-      { q: 'Que faire en cas de produit défectueux ?', a: 'Contactez notre service client avec votre numéro de commande et une description du problème. Nous trouverons une solution rapidement.' },
+      {
+        q: 'THEKLOPE vend-il des puffs jetables ?',
+        a: 'La disponibilité dépend de la réglementation applicable. THEKLOPE privilégie les alternatives rechargeables et conformes pour adultes.',
+      },
+      {
+        q: 'Quelle alternative choisir à la place d’une puff jetable ?',
+        a: 'Un pod rechargeable compact avec cartouches ou résistances compatibles est souvent l’alternative la plus proche en simplicité, tout en étant réutilisable.',
+      },
+      {
+        q: 'Une alternative rechargeable contient-elle forcément de la nicotine ?',
+        a: 'Non. Le taux dépend du e-liquide utilisé. Les produits nicotinés restent réservés aux adultes et créent une dépendance.',
+      },
+    ],
+  },
+  {
+    title: 'Confiance et avis',
+    items: [
+      {
+        q: 'Les avis affichés par THEKLOPE sont-ils réels ?',
+        a: 'THEKLOPE met en avant des avis boutique réels lorsqu’ils sont disponibles, notamment des avis Google, sans inventer d’avis produit.',
+      },
+      {
+        q: 'Comment contacter le service client ?',
+        a: 'Vous pouvez contacter THEKLOPE via la page Contact, par e-mail ou avec les informations disponibles dans le footer du site.',
+      },
+      {
+        q: 'THEKLOPE est-il une boutique vape en France ?',
+        a: 'Oui. THEKLOPE cible le marché français avec une boutique en ligne et une présence associée à Marseille.',
+      },
     ],
   },
 ]
 
 export default function FAQ() {
   const faqSchema = useMemo(() => {
-    const questions = SECTIONS.flatMap(s => s.items).map(item => ({
-      "@type": "Question",
-      "name": item.q,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": item.a
-      }
+    const questions = SECTIONS.flatMap((s) => s.items).map((item) => ({
+      '@type': 'Question',
+      name: item.q,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.a,
+      },
     }))
     return {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": questions
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: questions,
     }
   }, [])
 
   return (
     <div className="container-page py-8">
       <Seo
-        title="FAQ"
-        description="Questions fréquentes THEKLOPE : livraison, retours, paiement, choix de la cigarette électronique et du e-liquide, taux de nicotine, garantie."
+        title="FAQ vape, livraison, nicotine et conformité"
+        description="Questions fréquentes THEKLOPE : livraison, retours, paiement Mollie, produits vape réservés aux adultes, nicotine, résistances, e-liquides et alternatives aux puffs."
         schema={faqSchema}
       />
       <Breadcrumbs items={[{ label: 'FAQ' }]} />
-      <h1 className="mt-4 font-display text-3xl font-bold text-white">Foire aux questions</h1>
-      <p className="mt-2 max-w-xl text-muted">Tout ce qu'il faut savoir avant et après votre commande.</p>
+      <h1 className="mt-4 font-display text-3xl font-bold text-white">Foire aux questions THEKLOPE</h1>
+      <p className="mt-2 max-w-2xl text-muted">
+        Réponses pratiques sur la boutique, les produits de vapotage, les commandes et les précautions à connaître.
+      </p>
 
       <div className="mt-8 space-y-10">
         {SECTIONS.map((section) => (
@@ -99,8 +187,8 @@ export default function FAQ() {
       </div>
 
       <div className="mt-12 card flex flex-col items-center gap-3 p-8 text-center">
-        <h3 className="font-display text-lg font-bold text-white">Vous n'avez pas trouvé votre réponse ?</h3>
-        <p className="text-sm text-muted">Notre équipe est là pour vous aider.</p>
+        <h3 className="font-display text-lg font-bold text-white">Besoin d’une vérification avant commande ?</h3>
+        <p className="text-sm text-muted">Notre équipe peut vous aider à contrôler une compatibilité produit.</p>
         <Link to="/contact" className="btn-primary mt-2">Contacter le support</Link>
       </div>
     </div>
