@@ -4,6 +4,7 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
+import { featuredProducts } from '../data/catalog.js'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
@@ -29,15 +30,29 @@ export default function Cart() {
   }
 
   if (cartDetailed.length === 0) {
+    const { bestSellers } = featuredProducts(products)
+    const inspirations = bestSellers.slice(0, 4)
+
     return (
       <div className="container-page py-8">
         <Seo title="Panier" noindex />
         <Breadcrumbs items={[{ label: 'Panier' }]} />
-        <div className="mt-10 card grid place-items-center p-16 text-center">
+        <div className="mt-10 card grid place-items-center p-10 text-center">
           <h1 className="font-display text-2xl font-bold text-white">Votre panier est vide</h1>
-          <p className="mt-2 text-muted">Parcourez la boutique pour trouver votre prochain produit.</p>
-          <Link to="/boutique" className="btn-primary mt-6">Découvrir la boutique</Link>
+          <p className="mt-2 text-muted text-sm">Parcourez la boutique pour trouver votre prochain produit.</p>
+          <Link to="/boutique" className="btn-primary mt-6 text-xs px-6 py-2.5">Découvrir la boutique</Link>
         </div>
+
+        {inspirations.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-6 font-display text-xl font-bold text-white text-center sm:text-left">Les coups de cœur de la communauté</h2>
+            <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+              {inspirations.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     )
   }

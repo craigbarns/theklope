@@ -119,6 +119,59 @@ export default function Product() {
     setNicotine(product.nicotine?.[0] ?? null)
   }, [product])
 
+  const [selectedBundleIds, setSelectedBundleIds] = useState([])
+
+  // Compte à rebours d'expédition (limite 14h00)
+  const shippingCountdown = useMemo(() => {
+    const now = new Date()
+    const hours = now.getHours()
+    const day = now.getDay()
+    const isWeekend = day === 0 || day === 6
+
+    if (hours < 14 && !isWeekend) {
+      const remainingHours = 14 - hours - 1
+      const remainingMinutes = 60 - now.getMinutes()
+      return `Expédition aujourd'hui ! Commandez dans les ${remainingHours}h ${remainingMinutes}min.`
+    }
+    return `Commandez maintenant pour une expédition dès demain (ou lundi) !`
+  }, [])
+
+  // Lot d'achat groupé compatible (Frequently Bought Together)
+  const bundleItems = useMemo(() => {
+    if (!product || !['ecig', 'pod'].includes(product.category)) return []
+
+    // Trouver un accessoire compatible (résistance de la marque ou accessoire générique)
+    const brandAccessory = products.find(
+      (p) => p.category === 'accessoire' && p.stock > 0 && p.brand.toLowerCase() === product.brand.toLowerCase()
+    )
+    const fallbackAccessory = products.find((p) => p.category === 'accessoire' && p.stock > 0 && p.id !== product.id)
+    const accessory = brandAccessory || fallbackAccessory
+
+    // Trouver un e-liquide
+    const eliquid = products.find((p) => p.category === 'eliquide' && p.stock > 0)
+
+    return [accessory, eliquid].filter(Boolean)
+  }, [product, products])
+
+  // Initialiser les éléments cochés du lot
+  useEffect(() => {
+    if (bundleItems.length) {
+      setSelectedBundleIds(bundleItems.map((item) => item.id))
+    } else {
+      setSelectedBundleIds([])
+    }
+  }, [bundleItems])
+
+  const bundleTotalPrice = useMemo(() => {
+    if (!product) return 0
+    let total = product.price
+    selectedBundleIds.forEach((id) => {
+      const p = products.find((item) => item.id === id)
+      if (p) total += p.price
+    })
+    return total
+  }, [product, selectedBundleIds, products])
+
   if (!product) return <NotFound />
 
   const fav = isFavorite(product.id)
@@ -135,6 +188,21 @@ export default function Product() {
     addToCart(product.id, Math.min(qty, maxQty), variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
+  }
+
+  const handleAddBundle = () => {
+    if (outOfStock) return
+    handleAdd()
+    selectedBundleIds.forEach((id) => {
+      const item = products.find((p) => p.id === id)
+      if (item) {
+        const variant = {}
+        if (item.colors?.length) variant.color = item.colors[0]
+        if (item.flavors?.length) variant.flavor = item.flavors[0]
+        if (item.nicotine?.length) variant.nicotine = item.nicotine[0]
+        addToCart(item.id, 1, variant)
+      }
+    })
   }
 
   return (
@@ -256,6 +324,13 @@ export default function Product() {
                   : `Plus que ${product.stock} en stock — commandez vite`}
             </p>
 
+            {!outOfStock && (
+              <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-neon/10 border border-neon/30 px-3.5 py-2.5 text-xs text-neon font-medium max-w-sm">
+                <IconTruck width={16} height={16} className="shrink-0" />
+                <span>{shippingCountdown}</span>
+              </div>
+            )}
+
             {/* Réassurance */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Reassure icon={IconLock} text="Paiement 100% sécurisé" />
@@ -263,6 +338,73 @@ export default function Product() {
               <Reassure icon={IconShield} text="Retours sous 14 jours" />
               <Reassure icon={IconShield} text="Vente réservée aux +18" />
             </div>
+
+            {bundleItems.length > 0 && (
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <h3 className="font-display text-base font-bold text-white mb-4">Acheter les indispensables compatibles</h3>
+                <div className="space-y-3">
+                  {/* Article principal (toujours présent et coché) */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-neon bg-neon text-noir">
+                      <IconCheck width={12} height={12} />
+                    </div>
+                    <span className="text-xs text-ash/80">
+                      <strong>Cet article :</strong> {product.name} ({formatPrice(product.price)})
+                    </span>
+                  </div>
+
+                  {/* Articles du bundle */}
+                  {bundleItems.map((item) => {
+                    const isChecked = selectedBundleIds.includes(item.id)
+                    return (
+                      <div key={item.id} className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSelectedBundleIds((prev) =>
+                              prev.includes(item.id)
+                                ? prev.filter((id) => id !== item.id)
+                                : [...prev, item.id]
+                            )
+                          }
+                          className={`grid h-5 w-5 place-items-center rounded border transition ${
+                            isChecked ? 'border-neon bg-neon text-noir' : 'border-white/25 hover:border-white/40'
+                          }`}
+                        >
+                          {isChecked && <IconCheck width={12} height={12} />}
+                        </button>
+                        <span className="text-xs text-ash/80">
+                          <strong>{item.category === 'accessoire' ? 'Consommable' : 'E-liquide'} conseillé :</strong>{' '}
+                          <Link to={`/produit/${item.id}`} className="hover:text-neon text-white font-medium">
+                            {item.name}
+                          </Link>{' '}
+                          ({formatPrice(item.price)})
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <div className="mt-5 rounded-2xl bg-white/[0.02] border border-white/8 p-4">
+                  <div className="flex items-baseline justify-between">
+                    <div>
+                      <p className="text-xs text-muted">Prix total du lot :</p>
+                      <p className="font-display text-lg font-bold text-white mt-0.5">{formatPrice(bundleTotalPrice)}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddBundle}
+                      className="btn-ghost text-xs px-5 py-2 min-h-0 text-neon hover:bg-neon hover:text-noir"
+                    >
+                      Ajouter le lot au panier
+                    </button>
+                  </div>
+                  <p className="mt-2 text-[10px] text-neon/80">
+                    💡 Astuce : Utilisez le code <strong className="font-bold underline">PACK15</strong> au panier pour obtenir -15% sur ce lot !
+                  </p>
+                </div>
+              </div>
+            )}
 
             {hasNicotine && (
               <p className="mt-4 rounded-xl border border-amber-400/20 bg-amber-400/5 px-3 py-2.5 text-xs leading-relaxed text-ash/70">

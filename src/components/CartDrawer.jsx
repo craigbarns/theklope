@@ -1,13 +1,30 @@
 import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { featuredProducts } from '../data/catalog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import ProductImage from './ProductImage.jsx'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
 export default function CartDrawer() {
-  const { cartOpen, setCartOpen, cartDetailed, updateQty, removeItem, totals, cartCount } = useStore()
+  const { cartOpen, setCartOpen, cartDetailed, updateQty, removeItem, totals, cartCount, products, addToCart } = useStore()
 
   const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
   const freeShippingPct = Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))
+
+  // Cross-sell : consommables/accessoires en stock, absents du panier
+  const crossSellSuggestions = useMemo(() => {
+    const inCart = new Set(cartDetailed.map((i) => i.product.id))
+    return products
+      .filter((p) => !inCart.has(p.id) && p.stock > 0 && ['accessoire', 'eliquide'].includes(p.category))
+      .slice(0, 3)
+  }, [products, cartDetailed])
+
+  // Inspiration : meilleures ventes si le panier est vide
+  const emptyCartInspirations = useMemo(() => {
+    if (products.length === 0) return []
+    const { bestSellers } = featuredProducts(products)
+    return bestSellers.slice(0, 2)
+  }, [products])
 
   return (
     <>
@@ -33,11 +50,33 @@ export default function CartDrawer() {
         </header>
 
         {cartDetailed.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
-            <p className="text-muted">Votre panier est vide.</p>
-            <Link to="/boutique" className="btn-primary" onClick={() => setCartOpen(false)}>
-              Découvrir la boutique
-            </Link>
+          <div className="flex flex-1 flex-col justify-between p-6">
+            <div className="flex flex-1 flex-col items-center justify-center text-center">
+              <p className="text-muted text-sm">Votre panier est vide.</p>
+              <Link to="/boutique" className="btn-primary mt-4 text-xs py-2.5 px-6" onClick={() => setCartOpen(false)}>
+                Découvrir la boutique
+              </Link>
+            </div>
+            {emptyCartInspirations.length > 0 && (
+              <div className="border-t border-white/8 pt-6">
+                <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Les préférés de la communauté</p>
+                <div className="grid grid-cols-2 gap-3">
+                  {emptyCartInspirations.map((p) => (
+                    <div key={p.id} className="card p-3 flex flex-col justify-between hover:border-neon/30 transition">
+                      <ProductImage src={p.image} alt="" className="aspect-square rounded-xl object-cover bg-carbon p-1" />
+                      <h3 className="mt-2 truncate text-xs font-semibold text-white">{p.name}</h3>
+                      <p className="text-[10px] text-faint mt-0.5">{formatPrice(p.price)}</p>
+                      <button
+                        onClick={() => addToCart(p.id, 1)}
+                        className="btn-ghost mt-3 text-[10px] py-1 px-3 min-h-0 w-full"
+                      >
+                        Ajouter
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <>
@@ -101,6 +140,35 @@ export default function CartDrawer() {
                   </div>
                 </div>
               ))}
+              
+              {crossSellSuggestions.length > 0 && (
+                <div className="mt-8 border-t border-white/8 pt-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Complétez votre commande</p>
+                  <div className="space-y-3">
+                    {crossSellSuggestions.map((p) => (
+                      <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.01] p-3 hover:border-neon/30 transition">
+                        <ProductImage src={p.image} alt="" className="h-12 w-12 rounded-xl object-cover bg-carbon p-1 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            to={`/produit/${p.id}`}
+                            onClick={() => setCartOpen(false)}
+                            className="block truncate text-xs font-bold text-white hover:text-neon"
+                          >
+                            {p.name}
+                          </Link>
+                          <p className="text-[10px] text-faint mt-0.5">{p.brand} · {formatPrice(p.price)}</p>
+                        </div>
+                        <button
+                          onClick={() => addToCart(p.id, 1)}
+                          className="rounded-full bg-neon/10 border border-neon/30 hover:bg-neon hover:text-noir px-3 py-1.5 text-xs text-neon font-bold transition shrink-0"
+                        >
+                          Ajouter
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <footer className="border-t border-white/10 px-5 py-5">
