@@ -278,6 +278,18 @@ export default function Product() {
           <div className="card p-6">
             <h3 className="font-display text-lg font-semibold text-white">Caractéristiques techniques</h3>
             <dl className="mt-4 divide-y divide-white/8">
+              {product.volume && (
+                <div className="flex items-center justify-between py-3 text-sm">
+                  <dt className="text-muted">Volume</dt>
+                  <dd className="text-right font-medium text-white">{product.volume}</dd>
+                </div>
+              )}
+              {product.ohm && (
+                <div className="flex items-center justify-between py-3 text-sm">
+                  <dt className="text-muted">Résistance</dt>
+                  <dd className="text-right font-medium text-white">{product.ohm}</dd>
+                </div>
+              )}
               {Object.entries(product.specs || {}).map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between py-3 text-sm">
                   <dt className="text-muted">{k}</dt>

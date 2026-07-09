@@ -8,14 +8,14 @@ import { SHIPPING_METHODS as SHARED_SHIPPING_METHODS } from '../lib/pricing.js'
 
 // Méthodes de livraison : prix/labels viennent du module partagé (source de
 // vérité, identique au serveur), on n'ajoute ici que l'icône d'affichage.
-const SHIPPING_ICONS = { standard: IconTruck, express: IconBolt, pickup: IconTruck }
+const SHIPPING_ICONS = { poste: IconTruck, coursier: IconBolt, pickup: IconTruck }
 const SHIPPING_METHODS = SHARED_SHIPPING_METHODS.map((m) => ({ ...m, icon: SHIPPING_ICONS[m.id] || IconTruck }))
 
 export default function Checkout() {
   const { cartDetailed, totals, promo } = useStore()
 
   const [step, setStep] = useState(1)
-  const [shipping, setShipping] = useState('standard')
+  const [shipping, setShipping] = useState('poste')
   const [submitting, setSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
