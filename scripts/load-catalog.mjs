@@ -33,6 +33,7 @@ export async function loadProducts() {
           nicotine: row.nicotine,
           flavors: row.flavors,
           colors: row.colors,
+          ohmOptions: row.ohm_options,
           short: row.short,
           long: row.long,
           specs: row.specs,

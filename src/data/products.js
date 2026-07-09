@@ -10350,6 +10350,7 @@ export const PRODUCTS = [
   },
   {
     "id": "gti-mesh-015020405-vaporesso-pack-de-5-300",
+    "ohmOptions": ["0.15", "0.2", "0.4", "0.5"],
     "name": "Gti Mesh 015020405 Vaporesso Pack De 5",
     "category": "accessoire",
     "brand": "Vaporesso",
@@ -10376,6 +10377,7 @@ export const PRODUCTS = [
   },
   {
     "id": "ito-v2-0-7-1-2-voopoo-pack-de-5-301",
+    "ohmOptions": ["0.7", "1.2"],
     "name": "Ito V2 0 7 1 2 Voopoo Pack De 5",
     "category": "accessoire",
     "brand": "Voopoo",
@@ -10402,6 +10404,7 @@ export const PRODUCTS = [
   },
   {
     "id": "pnp-x-015020304506ohm-voopoo-pack-de-5-302",
+    "ohmOptions": ["0.15", "0.2", "0.3", "0.45", "0.6"],
     "name": "Pnp X 015020304506ohm Voopoo Pack De 5",
     "category": "accessoire",
     "brand": "Voopoo",

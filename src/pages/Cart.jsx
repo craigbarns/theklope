@@ -188,6 +188,7 @@ function VariantLabel({ variant }) {
   if (variant.color) parts.push(variant.color)
   if (variant.flavor) parts.push(variant.flavor)
   if (variant.nicotine != null) parts.push(`${variant.nicotine} mg`)
+  if (variant.ohm != null) parts.push(`${variant.ohm} Ω`)
   if (!parts.length) return null
   return <p className="mt-1 text-xs text-faint">{parts.join(' · ')}</p>
 }

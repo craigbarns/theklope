@@ -18,6 +18,7 @@ export default function ProductCard({ product }) {
     if (product.colors?.length) variant.color = product.colors[0]
     if (product.flavors?.length) variant.flavor = product.flavors[0]
     if (product.nicotine?.length) variant.nicotine = product.nicotine[0]
+    if (product.ohmOptions?.length) variant.ohm = product.ohmOptions[0]
     addToCart(product.id, 1, variant)
   }
 

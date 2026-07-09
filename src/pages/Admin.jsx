@@ -33,6 +33,7 @@ const emptyProduct = {
   type: 'E-liquide',
   volume: '',
   ohm: '',
+  ohmOptions: '',
   price: '',
   oldPrice: '',
   stock: 24,
@@ -592,6 +593,15 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
             </label>
             <Field label="Ohm (résistance)" value={form.ohm || ''} onChange={update('ohm')} placeholder="0.8Ω, 1.2Ω…" />
           </div>
+          <Field
+            label="Valeurs Ohm sélectionnables (résistance)"
+            value={form.ohmOptions || ''}
+            onChange={update('ohmOptions')}
+            placeholder="0.15, 0.2, 0.3, 0.45, 0.6"
+          />
+          <p className="-mt-2 text-xs text-muted">
+            Séparez par des virgules. Renseigné = le client choisit sa valeur Ω sur la fiche (comme le taux de nicotine).
+          </p>
           <TextArea label="Résumé court" value={form.short} onChange={update('short')} rows={3} required />
           <TextArea label="Description longue" value={form.long} onChange={update('long')} rows={5} />
           <TextArea label="Caractéristiques" value={form.specsText} onChange={update('specsText')} rows={4} />
@@ -837,6 +847,7 @@ function toFormProduct(product) {
     nicotine: (product.nicotine || []).join(', '),
     flavors: (product.flavors || []).join(', '),
     colors: (product.colors || []).join(', '),
+    ohmOptions: (product.ohmOptions || []).join(', '),
     specsText: Object.entries(product.specs || {}).map(([key, value]) => `${key}: ${value}`).join('\n'),
   }
 }
@@ -854,6 +865,7 @@ function variantLabel(variant = {}) {
   if (variant.color) parts.push(variant.color)
   if (variant.flavor) parts.push(variant.flavor)
   if (variant.nicotine != null) parts.push(`${variant.nicotine} mg`)
+  if (variant.ohm != null) parts.push(`${variant.ohm} Ω`)
   return parts.length ? parts.join(' · ') : 'Standard'
 }
 

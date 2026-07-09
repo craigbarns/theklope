@@ -31,6 +31,7 @@ export default function Product() {
   const [color, setColor] = useState(product?.colors?.[0] || null)
   const [flavor, setFlavor] = useState(product?.flavors?.[0] || null)
   const [nicotine, setNicotine] = useState(product?.nicotine?.[0] ?? null)
+  const [ohm, setOhm] = useState(product?.ohmOptions?.[0] ?? null)
   const [added, setAdded] = useState(false)
 
   const similar = useMemo(() => {
@@ -117,6 +118,7 @@ export default function Product() {
     setColor(product.colors?.[0] || null)
     setFlavor(product.flavors?.[0] || null)
     setNicotine(product.nicotine?.[0] ?? null)
+    setOhm(product.ohmOptions?.[0] ?? null)
   }, [product])
 
   const [selectedBundleIds, setSelectedBundleIds] = useState([])
@@ -185,6 +187,7 @@ export default function Product() {
     if (color) variant.color = color
     if (flavor) variant.flavor = flavor
     if (nicotine != null) variant.nicotine = nicotine
+    if (ohm != null) variant.ohm = ohm
     addToCart(product.id, Math.min(qty, maxQty), variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
@@ -200,6 +203,7 @@ export default function Product() {
         if (item.colors?.length) variant.color = item.colors[0]
         if (item.flavors?.length) variant.flavor = item.flavors[0]
         if (item.nicotine?.length) variant.nicotine = item.nicotine[0]
+        if (item.ohmOptions?.length) variant.ohm = item.ohmOptions[0]
         addToCart(item.id, 1, variant)
       }
     })
@@ -289,6 +293,15 @@ export default function Product() {
                   value={nicotine}
                   onChange={setNicotine}
                   render={(n) => `${n} mg`}
+                />
+              )}
+              {product.ohmOptions?.length > 0 && (
+                <VariantPicker
+                  label="Résistance (Ω)"
+                  options={product.ohmOptions}
+                  value={ohm}
+                  onChange={setOhm}
+                  render={(v) => `${v} Ω`}
                 />
               )}
             </div>
@@ -432,10 +445,16 @@ export default function Product() {
                   <dd className="text-right font-medium text-white">{product.volume}</dd>
                 </div>
               )}
-              {product.ohm && (
+              {product.ohm && !(product.ohmOptions?.length > 0) && (
                 <div className="flex items-center justify-between py-3 text-sm">
                   <dt className="text-muted">Résistance</dt>
                   <dd className="text-right font-medium text-white">{product.ohm}</dd>
+                </div>
+              )}
+              {product.ohmOptions?.length > 0 && (
+                <div className="flex items-center justify-between py-3 text-sm">
+                  <dt className="text-muted">Résistance (Ω)</dt>
+                  <dd className="text-right font-medium text-white">{product.ohmOptions.join(' · ')} Ω</dd>
                 </div>
               )}
               {Object.entries(product.specs || {}).map(([k, v]) => (

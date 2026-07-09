@@ -9,6 +9,7 @@ create table if not exists public.products (
   type text not null default 'Produit',
   volume text,
   ohm text,
+  ohm_options jsonb not null default '[]'::jsonb,
   price numeric(10,2) not null default 0,
   old_price numeric(10,2),
   rating numeric(3,2) not null default 4.70,
@@ -30,6 +31,8 @@ create table if not exists public.products (
 -- Migration : volume (10ml/50ml, pour les remises auto) + ohm (résistances).
 alter table public.products add column if not exists volume text;
 alter table public.products add column if not exists ohm text;
+-- Migration : ohm_options (valeurs Ω sélectionnables par le client sur les résistances).
+alter table public.products add column if not exists ohm_options jsonb not null default '[]'::jsonb;
 
 create table if not exists public.orders (
   id text primary key,
