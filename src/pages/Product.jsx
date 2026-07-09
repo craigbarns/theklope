@@ -224,7 +224,7 @@ export default function Product() {
         <div className="mt-6 grid gap-10 lg:grid-cols-2">
           {/* Galerie */}
           <div>
-            <div className="card relative overflow-hidden rounded-3xl p-2">
+            <div className="card relative overflow-hidden rounded-3xl p-2 aspect-square flex items-center justify-center">
               <div className="absolute left-4 top-4 z-10 flex gap-2">
                 {product.badge && <Badge type={product.badge} />}
                 {product.oldPrice && !product.badge && <Badge type="promo" />}
@@ -234,7 +234,9 @@ export default function Product() {
                 alt={product.name}
                 fetchpriority="high"
                 decoding="async"
-                className="w-full rounded-2xl"
+                className="w-full h-full object-cover rounded-2xl"
+                width={600}
+                height={600}
               />
             </div>
             <div className="mt-3 flex gap-3">
@@ -246,7 +248,7 @@ export default function Product() {
                     activeImg === i ? 'border-neon' : 'border-white/10 hover:border-white/30'
                   }`}
                 >
-                  <ProductImage src={img} alt="" loading="lazy" className="h-20 w-20 object-cover" />
+                  <ProductImage src={img} alt="" loading="lazy" className="h-20 w-20 object-cover" width={80} height={80} />
                 </button>
               ))}
             </div>
@@ -341,7 +343,7 @@ export default function Product() {
 
             {bundleItems.length > 0 && (
               <div className="mt-8 border-t border-white/10 pt-6">
-                <h3 className="font-display text-base font-bold text-white mb-4">Acheter les indispensables compatibles</h3>
+                <h2 className="font-display text-base font-bold text-white mb-4">Acheter les indispensables compatibles</h2>
                 <div className="space-y-3">
                   {/* Article principal (toujours présent et coché) */}
                   <div className="flex items-center gap-3">

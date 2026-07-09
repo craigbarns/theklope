@@ -141,12 +141,12 @@ export default function Home() {
               <div className="relative mx-auto max-w-md">
                 {/* Halos de fond colorés et dynamiques */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
-                <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card">
-                  <ProductImage src={heroProduct.image} alt={heroProduct.name} fetchpriority="high" className="w-full rounded-2xl animate-fade-in" />
+                <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card aspect-square">
+                  <ProductImage src={heroProduct.image} alt={heroProduct.name} fetchpriority="high" className="w-full h-full object-cover rounded-2xl animate-fade-in" width={448} height={448} />
                 </div>
                 {featuredProduct && (
                   <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
-                    <ProductImage src={featuredProduct.image} alt="" loading="lazy" className="h-14 w-14 rounded-xl object-cover" />
+                    <ProductImage src={featuredProduct.image} alt="" loading="lazy" className="h-14 w-14 rounded-xl object-cover" width={56} height={56} />
                     <div>
                       <p className="text-xs text-muted">Best-seller</p>
                       <p className="max-w-[10rem] truncate text-sm font-semibold text-white">{featuredProduct.name}</p>
@@ -191,7 +191,7 @@ export default function Home() {
                 className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
               />
               <div className="relative">
-                <h3 className="font-display text-xl font-semibold text-white">{c.name}</h3>
+                <h2 className="font-display text-xl font-semibold text-white">{c.name}</h2>
                 <span className="mt-1 inline-flex items-center gap-1 text-sm text-neon">
                   Explorer <IconArrowRight width={15} height={15} />
                 </span>
@@ -303,9 +303,9 @@ export default function Home() {
           <span className="grid h-12 w-12 place-items-center rounded-full border border-amber-400/40 text-amber-400">
             <IconShield />
           </span>
-          <h3 className="font-display text-xl font-bold text-white">
+          <h2 className="font-display text-xl font-bold text-white">
             Interdit aux mineurs — vente réservée aux plus de 18 ans
-          </h3>
+          </h2>
           <p className="max-w-2xl text-sm text-muted">
             La vente de produits de vapotage est interdite aux mineurs. Les produits contenant de la nicotine
             créent une forte dépendance. Leur utilisation est déconseillée aux non-fumeurs.

@@ -32,6 +32,8 @@ export default function ProductCard({ product }) {
           alt={`${product.name} — ${product.type} ${product.brand}`}
           loading="lazy"
           className="h-full w-full object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.07]"
+          width={400}
+          height={400}
         />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-noir/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">

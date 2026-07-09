@@ -187,7 +187,7 @@ export default function FAQ() {
       </div>
 
       <div className="mt-12 card flex flex-col items-center gap-3 p-8 text-center">
-        <h3 className="font-display text-lg font-bold text-white">Besoin d’une vérification avant commande ?</h3>
+        <h2 className="font-display text-lg font-bold text-white">Besoin d’une vérification avant commande ?</h2>
         <p className="text-sm text-muted">Notre équipe peut vous aider à contrôler une compatibilité produit.</p>
         <Link to="/contact" className="btn-primary mt-2">Contacter le support</Link>
       </div>

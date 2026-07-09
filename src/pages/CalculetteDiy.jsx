@@ -261,7 +261,7 @@ export default function CalculetteDiy() {
         <aside className="space-y-6">
           {/* Fiole visuelle */}
           <div className="card p-6 flex flex-col items-center">
-            <h3 className="font-display text-sm font-bold text-white mb-6 text-center w-full border-b border-white/8 pb-3">Proportions du mélange</h3>
+            <h2 className="font-display text-sm font-bold text-white mb-6 text-center w-full border-b border-white/8 pb-3">Proportions du mélange</h2>
 
             {/* Container Fiole */}
             <div className="relative w-24 h-48 border-[3px] border-white/25 rounded-b-2xl rounded-t-lg bg-carbon/20 flex flex-col-reverse overflow-hidden shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]">

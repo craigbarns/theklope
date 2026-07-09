@@ -13,7 +13,7 @@ export default {
         electric: '#3B82F6',
         // Tokens texte à contraste maîtrisé (WCAG AA sur fond sombre)
         muted: '#A3A3A3', // ~7:1 sur #050505 — texte secondaire
-        faint: '#8A8A8A', // ~5:1 — légendes / petits libellés
+        faint: '#9E9E9E', // Contrast-compliant (AA >4.5:1 on dark)
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],

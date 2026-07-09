@@ -226,11 +226,13 @@ export default function Configurateur() {
                             alt=""
                             loading="lazy"
                             className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                            width={300}
+                            height={300}
                           />
                         </div>
-                        <h3 className="mt-3 font-display text-sm font-bold text-white group-hover:text-neon transition">
+                        <h2 className="mt-3 font-display text-sm font-bold text-white group-hover:text-neon transition">
                           {p.name}
-                        </h3>
+                        </h2>
                         <p className="text-[11px] text-faint uppercase tracking-wider font-semibold mt-0.5">
                           {p.brand}
                         </p>

@@ -54,7 +54,7 @@ export default function About() {
               <div className="mb-4 grid h-12 w-12 place-items-center rounded-xl border border-neon/30 bg-neon/10 text-neon">
                 <v.icon />
               </div>
-              <h3 className="font-display text-lg font-semibold text-white">{v.title}</h3>
+              <h2 className="font-display text-lg font-semibold text-white">{v.title}</h2>
               <p className="mt-2 text-sm text-muted">{v.text}</p>
             </div>
           ))}
