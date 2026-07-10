@@ -21,7 +21,7 @@ import { loadProducts } from './load-catalog.mjs'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 const dist = resolve(root, 'dist')
-const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://theklope.com').replace(/\/$/, '')
+const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').replace(/\/$/, '')
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
@@ -259,9 +259,9 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
       ...(page.localBusiness
         ? [{
             '@type': 'LocalBusiness',
-            '@id': 'https://theklope.com/#store',
+            '@id': 'https://www.theklope.com/#store',
             name: 'THEKLOPE',
-            url: 'https://theklope.com',
+            url: 'https://www.theklope.com',
             address: {
               '@type': 'PostalAddress',
               streetAddress: '188 rue de Rome',
@@ -295,8 +295,8 @@ const homeSchema = {
       '@type': 'LocalBusiness',
       name: 'THEKLOPE',
       image: `${BASE_URL}/og-image.jpg`,
-      '@id': 'https://theklope.com/#store',
-      url: 'https://theklope.com',
+      '@id': 'https://www.theklope.com/#store',
+      url: 'https://www.theklope.com',
       telephone: '+33491555555',
       priceRange: '$$',
       address: {
@@ -319,20 +319,20 @@ const homeSchema = {
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://theklope.com/#website',
-      url: 'https://theklope.com',
+      '@id': 'https://www.theklope.com/#website',
+      url: 'https://www.theklope.com',
       name: 'THEKLOPE',
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://theklope.com/boutique?q={search_term_string}',
+        target: 'https://www.theklope.com/boutique?q={search_term_string}',
         'query-input': 'required name=search_term_string',
       },
     },
     {
       '@type': 'Organization',
-      '@id': 'https://theklope.com/#organization',
+      '@id': 'https://www.theklope.com/#organization',
       name: 'THEKLOPE',
-      url: 'https://theklope.com',
+      url: 'https://www.theklope.com',
       logo: `${BASE_URL}/logo.png`,
     },
   ],

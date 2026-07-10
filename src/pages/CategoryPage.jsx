@@ -32,7 +32,7 @@ export default function CategoryPage() {
 
   const schema = useMemo(() => {
     if (!category) return null
-    const path = `https://theklope.com/categorie/${slug}`
+    const path = `https://www.theklope.com/categorie/${slug}`
     const graph = [
       {
         '@type': 'CollectionPage',
@@ -40,13 +40,13 @@ export default function CategoryPage() {
         url: path,
         name: seo?.h1 || category.name,
         description: seo?.metaDescription || category.tagline,
-        isPartOf: { '@id': 'https://theklope.com/#website' },
+        isPartOf: { '@id': 'https://www.theklope.com/#website' },
       },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://theklope.com/' },
-          { '@type': 'ListItem', position: 2, name: 'Catégories', item: 'https://theklope.com/categories' },
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.theklope.com/' },
+          { '@type': 'ListItem', position: 2, name: 'Catégories', item: 'https://www.theklope.com/categories' },
           { '@type': 'ListItem', position: 3, name: category.name, item: path },
         ],
       },
@@ -56,7 +56,7 @@ export default function CategoryPage() {
         itemListElement: products.slice(0, 24).map((p, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          url: `https://theklope.com/produit/${p.id}`,
+          url: `https://www.theklope.com/produit/${p.id}`,
           name: p.name,
         })),
       },

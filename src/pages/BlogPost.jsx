@@ -41,11 +41,11 @@ export default function BlogPost() {
       '@type': 'BlogPosting',
       mainEntityOfPage: {
         '@type': 'WebPage',
-        '@id': `https://theklope.com/guides/${post.slug}`,
+        '@id': `https://www.theklope.com/guides/${post.slug}`,
       },
       headline: post.title,
       description: post.description,
-      image: `https://theklope.com${post.image}`,
+      image: `https://www.theklope.com${post.image}`,
       datePublished: post.isoDate,
       dateModified: post.isoDate,
       author: {
@@ -57,7 +57,7 @@ export default function BlogPost() {
         name: 'THEKLOPE',
         logo: {
           '@type': 'ImageObject',
-          url: 'https://theklope.com/logo.png',
+          url: 'https://www.theklope.com/logo.png',
         },
       },
     }
@@ -90,7 +90,7 @@ export default function BlogPost() {
         <Seo
           title={`${post.title} | THEKLOPE`}
           description={post.description}
-          canonical={`https://theklope.com/guides/${post.slug}`}
+          canonical={`https://www.theklope.com/guides/${post.slug}`}
           schema={schema}
         />
         <Breadcrumbs items={[{ label: 'Guides', to: '/guides' }, { label: post.title }]} />

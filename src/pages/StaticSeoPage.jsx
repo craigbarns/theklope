@@ -12,7 +12,7 @@ export default function StaticSeoPage() {
 
   const schema = useMemo(() => {
     if (!page) return null
-    const url = `https://theklope.com/${slug}`
+    const url = `https://www.theklope.com/${slug}`
     const graph = [
       {
         '@type': 'WebPage',
@@ -20,12 +20,12 @@ export default function StaticSeoPage() {
         url,
         name: page.h1,
         description: page.metaDescription,
-        isPartOf: { '@id': 'https://theklope.com/#website' },
+        isPartOf: { '@id': 'https://www.theklope.com/#website' },
       },
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://theklope.com/' },
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://www.theklope.com/' },
           { '@type': 'ListItem', position: 2, name: page.h1, item: url },
         ],
       },
@@ -45,10 +45,10 @@ export default function StaticSeoPage() {
     if (page.localBusiness) {
       graph.push({
         '@type': 'LocalBusiness',
-        '@id': 'https://theklope.com/#store',
+        '@id': 'https://www.theklope.com/#store',
         name: 'THEKLOPE',
-        url: 'https://theklope.com',
-        image: 'https://theklope.com/og-image.jpg',
+        url: 'https://www.theklope.com',
+        image: 'https://www.theklope.com/og-image.jpg',
         address: {
           '@type': 'PostalAddress',
           streetAddress: '188 rue de Rome',
@@ -73,7 +73,7 @@ export default function StaticSeoPage() {
       <Seo
         title={page.title}
         description={page.metaDescription}
-        canonical={`https://theklope.com/${slug}`}
+        canonical={`https://www.theklope.com/${slug}`}
         schema={schema}
       />
       <Breadcrumbs items={[{ label: page.h1 }]} />
