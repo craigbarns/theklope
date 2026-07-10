@@ -52,7 +52,7 @@ export default function AgeGate() {
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-noir/95 px-5 backdrop-blur-md">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-noir/60 px-5 backdrop-blur-sm">
       <div className="w-full max-w-md animate-fade-up rounded-3xl border border-white/10 bg-anthracite p-8 text-center shadow-card sm:p-10">
         <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl border border-neon/30 bg-neon/10 text-neon">
           <IconShield width={30} height={30} />
