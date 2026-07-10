@@ -1,6 +1,8 @@
 # THEKLOPE
 > THEKLOPE est une boutique vape en ligne premium de cigarettes électroniques, e-liquides et accessoires pour adultes.
 
+- [Full Specifications Database](https://theklope.com/llms-full.txt): Complete product catalog, real-time stock levels, pricing details, and specifications in raw markdown.
+
 ## Informations importantes
 > Les produits de vapotage sont strictement réservés aux personnes majeures de 18 ans et plus. Les produits contenant de la nicotine créent une forte dépendance. La vape ne doit pas être présentée comme totalement sans risque et ne remplace pas un avis médical.
 
