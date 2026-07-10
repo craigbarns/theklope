@@ -26,7 +26,7 @@ export const PROMO_CODES = {
 // -----------------------------------------------------------------------------
 // Remises automatiques par marque / volume (e-liquides uniquement).
 //   - Paliers « 10ml » : X e-liquides 10ml de certaines marques → prix de lot fixe.
-//   - Palier « 50ml »  : à partir de N e-liquides 50ml de ces marques → % de remise.
+//   - Palier « 50ml »  : à partir de N e-liquides 50ml, TOUTES marques → % de remise.
 // Les marques sont comparées en minuscules/sans espaces superflus.
 // -----------------------------------------------------------------------------
 export const BUNDLE_TIERS_10ML = [
@@ -34,11 +34,11 @@ export const BUNDLE_TIERS_10ML = [
   { key: 'B', brands: ['alfaliquid', 'pulp'], packSize: 20, packPrice: 88.5, label: '20 e-liquides Alfaliquid / Pulp', progressLabel: 'Alfaliquid / Pulp', promoLabel: '-25%' },
 ]
 export const BUNDLE_50ML = {
-  brands: ['liquidarom', 'freaks', 'alfaliquid', 'pulp'],
+  // Toutes marques confondues (contrairement aux paliers 10ml, réservés aux 4 marques).
   minQty: 4,
   rate: 0.25,
   label: '4 e-liquides 50ml ou +',
-  progressLabel: 'en 50ml',
+  progressLabel: 'en 50ml (toutes marques)',
   promoLabel: '-25%',
 }
 
@@ -93,7 +93,7 @@ export function computeAutoDiscount(lines = []) {
   }
 
   // Palier 50ml (% de remise à partir de minQty)
-  const fifty = lines.filter((l) => isEliquid(l) && is50ml(l) && BUNDLE_50ML.brands.includes(normBrand(l.brand)))
+  const fifty = lines.filter((l) => isEliquid(l) && is50ml(l))
   const units50 = fifty.reduce((s, l) => s + (Number(l.qty) || 0), 0)
   if (units50 >= BUNDLE_50ML.minQty) {
     const sum50 = round2(fifty.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0))
@@ -130,7 +130,7 @@ export function computeBundleProgress(lines = []) {
   }
 
   const units50 = lines
-    .filter((l) => isEliquid(l) && is50ml(l) && BUNDLE_50ML.brands.includes(normBrand(l.brand)))
+    .filter((l) => isEliquid(l) && is50ml(l))
     .reduce((s, l) => s + (Number(l.qty) || 0), 0)
   if (units50 > 0 && units50 < BUNDLE_50ML.minQty) {
     hints.push({
