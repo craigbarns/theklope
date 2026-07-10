@@ -5,20 +5,20 @@
 > Les produits de vapotage sont strictement réservés aux personnes majeures de 18 ans et plus. Les produits contenant de la nicotine créent une forte dépendance. La vape ne doit pas être présentée comme totalement sans risque et ne remplace pas un avis médical.
 
 ## Pages principales
-- [Accueil](https://theklope.com/): Boutique vape en ligne pour adultes, meilleures ventes et guides.
-- [Boutique](https://theklope.com/boutique): Catalogue complet de cigarettes électroniques, pods, e-liquides et résistances.
-- [Cigarettes électroniques](https://theklope.com/categorie/cigarettes-electroniques): Modèles et kits complets pour adultes.
-- [Pods rechargeables](https://theklope.com/categorie/pods): Systèmes rechargeables compacts et simples d'utilisation.
-- [E-liquides](https://theklope.com/categorie/e-liquides): Sélection de saveurs premium de fabrication française.
-- [Résistances](https://theklope.com/categorie/resistances): Consommables et coils compatibles pour entretenir votre matériel.
-- [Accessoires](https://theklope.com/categorie/accessoires): Chargeurs, étuis, cartouches et résistances de rechange.
-- [Alternatives puffs](https://theklope.com/categorie/alternatives-puffs): Pods et modèles rechargeables conformes pour adultes.
-- [Guides responsables](https://theklope.com/guides): Conseils pratiques pour choisir son matériel, e-liquide ou taux de nicotine.
-- [FAQ](https://theklope.com/faq): Réponses fréquentes sur les produits, la livraison et la conformité.
-- [Boutique Marseille](https://theklope.com/boutique-vape-marseille): Notre boutique physique située au 188 rue de Rome, 13006 Marseille.
-- [Conformité](https://theklope.com/conformite-vape): Nos engagements pour une information responsable et la vente aux majeurs.
-- [Livraison et retours](https://theklope.com/livraison-retours): Détails sur l'expédition en France et les modalités de retour.
-- [Contact](https://theklope.com/contact): Formulaire de contact et coordonnées du support client.
+- [Accueil](https://www.theklope.com/): Boutique vape en ligne pour adultes, meilleures ventes et guides.
+- [Boutique](https://www.theklope.com/boutique): Catalogue complet de cigarettes électroniques, pods, e-liquides et résistances.
+- [Cigarettes électroniques](https://www.theklope.com/categorie/cigarettes-electroniques): Modèles et kits complets pour adultes.
+- [Pods rechargeables](https://www.theklope.com/categorie/pods): Systèmes rechargeables compacts et simples d'utilisation.
+- [E-liquides](https://www.theklope.com/categorie/e-liquides): Sélection de saveurs premium de fabrication française.
+- [Résistances](https://www.theklope.com/categorie/resistances): Consommables et coils compatibles pour entretenir votre matériel.
+- [Accessoires](https://www.theklope.com/categorie/accessoires): Chargeurs, étuis, cartouches et résistances de rechange.
+- [Alternatives puffs](https://www.theklope.com/categorie/alternatives-puffs): Pods et modèles rechargeables conformes pour adultes.
+- [Guides responsables](https://www.theklope.com/guides): Conseils pratiques pour choisir son matériel, e-liquide ou taux de nicotine.
+- [FAQ](https://www.theklope.com/faq): Réponses fréquentes sur les produits, la livraison et la conformité.
+- [Boutique Marseille](https://www.theklope.com/boutique-vape-marseille): Notre boutique physique située au 188 rue de Rome, 13006 Marseille.
+- [Conformité](https://www.theklope.com/conformite-vape): Nos engagements pour une information responsable et la vente aux majeurs.
+- [Livraison et retours](https://www.theklope.com/livraison-retours): Détails sur l'expédition en France et les modalités de retour.
+- [Contact](https://www.theklope.com/contact): Formulaire de contact et coordonnées du support client.
 
 ## Fonctionnalités & Services
 - **Paiement sécurisé** : Intégration du checkout sécurisé Mollie.

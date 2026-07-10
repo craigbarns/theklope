@@ -52,9 +52,9 @@ export default function Home() {
       {
         '@type': 'LocalBusiness',
         name: 'THEKLOPE',
-        image: 'https://theklope.com/og-image.jpg',
-        '@id': 'https://theklope.com/#store',
-        url: 'https://theklope.com',
+        image: 'https://www.theklope.com/og-image.jpg',
+        '@id': 'https://www.theklope.com/#store',
+        url: 'https://www.theklope.com',
         telephone: '+33491555555',
         priceRange: '$$',
         address: {
@@ -77,21 +77,21 @@ export default function Home() {
       },
       {
         '@type': 'WebSite',
-        '@id': 'https://theklope.com/#website',
-        url: 'https://theklope.com',
+        '@id': 'https://www.theklope.com/#website',
+        url: 'https://www.theklope.com',
         name: 'THEKLOPE',
         potentialAction: {
           '@type': 'SearchAction',
-          target: 'https://theklope.com/boutique?q={search_term_string}',
+          target: 'https://www.theklope.com/boutique?q={search_term_string}',
           'query-input': 'required name=search_term_string',
         },
       },
       {
         '@type': 'Organization',
-        '@id': 'https://theklope.com/#organization',
+        '@id': 'https://www.theklope.com/#organization',
         name: 'THEKLOPE',
-        url: 'https://theklope.com',
-        logo: 'https://theklope.com/logo.png',
+        url: 'https://www.theklope.com',
+        logo: 'https://www.theklope.com/logo.png',
       },
     ],
   }), [])

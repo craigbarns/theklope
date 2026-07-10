@@ -48,7 +48,7 @@ export default function Product() {
       "@type": "Product",
       "name": product.name,
       "image": [
-        product.image.startsWith('http') ? product.image : `https://theklope.com${product.image}`
+        product.image.startsWith('http') ? product.image : `https://www.theklope.com${product.image}`
       ],
       "description": product.long || product.short,
       "sku": product.id,
@@ -58,7 +58,7 @@ export default function Product() {
       },
       "offers": {
         "@type": "Offer",
-        "url": `https://theklope.com/produit/${product.id}`,
+        "url": `https://www.theklope.com/produit/${product.id}`,
         "priceCurrency": "EUR",
         "price": (Number(product.price) || 0).toFixed(2),
         "priceValidUntil": priceValidUntil,

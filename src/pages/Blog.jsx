@@ -27,7 +27,7 @@ export default function Blog() {
     itemListElement: BLOG_POSTS.map((post, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      url: `https://theklope.com/guides/${post.slug}`,
+      url: `https://www.theklope.com/guides/${post.slug}`,
       name: post.title,
     })),
   }), [])
@@ -37,7 +37,7 @@ export default function Blog() {
       <Seo
         title="Guides vape responsables | THEKLOPE"
         description="Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes."
-        canonical="https://theklope.com/guides"
+        canonical="https://www.theklope.com/guides"
         schema={schema}
       />
       <Breadcrumbs items={[{ label: 'Guides' }]} />

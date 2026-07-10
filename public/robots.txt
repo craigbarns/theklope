@@ -5,4 +5,4 @@ Disallow: /checkout
 Disallow: /panier
 Disallow: /favoris
 
-Sitemap: https://theklope.com/sitemap.xml
+Sitemap: https://www.theklope.com/sitemap.xml

@@ -13,7 +13,7 @@ const { CATEGORIES } = await import(resolve(root, 'src/data/catalog.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 
-const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://theklope.com').replace(/\/$/, '')
+const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').replace(/\/$/, '')
 const today = new Date().toISOString().slice(0, 10)
 
 const staticRoutes = [
