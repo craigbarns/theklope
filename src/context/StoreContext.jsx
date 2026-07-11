@@ -361,6 +361,28 @@ export function StoreProvider({ children }) {
 
   // ----- Cart -----
   const addToCart = useCallback((productId, qty = 1, variant = {}) => {
+    // GA4 Tracking
+    loadStaticCatalog().then((catalog) => {
+      const product = catalog.find((p) => p.id === productId)
+      if (product && typeof window !== 'undefined' && typeof window.gtag === 'function') {
+        window.gtag('event', 'add_to_cart', {
+          currency: 'EUR',
+          value: product.price * qty,
+          items: [
+            {
+              item_id: product.id,
+              item_name: product.name,
+              item_brand: product.brand,
+              item_category: product.category,
+              price: product.price,
+              quantity: qty,
+              item_variant: Object.values(variant).join(', ')
+            }
+          ]
+        });
+      }
+    }).catch(() => {})
+
     setCart((prev) => {
       const key = JSON.stringify(variant)
       const existing = prev.find((i) => i.productId === productId && JSON.stringify(i.variant) === key)

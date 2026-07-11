@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
@@ -18,14 +18,37 @@ export default function Checkout() {
   const [shipping, setShipping] = useState('poste')
   const [submitting, setSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
-  const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
-  const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
-  const [ageAccepted, setAgeAccepted] = useState(false)
 
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || SHIPPING_METHODS[0]
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
   const shippingCost = shippingIsFree ? 0 : selectedShipping.price
   const grandTotal = Math.max(0, totals.subtotal - totals.discount) + shippingCost
+
+  // GA4 begin_checkout tracking
+  const trackedRef = useRef(false)
+  useEffect(() => {
+    if (trackedRef.current || cartDetailed.length === 0) return
+    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+      trackedRef.current = true
+      window.gtag('event', 'begin_checkout', {
+        currency: 'EUR',
+        value: grandTotal,
+        items: cartDetailed.map((item) => ({
+          item_id: item.product.id,
+          item_name: item.product.name,
+          item_brand: item.product.brand,
+          item_category: item.product.category,
+          price: item.product.price,
+          quantity: item.qty,
+          item_variant: Object.values(item.variant).join(', ')
+        }))
+      });
+    }
+  }, [cartDetailed, grandTotal])
+  const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
+  const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
+  const [ageAccepted, setAgeAccepted] = useState(false)
+
 
   const updateCustomer = (key) => (e) => setCustomer((prev) => ({ ...prev, [key]: e.target.value }))
   const updateAddress = (key) => (e) => setAddress((prev) => ({ ...prev, [key]: e.target.value }))

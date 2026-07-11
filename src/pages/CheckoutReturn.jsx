@@ -9,7 +9,7 @@ import { IconCheck, IconLock } from '../components/icons.jsx'
 export default function CheckoutReturn() {
   const [params] = useSearchParams()
   const orderId = params.get('order')
-  const { clearCart } = useStore()
+  const { clearCart, cartDetailed } = useStore()
 
   const [state, setState] = useState('pending') // 'pending' | 'paid' | 'failed' | 'error'
   const [order, setOrder] = useState(null)
@@ -36,6 +36,27 @@ export default function CheckoutReturn() {
           setState('paid')
           if (!clearedRef.current) {
             clearedRef.current = true
+            
+            // Track GA4 purchase event
+            if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+              window.gtag('event', 'purchase', {
+                transaction_id: data.order?.id || orderId,
+                value: data.order?.total || 0,
+                tax: 0,
+                shipping: data.order?.shipping || 0,
+                currency: 'EUR',
+                items: cartDetailed.map((item) => ({
+                  item_id: item.product.id,
+                  item_name: item.product.name,
+                  item_brand: item.product.brand,
+                  item_category: item.product.category,
+                  price: item.product.price,
+                  quantity: item.qty,
+                  item_variant: Object.values(item.variant).join(', ')
+                }))
+              });
+            }
+
             clearCart()
           }
           return
