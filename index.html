@@ -59,30 +59,7 @@
   </head>
   <body>
     <div id="root"></div>
-    <!--
-      Kill-switch : l'ancien site (PrestaShop) avait un service worker qui, chez
-      les visiteurs l'ayant déjà consulté, ressert l'ancien site en cache même
-      après le passage au nouveau site. Ce script le désinscrit et vide ses caches
-      automatiquement, puis recharge une seule fois. Sans effet si aucun SW.
-    -->
-    <script>
-      (function () {
-        if (!('serviceWorker' in navigator)) return
-        navigator.serviceWorker.getRegistrations().then(function (regs) {
-          if (!regs || !regs.length) return
-          Promise.all(regs.map(function (r) { return r.unregister() }))
-            .then(function () { return window.caches ? caches.keys() : [] })
-            .then(function (keys) { return Promise.all(keys.map(function (k) { return caches.delete(k) })) })
-            .then(function () {
-              if (!sessionStorage.getItem('tk_sw_cleared')) {
-                sessionStorage.setItem('tk_sw_cleared', '1')
-                location.reload()
-              }
-            })
-            .catch(function () {})
-        }).catch(function () {})
-      })()
-    </script>
+
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

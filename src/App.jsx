@@ -9,7 +9,6 @@ import SearchOverlay from './components/SearchOverlay.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import CoachVape from './components/CoachVape.jsx'
-import SmartRedirect from './components/SmartRedirect.jsx'
 
 // Pages chargées à la demande (code-splitting) pour alléger le bundle initial.
 const Home = lazy(() => import('./pages/Home.jsx'))
@@ -82,7 +81,7 @@ export default function App() {
             <Route path="/faq" element={<FAQ />} />
             <Route path="/legal/:slug" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<SmartRedirect />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </main>
