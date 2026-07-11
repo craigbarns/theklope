@@ -67,7 +67,7 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
 
   if (jsonLd) {
     const json = JSON.stringify(jsonLd).replace(/</g, '\\u003c')
-    html = html.replace('</head>', `    <script type="application/ld+json">${json}</script>\n  </head>`)
+    html = html.replace('</head>', `    <script id="jsonld-schema" type="application/ld+json">${json}</script>\n  </head>`)
   }
   if (content) {
     // Contenu injecté dans #root : lu par les crawlers, remplacé par React au chargement.
