@@ -11,13 +11,15 @@ const root = resolve(__dirname, '..')
 export async function loadProducts() {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const isDeploymentBuild = Boolean(process.env.VERCEL || process.env.VERCEL_ENV)
+
   if (url && key) {
     try {
       const { createClient } = await import('@supabase/supabase-js')
       const sb = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } })
       const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: false })
       if (error) throw error
-      if (data && data.length) {
+      if (Array.isArray(data) && data.length > 0) {
         console.log(`↪ catalogue : ${data.length} produits chargés depuis Supabase`)
         return data.map((row) => ({
           id: row.id,
@@ -25,11 +27,14 @@ export async function loadProducts() {
           category: row.category,
           brand: row.brand,
           type: row.type,
+          volume: row.volume,
+          ohm: row.ohm,
           price: row.price,
           oldPrice: row.old_price,
           rating: row.rating,
           reviews: row.reviews,
           stock: row.stock,
+          badge: row.badge,
           nicotine: row.nicotine,
           flavors: row.flavors,
           colors: row.colors,
@@ -39,13 +44,28 @@ export async function loadProducts() {
           specs: row.specs,
           images: row.images,
           image: row.image,
+          createdAt: row.created_at,
+          updatedAt: row.updated_at,
         }))
       }
-      console.log('↪ Supabase vide → repli sur le catalogue statique')
+      throw new Error('Le catalogue Supabase est vide')
     } catch (e) {
+      if (isDeploymentBuild) {
+        throw new Error(`Catalogue Supabase indisponible pendant le déploiement : ${e.message}`)
+      }
       console.warn(`↪ Supabase indisponible au build (${e.message}) → repli sur le catalogue statique`)
     }
   }
+
+  if (isDeploymentBuild) {
+    const missing = [
+      !url && 'VITE_SUPABASE_URL',
+      !key && 'SUPABASE_SERVICE_ROLE_KEY',
+    ].filter(Boolean).join(', ')
+    throw new Error(`Catalogue live requis pendant le déploiement. Variable(s) manquante(s) : ${missing}`)
+  }
+
+  console.warn('↪ build local sans Supabase → repli sur le catalogue statique')
   const mod = await import(resolve(root, 'src/data/products.js'))
   return mod.PRODUCTS
 }

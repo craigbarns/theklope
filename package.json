@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "test": "node --test",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "prebuild": "node scripts/generate-sitemap.mjs && node scripts/generate-llms-full.mjs",
     "build": "vite build",

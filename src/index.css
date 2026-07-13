@@ -3,6 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: 'Inter';
+    src: url('/fonts/inter-latin.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 400 800;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Space Grotesk';
+    src: url('/fonts/space-grotesk-latin.woff2') format('woff2');
+    font-style: normal;
+    font-weight: 500 700;
+    font-display: swap;
+  }
+
   :root {
     color-scheme: dark;
     --line: rgba(255, 255, 255, 0.1);

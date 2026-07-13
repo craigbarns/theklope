@@ -3,19 +3,27 @@
 // Table attendue : newsletter_subscribers (email text unique, created_at timestamptz default now()).
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
+import { enforceRequestRateLimits } from './_lib/rateLimit.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setNoStore(res)
+  if (!configureSameOriginCors(req, res)) {
+    return res.status(403).json({ error: 'Origine de requête refusée.' })
+  }
 
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    let body
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    } catch {
+      return res.status(400).json({ error: 'Corps JSON invalide.' })
+    }
     const email = String(body.email || '').trim().toLowerCase()
 
     if (!EMAIL_RE.test(email)) {
@@ -24,6 +32,15 @@ export default async function handler(req, res) {
 
     if (!hasSupabaseAdmin) {
       return res.status(503).json({ error: "Service d'inscription indisponible pour le moment." })
+    }
+
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'newsletter_ip', limit: 20, windowSeconds: 3600 },
+      { scope: 'newsletter_email', value: email, limit: 3, windowSeconds: 3600 },
+    ])
+    if (!rateLimit.allowed) {
+      res.setHeader('Retry-After', String(rateLimit.retryAfter))
+      return res.status(429).json({ error: 'Trop de tentatives. Réessayez plus tard.' })
     }
 
     // upsert pour éviter une erreur si l'e-mail est déjà inscrit (idempotent).

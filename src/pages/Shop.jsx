@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { CATEGORIES, productMatchesCategory } from '../data/catalog.js'
 import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
+import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 
 const SORTS = [
   { value: 'popularite', label: 'Popularité' },
@@ -15,9 +16,10 @@ const SORTS = [
 ]
 
 const PRODUCT_CATEGORIES = CATEGORIES.filter((c) => !['nouveautes', 'meilleures-ventes'].includes(c.slug))
+const PAGE_SIZE = 24
 
 export default function Shop() {
-  const { products, catalogMeta } = useStore()
+  const { products, catalogMeta, cookiesChoice } = useStore()
   const [params] = useSearchParams()
   const initialQ = params.get('q') || ''
   const maxAvailablePrice = catalogMeta.maxPrice
@@ -31,6 +33,8 @@ export default function Shop() {
   const [maxPrice, setMaxPrice] = useState(maxAvailablePrice)
   const [sort, setSort] = useState('popularite')
   const [mobileFilters, setMobileFilters] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const trackedListRef = useRef('')
 
   useEffect(() => {
     setMaxPrice((value) => Math.min(value || maxAvailablePrice, maxAvailablePrice))
@@ -85,6 +89,27 @@ export default function Shop() {
     }
     return list
   }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort, products])
+
+  const visibleProducts = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort])
+
+  useEffect(() => {
+    const signature = visibleProducts.slice(0, PAGE_SIZE).map((product) => product.id).join('|')
+    if (!signature || trackedListRef.current === signature) return
+    if (trackEvent('view_item_list', {
+      item_list_id: 'boutique',
+      item_list_name: 'Boutique',
+      items: visibleProducts.slice(0, PAGE_SIZE).map((product, index) => ({
+        ...toAnalyticsItem(product),
+        index,
+      })),
+    })) {
+      trackedListRef.current = signature
+    }
+  }, [cookiesChoice, visibleProducts])
 
   const activeCount = cats.length + brands.length + types.length + nicotine.length + flavors.length + (maxPrice < maxAvailablePrice ? 1 : 0)
 
@@ -286,11 +311,28 @@ export default function Shop() {
                 <button onClick={reset} className="btn-ghost mt-4">Réinitialiser</button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3">
-                {filtered.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
-              </div>
+              <>
+                <div id="catalogue-products" className="grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3">
+                  {visibleProducts.map((p) => (
+                    <ProductCard key={p.id} product={p} />
+                  ))}
+                </div>
+                <div className="mt-8 flex flex-col items-center gap-3">
+                  <p className="text-xs text-muted">
+                    {visibleProducts.length} produit{visibleProducts.length > 1 ? 's' : ''} affiché{visibleProducts.length > 1 ? 's' : ''} sur {filtered.length}
+                  </p>
+                  {visibleProducts.length < filtered.length && (
+                    <button
+                      type="button"
+                      className="btn-ghost px-6 py-3 text-sm"
+                      aria-controls="catalogue-products"
+                      onClick={() => setVisibleCount((count) => Math.min(count + PAGE_SIZE, filtered.length))}
+                    >
+                      Afficher {Math.min(PAGE_SIZE, filtered.length - visibleProducts.length)} produits de plus
+                    </button>
+                  )}
+                </div>
+              </>
             )}
           </div>
         </div>

@@ -1,9 +1,9 @@
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+import { useStore } from '../context/StoreContext.jsx'
 
-// Widget d'avis Google (Elfsight). Le script platform.js est chargé dans
-// index.html ; il détecte ce conteneur et monte le widget automatiquement.
-// data-elfsight-app-lazy => chargement différé quand le bloc devient visible.
 export default function GoogleReviews() {
+  const { reviewsChoice, setReviewsChoice } = useStore()
+
   return (
     <section className="container-page py-14">
       <div className="mb-8 text-center">
@@ -15,10 +15,21 @@ export default function GoogleReviews() {
           {STORE_REVIEW_SUMMARY.sentence}
         </p>
       </div>
-      <div
-        className="elfsight-app-d3ee988e-faab-4c3f-81d5-fc3ff7d42140"
-        data-elfsight-app-lazy
-      />
+      {reviewsChoice === 'accepted' ? (
+        <div
+          className="elfsight-app-d3ee988e-faab-4c3f-81d5-fc3ff7d42140"
+          data-elfsight-app-lazy
+        />
+      ) : (
+        <div className="rounded-lg border border-white/10 bg-white/[0.03] px-5 py-6 text-center">
+          <p className="text-sm text-muted">
+            L'affichage du widget d'avis Google via Elfsight nécessite votre accord. Il n'active pas la mesure d'audience.
+          </p>
+          <button className="btn-ghost mt-4 px-5 py-2.5 text-xs" onClick={() => setReviewsChoice('accepted')}>
+            Autoriser et afficher les avis
+          </button>
+        </div>
+      )}
     </section>
   )
 }

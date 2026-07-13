@@ -1,6 +1,5 @@
 import { Suspense, lazy } from 'react'
 import { Routes, Route, Navigate, useParams } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import AgeGate from './components/AgeGate.jsx'
@@ -9,6 +8,7 @@ import SearchOverlay from './components/SearchOverlay.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import CoachVape from './components/CoachVape.jsx'
+import ConsentManager from './components/ConsentManager.jsx'
 
 // Pages chargées à la demande (code-splitting) pour alléger le bundle initial.
 const Home = lazy(() => import('./pages/Home.jsx'))
@@ -89,7 +89,7 @@ export default function App() {
       <Footer />
       <CookieBanner />
       <CoachVape />
-      <Analytics />
+      <ConsentManager />
     </div>
   )
 }

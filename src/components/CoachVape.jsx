@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 
 export default function CoachVape() {
-  const { products, addToCart } = useStore()
+  const { products, addToCart, ageVerified, cookiesChoice, reviewsChoice } = useStore()
   const navigate = useNavigate()
+  const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -24,6 +25,10 @@ export default function CoachVape() {
       document.body.style.overflow = 'unset'
     }
   }, [isOpen])
+
+  useEffect(() => {
+    setIsOpen(false)
+  }, [location.pathname])
 
   // Initialiser les messages de bienvenue
   useEffect(() => {
@@ -164,7 +169,7 @@ export default function CoachVape() {
         setStep('chat')
         addMessage({
           isBot: true,
-          content: 'Voici les codes promotionnels du moment :\n\n- 🏷️ **BIENVENUE** : -15% sur votre première commande.\n- 🏷️ **THEKLOPE10** : -10% sur toute la boutique.\n- 🏷️ **LIVRAISON** : Livraison offerte dès 49€ d\'achat.',
+          content: 'Voici les codes promotionnels du moment :\n\n- 🏷️ **BIENVENUE** : -15% sur votre première commande.\n- 🏷️ **THEKLOPE10** : -10% sur toute la boutique.\n- 🏷️ **LIVRAISON** : livraison offerte sans minimum d\'achat.',
           options: [{ text: 'Voir toute la boutique 🛒', action: 'go_shop' }]
         })
         break;
@@ -311,7 +316,7 @@ export default function CoachVape() {
     } else if (/(livraison|envoi|delai|frais de port|frais d'envoi|expédition)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: '🚀 **Livraison 24/48h en France métropolitaine.**\n\nLes frais de port standard sont de 4,90€, et ils sont **totalement offerts** dès 49€ d\'achat !'
+        content: '🚀 **Livraison en 2 à 4 jours en France métropolitaine.**\n\nLes frais de port standard sont de 7,50 €, et ils sont **totalement offerts** dès 49 € d\'achat.'
       })
     } else if (/(nicotine|taux|dosage|mg)/i.test(clean)) {
       addMessage({
@@ -322,7 +327,7 @@ export default function CoachVape() {
     } else if (/(contact|telephone|mail|adresse|magasin|conseiller|service client)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.com\n- **Téléphone** : 04 91 55 55 55 (du lundi au samedi de 9h à 19h)\n- **Boutique** : 188 rue de Rome, 13006 Marseille'
+        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.com\n- **Téléphone** : 04 91 55 55 55 (du lundi au vendredi de 9h à 19h)\n- **Boutique** : 188 rue de Rome, 13006 Marseille'
       })
     } else if (/(pod|kit|clearomiseur|clearomiseur|resistance|box|batterie)/i.test(clean)) {
       addMessage({
@@ -357,12 +362,21 @@ export default function CoachVape() {
     }
   }
 
+  const isProductPage = location.pathname.startsWith('/produit/')
+  const isCheckout = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/')
+
+  if (ageVerified !== true || !cookiesChoice || !reviewsChoice || isCheckout) return null
+
   return (
     <>
       {/* Bouton de chat flottant */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-neon to-electric text-noir shadow-glow transition hover:scale-110 active:scale-95"
+        className={`fixed right-4 z-[35] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-neon to-electric text-noir shadow-glow transition hover:scale-110 active:scale-95 sm:bottom-6 sm:right-6 sm:z-40 ${
+          isProductPage
+            ? 'bottom-[calc(6.25rem+env(safe-area-inset-bottom))]'
+            : 'bottom-[calc(1.25rem+env(safe-area-inset-bottom))]'
+        }`}
         aria-label="Ouvrir le Coach Vape"
       >
         {isOpen ? (
@@ -450,8 +464,13 @@ export default function CoachVape() {
                         <div className="flex flex-col gap-1.5 shrink-0">
                           <button
                             onClick={() => {
-                              addToCart(p.id, 1)
-                              addMessage({ isBot: true, content: `🛒 J'ai ajouté **${p.name}** à votre panier.` })
+                              const added = addToCart(p.id, 1)
+                              addMessage({
+                                isBot: true,
+                                content: added
+                                  ? `🛒 J'ai ajouté **${p.name}** à votre panier.`
+                                  : `La quantité maximale disponible de **${p.name}** est déjà dans votre panier.`,
+                              })
                             }}
                             className="rounded-full bg-neon/10 border border-neon/30 p-2 text-neon hover:bg-neon hover:text-noir transition"
                             title="Ajouter au panier"

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useStore } from '../context/StoreContext.jsx'
 import { IconShield } from './icons.jsx'
+import { verifyAdultBirthDate } from '../lib/ageVerification.js'
 
 export default function AgeGate() {
   const { ageVerified, setAgeVerified } = useStore()
@@ -18,33 +19,13 @@ export default function AgeGate() {
     e.preventDefault()
     setError('')
 
-    const d = parseInt(day, 10)
-    const m = parseInt(month, 10)
-    const y = parseInt(year, 10)
-
-    if (isNaN(d) || isNaN(m) || isNaN(y)) {
-      setError('Veuillez saisir une date de naissance valide.')
-      return
-    }
-
-    // Validation basique des plages de date
-    const currentYear = new Date().getFullYear()
-    if (d < 1 || d > 31 || m < 1 || m > 12 || y < 1900 || y > currentYear) {
+    const result = verifyAdultBirthDate({ day: Number(day), month: Number(month), year: Number(year) })
+    if (!result.valid) {
       setError('Date de naissance incohérente.')
       return
     }
 
-    // Calcul de l'âge
-    const birthDate = new Date(y, m - 1, d)
-    const today = new Date()
-    let age = today.getFullYear() - birthDate.getFullYear()
-    const monthDiff = today.getMonth() - birthDate.getMonth()
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--
-    }
-
-    if (age >= 18) {
+    if (result.adult) {
       setAgeVerified(true)
     } else {
       setAgeVerified('no')

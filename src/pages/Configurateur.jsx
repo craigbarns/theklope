@@ -7,7 +7,7 @@ import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
 
 export default function Configurateur() {
-  const { products, addToCart, applyPromo } = useStore()
+  const { products, addItemsToCart, applyPromo } = useStore()
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1) // 1: Box, 2: Clearomiseur, 3: E-liquide, 4: Recap
@@ -17,11 +17,12 @@ export default function Configurateur() {
   const [selectedEliquid, setSelectedEliquid] = useState(null)
   const [selectedNicotine, setSelectedNicotine] = useState(null) // in mg/ml
   const [searchQuery, setSearchQuery] = useState('')
+  const [addError, setAddError] = useState('')
 
   // 1. Filtrer les boxs
   const boxes = useMemo(() => {
     return products.filter(
-      (p) => p.category === 'ecig' || p.category === 'pod'
+      (p) => p.stock > 0 && (p.category === 'ecig' || p.category === 'pod')
     )
   }, [products])
 
@@ -29,7 +30,7 @@ export default function Configurateur() {
   // aucun ne correspond aux mots-clés, on retombe sur tous les accessoires pour
   // ne jamais bloquer l'utilisateur avec une étape vide.
   const clearomizers = useMemo(() => {
-    const accessoires = products.filter((p) => p.category === 'accessoire')
+    const accessoires = products.filter((p) => p.category === 'accessoire' && p.stock > 0)
     const keywords = ['nautilus', 'ce5', 'apex', 'tpp', 'luxe', 'cartouche', 'pod', 'clearomiseur', 'reservoir', 'réservoir', 'resistance', 'résistance']
     const matched = accessoires.filter((p) => keywords.some((k) => p.name.toLowerCase().includes(k)))
     return matched.length ? matched : accessoires
@@ -37,7 +38,7 @@ export default function Configurateur() {
 
   // 3. Filtrer les e-liquides
   const eliquids = useMemo(() => {
-    return products.filter((p) => p.category === 'eliquide')
+    return products.filter((p) => p.category === 'eliquide' && p.stock > 0)
   }, [products])
 
   // Filtrage par recherche
@@ -95,14 +96,32 @@ export default function Configurateur() {
   const handleAddToCart = () => {
     if (!selectedBox || !selectedClearomizer || !selectedEliquid) return
 
-    // Ajouter les trois produits au panier — clés de variantes normalisées
-    // (color / nicotine) pour qu'elles s'affichent dans le panier et la commande.
-    addToCart(selectedBox.id, 1, selectedBoxColor ? { color: selectedBoxColor } : {})
-    addToCart(selectedClearomizer.id, 1)
-    addToCart(selectedEliquid.id, 1, { nicotine: selectedNicotine })
+    const currentBox = products.find((product) => product.id === selectedBox.id)
+    const currentClearomizer = products.find((product) => product.id === selectedClearomizer.id)
+    const currentEliquid = products.find((product) => product.id === selectedEliquid.id)
+    if (!currentBox || !currentClearomizer || !currentEliquid) {
+      setAddError("Un article du pack n'est plus disponible. Choisissez une nouvelle composition.")
+      return
+    }
+
+    const added = addItemsToCart([
+      { productId: currentBox.id, qty: 1, variant: selectedBoxColor ? { color: selectedBoxColor } : {} },
+      { productId: currentClearomizer.id, qty: 1 },
+      { productId: currentEliquid.id, qty: 1, variant: { nicotine: selectedNicotine } },
+    ])
+    if (!added) {
+      setAddError("Le stock d'un article a évolué. Le panier n'a pas été modifié.")
+      return
+    }
+    setAddError('')
 
     // Appliquer la promotion -15% automatiquement
-    applyPromo('PACK15')
+    applyPromo('PACK15', {
+      eligibilityLines: [currentBox, currentClearomizer, currentEliquid].map((product) => ({
+        category: product.category,
+        qty: 1,
+      })),
+    })
 
     // Rediriger ou notifier
     navigate('/panier')
@@ -397,9 +416,16 @@ export default function Configurateur() {
             </dl>
 
             {step === 4 ? (
-              <button onClick={handleAddToCart} className="btn-primary mt-6 w-full py-3 text-center text-xs">
-                Ajouter le pack & Payer
-              </button>
+              <>
+                {addError && (
+                  <p className="mt-5 rounded-lg border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                    {addError}
+                  </p>
+                )}
+                <button onClick={handleAddToCart} className="btn-primary mt-6 w-full py-3 text-center text-xs">
+                  Ajouter le pack & Payer
+                </button>
+              </>
             ) : (
               <button
                 disabled={nextDisabled}

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+import { useStore } from '../context/StoreContext.jsx'
 
 const COLUMNS = [
   {
@@ -49,6 +50,8 @@ const COLUMNS = [
 ]
 
 export default function Footer() {
+  const { setCookiesChoice, setReviewsChoice } = useStore()
+
   return (
     <footer className="mt-10 border-t border-white/10 bg-anthracite/60">
       <div className="container-page py-14">
@@ -98,7 +101,19 @@ export default function Footer() {
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 sm:flex-row">
           <p className="text-xs text-faint">© {new Date().getFullYear()} THEKLOPE — édité par SEVEN SEVENTY (SASU). Tous droits réservés.</p>
-          <p className="text-xs text-faint">RCS Marseille 815&nbsp;155&nbsp;973 · TVA FR58&nbsp;815&nbsp;155&nbsp;973</p>
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:justify-end">
+            <button
+              type="button"
+              className="text-xs text-faint transition hover:text-neon"
+              onClick={() => {
+                setCookiesChoice(null)
+                setReviewsChoice(null)
+              }}
+            >
+              Gérer les cookies
+            </button>
+            <p className="text-xs text-faint">RCS Marseille 815&nbsp;155&nbsp;973 · TVA FR58&nbsp;815&nbsp;155&nbsp;973</p>
+          </div>
         </div>
       </div>
     </footer>

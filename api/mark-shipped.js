@@ -2,42 +2,54 @@
 // POST /api/mark-shipped — marque une commande « expédiée », enregistre le
 // numéro de suivi et envoie l'e-mail « Votre commande a été expédiée » au client.
 // -----------------------------------------------------------------------------
-// SÉCURITÉ : réservé aux admins. On exige le jeton d'accès Supabase de l'admin
-// (Authorization: Bearer <access_token>) et on le valide côté serveur.
+// SÉCURITÉ : réservé aux admins. On valide le jeton d'accès Supabase côté
+// serveur, puis son appartenance à l'allowlist public.admin_users.
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { authenticateAdminRequest } from './_lib/adminAuth.js'
 import { sendEmail, emailLayout, escapeHtml, euro, FROM_CHECKOUT } from './_lib/email.js'
+import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setNoStore(res)
+  if (!configureSameOriginCors(req, res)) {
+    return res.status(403).json({ error: 'Origine de requête refusée.' })
+  }
 
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
   if (!hasSupabaseAdmin) return res.status(500).json({ error: 'Base de données non configurée.' })
 
-  // 1. Auth admin : valider le jeton Supabase
-  const authHeader = req.headers.authorization || ''
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : ''
-  if (!token) return res.status(401).json({ error: 'Authentification requise.' })
-  const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token)
-  if (userErr || !userData?.user) return res.status(401).json({ error: 'Session admin invalide.' })
+  // 1. Auth admin : le jeton doit appartenir a un membre de l'allowlist.
+  const adminAuth = await authenticateAdminRequest(req)
+  if (!adminAuth.ok) return res.status(adminAuth.status).json({ error: adminAuth.error })
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    let body
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    } catch {
+      return res.status(400).json({ error: 'Corps JSON invalide.' })
+    }
     const orderId = String(body.orderId || '').trim()
     const tracking = String(body.tracking || '').trim().slice(0, 120)
     const carrier = String(body.carrier || '').trim().slice(0, 60)
     if (!orderId) return res.status(400).json({ error: 'orderId manquant.' })
 
     // 2. Récupérer la commande
-    const { data: order } = await supabaseAdmin
+    const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, customer, address, shipping, total, order_items(name, qty, line_total)')
+      .select('id, status, payment_status, customer, address, shipping, total, order_items(name, qty, line_total)')
       .eq('id', orderId)
       .maybeSingle()
+    if (orderError) throw orderError
     if (!order) return res.status(404).json({ error: 'Commande introuvable.' })
+    if (order.payment_status !== 'paid') {
+      return res.status(409).json({ error: 'Seule une commande payee peut etre expediee.' })
+    }
+    if (!['processing', 'shipped'].includes(order.status)) {
+      return res.status(409).json({ error: `Cette commande ne peut pas etre expediee depuis le statut ${order.status}.` })
+    }
 
     // 3. Mettre à jour statut + suivi (fusionné dans la colonne shipping jsonb)
     const shipping = { ...(order.shipping || {}), tracking, carrier }

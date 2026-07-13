@@ -107,7 +107,7 @@ export default function Contact() {
             </a>
             <div className="flex items-center gap-3 text-sm text-ash/75">
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconHeadset width={17} height={17} /></span>
-              Lundi – Samedi · 9h00 – 19h00
+              Lundi – Vendredi · 9h00 – 19h00
             </div>
           </div>
 

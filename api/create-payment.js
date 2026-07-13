@@ -7,23 +7,33 @@
 // On crée un paiement Mollie (checkout hébergé) + une commande « en attente »
 // que le webhook Mollie confirmera. Renvoie l'URL de checkout pour la redirection.
 // =============================================================================
+import { randomBytes } from 'node:crypto'
 import { computeTotals } from '../src/lib/pricing.js'
 import { getProductsByIds } from './_lib/catalog.js'
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { mollie, hasMollie, baseUrlFromRequest } from './_lib/mollie.js'
+import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
+import { enforceRequestRateLimits } from './_lib/rateLimit.js'
+import {
+  MAX_CART_LINES,
+  aggregateQuantities,
+  normalizeVariant,
+  parseQuantity,
+  validateFulfillment,
+} from './_lib/orderValidation.js'
 
 // Identifiant lisible (TK-XXXXXX) + suffixe aléatoire pour empêcher l'énumération
 // de l'endpoint public /api/payment-status.
-const rand = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 36).toString(36)).join('').toUpperCase()
-const newOrderId = () => 'TK-' + Math.floor(100000 + Math.random() * 899999) + '-' + rand(5)
+const newOrderId = () => `TK-${randomBytes(8).toString('hex').toUpperCase()}`
 const toMollieAmount = (n) => (Math.round(Number(n) * 100) / 100).toFixed(2)
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const clean = (value, max = 200) => String(value ?? '').trim().slice(0, max)
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setNoStore(res)
+  if (!configureSameOriginCors(req, res)) {
+    return res.status(403).json({ error: 'Origine de requête refusée.' })
+  }
 
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
@@ -39,50 +49,72 @@ export default async function handler(req, res) {
   let paymentCreated = false
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    let body
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    } catch {
+      return res.status(400).json({ error: 'Corps JSON invalide.' })
+    }
     const { items, shippingMethodId, promoCode, customer = {}, address = {} } = body
 
     if (!Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: 'Panier vide ou invalide.' })
     }
+    if (items.length > MAX_CART_LINES) {
+      return res.status(400).json({ error: 'Le panier contient trop de lignes.' })
+    }
 
+    if (!customer || typeof customer !== 'object' || Array.isArray(customer)) {
+      return res.status(400).json({ error: 'Coordonnées client invalides.' })
+    }
     const normalizedCustomer = {
       name: clean(customer.name, 160),
       email: clean(customer.email, 180).toLowerCase(),
       phone: clean(customer.phone, 40),
     }
-    const normalizedAddress = {
-      street: clean(address.street, 220),
-      extra: clean(address.extra, 220),
-      zip: clean(address.zip, 20),
-      city: clean(address.city, 120),
-      country: clean(address.country || 'France', 80),
-    }
-
     if (!normalizedCustomer.name || !EMAIL_RE.test(normalizedCustomer.email)) {
       return res.status(400).json({ error: 'Coordonnées client invalides.' })
     }
-    if (!normalizedAddress.street || !normalizedAddress.zip || !normalizedAddress.city || !normalizedAddress.country) {
-      return res.status(400).json({ error: 'Adresse de livraison incomplète.' })
+
+    const fulfillment = validateFulfillment(shippingMethodId, address)
+    if (!fulfillment.ok) {
+      return res.status(400).json({ error: fulfillment.error })
+    }
+    const normalizedAddress = fulfillment.address
+
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'create_payment_ip', limit: 20, windowSeconds: 900 },
+      { scope: 'create_payment_email', value: normalizedCustomer.email, limit: 8, windowSeconds: 900 },
+    ])
+    if (!rateLimit.allowed) {
+      res.setHeader('Retry-After', String(rateLimit.retryAfter))
+      return res.status(429).json({ error: 'Trop de tentatives de paiement. Réessayez dans quelques minutes.' })
     }
 
     // 1. Relire les prix côté serveur (jamais ceux du client)
-    const ids = items.map((it) => it?.id).filter(Boolean)
+    const ids = []
+    for (const item of items) {
+      const id = typeof item?.id === 'string' ? item.id.trim() : ''
+      if (!/^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,158}[A-Za-z0-9])?$/.test(id)) {
+        return res.status(400).json({ error: 'Identifiant produit invalide.' })
+      }
+      ids.push(id)
+    }
     const productMap = await getProductsByIds(ids)
 
     const lines = []
-    for (const it of items) {
-      const product = productMap.get(it?.id)
-      if (!product) return res.status(400).json({ error: `Produit introuvable : ${it?.id}` })
-      const qty = Math.max(1, Math.floor(Number(it?.qty) || 0))
+    for (const [index, it] of items.entries()) {
+      const product = productMap.get(ids[index])
+      if (!product) return res.status(400).json({ error: `Produit introuvable : ${ids[index]}` })
+      const qty = parseQuantity(it?.qty)
+      if (!qty) return res.status(400).json({ error: `Quantité invalide pour ${product.name}.` })
       if (Number.isFinite(product.stock) && product.stock <= 0) {
         return res.status(409).json({ error: `Produit en rupture : ${product.name}` })
       }
-      if (Number.isFinite(product.stock) && qty > product.stock) {
-        return res.status(409).json({
-          error: `Stock insuffisant pour ${product.name}. Quantité disponible : ${product.stock}.`,
-        })
-      }
+
+      const normalizedVariant = normalizeVariant(product, it?.variant)
+      if (!normalizedVariant.ok) return res.status(400).json({ error: normalizedVariant.error })
+
       lines.push({
         productId: product.id,
         name: product.name,
@@ -92,9 +124,20 @@ export default async function handler(req, res) {
         brand: product.brand,
         volume: product.volume,
         category: product.category,
-        variant: it?.variant || {},
+        variant: normalizedVariant.variant,
         lineTotal: Math.round((Number(product.price) || 0) * qty * 100) / 100,
       })
+    }
+
+    // Un meme produit peut apparaitre sur plusieurs lignes de variantes. Le
+    // stock doit etre controle sur la somme, pas ligne par ligne.
+    for (const [productId, requested] of aggregateQuantities(lines)) {
+      const product = productMap.get(productId)
+      if (Number.isFinite(product?.stock) && requested > product.stock) {
+        return res.status(409).json({
+          error: `Stock insuffisant pour ${product.name}. Quantité disponible : ${product.stock}.`,
+        })
+      }
     }
 
     // 1bis. Le code BIENVENUE est réservé à la première commande : on vérifie
@@ -120,6 +163,12 @@ export default async function handler(req, res) {
       shippingMethodId,
       promoCode,
     })
+    if (normalizedPromo && !totals.promo) {
+      const error = normalizedPromo === 'PACK15'
+        ? 'Le code PACK15 nécessite un appareil, un accessoire et un e-liquide.'
+        : 'Code promo invalide.'
+      return res.status(400).json({ error })
+    }
     if (totals.total <= 0) return res.status(400).json({ error: 'Montant de commande invalide.' })
 
     const orderId = newOrderId()

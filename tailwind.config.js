@@ -20,7 +20,7 @@ export default {
         display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
       },
       letterSpacing: {
-        tightest: '-0.03em',
+        tightest: '0',
       },
       transitionTimingFunction: {
         premium: 'cubic-bezier(0.22, 1, 0.36, 1)',
