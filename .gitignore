@@ -13,3 +13,5 @@ pulp-liquides-images/
 _*.jpg
 _*.png
 .vercel
+public/sitemap-static.xml
+public/catalog-fallback.json

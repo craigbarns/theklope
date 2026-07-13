@@ -87,25 +87,28 @@ async function finalizePaidOrder(orderId) {
 // Récupère le paiement Mollie, met à jour la commande correspondante et renvoie
 // son statut normalisé : 'paid' | 'pending' | 'failed'.
 export async function syncOrderFromMolliePayment(paymentId) {
-  if (!hasSupabaseAdmin || !mollie) return { status: 'unknown' }
+  if (!hasSupabaseAdmin || !mollie) {
+    throw new Error('Paiement ou base de donnees non configure.')
+  }
 
   const payment = await mollie.payments.get(paymentId)
   const orderId = payment.metadata?.orderId
   if (!orderId) return { status: 'unknown' }
 
-  const { data: order } = await supabaseAdmin
+  const { data: order, error: orderError } = await supabaseAdmin
     .from('orders')
     .select('id, payment_status, payment_id')
     .eq('id', orderId)
     .maybeSingle()
-  if (!order) return { status: 'unknown' }
+  if (orderError) throw orderError
+  if (!order) throw new Error(`Commande Mollie introuvable : ${orderId}`)
 
   if (order.payment_id !== paymentId) {
     const { error: linkErr } = await supabaseAdmin
       .from('orders')
       .update({ payment_id: paymentId })
       .eq('id', orderId)
-    if (linkErr) console.error('payment_id link error:', linkErr)
+    if (linkErr) throw linkErr
   }
 
   const isPaid = typeof payment.isPaid === 'function' ? payment.isPaid() : payment.status === 'paid'
@@ -123,12 +126,15 @@ export async function syncOrderFromMolliePayment(paymentId) {
         return { status: 'paid', orderId, orderStatus: 'stock_issue' }
       }
 
-      // E-mails de confirmation (client + interne). Non bloquant. On les envoie
-      // seulement quand la commande peut réellement passer en préparation.
-      try {
-        await sendOrderConfirmationEmails(orderId)
-      } catch (err) {
-        console.error('order email error:', err)
+      // Seul l'appel qui vient effectivement de finaliser la commande envoie
+      // les e-mails. Un webhook et la page de retour peuvent arriver en meme
+      // temps ; la RPC renvoie alors `already_paid` au second appel.
+      if (finalization.status === 'processing') {
+        try {
+          await sendOrderConfirmationEmails(orderId)
+        } catch (err) {
+          console.error('order email error:', err)
+        }
       }
     }
     return { status: 'paid', orderId }
@@ -136,10 +142,11 @@ export async function syncOrderFromMolliePayment(paymentId) {
 
   if (['failed', 'canceled', 'expired'].includes(payment.status)) {
     if (order.payment_status !== 'failed') {
-      await supabaseAdmin
+      const { error: failedUpdateError } = await supabaseAdmin
         .from('orders')
         .update({ payment_status: 'failed', status: 'cancelled' })
         .eq('id', orderId)
+      if (failedUpdateError) throw failedUpdateError
     }
     return { status: 'failed', orderId }
   }

@@ -258,7 +258,7 @@ function AdminLogin({ signInAdmin, syncError }) {
         </div>
         <h1 className="text-center font-display text-2xl font-bold text-white">Connexion admin</h1>
         <p className="mt-2 text-center text-sm text-muted">
-          Connectez-vous avec un utilisateur créé dans Supabase Auth pour gérer THEKLOPE.
+          Connectez-vous avec un compte Supabase Auth autorisé dans la liste des administrateurs.
         </p>
 
         <form onSubmit={submit} className="mt-7 space-y-4">
@@ -275,7 +275,7 @@ function AdminLogin({ signInAdmin, syncError }) {
         </form>
 
         <p className="mt-5 text-xs leading-relaxed text-faint">
-          Si vous n’avez pas encore de compte admin, créez un utilisateur dans Supabase Dashboard, rubrique Authentication, puis Users.
+          L’utilisateur doit être créé dans Authentication, puis son identifiant ajouté à la table sécurisée public.admin_users.
         </p>
       </div>
     </div>
@@ -502,6 +502,8 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
     )
   }
 
+  const isExisting = Boolean(product.id)
+
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
   const submit = (e) => {
     e.preventDefault()
@@ -511,6 +513,7 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
     const image = form.image || imageList[0] || '/products/product-placeholder.svg'
     onSave({
       ...form,
+      originalId: isExisting ? product.id : '',
       image,
       images: imageList.length ? imageList : [image],
       oldPrice: form.oldPrice || null,
@@ -534,7 +537,16 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
 
         <div className="max-h-[calc(100vh-300px)] space-y-4 overflow-y-auto pr-1">
           <Field label="Nom" value={form.name} onChange={update('name')} required />
-          <Field label="Identifiant URL" value={form.id} onChange={update('id')} placeholder="auto si vide" />
+          <Field
+            label="Identifiant URL"
+            value={form.id}
+            onChange={update('id')}
+            placeholder="auto si vide"
+            pattern="[A-Za-z0-9]([A-Za-z0-9._-]{0,158}[A-Za-z0-9])?"
+            maxLength={160}
+            readOnly={isExisting}
+            title="Commence et finit par une lettre ou un chiffre; lettres sans accent, chiffres, points, tirets et underscores uniquement"
+          />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Marque" value={form.brand} onChange={update('brand')} list="brands" required />
             <Field label="Type" value={form.type} onChange={update('type')} list="types" required />
@@ -676,7 +688,9 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
                 <MiniTotal label="Paiement" value={order.paymentStatus === 'paid' ? 'Payé' : order.paymentStatus} />
               </dl>
 
-              <ShipControl order={order} markShipped={markShipped} />
+              {order.paymentStatus === 'paid' && ['processing', 'shipped'].includes(order.status) && (
+                <ShipControl order={order} markShipped={markShipped} />
+              )}
             </article>
           ))}
         </div>

@@ -4,20 +4,28 @@
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { sendEmail, emailLayout, escapeHtml, FROM_CONTACT, INBOX_CONTACT } from './_lib/email.js'
+import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
+import { enforceRequestRateLimits } from './_lib/rateLimit.js'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const clip = (v, max) => String(v || '').trim().slice(0, max)
 
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+  setNoStore(res)
+  if (!configureSameOriginCors(req, res)) {
+    return res.status(403).json({ error: 'Origine de requête refusée.' })
+  }
 
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    let body
+    try {
+      body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+    } catch {
+      return res.status(400).json({ error: 'Corps JSON invalide.' })
+    }
     const name = clip(body.name, 120)
     const email = clip(body.email, 180).toLowerCase()
     const subject = clip(body.subject, 200)
@@ -32,6 +40,15 @@ export default async function handler(req, res) {
 
     if (!hasSupabaseAdmin) {
       return res.status(503).json({ error: "Service de contact indisponible pour le moment." })
+    }
+
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'contact_ip', limit: 15, windowSeconds: 3600 },
+      { scope: 'contact_email', value: email, limit: 5, windowSeconds: 3600 },
+    ])
+    if (!rateLimit.allowed) {
+      res.setHeader('Retry-After', String(rateLimit.retryAfter))
+      return res.status(429).json({ error: 'Trop de messages envoyés. Réessayez plus tard.' })
     }
 
     const { error } = await supabaseAdmin

@@ -48,9 +48,9 @@ const absImg = (img) => (!img ? DEFAULT_OG : /^https?:/.test(img) ? img : abs(im
 // Remplace le contenu d'une balise meta/link/title dans le template HTML.
 const replaceAttr = (html, re, value) => html.replace(re, (_m, p1, p2) => `${p1}${esc(value)}${p2}`)
 
-function buildPage({ title, description, canonicalPath, ogImage, ogType = 'website', jsonLd, content = '' }) {
+function buildPage({ title, description, canonicalPath, ogImage, ogType = 'website', jsonLd, content = '', noindex = false }) {
   const fullTitle = title
-  const canonical = abs(canonicalPath)
+  const canonical = canonicalPath ? abs(canonicalPath) : null
   const image = ogImage || DEFAULT_OG
   let html = template
   html = html.replace(/<title>[\s\S]*?<\/title>/, `<title>${esc(fullTitle)}</title>`)
@@ -58,20 +58,39 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
   html = replaceAttr(html, /(<meta\s+property="og:title"\s+content=")[^"]*(")/, fullTitle)
   html = replaceAttr(html, /(<meta\s+property="og:description"\s+content=")[^"]*(")/, description)
   html = replaceAttr(html, /(<meta\s+property="og:type"\s+content=")[^"]*(")/, ogType)
-  html = replaceAttr(html, /(<meta\s+property="og:url"\s+content=")[^"]*(")/, canonical)
+  if (canonical) {
+    html = replaceAttr(html, /(<meta\s+property="og:url"\s+content=")[^"]*(")/, canonical)
+  } else {
+    html = html.replace(/\s*<meta\s+property="og:url"[^>]*>/, '')
+  }
   html = replaceAttr(html, /(<meta\s+property="og:image"\s+content=")[^"]*(")/, image)
   html = replaceAttr(html, /(<meta\s+name="twitter:title"\s+content=")[^"]*(")/, fullTitle)
   html = replaceAttr(html, /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, description)
   html = replaceAttr(html, /(<meta\s+name="twitter:image"\s+content=")[^"]*(")/, image)
-  html = replaceAttr(html, /(<link\s+rel="canonical"\s+href=")[^"]*(")/, canonical)
+  if (canonical) {
+    html = replaceAttr(html, /(<link\s+rel="canonical"\s+href=")[^"]*(")/, canonical)
+  } else {
+    html = html.replace(/\s*<link\s+rel="canonical"[^>]*>/, '')
+  }
+  html = replaceAttr(
+    html,
+    /(<meta\s+name="robots"\s+content=")[^"]*(")/,
+    noindex ? 'noindex, nofollow' : 'index, follow',
+  )
 
   if (jsonLd) {
     const json = JSON.stringify(jsonLd).replace(/</g, '\\u003c')
-    html = html.replace('</head>', `    <script id="jsonld-schema" type="application/ld+json">${json}</script>\n  </head>`)
+    html = html.replace(
+      '</head>',
+      () => `    <script id="jsonld-schema" type="application/ld+json">${json}</script>\n  </head>`,
+    )
   }
   if (content) {
     // Contenu injecté dans #root : lu par les crawlers, remplacé par React au chargement.
-    html = html.replace('<div id="root"></div>', `<div id="root"><div data-prerender="seo">${content}</div></div>`)
+    html = html.replace(
+      '<div id="root"></div>',
+      () => `<div id="root"><div data-prerender="seo">${content}</div></div>`,
+    )
   }
   return html
 }
@@ -369,5 +388,19 @@ const homeContent = `
 
 writePage('/', buildPage({ title: homeTitle, description: homeDescription, canonicalPath: '/', jsonLd: homeSchema, content: homeContent }))
 count++
+
+// Vercel sert automatiquement 404.html avec un vrai statut HTTP 404 lorsque
+// aucune route pré-rendue ou réécriture applicative ne correspond.
+const notFoundHtml = buildPage({
+  title: 'Page introuvable | THEKLOPE',
+  description: "La page demandée n'existe pas ou n'est plus disponible.",
+  canonicalPath: null,
+  noindex: true,
+  content: `
+    <h1>Page introuvable</h1>
+    <p>La page que vous cherchez n'existe pas ou a été déplacée.</p>
+    <p><a href="/">Retour à l'accueil</a> · <a href="/boutique">Voir la boutique</a></p>`,
+})
+writeFileSync(resolve(dist, '404.html'), notFoundHtml)
 
 console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length + Object.keys(STATIC_SEO_PAGES).length + 1} pages statiques).`)

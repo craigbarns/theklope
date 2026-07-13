@@ -1,8 +1,94 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
+  "trailingSlash": false,
   "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "theklope.vercel.app" }],
+      "destination": "https://www.theklope.com/:path*",
+      "permanent": true
+    },
     { "source": "/blog", "destination": "/guides", "permanent": true },
-    { "source": "/blog/:slug", "destination": "/guides/:slug", "permanent": true }
+    { "source": "/blog/:slug", "destination": "/guides/:slug", "permanent": true },
+
+    { "source": "/fr", "destination": "/", "permanent": true },
+    { "source": "/fr/:path*", "destination": "/:path*", "permanent": true },
+    { "source": "/contact-us", "destination": "/contact", "permanent": true },
+    { "source": "/contactez-nous", "destination": "/contact", "permanent": true },
+    { "source": "/cart", "destination": "/panier", "permanent": true },
+    { "source": "/search", "destination": "/boutique", "permanent": true },
+
+    { "source": "/content/1-:slug", "destination": "/livraison-retours", "permanent": true },
+    { "source": "/content/2-:slug", "destination": "/legal/mentions-legales", "permanent": true },
+    { "source": "/content/3-:slug", "destination": "/legal/cgv", "permanent": true },
+    { "source": "/content/5-:slug", "destination": "/legal/retour", "permanent": true },
+    { "source": "/content/8-:slug", "destination": "/legal/confidentialite", "permanent": true },
+
+    { "source": "/2-accueil", "destination": "/boutique", "permanent": true },
+    { "source": "/23-resistances", "destination": "/categorie/resistances", "permanent": true },
+    { "source": "/44-reservoirs", "destination": "/categorie/accessoires", "permanent": true },
+    { "source": "/e-liquides-france", "destination": "/categorie/e-liquides", "permanent": true },
+    { "source": "/kits-complets", "destination": "/categorie/cigarettes-electroniques", "permanent": true },
+    { "source": "/resistances", "destination": "/categorie/resistances", "permanent": true },
+    { "source": "/accus", "destination": "/categorie/accessoires", "permanent": true },
+    { "source": "/brand/9-innokin", "destination": "/boutique?q=Innokin", "permanent": true },
+    { "source": "/brand/8-smok", "destination": "/boutique?q=Smok", "permanent": true },
+
+    { "source": "/e-liquides-france/306-peche-abricot-50-ml-freaks.html", "destination": "/produit/peche-abricot-50ml-0mg-zhc-297", "permanent": true },
+    { "source": "/e-liquides-france/139-melon-50-ml-freaks.html", "destination": "/produit/melon-de-cavaillon-50ml-0mg-293", "permanent": true },
+    { "source": "/e-liquides-france/335-freeze-dragon-50-ml-liquideo.html", "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253", "permanent": true },
+    { "source": "/e-liquides-france/443-la-petite-limo-60-ml-petit-nuage.html", "destination": "/produit/la-petite-limo-60ml-petit-nuage-286", "permanent": true },
+    { "source": "/e-liquides-france/445-reve-bleu-60-ml-petit-nuage.html", "destination": "/produit/reve-bleu-60ml-petit-nuage-303", "permanent": true },
+    { "source": "/e-liquides-france/266-fruits-rouges-givres-10-ml-liquidarom.html", "destination": "/produit/fruits-rouges-givres-10ml-liquidarom-227", "permanent": true },
+    { "source": "/kits-complets/416-drag-s2-voopoo.html", "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280", "permanent": true },
+    { "source": "/kits-complets/72-q16-pro-justfog.html", "destination": "/produit/q16-pro-146", "permanent": true },
+    { "source": "/kits-complets/388-608-gen-max-vaporesso.html", "destination": "/produit/gen-max-220w-avec-itank-t-vaporesso-noir-274", "permanent": true }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+        { "key": "Content-Security-Policy", "value": "base-uri 'self'; frame-ancestors 'none'; object-src 'none'" }
+      ]
+    },
+    {
+      "source": "/service-worker.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store, max-age=0" },
+        { "key": "Service-Worker-Allowed", "value": "/" }
+      ]
+    },
+    {
+      "source": "/404.html",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+      ]
+    }
+  ],
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    {
+      "source": "/produit/:id",
+      "has": [{ "type": "query", "key": "catalogue_live", "value": "1" }],
+      "destination": "/index.html"
+    },
+    { "source": "/produit/:id", "destination": "/api/product-route?id=:id" },
+    { "source": "/panier", "destination": "/index.html" },
+    { "source": "/checkout", "destination": "/index.html" },
+    { "source": "/checkout/retour", "destination": "/index.html" },
+    { "source": "/favoris", "destination": "/index.html" },
+    { "source": "/admin", "destination": "/index.html" }
+  ]
 }

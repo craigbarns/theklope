@@ -12,12 +12,16 @@ export async function getProductsByIds(ids) {
   if (hasSupabaseAdmin) {
     const { data, error } = await supabaseAdmin
       .from('products')
-      .select('id,name,price,image,stock,brand,volume,category,specs')
+      .select('id,name,price,image,stock,brand,volume,category,specs,nicotine,flavors,colors,ohm_options')
       .in('id', unique)
     if (error) throw error
     // Volume dérivé de specs.Contenance si le champ volume est vide (sinon les
     // remises dégressives ne tomberaient jamais côté serveur).
-    return new Map((data || []).map((p) => [p.id, { ...p, volume: resolveVolume(p) }]))
+    return new Map((data || []).map((p) => [p.id, {
+      ...p,
+      ohmOptions: p.ohm_options || [],
+      volume: resolveVolume(p),
+    }]))
   }
 
   // Fallback : catalogue statique (importé dynamiquement pour ne pas le charger
@@ -25,7 +29,20 @@ export async function getProductsByIds(ids) {
   const mod = await import('../../src/data/products.js')
   const map = new Map()
   for (const p of mod.PRODUCTS) {
-    if (unique.includes(p.id)) map.set(p.id, { id: p.id, name: p.name, price: p.price, image: p.image, stock: p.stock, brand: p.brand, volume: resolveVolume(p), category: p.category })
+    if (unique.includes(p.id)) map.set(p.id, {
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image: p.image,
+      stock: p.stock,
+      brand: p.brand,
+      volume: resolveVolume(p),
+      category: p.category,
+      nicotine: p.nicotine || [],
+      flavors: p.flavors || [],
+      colors: p.colors || [],
+      ohmOptions: p.ohmOptions || [],
+    })
   }
   return map
 }

@@ -20,7 +20,7 @@ export const PROMO_CODES = {
   THEKLOPE10: { type: 'percent', value: 10, label: '-10%' },
   BIENVENUE: { type: 'percent', value: 15, label: '-15% première commande' },
   LIVRAISON: { type: 'shipping', value: 0, label: 'Livraison offerte' },
-  PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure' },
+  PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure', eligibility: 'complete-pack' },
 }
 
 // -----------------------------------------------------------------------------
@@ -67,6 +67,40 @@ export const getShippingMethod = (id) =>
 export const normalizePromo = (code) => {
   const clean = String(code || '').trim().toUpperCase()
   return PROMO_CODES[clean] ? { code: clean, ...PROMO_CODES[clean] } : null
+}
+
+// PACK15 est reserve aux compositions qui contiennent reellement les trois
+// familles du configurateur : appareil, reservoir/accessoire et e-liquide.
+// Cette verification est partagee par le navigateur et l'API de paiement.
+export const isCompletePack = (lines = []) => {
+  const active = lines.filter((line) => Number(line?.qty) > 0)
+  return (
+    active.some((line) => ['ecig', 'pod'].includes(line.category)) &&
+    active.some((line) => line.category === 'accessoire') &&
+    active.some((line) => line.category === 'eliquide')
+  )
+}
+
+// Une remise PACK15 couvre un seul article de chaque famille du configurateur.
+// Les quantités supplémentaires et les autres articles restent au prix normal.
+export const getCompletePackSubtotal = (lines = []) => {
+  const active = lines.filter((line) => Number(line?.qty) > 0)
+  const highestPrice = (categories) => active
+    .filter((line) => categories.includes(line.category))
+    .reduce((highest, line) => Math.max(highest, Number(line.price) || 0), 0)
+
+  if (!isCompletePack(active)) return 0
+  return round2(
+    highestPrice(['ecig', 'pod'])
+      + highestPrice(['accessoire'])
+      + highestPrice(['eliquide']),
+  )
+}
+
+export const isPromoEligible = (promo, lines = []) => {
+  if (!promo) return false
+  if (promo.eligibility === 'complete-pack') return isCompletePack(lines)
+  return true
 }
 
 // Calcule la remise automatique (paliers marque/volume). Renvoie le détail pour
@@ -155,7 +189,8 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) 
     lines.reduce((sum, l) => sum + (Number(l.price) || 0) * (Number(l.qty) || 0), 0),
   )
 
-  const promo = normalizePromo(promoCode)
+  const requestedPromo = normalizePromo(promoCode)
+  const promo = isPromoEligible(requestedPromo, lines) ? requestedPromo : null
   const method = getShippingMethod(shippingMethodId)
 
   // Livraison : gratuite dès le seuil (sauf Click & Collect déjà à 0) ou via un
@@ -168,7 +203,8 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) 
   // Remises : automatique (marque/volume) vs code promo % — on applique la plus
   // avantageuse pour le client (elles ne se cumulent PAS).
   const auto = computeAutoDiscount(lines)
-  const promoPercent = promo?.type === 'percent' ? round2((subtotal * promo.value) / 100) : 0
+  const promoBase = promo?.code === 'PACK15' ? getCompletePackSubtotal(lines) : subtotal
+  const promoPercent = promo?.type === 'percent' ? round2((promoBase * promo.value) / 100) : 0
   const discount = round2(Math.max(auto.total, promoPercent))
   const discountSource = discount > 0 ? (auto.total >= promoPercent ? 'auto' : 'promo') : null
 
@@ -184,6 +220,7 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) 
     freeShipping: shipping === 0,
     freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
     promo,
+    promoRejected: Boolean(requestedPromo && !promo),
     shippingMethod: method,
   }
 }

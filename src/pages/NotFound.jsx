@@ -4,7 +4,7 @@ import Seo from '../components/Seo.jsx'
 export default function NotFound() {
   return (
     <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
-      <Seo title="Page introuvable" />
+      <Seo title="Page introuvable" noindex />
       <div>
         <p className="font-display text-7xl font-bold text-neon">404</p>
         <h1 className="mt-4 font-display text-2xl font-bold text-white">Page introuvable</h1>

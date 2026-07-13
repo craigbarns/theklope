@@ -1,7 +1,8 @@
 import { IconStar } from './icons.jsx'
 
 export default function Stars({ rating = 0, reviews, size = 14, showCount = true }) {
-  const rate = Number(rating) || 0
+  const hasReviews = reviews == null || Number(reviews) > 0
+  const rate = hasReviews ? Number(rating) || 0 : 0
   return (
     <div className="flex items-center gap-1.5">
       <div className="flex items-center text-neon">
@@ -11,7 +12,7 @@ export default function Stars({ rating = 0, reviews, size = 14, showCount = true
       </div>
       {showCount && (
         <span className="text-xs text-muted">
-          {rate.toFixed(1)}{reviews != null && ` (${reviews})`}
+          {reviews === 0 ? 'Aucun avis' : `${rate.toFixed(1)}${reviews != null ? ` (${reviews})` : ''}`}
         </span>
       )}
     </div>

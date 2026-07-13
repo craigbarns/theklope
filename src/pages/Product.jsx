@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName } from '../data/catalog.js'
@@ -10,6 +10,7 @@ import Stars from '../components/Stars.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
+import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import {
   IconHeart,
   IconCart,
@@ -23,7 +24,7 @@ import {
 
 export default function Product() {
   const { id } = useParams()
-  const { products, getProduct, addToCart, toggleFavorite, isFavorite } = useStore()
+  const { products, cart, getProduct, addToCart, addItemsToCart, toggleFavorite, isFavorite, cookiesChoice } = useStore()
   const product = getProduct(id)
 
   const [activeImg, setActiveImg] = useState(0)
@@ -33,6 +34,8 @@ export default function Product() {
   const [nicotine, setNicotine] = useState(product?.nicotine?.[0] ?? null)
   const [ohm, setOhm] = useState(product?.ohmOptions?.[0] ?? null)
   const [added, setAdded] = useState(false)
+  const [addError, setAddError] = useState('')
+  const trackedProductRef = useRef(null)
 
   const similar = useMemo(() => {
     if (!product) return []
@@ -121,6 +124,17 @@ export default function Product() {
     setOhm(product.ohmOptions?.[0] ?? null)
   }, [product])
 
+  useEffect(() => {
+    if (!product || trackedProductRef.current === product.id) return
+    if (trackEvent('view_item', {
+      currency: 'EUR',
+      value: product.price,
+      items: [toAnalyticsItem(product)],
+    })) {
+      trackedProductRef.current = product.id
+    }
+  }, [cookiesChoice, product])
+
   const [selectedBundleIds, setSelectedBundleIds] = useState([])
 
   // Compte à rebours d'expédition (limite 14h00)
@@ -174,39 +188,75 @@ export default function Product() {
     return total
   }, [product, selectedBundleIds, products])
 
+  const cartProductQty = product
+    ? cart.reduce(
+      (sum, item) => sum + (item.productId === product.id ? Number(item.qty) || 0 : 0),
+      0,
+    )
+    : 0
+  const remainingStock = product ? Math.max(0, product.stock - cartProductQty) : 0
+
+  useEffect(() => {
+    if (!product) return
+    setQty((current) => Math.min(current, Math.max(1, remainingStock)))
+  }, [product, remainingStock])
+
   if (!product) return <NotFound />
 
   const fav = isFavorite(product.id)
   const outOfStock = product.stock <= 0
-  const maxQty = product.stock > 0 ? product.stock : 1
+  const stockLimitReached = !outOfStock && remainingStock === 0
+  const maxQty = remainingStock > 0 ? remainingStock : 1
   const hasNicotine = Array.isArray(product.nicotine) && product.nicotine.some((n) => Number(n) > 0)
 
-  const handleAdd = () => {
-    if (outOfStock) return
+  const handleAdd = (requestedQty = qty) => {
+    if (outOfStock || stockLimitReached) {
+      setAddError('La quantité maximale disponible est déjà dans votre panier.')
+      return false
+    }
     const variant = {}
     if (color) variant.color = color
     if (flavor) variant.flavor = flavor
     if (nicotine != null) variant.nicotine = nicotine
     if (ohm != null) variant.ohm = ohm
-    addToCart(product.id, Math.min(qty, maxQty), variant)
+    const wasAdded = addToCart(product.id, Math.min(requestedQty, maxQty), variant)
+    if (!wasAdded) {
+      setAddError('Le stock vient d’évoluer. Vérifiez votre panier avant de réessayer.')
+      return false
+    }
+    setAddError('')
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
+    return true
   }
 
   const handleAddBundle = () => {
     if (outOfStock) return
-    handleAdd()
-    selectedBundleIds.forEach((id) => {
-      const item = products.find((p) => p.id === id)
-      if (item) {
-        const variant = {}
-        if (item.colors?.length) variant.color = item.colors[0]
-        if (item.flavors?.length) variant.flavor = item.flavors[0]
-        if (item.nicotine?.length) variant.nicotine = item.nicotine[0]
-        if (item.ohmOptions?.length) variant.ohm = item.ohmOptions[0]
-        addToCart(item.id, 1, variant)
-      }
+    const selectedItems = selectedBundleIds
+      .map((id) => products.find((item) => item.id === id))
+      .filter(Boolean)
+    const mainVariant = {}
+    if (color) mainVariant.color = color
+    if (flavor) mainVariant.flavor = flavor
+    if (nicotine != null) mainVariant.nicotine = nicotine
+    if (ohm != null) mainVariant.ohm = ohm
+    const entries = [{ productId: product.id, qty: 1, variant: mainVariant }]
+    selectedItems.forEach((item) => {
+      const variant = {}
+      if (item.colors?.length) variant.color = item.colors[0]
+      if (item.flavors?.length) variant.flavor = item.flavors[0]
+      if (item.nicotine?.length) variant.nicotine = item.nicotine[0]
+      if (item.ohmOptions?.length) variant.ohm = item.ohmOptions[0]
+      entries.push({ productId: item.id, qty: 1, variant })
     })
+
+    if (!addItemsToCart(entries)) {
+      setAddError("Le stock d'un article du lot a évolué. Le panier n'a pas été modifié.")
+      return
+    }
+    setAddError('')
+    setAdded(true)
+    setTimeout(() => setAdded(false), 2000)
   }
 
   return (
@@ -256,6 +306,12 @@ export default function Product() {
                 </button>
               ))}
             </div>
+            {product.nicotine?.length > 1 && (
+              <p className="mt-3 text-xs leading-relaxed text-muted">
+                Le visuel du flacon peut présenter un autre dosage. Le taux sélectionné et repris dans votre panier
+                fait foi{nicotine != null ? ` : ${nicotine} mg.` : '.'}
+              </p>
+            )}
           </div>
 
           {/* Infos */}
@@ -317,8 +373,14 @@ export default function Product() {
                   <IconPlus width={16} height={16} />
                 </button>
               </div>
-              <button onClick={handleAdd} disabled={outOfStock} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-10">
-                {outOfStock ? 'Rupture de stock' : added ? <><IconCheck width={18} height={18} /> Ajouté !</> : <><IconCart width={18} height={18} /> Ajouter au panier</>}
+              <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-10">
+                {outOfStock
+                  ? 'Rupture de stock'
+                  : stockLimitReached
+                    ? 'Stock maximum au panier'
+                    : added
+                      ? <><IconCheck width={18} height={18} /> Ajouté !</>
+                      : <><IconCart width={18} height={18} /> Ajouter au panier</>}
               </button>
               <button
                 onClick={() => toggleFavorite(product.id)}
@@ -334,10 +396,14 @@ export default function Product() {
             <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : 'text-muted'}`}>
               {outOfStock
                 ? 'Rupture de stock — bientôt de retour'
-                : product.stock > 10
-                  ? 'En stock — expédié sous 24/48h'
-                  : `Plus que ${product.stock} en stock — commandez vite`}
+                : stockLimitReached
+                  ? 'Tout le stock disponible est déjà dans votre panier'
+                : remainingStock > 10
+                  ? 'En stock — expédition sous 24/48 h'
+                  : `Plus que ${remainingStock} disponible${remainingStock > 1 ? 's' : ''} à ajouter`}
             </p>
+
+            {addError && <p className="mt-2 text-xs text-rose-300">{addError}</p>}
 
             {!outOfStock && (
               <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-neon/10 border border-neon/30 px-3.5 py-2.5 text-xs text-neon font-medium max-w-sm">
@@ -349,7 +415,7 @@ export default function Product() {
             {/* Réassurance */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Reassure icon={IconLock} text="Paiement 100% sécurisé" />
-              <Reassure icon={IconTruck} text="Livraison 24/48h en France" />
+              <Reassure icon={IconTruck} text="Livraison en 2–4 jours" />
               <Reassure icon={IconShield} text="Retours sous 14 jours" />
               <Reassure icon={IconShield} text="Vente réservée aux +18" />
             </div>
@@ -505,8 +571,14 @@ export default function Product() {
             <p className="truncate text-sm font-medium text-white">{product.name}</p>
             <p className="font-display text-base font-bold text-neon">{formatPrice(product.price)}</p>
           </div>
-          <button onClick={handleAdd} disabled={outOfStock} className="btn-primary shrink-0 px-6 disabled:cursor-not-allowed disabled:opacity-50">
-            {outOfStock ? 'Rupture' : added ? <><IconCheck width={18} height={18} /> Ajouté</> : <><IconCart width={18} height={18} /> Ajouter</>}
+          <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary shrink-0 px-6 disabled:cursor-not-allowed disabled:opacity-50">
+            {outOfStock
+              ? 'Rupture'
+              : stockLimitReached
+                ? 'Stock maximum'
+                : added
+                  ? <><IconCheck width={18} height={18} /> Ajouté</>
+                  : <><IconCart width={18} height={18} /> Ajouter</>}
           </button>
         </div>
       </div>

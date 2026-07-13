@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
@@ -14,11 +14,13 @@ const SORTS = [
   { value: 'prix-asc', label: 'Prix croissant' },
   { value: 'prix-desc', label: 'Prix décroissant' },
 ]
+const PAGE_SIZE = 24
 
 export default function CategoryPage() {
   const { slug } = useParams()
   const { products: allProducts } = useStore()
   const [sort, setSort] = useState('popularite')
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const category = CATEGORIES.find((c) => c.slug === slug)
   const seo = CATEGORY_SEO[slug]
@@ -29,6 +31,11 @@ export default function CategoryPage() {
     if (sort === 'popularite') list = [...list].sort((a, b) => b.reviews - a.reviews)
     return list
   }, [allProducts, slug, sort])
+  const visibleProducts = useMemo(() => products.slice(0, visibleCount), [products, visibleCount])
+
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE)
+  }, [slug, sort])
 
   const schema = useMemo(() => {
     if (!category) return null
@@ -132,11 +139,28 @@ export default function CategoryPage() {
           <Link to="/boutique" className="btn-primary mt-4">Voir toute la boutique</Link>
         </div>
       ) : (
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-          {products.map((p) => (
-            <ProductCard key={p.id} product={p} />
-          ))}
-        </div>
+        <>
+          <div id="category-products" className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+            {visibleProducts.map((p) => (
+              <ProductCard key={p.id} product={p} />
+            ))}
+          </div>
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <p className="text-xs text-muted">
+              {visibleProducts.length} produit{visibleProducts.length > 1 ? 's' : ''} affiché{visibleProducts.length > 1 ? 's' : ''} sur {products.length}
+            </p>
+            {visibleProducts.length < products.length && (
+              <button
+                type="button"
+                className="btn-ghost px-6 py-3 text-sm"
+                aria-controls="category-products"
+                onClick={() => setVisibleCount((count) => Math.min(count + PAGE_SIZE, products.length))}
+              >
+                Afficher {Math.min(PAGE_SIZE, products.length - visibleProducts.length)} produits de plus
+              </button>
+            )}
+          </div>
+        </>
       )}
 
       {seo?.faq?.length > 0 && (

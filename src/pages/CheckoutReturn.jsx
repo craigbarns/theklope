@@ -3,15 +3,16 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import { IconCheck, IconLock } from '../components/icons.jsx'
+import { trackEvent } from '../lib/analytics.js'
 
 // Page affichée au retour de Mollie. Elle interroge /api/payment-status qui relit
 // le vrai statut du paiement (et finalise la commande si payée).
 export default function CheckoutReturn() {
   const [params] = useSearchParams()
   const orderId = params.get('order')
-  const { clearCart, cartDetailed } = useStore()
+  const { clearCart, cookiesChoice } = useStore()
 
-  const [state, setState] = useState('pending') // 'pending' | 'paid' | 'failed' | 'error'
+  const [state, setState] = useState('pending') // 'pending' | 'paid' | 'failed' | 'delayed' | 'error'
   const [order, setOrder] = useState(null)
   const clearedRef = useRef(false)
 
@@ -30,6 +31,7 @@ export default function CheckoutReturn() {
         const res = await fetch(`/api/payment-status?order=${encodeURIComponent(orderId)}`)
         const data = await res.json()
         if (!active) return
+        if (!res.ok) throw new Error(data.error || 'Statut indisponible')
         if (data.order) setOrder(data.order)
 
         if (data.status === 'paid') {
@@ -37,26 +39,6 @@ export default function CheckoutReturn() {
           if (!clearedRef.current) {
             clearedRef.current = true
             
-            // Track GA4 purchase event
-            if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-              window.gtag('event', 'purchase', {
-                transaction_id: data.order?.id || orderId,
-                value: data.order?.total || 0,
-                tax: 0,
-                shipping: data.order?.shipping || 0,
-                currency: 'EUR',
-                items: cartDetailed.map((item) => ({
-                  item_id: item.product.id,
-                  item_name: item.product.name,
-                  item_brand: item.product.brand,
-                  item_category: item.product.category,
-                  price: item.product.price,
-                  quantity: item.qty,
-                  item_variant: Object.values(item.variant).join(', ')
-                }))
-              });
-            }
-
             clearCart()
           }
           return
@@ -67,6 +49,7 @@ export default function CheckoutReturn() {
         }
         // pending : on réessaie quelques fois (le temps que Mollie confirme)
         if (attempts < 8) setTimeout(poll, 2000)
+        else setState('delayed')
       } catch {
         if (!active) return
         if (attempts < 8) setTimeout(poll, 2500)
@@ -79,6 +62,35 @@ export default function CheckoutReturn() {
       active = false
     }
   }, [orderId, clearCart])
+
+  useEffect(() => {
+    if (state !== 'paid' || !order || cookiesChoice !== 'accepted') return
+
+    const trackedKey = `tk_purchase_tracked_${order.id || orderId}`
+    try {
+      if (window.sessionStorage.getItem(trackedKey)) return
+      const raw = window.sessionStorage.getItem(`tk_purchase_${order.id || orderId}`)
+      const snapshot = raw ? JSON.parse(raw) : null
+      const fallbackShipping = typeof order.shipping === 'number'
+        ? order.shipping
+        : Number(order.shipping?.price || order.shipping?.cost || 0)
+
+      if (trackEvent('purchase', {
+        transaction_id: order.id || orderId,
+        value: Number(order.total) || 0,
+        tax: 0,
+        shipping: Number(snapshot?.totals?.shipping ?? fallbackShipping) || 0,
+        currency: 'EUR',
+        coupon: snapshot?.coupon,
+        items: Array.isArray(snapshot?.items) ? snapshot.items : [],
+      })) {
+        window.sessionStorage.setItem(trackedKey, '1')
+        window.sessionStorage.removeItem(`tk_purchase_${order.id || orderId}`)
+      }
+    } catch {
+      // Le statut de commande ne dépend jamais de la mesure d'audience.
+    }
+  }, [cookiesChoice, order, orderId, state])
 
   return (
     <div className="container-page py-16">
@@ -128,6 +140,25 @@ export default function CheckoutReturn() {
             <div className="mt-7 flex flex-col gap-3">
               <Link to="/checkout" className="btn-primary w-full">Réessayer le paiement</Link>
               <Link to="/panier" className="btn-ghost w-full">Revenir au panier</Link>
+            </div>
+          </>
+        )}
+
+        {state === 'delayed' && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-white/15 text-faint">
+              <IconLock width={26} height={26} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Confirmation plus longue que prévu</h1>
+            <p className="mt-3 text-sm text-muted">
+              Mollie n'a pas encore confirmé la commande <strong className="text-white">{orderId}</strong>.
+              Ne relancez pas le paiement si vous avez été débité : la confirmation peut arriver avec un léger délai.
+            </p>
+            <div className="mt-7 flex flex-col gap-3">
+              <button type="button" className="btn-primary w-full" onClick={() => window.location.reload()}>
+                Vérifier à nouveau
+              </button>
+              <Link to="/contact" className="btn-ghost w-full">Nous contacter</Link>
             </div>
           </>
         )}

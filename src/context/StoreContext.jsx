@@ -2,7 +2,17 @@ import { createContext, useContext, useEffect, useMemo, useState, useCallback } 
 import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
 import { enrichProductCopy } from '../data/productCopy.js'
 import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
-import { PROMO_CODES, FREE_SHIPPING_THRESHOLD, computeTotals, computeBundleProgress, resolveVolume } from '../lib/pricing.js'
+import {
+  PROMO_CODES,
+  FREE_SHIPPING_THRESHOLD,
+  computeTotals,
+  computeBundleProgress,
+  isPromoEligible,
+  resolveVolume,
+} from '../lib/pricing.js'
+import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
+import { buildCartAddition } from '../lib/cart.js'
+import { getPaidOrders } from '../lib/dashboard.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -10,6 +20,13 @@ const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
 // Le catalogue statique (~300 produits) est lourd : on ne le charge qu'à la
 // demande, en fallback, pour ne pas l'embarquer dans le bundle initial.
 const loadStaticCatalog = async () => {
+  if (import.meta.env.PROD && isSupabaseConfigured) {
+    const response = await fetch('/catalog-fallback.json', { cache: 'no-cache' })
+    if (!response.ok) throw new Error('Catalogue de secours indisponible.')
+    const products = await response.json()
+    if (!Array.isArray(products)) throw new Error('Catalogue de secours invalide.')
+    return products
+  }
   const mod = await import('../data/products.js')
   return mod.PRODUCTS
 }
@@ -39,6 +56,7 @@ const slugify = (value) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
     .slice(0, 80)
+const PRODUCT_ID_RE = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,158}[A-Za-z0-9])?$/
 
 const toNumber = (value, fallback = 0) => {
   const n = Number(value)
@@ -161,10 +179,21 @@ const orderFromRow = (row) => ({
   })),
 })
 
+const verifiedAdminSession = async (supabase, session) => {
+  if (!session) return null
+  const { data, error } = await supabase.rpc('is_admin')
+  if (error || data !== true) return null
+  return session
+}
+
 export function StoreProvider({ children }) {
   // Vérification d'âge — null = pas encore répondu
   const [ageVerified, setAgeVerified] = useState(() => read('tk_age', null))
   const [cookiesChoice, setCookiesChoice] = useState(() => read('tk_cookies', null))
+  const [reviewsChoice, setReviewsChoice] = useState(() => {
+    const saved = read('tk_reviews_consent', null)
+    return saved ?? read('tk_cookies', null)
+  })
   const [products, setProducts] = useState(() => {
     const saved = read('tk_products', null)
     const hasPacks = Array.isArray(saved) && saved.some((p) => p.category === 'pack')
@@ -189,6 +218,7 @@ export function StoreProvider({ children }) {
 
   useEffect(() => localStorage.setItem('tk_age', JSON.stringify(ageVerified)), [ageVerified])
   useEffect(() => localStorage.setItem('tk_cookies', JSON.stringify(cookiesChoice)), [cookiesChoice])
+  useEffect(() => localStorage.setItem('tk_reviews_consent', JSON.stringify(reviewsChoice)), [reviewsChoice])
   useEffect(() => localStorage.setItem('tk_products', JSON.stringify(products)), [products])
   useEffect(() => localStorage.setItem('tk_orders', JSON.stringify(orders)), [orders])
   useEffect(() => localStorage.setItem('tk_cart', JSON.stringify(cart)), [cart])
@@ -202,10 +232,19 @@ export function StoreProvider({ children }) {
     getSupabase().then((sb) => {
       if (!sb || !active) return
       sb.auth.getSession().then(({ data }) => {
-        if (active) setAdminSession(data.session)
+        verifiedAdminSession(sb, data.session).then((session) => {
+          if (active) setAdminSession(session)
+        })
       })
       const { data } = sb.auth.onAuthStateChange((_event, session) => {
-        setAdminSession(session)
+        setAdminSession(null)
+        // Sortir du callback Auth avant d'interroger Supabase evite de bloquer
+        // le verrou interne de gestion de session du client.
+        setTimeout(() => {
+          verifiedAdminSession(sb, session).then((verified) => {
+            if (active) setAdminSession(verified)
+          })
+        }, 0)
       })
       subscription = data.subscription
     })
@@ -219,7 +258,7 @@ export function StoreProvider({ children }) {
   const loadFallbackCatalog = useCallback(async () => {
     try {
       const catalog = await loadStaticCatalog()
-      setProducts((prev) => (prev.length ? prev : catalog.map(normalizeProduct)))
+      setProducts(catalog.map(normalizeProduct))
     } catch {
       /* ignore — le catalogue restera vide */
     }
@@ -249,9 +288,9 @@ export function StoreProvider({ children }) {
 
       if (productsResult.error) throw productsResult.error
       const remoteProducts = (productsResult.data || []).map(productFromRow)
-      // Si Supabase est vide (catalogue pas encore publié), on garde le fallback statique.
-      if (remoteProducts.length) setProducts(remoteProducts)
-      else await loadFallbackCatalog()
+      // Une réponse vide est une source valide (par exemple après une suppression
+      // volontaire dans l'admin). Le fallback ne sert qu'aux erreurs réseau.
+      setProducts(remoteProducts)
 
       if (adminSession) {
         const ordersResult = await sb
@@ -283,6 +322,43 @@ export function StoreProvider({ children }) {
     refreshRemoteData()
   }, [refreshRemoteData])
 
+  // Le stock est global au produit, même lorsque le panier contient plusieurs
+  // variantes. On réconcilie aussi les paniers restaurés depuis localStorage.
+  useEffect(() => {
+    if (products.length === 0) {
+      if (syncStatus === 'online') setCart([])
+      return
+    }
+
+    setCart((previous) => {
+      const usedByProduct = new Map()
+      let changed = false
+      const next = []
+
+      for (const item of previous) {
+        const product = getProductFrom(products, item.productId)
+        if (!product) {
+          changed = true
+          continue
+        }
+
+        const alreadyUsed = usedByProduct.get(item.productId) || 0
+        const available = Math.max(0, product.stock - alreadyUsed)
+        const requested = Math.max(0, Math.floor(Number(item.qty) || 0))
+        const qty = Math.min(available, requested)
+        if (qty <= 0) {
+          changed = true
+          continue
+        }
+        if (qty !== item.qty) changed = true
+        usedByProduct.set(item.productId, alreadyUsed + qty)
+        next.push(qty === item.qty ? item : { ...item, qty })
+      }
+
+      return changed ? next : previous
+    })
+  }, [products, syncStatus])
+
   const getProduct = useCallback((id) => getProductFrom(products, id), [products])
 
   const signInAdmin = useCallback(async ({ email, password }) => {
@@ -290,7 +366,12 @@ export function StoreProvider({ children }) {
     if (!sb) throw new Error('Supabase n’est pas configuré.')
     const { data, error } = await sb.auth.signInWithPassword({ email, password })
     if (error) throw error
-    setAdminSession(data.session)
+    const verified = await verifiedAdminSession(sb, data.session)
+    if (!verified) {
+      await sb.auth.signOut()
+      throw new Error('Ce compte ne possède pas les droits administrateur.')
+    }
+    setAdminSession(verified)
     return data
   }, [])
 
@@ -305,7 +386,18 @@ export function StoreProvider({ children }) {
 
   // ----- Catalogue admin -----
   const upsertProduct = useCallback(async (input) => {
-    const nextProduct = normalizeProduct(input)
+    const requestedId = String(input.id || '').trim() || slugify(input.name)
+    const originalId = String(input.originalId || '').trim()
+    if (!PRODUCT_ID_RE.test(requestedId)) {
+      throw new Error("L'identifiant URL doit commencer et finir par une lettre ou un chiffre et contenir uniquement des lettres sans accent, chiffres, points, tirets ou underscores.")
+    }
+    if (originalId && requestedId !== originalId) {
+      throw new Error("L'identifiant URL d'un produit existant ne peut pas être modifié.")
+    }
+    if (!originalId && products.some((product) => product.id === requestedId)) {
+      throw new Error('Cet identifiant URL est déjà utilisé par un autre produit.')
+    }
+    const nextProduct = normalizeProduct({ ...input, id: requestedId })
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
@@ -321,7 +413,7 @@ export function StoreProvider({ children }) {
         : [nextProduct, ...prev]
     })
     return nextProduct
-  }, [adminSession])
+  }, [adminSession, products])
 
   const deleteProduct = useCallback(async (productId) => {
     if (isSupabaseConfigured) {
@@ -360,47 +452,52 @@ export function StoreProvider({ children }) {
   }, [adminSession])
 
   // ----- Cart -----
-  const addToCart = useCallback((productId, qty = 1, variant = {}) => {
-    // GA4 Tracking
-    loadStaticCatalog().then((catalog) => {
-      const product = catalog.find((p) => p.id === productId)
-      if (product && typeof window !== 'undefined' && typeof window.gtag === 'function') {
-        window.gtag('event', 'add_to_cart', {
-          currency: 'EUR',
-          value: product.price * qty,
-          items: [
-            {
-              item_id: product.id,
-              item_name: product.name,
-              item_brand: product.brand,
-              item_category: product.category,
-              price: product.price,
-              quantity: qty,
-              item_variant: Object.values(variant).join(', ')
-            }
-          ]
-        });
-      }
-    }).catch(() => {})
+  const addItemsToCart = useCallback((entries = []) => {
+    const initial = buildCartAddition({ cart, products, entries })
+    if (!initial.ok) return false
 
-    setCart((prev) => {
-      const key = JSON.stringify(variant)
-      const existing = prev.find((i) => i.productId === productId && JSON.stringify(i.variant) === key)
-      if (existing) {
-        return prev.map((i) => (i === existing ? { ...i, qty: i.qty + qty } : i))
-      }
-      return [...prev, { productId, qty, variant }]
+    // Une seule mutation : soit toutes les lignes sont encore disponibles, soit
+    // le panier reste strictement inchangé.
+    setCart((previous) => {
+      const current = buildCartAddition({ cart: previous, products, entries })
+      return current.ok ? current.cart : previous
+    })
+
+    trackEvent('add_to_cart', {
+      currency: 'EUR',
+      value: initial.prepared.reduce((sum, entry) => sum + entry.product.price * entry.qty, 0),
+      items: initial.prepared.map((entry) => toAnalyticsItem(entry.product, entry.qty, entry.variant)),
     })
     setCartOpen(true)
-  }, [])
+    return true
+  }, [cart, products])
+
+  const addToCart = useCallback(
+    (productId, qty = 1, variant = {}) => addItemsToCart([{ productId, qty, variant }]),
+    [addItemsToCart],
+  )
 
   const updateQty = useCallback((index, qty) => {
     setCart((prev) =>
       prev
-        .map((i, idx) => (idx === index ? { ...i, qty: Math.max(0, qty) } : i))
+        .map((item, idx) => {
+          if (idx !== index) return item
+          const product = getProductFrom(products, item.productId)
+          const usedByOtherVariants = prev.reduce(
+            (sum, other, otherIndex) => (
+              otherIndex !== index && other.productId === item.productId
+                ? sum + (Number(other.qty) || 0)
+                : sum
+            ),
+            0,
+          )
+          const max = Math.max(0, (Number(product?.stock) || 0) - usedByOtherVariants)
+          const next = Math.max(0, Math.floor(Number(qty) || 0))
+          return { ...item, qty: Math.min(max, next) }
+        })
         .filter((i) => i.qty > 0),
     )
-  }, [])
+  }, [products])
 
   const removeItem = useCallback((index) => {
     setCart((prev) => prev.filter((_, idx) => idx !== index))
@@ -420,14 +517,23 @@ export function StoreProvider({ children }) {
   const isFavorite = useCallback((productId) => favorites.includes(productId), [favorites])
 
   // ----- Promo -----
-  const applyPromo = useCallback((code) => {
+  const applyPromo = useCallback((code, { eligibilityLines } = {}) => {
     const clean = (code || '').trim().toUpperCase()
-    if (PROMO_CODES[clean]) {
-      setPromo({ code: clean, ...PROMO_CODES[clean] })
-      return { ok: true, message: `Code « ${clean} » appliqué (${PROMO_CODES[clean].label}).` }
+    const definition = PROMO_CODES[clean]
+    if (!definition) return { ok: false, message: 'Code promo invalide.' }
+
+    const currentLines = eligibilityLines || cart.map((item) => {
+      const product = getProductFrom(products, item.productId)
+      return product ? { category: product.category, qty: item.qty } : null
+    }).filter(Boolean)
+
+    if (!isPromoEligible(definition, currentLines)) {
+      return { ok: false, message: 'Le code PACK15 est réservé à un pack complet configuré sur le site.' }
     }
-    return { ok: false, message: 'Code promo invalide.' }
-  }, [])
+
+    setPromo({ code: clean, ...definition })
+    return { ok: true, message: `Code « ${clean} » appliqué (${definition.label}).` }
+  }, [cart, products])
   const removePromo = useCallback(() => setPromo(null), [])
 
   // ----- Totaux -----
@@ -461,8 +567,13 @@ export function StoreProvider({ children }) {
       total: t.total,
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
       bundleProgress: computeBundleProgress(lines),
+      promoRejected: t.promoRejected,
     }
   }, [cartDetailed, promo])
+
+  useEffect(() => {
+    if (totals.promoRejected) setPromo(null)
+  }, [totals.promoRejected])
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
 
@@ -502,9 +613,12 @@ export function StoreProvider({ children }) {
       setOrders((prev) => [order, ...prev])
       setProducts((prev) =>
         prev.map((product) => {
-          const ordered = order.items.find((item) => item.productId === product.id)
-          if (!ordered) return product
-          return { ...product, stock: Math.max(0, product.stock - ordered.qty) }
+          const orderedQty = order.items.reduce(
+            (sum, item) => sum + (item.productId === product.id ? item.qty : 0),
+            0,
+          )
+          if (!orderedQty) return product
+          return { ...product, stock: Math.max(0, product.stock - orderedQty) }
         }),
       )
       clearCart()
@@ -548,15 +662,15 @@ export function StoreProvider({ children }) {
   const catalogMeta = useMemo(() => getCatalogMeta(products), [products])
 
   const dashboard = useMemo(() => {
-    const activeOrders = orders.filter((order) => order.status !== 'cancelled')
-    const revenue = activeOrders.reduce((sum, order) => sum + order.total, 0)
-    const units = activeOrders.reduce(
+    const paidOrders = getPaidOrders(orders)
+    const revenue = paidOrders.reduce((sum, order) => sum + order.total, 0)
+    const units = paidOrders.reduce(
       (sum, order) => sum + order.items.reduce((itemSum, item) => itemSum + item.qty, 0),
       0,
     )
     const lowStock = products.filter((product) => product.stock <= 10).sort((a, b) => a.stock - b.stock)
     const productSales = new Map()
-    for (const order of activeOrders) {
+    for (const order of paidOrders) {
       for (const item of order.items) {
         const current = productSales.get(item.productId) || { name: item.name, qty: 0, revenue: 0 }
         current.qty += item.qty
@@ -567,8 +681,8 @@ export function StoreProvider({ children }) {
     const bestProducts = [...productSales.values()].sort((a, b) => b.revenue - a.revenue).slice(0, 5)
     return {
       revenue,
-      ordersCount: activeOrders.length,
-      avgOrder: activeOrders.length ? revenue / activeOrders.length : 0,
+      ordersCount: paidOrders.length,
+      avgOrder: paidOrders.length ? revenue / paidOrders.length : 0,
       units,
       lowStock,
       bestProducts,
@@ -582,6 +696,8 @@ export function StoreProvider({ children }) {
     setAgeVerified,
     cookiesChoice,
     setCookiesChoice,
+    reviewsChoice,
+    setReviewsChoice,
     supabaseEnabled: isSupabaseConfigured,
     adminSession,
     adminUser: adminSession?.user || null,
@@ -601,6 +717,7 @@ export function StoreProvider({ children }) {
     cartDetailed,
     cartCount,
     addToCart,
+    addItemsToCart,
     updateQty,
     removeItem,
     clearCart,
