@@ -33,7 +33,7 @@ let md = `# THEKLOPE - Full Database & Specifications
 ## 3. Tarifs, Lots et Codes Promotionnels
 - **Code promo BIENVENUE** : -15% sur la première commande.
 - **Code promo THEKLOPE10** : -10% sur l'ensemble du panier.
-- **Code promo PACK15** : -15% sur les packs complets et les lots compatibles Frequently Bought Together.
+- **Code promo PACK15** : -15% sur une composition complète éligible avec matériel, accessoire et e-liquide.
 - **Livraison gratuite** : Offerte dès 49€ d'achat en France métropolitaine.
 - **Calculateur DIY** : Outil en ligne disponible sur ${BASE_URL}/calculette-diy pour formuler les proportions (base, booster, arômes).
 

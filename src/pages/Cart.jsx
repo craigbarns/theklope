@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import { featuredProducts } from '../data/catalog.js'
 import ProductImage from '../components/ProductImage.jsx'
 import BundleProgress from '../components/BundleProgress.jsx'
+import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
@@ -14,13 +15,9 @@ export default function Cart() {
   const [code, setCode] = useState('')
   const [feedback, setFeedback] = useState(null)
 
-  // Cross-sell : consommables/accessoires en stock, absents du panier.
+  // Produits associés choisis manuellement, en stock et absents du panier.
   const suggestions = useMemo(() => {
-    const inCart = new Set(cartDetailed.map((i) => i.product.id))
-    const complementary = products.filter(
-      (p) => !inCart.has(p.id) && p.stock > 0 && ['accessoire', 'eliquide'].includes(p.category),
-    )
-    return complementary.slice(0, 4)
+    return resolveCartRelatedProducts(cartDetailed, products).slice(0, 4)
   }, [products, cartDetailed])
 
   const submitPromo = (e) => {

@@ -13,7 +13,8 @@ Supabase simplement authentifie n'a aucun droit d'administration.
    tout compte inconnu avant de continuer.
 3. Executer les migrations suivantes, dans l'ordre, depuis le SQL Editor :
    `migrations/202607130001_lock_down_admin_access.sql`, puis
-   `migrations/202607130002_add_api_rate_limits.sql`.
+   `migrations/202607130002_add_api_rate_limits.sql`, puis
+   `migrations/202607150003_add_product_related_ids.sql`.
 4. Ajouter uniquement le compte proprietaire a l'allowlist, en remplacant
    l'adresse ci-dessous :
 

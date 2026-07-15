@@ -44,6 +44,7 @@ export async function loadProducts() {
           specs: row.specs,
           images: row.images,
           image: row.image,
+          relatedProductIds: row.related_product_ids || [],
           createdAt: row.created_at,
           updatedAt: row.updated_at,
         }))
