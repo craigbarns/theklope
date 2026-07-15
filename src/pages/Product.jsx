@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY, STORE_REVIEW_SNIPPETS } from '../data/reviews.js'
@@ -11,6 +11,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
+import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import {
   IconHeart,
   IconCart,
@@ -24,7 +25,7 @@ import {
 
 export default function Product() {
   const { id } = useParams()
-  const { products, cart, getProduct, addToCart, addItemsToCart, toggleFavorite, isFavorite, cookiesChoice } = useStore()
+  const { products, cart, getProduct, addToCart, toggleFavorite, isFavorite, cookiesChoice } = useStore()
   const product = getProduct(id)
 
   const [activeImg, setActiveImg] = useState(0)
@@ -37,10 +38,7 @@ export default function Product() {
   const [addError, setAddError] = useState('')
   const trackedProductRef = useRef(null)
 
-  const similar = useMemo(() => {
-    if (!product) return []
-    return products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
-  }, [product, products])
+  const relatedProducts = useMemo(() => resolveRelatedProducts(product, products), [product, products])
 
   const productSchema = useMemo(() => {
     if (!product) return null
@@ -135,8 +133,6 @@ export default function Product() {
     }
   }, [cookiesChoice, product])
 
-  const [selectedBundleIds, setSelectedBundleIds] = useState([])
-
   // Compte à rebours d'expédition (limite 14h00)
   const shippingCountdown = useMemo(() => {
     const now = new Date()
@@ -151,42 +147,6 @@ export default function Product() {
     }
     return `Commandez maintenant pour une expédition dès demain (ou lundi) !`
   }, [])
-
-  // Lot d'achat groupé compatible (Frequently Bought Together)
-  const bundleItems = useMemo(() => {
-    if (!product || !['ecig', 'pod'].includes(product.category)) return []
-
-    // Trouver un accessoire compatible (résistance de la marque ou accessoire générique)
-    const brandAccessory = products.find(
-      (p) => p.category === 'accessoire' && p.stock > 0 && p.brand.toLowerCase() === product.brand.toLowerCase()
-    )
-    const fallbackAccessory = products.find((p) => p.category === 'accessoire' && p.stock > 0 && p.id !== product.id)
-    const accessory = brandAccessory || fallbackAccessory
-
-    // Trouver un e-liquide
-    const eliquid = products.find((p) => p.category === 'eliquide' && p.stock > 0)
-
-    return [accessory, eliquid].filter(Boolean)
-  }, [product, products])
-
-  // Initialiser les éléments cochés du lot
-  useEffect(() => {
-    if (bundleItems.length) {
-      setSelectedBundleIds(bundleItems.map((item) => item.id))
-    } else {
-      setSelectedBundleIds([])
-    }
-  }, [bundleItems])
-
-  const bundleTotalPrice = useMemo(() => {
-    if (!product) return 0
-    let total = product.price
-    selectedBundleIds.forEach((id) => {
-      const p = products.find((item) => item.id === id)
-      if (p) total += p.price
-    })
-    return total
-  }, [product, selectedBundleIds, products])
 
   const cartProductQty = product
     ? cart.reduce(
@@ -228,35 +188,6 @@ export default function Product() {
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
     return true
-  }
-
-  const handleAddBundle = () => {
-    if (outOfStock) return
-    const selectedItems = selectedBundleIds
-      .map((id) => products.find((item) => item.id === id))
-      .filter(Boolean)
-    const mainVariant = {}
-    if (color) mainVariant.color = color
-    if (flavor) mainVariant.flavor = flavor
-    if (nicotine != null) mainVariant.nicotine = nicotine
-    if (ohm != null) mainVariant.ohm = ohm
-    const entries = [{ productId: product.id, qty: 1, variant: mainVariant }]
-    selectedItems.forEach((item) => {
-      const variant = {}
-      if (item.colors?.length) variant.color = item.colors[0]
-      if (item.flavors?.length) variant.flavor = item.flavors[0]
-      if (item.nicotine?.length) variant.nicotine = item.nicotine[0]
-      if (item.ohmOptions?.length) variant.ohm = item.ohmOptions[0]
-      entries.push({ productId: item.id, qty: 1, variant })
-    })
-
-    if (!addItemsToCart(entries)) {
-      setAddError("Le stock d'un article du lot a évolué. Le panier n'a pas été modifié.")
-      return
-    }
-    setAddError('')
-    setAdded(true)
-    setTimeout(() => setAdded(false), 2000)
   }
 
   return (
@@ -420,73 +351,6 @@ export default function Product() {
               <Reassure icon={IconShield} text="Vente réservée aux +18" />
             </div>
 
-            {bundleItems.length > 0 && (
-              <div className="mt-8 border-t border-white/10 pt-6">
-                <h2 className="font-display text-base font-bold text-white mb-4">Acheter les indispensables compatibles</h2>
-                <div className="space-y-3">
-                  {/* Article principal (toujours présent et coché) */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded border border-neon bg-neon text-noir">
-                      <IconCheck width={12} height={12} />
-                    </div>
-                    <span className="text-xs text-ash/80">
-                      <strong>Cet article :</strong> {product.name} ({formatPrice(product.price)})
-                    </span>
-                  </div>
-
-                  {/* Articles du bundle */}
-                  {bundleItems.map((item) => {
-                    const isChecked = selectedBundleIds.includes(item.id)
-                    return (
-                      <div key={item.id} className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setSelectedBundleIds((prev) =>
-                              prev.includes(item.id)
-                                ? prev.filter((id) => id !== item.id)
-                                : [...prev, item.id]
-                            )
-                          }
-                          className={`grid h-5 w-5 place-items-center rounded border transition ${
-                            isChecked ? 'border-neon bg-neon text-noir' : 'border-white/25 hover:border-white/40'
-                          }`}
-                        >
-                          {isChecked && <IconCheck width={12} height={12} />}
-                        </button>
-                        <span className="text-xs text-ash/80">
-                          <strong>{item.category === 'accessoire' ? 'Consommable' : 'E-liquide'} conseillé :</strong>{' '}
-                          <Link to={`/produit/${item.id}`} className="hover:text-neon text-white font-medium">
-                            {item.name}
-                          </Link>{' '}
-                          ({formatPrice(item.price)})
-                        </span>
-                      </div>
-                    )
-                  })}
-                </div>
-
-                <div className="mt-5 rounded-2xl bg-white/[0.02] border border-white/8 p-4">
-                  <div className="flex items-baseline justify-between">
-                    <div>
-                      <p className="text-xs text-muted">Prix total du lot :</p>
-                      <p className="font-display text-lg font-bold text-white mt-0.5">{formatPrice(bundleTotalPrice)}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={handleAddBundle}
-                      className="btn-ghost text-xs px-5 py-2 min-h-0 text-neon hover:bg-neon hover:text-noir"
-                    >
-                      Ajouter le lot au panier
-                    </button>
-                  </div>
-                  <p className="mt-2 text-[10px] text-neon/80">
-                    💡 Astuce : Utilisez le code <strong className="font-bold underline">PACK15</strong> au panier pour obtenir -15% sur ce lot !
-                  </p>
-                </div>
-              </div>
-            )}
-
             {hasNicotine && (
               <p className="mt-4 rounded-xl border border-amber-400/20 bg-amber-400/5 px-3 py-2.5 text-xs leading-relaxed text-ash/70">
                 <strong className="text-ash/80">Avertissement —</strong> Produit contenant de la nicotine, substance
@@ -551,12 +415,12 @@ export default function Product() {
           </div>
         </div>
 
-        {/* Similaires */}
-        {similar.length > 0 && (
+        {/* Produits associés choisis dans l'administration */}
+        {relatedProducts.length > 0 && (
           <div className="mt-16">
-            <h2 className="mb-6 font-display text-2xl font-bold text-white">Produits similaires</h2>
+            <h2 className="mb-6 font-display text-2xl font-bold text-white">Produits associés</h2>
             <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-              {similar.map((p) => (
+              {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
             </div>

@@ -4,6 +4,7 @@ import { featuredProducts } from '../data/catalog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
+import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
 export default function CartDrawer() {
@@ -12,12 +13,9 @@ export default function CartDrawer() {
   const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
   const freeShippingPct = Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))
 
-  // Cross-sell : consommables/accessoires en stock, absents du panier
+  // Produits associés choisis manuellement, en stock et absents du panier.
   const crossSellSuggestions = useMemo(() => {
-    const inCart = new Set(cartDetailed.map((i) => i.product.id))
-    return products
-      .filter((p) => !inCart.has(p.id) && p.stock > 0 && ['accessoire', 'eliquide'].includes(p.category))
-      .slice(0, 3)
+    return resolveCartRelatedProducts(cartDetailed, products).slice(0, 3)
   }, [products, cartDetailed])
 
   // Inspiration : meilleures ventes si le panier est vide

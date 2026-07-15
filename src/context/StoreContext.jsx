@@ -13,6 +13,7 @@ import {
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { buildCartAddition } from '../lib/cart.js'
 import { getPaidOrders } from '../lib/dashboard.js'
+import { normalizeRelatedProductIds, removeProductAndReferences } from '../lib/relatedProducts.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -101,6 +102,7 @@ const normalizeProduct = (product) => {
     specs: product.specs && typeof product.specs === 'object' ? product.specs : {},
     images: images.length ? images : [image],
     image,
+    relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, id),
   })
 }
 
@@ -127,6 +129,7 @@ const productToRow = (product) => ({
   specs: product.specs,
   images: product.images,
   image: product.image,
+  related_product_ids: product.relatedProductIds || [],
 })
 
 const productFromRow = (row) =>
@@ -153,6 +156,7 @@ const productFromRow = (row) =>
     specs: row.specs,
     images: row.images,
     image: row.image,
+    relatedProductIds: row.related_product_ids,
   })
 
 const orderFromRow = (row) => ({
@@ -422,14 +426,18 @@ export function StoreProvider({ children }) {
       const { error } = await sb.from('products').delete().eq('id', productId)
       if (error) throw error
     }
-    setProducts((prev) => prev.filter((p) => p.id !== productId))
+    setProducts((prev) => removeProductAndReferences(prev, productId))
     setCart((prev) => prev.filter((item) => item.productId !== productId))
     setFavorites((prev) => prev.filter((id) => id !== productId))
   }, [adminSession])
 
   const resetProducts = useCallback(async () => {
     const catalog = await loadStaticCatalog()
-    const defaults = catalog.map(normalizeProduct)
+    const relatedIdsByProduct = new Map(products.map((product) => [product.id, product.relatedProductIds || []]))
+    const defaults = catalog.map((product) => normalizeProduct({
+      ...product,
+      relatedProductIds: relatedIdsByProduct.get(product.id) || [],
+    }))
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
@@ -437,7 +445,7 @@ export function StoreProvider({ children }) {
       if (error) throw error
     }
     setProducts(defaults)
-  }, [adminSession])
+  }, [adminSession, products])
 
   const clearAllProducts = useCallback(async () => {
     if (isSupabaseConfigured) {

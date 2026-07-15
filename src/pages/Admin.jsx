@@ -6,12 +6,19 @@ import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
 import GalleryUploader from '../components/GalleryUploader.jsx'
 import {
+  addRelatedProductId,
+  normalizeRelatedProductIds,
+  removeRelatedProductId,
+  searchRelatedProducts,
+} from '../lib/relatedProducts.js'
+import {
   IconArrowRight,
   IconBolt,
   IconCart,
   IconCheck,
   IconClose,
   IconPlus,
+  IconSearch,
   IconShield,
   IconTrash,
   IconUser,
@@ -46,6 +53,7 @@ const emptyProduct = {
   short: '',
   long: '',
   specsText: 'Origine: France\nConformité: Produit à valider',
+  relatedProductIds: [],
 }
 
 const statusLabel = Object.fromEntries(ORDER_STATUSES.map((status) => [status.value, status.label]))
@@ -403,7 +411,7 @@ function Overview({ dashboard, orders, products }) {
 function ProductsPanel({ products, allProducts, catalogMeta, editing, query, setEditing, setQuery, onDelete, onSave }) {
   return (
     <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_440px]">
-      <section className="card p-5 sm:p-6">
+      <section className="card min-w-0 p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="eyebrow mb-2">Catalogue</p>
@@ -476,6 +484,7 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
         key={editing?.id || 'new-product'}
         product={editing}
         catalogMeta={catalogMeta}
+        products={allProducts}
         onCancel={() => setEditing(null)}
         onSave={onSave}
       />
@@ -483,7 +492,7 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
   )
 }
 
-function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
+function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   const [form, setForm] = useState(product || emptyProduct)
 
   useEffect(() => setForm(product || emptyProduct), [product])
@@ -518,12 +527,13 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
       images: imageList.length ? imageList : [image],
       oldPrice: form.oldPrice || null,
       badge: form.badge || null,
+      relatedProductIds: normalizeRelatedProductIds(form.relatedProductIds, form.id),
       specs: parseSpecs(form.specsText),
     })
   }
 
   return (
-    <aside className="card sticky top-24 self-start p-5 sm:p-6">
+    <aside className="card min-w-0 sticky top-24 self-start p-5 sm:p-6">
       <form onSubmit={submit}>
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
@@ -578,6 +588,13 @@ function ProductEditor({ product, catalogMeta, onCancel, onSave }) {
               ))}
             </select>
           </label>
+
+          <RelatedProductsPicker
+            products={products}
+            currentProductId={form.id}
+            value={form.relatedProductIds}
+            onChange={(relatedProductIds) => setForm((prev) => ({ ...prev, relatedProductIds }))}
+          />
 
           <ImageUploader
             value={form.image}
@@ -852,6 +869,113 @@ function EmptyState({ title, text, compact = false }) {
   )
 }
 
+function RelatedProductsPicker({ products, currentProductId, value, onChange }) {
+  const [query, setQuery] = useState('')
+  const [resultLimit, setResultLimit] = useState(12)
+  const selectedIds = normalizeRelatedProductIds(value, currentProductId)
+  const productsById = useMemo(() => new Map(products.map((product) => [product.id, product])), [products])
+  const matchingProducts = useMemo(
+    () => searchRelatedProducts({ products, query, currentProductId, selectedIds }),
+    [products, query, currentProductId, selectedIds],
+  )
+  const results = matchingProducts.slice(0, resultLimit)
+  const hasQuery = Boolean(query.trim())
+
+  return (
+    <div className="border-y border-white/10 py-4">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-xs font-medium text-muted">Produits associés</span>
+        <span className="text-xs font-semibold text-neon">{selectedIds.length} sélectionné{selectedIds.length > 1 ? 's' : ''}</span>
+      </div>
+
+      <div className="mt-3 space-y-2">
+        {selectedIds.map((id) => {
+          const selectedProduct = productsById.get(id)
+          return (
+            <div key={id} className="flex min-w-0 items-center gap-3 border-b border-white/8 pb-2 last:border-b-0 last:pb-0">
+              {selectedProduct ? (
+                <img src={selectedProduct.image} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+              ) : (
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-white/5 text-xs text-faint">?</div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white">{selectedProduct?.name || id}</p>
+                <p className="truncate text-xs text-faint">
+                  {selectedProduct ? `${selectedProduct.brand} · ${selectedProduct.type}` : 'Référence introuvable'}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange(removeRelatedProductId(selectedIds, id, currentProductId))}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/10 text-faint hover:border-rose-400/40 hover:text-rose-400"
+                aria-label={`Retirer ${selectedProduct?.name || id}`}
+                title="Retirer"
+              >
+                <IconTrash width={15} height={15} />
+              </button>
+            </div>
+          )
+        })}
+        {!selectedIds.length && <p className="py-1 text-sm text-faint">Aucun produit associé.</p>}
+      </div>
+
+      <label className="relative mt-4 block">
+        <span className="sr-only">Rechercher un produit à associer</span>
+        <IconSearch width={16} height={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint" />
+        <input
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value)
+            setResultLimit(12)
+          }}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') event.preventDefault()
+          }}
+          className="input pl-9"
+          placeholder="Rechercher nom, marque ou référence..."
+          autoComplete="off"
+        />
+      </label>
+
+      {hasQuery && (
+        <div className="mt-3 max-h-64 space-y-2 overflow-y-auto pr-1">
+          {results.map((result) => (
+            <div key={result.id} className="flex min-w-0 items-center gap-3 border-b border-white/8 pb-2 last:border-b-0 last:pb-0">
+              <img src={result.image} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-white">{result.name}</p>
+                <p className="truncate text-xs text-faint">{result.brand} · {result.id}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  onChange(addRelatedProductId(selectedIds, result.id, currentProductId))
+                  setQuery('')
+                }}
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-neon/30 text-neon hover:bg-neon hover:text-noir"
+                aria-label={`Associer ${result.name}`}
+                title="Associer"
+              >
+                <IconPlus width={15} height={15} />
+              </button>
+            </div>
+          ))}
+          {!results.length && <p className="py-2 text-sm text-faint">Aucun produit trouvé.</p>}
+          {matchingProducts.length > results.length && (
+            <button
+              type="button"
+              onClick={() => setResultLimit((current) => current + 12)}
+              className="btn-ghost min-h-0 w-full px-4 py-2 text-xs"
+            >
+              <IconPlus width={15} height={15} /> Afficher plus
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function toFormProduct(product) {
   return {
     ...product,
@@ -862,6 +986,7 @@ function toFormProduct(product) {
     flavors: (product.flavors || []).join(', '),
     colors: (product.colors || []).join(', '),
     ohmOptions: (product.ohmOptions || []).join(', '),
+    relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, product.id),
     specsText: Object.entries(product.specs || {}).map(([key, value]) => `${key}: ${value}`).join('\n'),
   }
 }
