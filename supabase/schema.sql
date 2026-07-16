@@ -29,7 +29,7 @@ create table if not exists public.products (
   updated_at timestamptz not null default now()
 );
 
--- Migration : volume (10ml/50ml, pour les remises auto) + ohm (résistances).
+-- Migration : volume (10ml/50ml/100ml, pour les remises auto) + ohm (résistances).
 alter table public.products add column if not exists volume text;
 alter table public.products add column if not exists ohm text;
 -- Migration : ohm_options (valeurs Ω sélectionnables par le client sur les résistances).

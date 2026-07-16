@@ -28,7 +28,8 @@ const PACK_CONSUMABLE_CATEGORIES = ['accessoire', 'resistance']
 // -----------------------------------------------------------------------------
 // Remises automatiques par marque / volume (e-liquides uniquement).
 //   - Paliers « 10ml » : X e-liquides 10ml de certaines marques → prix de lot fixe.
-//   - Palier « 50ml »  : à partir de N e-liquides 50ml, TOUTES marques → % de remise.
+//   - Paliers « 50ml / 100ml » : à partir de N e-liquides du même volume,
+//     TOUTES marques → % de remise.
 // Les marques sont comparées en minuscules/sans espaces superflus.
 // -----------------------------------------------------------------------------
 export const BUNDLE_TIERS_10ML = [
@@ -36,6 +37,8 @@ export const BUNDLE_TIERS_10ML = [
   { key: 'B', brands: ['alfaliquid', 'pulp'], packSize: 20, packPrice: 88.5, label: '20 e-liquides Alfaliquid / Pulp', progressLabel: 'Alfaliquid / Pulp', promoLabel: '-25%' },
 ]
 export const BUNDLE_50ML = {
+  key: '50ml',
+  volume: '50ml',
   // Toutes marques confondues (contrairement aux paliers 10ml, réservés aux 4 marques).
   minQty: 4,
   rate: 0.25,
@@ -43,12 +46,22 @@ export const BUNDLE_50ML = {
   progressLabel: 'en 50ml (toutes marques)',
   promoLabel: '-25%',
 }
+export const BUNDLE_100ML = {
+  key: '100ml',
+  volume: '100ml',
+  minQty: BUNDLE_50ML.minQty,
+  rate: BUNDLE_50ML.rate,
+  label: '4 e-liquides 100ml ou +',
+  progressLabel: 'en 100ml (toutes marques)',
+  promoLabel: BUNDLE_50ML.promoLabel,
+}
+export const BUNDLE_VOLUME_TIERS = [BUNDLE_50ML, BUNDLE_100ML]
 
 const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100
 const normBrand = (b) => String(b || '').trim().toLowerCase()
 const normVolume = (v) => String(v || '').trim().toLowerCase().replace(/\s+/g, '')
 const is10ml = (l) => normVolume(l.volume) === '10ml'
-const is50ml = (l) => normVolume(l.volume) === '50ml'
+const isVolume = (l, volume) => normVolume(l.volume) === volume
 const isEliquid = (l) => (l.category || 'eliquide') === 'eliquide'
 
 // Volume effectif d'un produit pour les remises : champ `volume` s'il est
@@ -57,10 +70,16 @@ const isEliquid = (l) => (l.category || 'eliquide') === 'eliquide'
 // aucune remise dégressive ne se déclencherait. Utilisé CÔTÉ CLIENT ET SERVEUR.
 export const resolveVolume = (p = {}) => {
   const raw = p?.volume || p?.specs?.Contenance || p?.specs?.contenance || ''
-  const n = normVolume(raw)
-  if (n.includes('50ml')) return '50ml'
-  if (n.includes('10ml')) return '10ml'
-  return n
+  const detected = [...String(raw).matchAll(/(\d+(?:[.,]\d+)?)\s*ml\b/gi)]
+    .map((match) => Number(match[1].replace(',', '.')))
+    .filter(Number.isFinite)
+    .map((value) => `${value}ml`)
+  const unique = [...new Set(detected)]
+
+  // Une seule contenance explicite peut piloter une remise. Une chaîne ambiguë
+  // comme « 50ml / 100ml » reste non éligible plutôt que d'appliquer un palier
+  // au hasard. Cela évite aussi de confondre 150ml ou 250ml avec 50ml.
+  return unique.length === 1 ? unique[0] : normVolume(raw)
 }
 
 export const getShippingMethod = (id) =>
@@ -128,15 +147,17 @@ export function computeAutoDiscount(lines = []) {
     }
   }
 
-  // Palier 50ml (% de remise à partir de minQty)
-  const fifty = lines.filter((l) => isEliquid(l) && is50ml(l))
-  const units50 = fifty.reduce((s, l) => s + (Number(l.qty) || 0), 0)
-  if (units50 >= BUNDLE_50ML.minQty) {
-    const sum50 = round2(fifty.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0))
-    const saved = round2(sum50 * BUNDLE_50ML.rate)
+  // Paliers 50ml et 100ml : même seuil et même taux, calculés séparément afin
+  // qu'un panier doive atteindre quatre flacons dans le format concerné.
+  for (const tier of BUNDLE_VOLUME_TIERS) {
+    const eligible = lines.filter((l) => isEliquid(l) && isVolume(l, tier.volume))
+    const units = eligible.reduce((s, l) => s + (Number(l.qty) || 0), 0)
+    if (units < tier.minQty) continue
+    const sumNormal = round2(eligible.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0))
+    const saved = round2(sumNormal * tier.rate)
     if (saved > 0) {
       total += saved
-      details.push({ key: '50ml', label: BUNDLE_50ML.label, amount: saved })
+      details.push({ key: tier.key, label: tier.label, amount: saved })
     }
   }
 
@@ -165,18 +186,20 @@ export function computeBundleProgress(lines = []) {
     }
   }
 
-  const units50 = lines
-    .filter((l) => isEliquid(l) && is50ml(l))
-    .reduce((s, l) => s + (Number(l.qty) || 0), 0)
-  if (units50 > 0 && units50 < BUNDLE_50ML.minQty) {
-    hints.push({
-      key: '50ml',
-      progressLabel: BUNDLE_50ML.progressLabel,
-      promoLabel: BUNDLE_50ML.promoLabel,
-      current: units50,
-      target: BUNDLE_50ML.minQty,
-      remaining: BUNDLE_50ML.minQty - units50,
-    })
+  for (const tier of BUNDLE_VOLUME_TIERS) {
+    const units = lines
+      .filter((l) => isEliquid(l) && isVolume(l, tier.volume))
+      .reduce((s, l) => s + (Number(l.qty) || 0), 0)
+    if (units > 0 && units < tier.minQty) {
+      hints.push({
+        key: tier.key,
+        progressLabel: tier.progressLabel,
+        promoLabel: tier.promoLabel,
+        current: units,
+        target: tier.minQty,
+        remaining: tier.minQty - units,
+      })
+    }
   }
 
   return hints

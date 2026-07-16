@@ -618,6 +618,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
                 <option value="">—</option>
                 <option value="10ml">10 ml</option>
                 <option value="50ml">50 ml</option>
+                <option value="100ml">100 ml</option>
               </select>
             </label>
             <Field label="Ohm (résistance)" value={form.ohm || ''} onChange={update('ohm')} placeholder="0.8Ω, 1.2Ω…" />
