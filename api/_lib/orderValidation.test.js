@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
+import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
 
 import {
   aggregateQuantities,
@@ -48,9 +49,10 @@ test('quantities are strict and aggregate across variant lines', () => {
 })
 
 test('pickup works without an address and uses the store address', () => {
-  const result = validateFulfillment('pickup', {})
+  const result = validateFulfillment('pickup', { deliveryInstructions: { malicious: true } })
   assert.equal(result.ok, true)
   assert.equal(result.address.zip, '13006')
+  assert.equal('deliveryInstructions' in result.address, false)
   assert.equal(validateFulfillment('pickup', null).ok, true)
 })
 
@@ -61,4 +63,32 @@ test('courier is restricted to Marseille and postal shipping to France', () => {
   assert.equal(validateFulfillment('poste', { ...marseille, country: 'Belgique' }).ok, false)
   assert.equal(validateFulfillment('poste', null).ok, false)
   assert.equal(validateFulfillment('unknown', marseille).ok, false)
+})
+
+test('delivery instructions are optional, trimmed and keep intentional line breaks', () => {
+  const address = { street: '1 rue Test', zip: '13016', city: 'Marseille', country: 'France' }
+  const empty = validateFulfillment('poste', address)
+  assert.equal(empty.ok, true)
+  assert.equal(empty.address.deliveryInstructions, '')
+
+  const result = validateFulfillment('coursier', {
+    ...address,
+    deliveryInstructions: '  3e étage\r\nInterphone Dupont\nAppeler à l’arrivée  ',
+  })
+  assert.equal(result.ok, true)
+  assert.equal(result.address.deliveryInstructions, '3e étage\nInterphone Dupont\nAppeler à l’arrivée')
+})
+
+test('delivery instructions reject invalid types and excessive content', () => {
+  const address = { street: '1 rue Test', zip: '13016', city: 'Marseille', country: 'France' }
+  const exactLimit = validateFulfillment('poste', {
+    ...address,
+    deliveryInstructions: 'a'.repeat(MAX_DELIVERY_INSTRUCTIONS_LENGTH),
+  })
+  assert.equal(exactLimit.ok, true)
+  assert.equal(exactLimit.address.deliveryInstructions.length, MAX_DELIVERY_INSTRUCTIONS_LENGTH)
+
+  assert.equal(validateFulfillment('poste', { ...address, deliveryInstructions: 'a'.repeat(MAX_DELIVERY_INSTRUCTIONS_LENGTH + 1) }).ok, false)
+  assert.equal(validateFulfillment('poste', { ...address, deliveryInstructions: { floor: 3 } }).ok, false)
+  assert.equal(validateFulfillment('poste', { ...address, deliveryInstructions: ['3e étage'] }).ok, false)
 })

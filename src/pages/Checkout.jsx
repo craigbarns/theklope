@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconLock, IconCheck, IconTruck, IconBolt } from '../components/icons.jsx'
 import { SHIPPING_METHODS as SHARED_SHIPPING_METHODS } from '../lib/pricing.js'
+import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../lib/delivery.js'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 
 // Méthodes de livraison : prix/labels viennent du module partagé (source de
@@ -42,7 +43,14 @@ export default function Checkout() {
     }
   }, [cartDetailed, cookiesChoice, grandTotal, promo?.code])
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
-  const [address, setAddress] = useState({ street: '', extra: '', zip: '', city: '', country: 'France' })
+  const [address, setAddress] = useState({
+    street: '',
+    extra: '',
+    zip: '',
+    city: '',
+    country: 'France',
+    deliveryInstructions: '',
+  })
   const [ageAccepted, setAgeAccepted] = useState(false)
   const cleanPostcode = address.zip.trim()
   const isFrenchPostcode = FRENCH_POSTCODE.test(cleanPostcode)
@@ -224,7 +232,7 @@ export default function Checkout() {
                   <Section title="Adresse de livraison">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field label="Adresse" value={address.street} onChange={updateAddress('street')} required className="sm:col-span-2" autoComplete="street-address" />
-                      <Field label="Complément" value={address.extra} onChange={updateAddress('extra')} className="sm:col-span-2" />
+                      <Field label="Complément d'adresse" value={address.extra} onChange={updateAddress('extra')} className="sm:col-span-2" />
                       <Field
                         label="Code postal"
                         value={address.zip}
@@ -237,6 +245,16 @@ export default function Checkout() {
                       />
                       <Field label="Ville" value={address.city} onChange={updateAddress('city')} required autoComplete="address-level2" />
                       <Field label="Pays" value={address.country} readOnly className="sm:col-span-2" />
+                      <TextArea
+                        label="Instructions de livraison (facultatif)"
+                        value={address.deliveryInstructions}
+                        onChange={updateAddress('deliveryInstructions')}
+                        rows={4}
+                        maxLength={MAX_DELIVERY_INSTRUCTIONS_LENGTH}
+                        placeholder="Ex. : 3e étage, digicode 1234, nom sur l'interphone, appeler le 06… à l'arrivée."
+                        hint={`Étage, accès, interphone ou numéro à contacter · ${address.deliveryInstructions.length}/${MAX_DELIVERY_INSTRUCTIONS_LENGTH} caractères`}
+                        className="sm:col-span-2"
+                      />
                     </div>
                     {shipping === 'coursier' && (
                       <p className={`mt-3 text-xs ${isMarseillePostcode ? 'text-neon' : 'text-muted'}`}>
@@ -264,6 +282,14 @@ export default function Checkout() {
                     <span className="text-muted">Livraison</span>
                     <span className="break-words text-white sm:text-right">{selectedShipping.label} — {selectedShipping.detail}</span>
                   </div>
+                  {shipping !== 'pickup' && address.deliveryInstructions.trim() && (
+                    <div className="grid gap-1 py-1 sm:grid-cols-[auto_1fr] sm:gap-4">
+                      <span className="text-muted">Instructions</span>
+                      <span className="whitespace-pre-wrap break-words text-white sm:text-right">
+                        {address.deliveryInstructions.trim()}
+                      </span>
+                    </div>
+                  )}
                   <div className="grid gap-1 py-1 sm:grid-cols-[auto_1fr] sm:gap-4">
                     <span className="text-muted">Montant à payer</span>
                     <span className="font-semibold text-white sm:text-right">{formatPrice(grandTotal)}</span>
@@ -342,6 +368,16 @@ function Field({ label, className = '', ...props }) {
     <label className={`block ${className}`}>
       <span className="mb-1.5 block text-xs font-medium text-muted">{label}</span>
       <input className="input" {...props} />
+    </label>
+  )
+}
+
+function TextArea({ label, hint, className = '', ...props }) {
+  return (
+    <label className={`block ${className}`}>
+      <span className="mb-1.5 block text-xs font-medium text-muted">{label}</span>
+      <textarea className="input min-h-28 resize-y" {...props} />
+      {hint && <span className="mt-1.5 block text-xs text-faint">{hint}</span>}
     </label>
   )
 }

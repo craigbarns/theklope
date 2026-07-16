@@ -1,4 +1,5 @@
 import { SHIPPING_METHODS } from '../../src/lib/pricing.js'
+import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
 
 export const MAX_CART_LINES = 100
 export const MAX_LINE_QUANTITY = 100
@@ -12,6 +13,22 @@ const VARIANT_FIELDS = [
 
 const comparable = (value) => String(value ?? '').trim().toLocaleLowerCase('fr-FR')
 const compact = (value, max = 220) => String(value ?? '').trim().slice(0, max)
+
+function normalizeDeliveryInstructions(value) {
+  if (value === undefined || value === null || value === '') return { ok: true, value: '' }
+  if (typeof value !== 'string') {
+    return { ok: false, error: 'Les instructions de livraison doivent être du texte.' }
+  }
+
+  const normalized = value.replace(/\r\n?/g, '\n').replace(/\u0000/g, '').trim()
+  if (normalized.length > MAX_DELIVERY_INSTRUCTIONS_LENGTH) {
+    return {
+      ok: false,
+      error: `Les instructions de livraison sont limitées à ${MAX_DELIVERY_INSTRUCTIONS_LENGTH} caractères.`,
+    }
+  }
+  return { ok: true, value: normalized }
+}
 
 export function parseQuantity(value) {
   const qty = Number(value)
@@ -89,12 +106,16 @@ export function validateFulfillment(shippingMethodId, address = {}) {
     return { ok: false, error: 'Adresse de livraison invalide.' }
   }
 
+  const deliveryInstructions = normalizeDeliveryInstructions(address.deliveryInstructions)
+  if (!deliveryInstructions.ok) return deliveryInstructions
+
   const normalized = {
     street: compact(address.street),
     extra: compact(address.extra),
     zip: compact(address.zip, 10).replace(/\s+/g, ''),
     city: compact(address.city, 120),
     country: compact(address.country || 'France', 80),
+    deliveryInstructions: deliveryInstructions.value,
   }
   const country = comparable(normalized.country).replace(/[.\s-]/g, '')
   if (!['france', 'fr'].includes(country)) {

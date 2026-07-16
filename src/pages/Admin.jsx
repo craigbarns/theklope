@@ -665,11 +665,20 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
                     <span className="rounded-full bg-neon/10 px-3 py-1 text-xs font-semibold text-neon">{statusLabel[order.status]}</span>
                   </div>
                   <p className="mt-1 text-sm text-muted">
-                    {order.customer?.name || 'Client'} · {order.customer?.email || 'email non renseigné'} · {formatDate(order.createdAt)}
+                    {order.customer?.name || 'Client'} · {order.customer?.email || 'email non renseigné'}
+                    {order.customer?.phone ? ` · ${order.customer.phone}` : ''} · {formatDate(order.createdAt)}
                   </p>
                   <p className="mt-1 text-xs text-faint">
                     {order.address?.street}, {order.address?.zip} {order.address?.city} · {order.shipping?.label}
                   </p>
+                  {typeof order.address?.deliveryInstructions === 'string' && order.address.deliveryInstructions.trim() && (
+                    <div className="mt-3 max-w-2xl rounded-xl border border-neon/20 bg-neon/5 px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-neon">Instructions client</p>
+                      <p className="mt-1 whitespace-pre-wrap break-words text-sm leading-relaxed text-white">
+                        {order.address.deliveryInstructions}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <select

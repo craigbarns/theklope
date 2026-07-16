@@ -2,7 +2,15 @@
 // le webhook et l'endpoint de statut. Idempotent : peut être appelé plusieurs fois.
 import { mollie } from './mollie.js'
 import { supabaseAdmin, hasSupabaseAdmin } from './supabaseAdmin.js'
-import { sendEmail, emailLayout, escapeHtml, euro, FROM_CHECKOUT, INBOX_CHECKOUT } from './email.js'
+import {
+  sendEmail,
+  emailLayout,
+  escapeHtml,
+  escapeHtmlWithLineBreaks,
+  euro,
+  FROM_CHECKOUT,
+  INBOX_CHECKOUT,
+} from './email.js'
 
 // Envoie la confirmation client + la notification interne (checkout@).
 // Tolérant aux erreurs : ne doit jamais faire échouer la finalisation de commande.
@@ -32,6 +40,10 @@ async function sendOrderConfirmationEmails(orderId) {
     </table>`
   const itemsTable = `<table style="width:100%;font-size:14px">${rows}</table>${totalsHtml}`
   const addressHtml = `${escapeHtml(customer.name || '')}<br>${escapeHtml(address.street || '')} ${escapeHtml(address.extra || '')}<br>${escapeHtml(address.zip || '')} ${escapeHtml(address.city || '')} — ${escapeHtml(address.country || '')}`
+  const deliveryInstructions = typeof address.deliveryInstructions === 'string' ? address.deliveryInstructions.trim() : ''
+  const deliveryInstructionsHtml = deliveryInstructions
+    ? `<p style="font-size:13px;line-height:1.6;color:#e5e5e5;margin-top:16px"><strong style="color:#fff">Instructions de livraison :</strong><br>${escapeHtmlWithLineBreaks(deliveryInstructions)}</p>`
+    : ''
 
   // 1. Confirmation client
   if (customer.email) {
@@ -41,7 +53,7 @@ async function sendOrderConfirmationEmails(orderId) {
       subject: `Confirmation de votre commande ${order.id} — THEKLOPE`,
       html: emailLayout({
         title: 'Merci pour votre commande !',
-        bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${addressHtml}</p>`,
+        bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${addressHtml}</p>${deliveryInstructionsHtml}`,
       }),
     })
   }
@@ -54,7 +66,7 @@ async function sendOrderConfirmationEmails(orderId) {
     subject: `Nouvelle commande payée ${order.id} — ${euro(order.total)}`,
     html: emailLayout({
       title: `Commande payée ${escapeHtml(order.id)}`,
-      bodyHtml: `<p style="font-size:14px;color:#cfcfcf">Client : ${escapeHtml(customer.name || '')} — ${escapeHtml(customer.email || '')} — ${escapeHtml(customer.phone || '')}</p>${itemsTable}<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Adresse :<br>${addressHtml}</p>`,
+      bodyHtml: `<p style="font-size:14px;color:#cfcfcf">Client : ${escapeHtml(customer.name || '')} — ${escapeHtml(customer.email || '')} — ${escapeHtml(customer.phone || '')}</p>${itemsTable}<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Adresse :<br>${addressHtml}</p>${deliveryInstructionsHtml}`,
     }),
   })
 }

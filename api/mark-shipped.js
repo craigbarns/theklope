@@ -7,7 +7,7 @@
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { authenticateAdminRequest } from './_lib/adminAuth.js'
-import { sendEmail, emailLayout, escapeHtml, euro, FROM_CHECKOUT } from './_lib/email.js'
+import { sendEmail, emailLayout, escapeHtml, escapeHtmlWithLineBreaks, euro, FROM_CHECKOUT } from './_lib/email.js'
 import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 
 export default async function handler(req, res) {
@@ -72,6 +72,10 @@ export default async function handler(req, res) {
              <p style="margin:0;font-size:18px;font-weight:700;color:#35FF8A;letter-spacing:0.5px">${escapeHtml(tracking)}</p>
            </div>`
         : ''
+      const deliveryInstructions = typeof address.deliveryInstructions === 'string' ? address.deliveryInstructions.trim() : ''
+      const deliveryInstructionsBlock = deliveryInstructions
+        ? `<p style="font-size:13px;line-height:1.6;color:#e5e5e5;margin-top:16px"><strong style="color:#fff">Instructions de livraison :</strong><br>${escapeHtmlWithLineBreaks(deliveryInstructions)}</p>`
+        : ''
       try {
         await sendEmail({
           from: FROM_CHECKOUT,
@@ -82,7 +86,8 @@ export default async function handler(req, res) {
             bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Bonne nouvelle : votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> vient d'être expédiée.</p>
               ${trackingBlock}
               <table style="width:100%;font-size:14px">${items}</table>
-              <p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${escapeHtml(customer.name || '')}<br>${escapeHtml(address.street || '')} ${escapeHtml(address.extra || '')}<br>${escapeHtml(address.zip || '')} ${escapeHtml(address.city || '')}</p>`,
+              <p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${escapeHtml(customer.name || '')}<br>${escapeHtml(address.street || '')} ${escapeHtml(address.extra || '')}<br>${escapeHtml(address.zip || '')} ${escapeHtml(address.city || '')}</p>
+              ${deliveryInstructionsBlock}`,
           }),
         })
       } catch (mailErr) {

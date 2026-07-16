@@ -46,6 +46,10 @@ export const escapeHtml = (s) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
 
+// À utiliser uniquement dans du contenu HTML : on échappe d'abord le texte
+// client, puis on réintroduit des sauts de ligne maîtrisés.
+export const escapeHtmlWithLineBreaks = (s) => escapeHtml(s).replace(/\r\n?|\n/g, '<br>')
+
 export const euro = (n) =>
   new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0)
 
