@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import GoogleReviews from '../components/GoogleReviews.jsx'
 import Newsletter from '../components/Newsletter.jsx'
-import { featuredProducts } from '../data/catalog.js'
+import { featuredProducts, isResistanceProduct } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import {
   IconArrowRight,
@@ -346,7 +346,7 @@ function catThumb(key, products = []) {
   const map = {
     ecig: products.find((p) => p.category === 'ecig'),
     eliquide: products.find((p) => p.category === 'eliquide'),
-    resistance: products.find((p) => p.category === 'accessoire' && /\b(r[eé]sistance|mesh|coil|bvc|nautilus|ito|gti)\b/i.test(p.name)),
+    resistance: products.find(isResistanceProduct),
     accessoire: products.find((p) => p.category === 'accessoire'),
     'alternative-puff': products.find((p) => p.category === 'pod') || products.find((p) => p.category === 'ecig'),
   }

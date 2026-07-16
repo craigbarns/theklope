@@ -23,6 +23,8 @@ export const PROMO_CODES = {
   PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure', eligibility: 'complete-pack' },
 }
 
+const PACK_CONSUMABLE_CATEGORIES = ['accessoire', 'resistance']
+
 // -----------------------------------------------------------------------------
 // Remises automatiques par marque / volume (e-liquides uniquement).
 //   - Paliers « 10ml » : X e-liquides 10ml de certaines marques → prix de lot fixe.
@@ -70,13 +72,13 @@ export const normalizePromo = (code) => {
 }
 
 // PACK15 est reserve aux compositions qui contiennent reellement les trois
-// familles du configurateur : appareil, reservoir/accessoire et e-liquide.
+// familles du configurateur : appareil, resistance/accessoire et e-liquide.
 // Cette verification est partagee par le navigateur et l'API de paiement.
 export const isCompletePack = (lines = []) => {
   const active = lines.filter((line) => Number(line?.qty) > 0)
   return (
     active.some((line) => ['ecig', 'pod'].includes(line.category)) &&
-    active.some((line) => line.category === 'accessoire') &&
+    active.some((line) => PACK_CONSUMABLE_CATEGORIES.includes(line.category)) &&
     active.some((line) => line.category === 'eliquide')
   )
 }
@@ -92,7 +94,7 @@ export const getCompletePackSubtotal = (lines = []) => {
   if (!isCompletePack(active)) return 0
   return round2(
     highestPrice(['ecig', 'pod'])
-      + highestPrice(['accessoire'])
+      + highestPrice(PACK_CONSUMABLE_CATEGORIES)
       + highestPrice(['eliquide']),
   )
 }

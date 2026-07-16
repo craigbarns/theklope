@@ -36,8 +36,10 @@ const normalizedProductText = (p = {}) =>
   [p.name, p.brand, p.type, p.description, ...(p.flavors || [])].filter(Boolean).join(' ').toLowerCase()
 
 export const isResistanceProduct = (p = {}) => {
+  if (p.category === 'resistance') return true
   if (p.category !== 'accessoire') return false
-  return /\b(r[eé]sistance|mesh|coil|bvc|nautilus|ito|gti)\b/i.test(normalizedProductText(p))
+  const resistanceText = [normalizedProductText(p), p.image, ...(p.images || [])].filter(Boolean).join(' ')
+  return /\b(r[eé]sistances?|cartouches?|mesh|coils?|bvc|nautilus|ito|gti|pnp|tpp|gt\s*core)\b/i.test(resistanceText)
 }
 
 export const isAlternativePuffProduct = (p = {}) => {

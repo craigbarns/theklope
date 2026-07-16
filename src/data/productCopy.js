@@ -9,6 +9,7 @@ const CATEGORY_LABELS = {
   ecig: 'cigarette électronique',
   pod: 'pod rechargeable',
   eliquide: 'e-liquide',
+  resistance: 'résistance ou cartouche',
   accessoire: 'accessoire',
   pack: 'pack débutant',
 }
@@ -60,6 +61,13 @@ function colorPhrase(product) {
   return `Coloris disponibles : ${list(colors)}.`
 }
 
+function ohmPhrase(product) {
+  const options = unique(product.ohmOptions || []).map((value) => `${value} Ω`)
+  if (options.length) return `Valeurs disponibles : ${list(options)}.`
+  const value = compact(product.ohm)
+  return value ? `Valeur de résistance : ${value}.` : ''
+}
+
 export function buildProductShort(product) {
   const name = compact(product.name)
   const brand = compact(product.brand) || 'THEKLOPE'
@@ -85,6 +93,11 @@ export function buildProductShort(product) {
   if (product.category === 'accessoire') {
     const compatibility = compact(specs.Compatibilité || specs.Compatibility)
     return `${name} de ${brand} est un accessoire vape${compatibility ? ` compatible ${compatibility}` : ''}, pratique pour entretenir ou compléter votre matériel.`
+  }
+
+  if (product.category === 'resistance') {
+    const compatibility = compact(specs.Compatibilité || specs.Compatibility)
+    return `${name} de ${brand} est une résistance ou cartouche de remplacement${compatibility ? ` compatible ${compatibility}` : ''}, conçue pour entretenir votre matériel de vape.`
   }
 
   if (product.category === 'pack') {
@@ -122,6 +135,14 @@ export function buildProductLong(product) {
     details.push(`${name} est un accessoire ${brand} pensé pour compléter, protéger ou entretenir votre matériel de vape.`)
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push('Il aide à garder une expérience plus régulière au quotidien, avec une référence claire à retrouver dans la boutique THEKLOPE.')
+    return details.filter(Boolean).join(' ')
+  }
+
+  if (product.category === 'resistance') {
+    details.push(`${name} est une résistance ou cartouche ${brand} destinée à remplacer un consommable usé et à conserver une vape régulière.`)
+    details.push(ohmPhrase(product))
+    details.push(specs ? `Caractéristiques : ${specs}.` : '')
+    details.push('Vérifiez la compatibilité avec votre matériel et la plage de puissance recommandée avant de choisir votre référence.')
     return details.filter(Boolean).join(' ')
   }
 

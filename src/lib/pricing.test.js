@@ -5,6 +5,7 @@ import { computeTotals, getCompletePackSubtotal, isCompletePack } from './pricin
 
 const device = { category: 'ecig', price: 40, qty: 1 }
 const accessory = { category: 'accessoire', price: 20, qty: 1 }
+const resistance = { category: 'resistance', price: 30, qty: 1 }
 const liquid = { category: 'eliquide', price: 10, qty: 1, volume: '10ml', brand: 'Other' }
 
 test('PACK15 is rejected outside a complete configured pack', () => {
@@ -23,6 +24,15 @@ test('PACK15 applies to a device, accessory and e-liquid composition', () => {
   assert.equal(totals.total, 59.5)
 })
 
+test('PACK15 accepts the canonical resistance category', () => {
+  const lines = [device, resistance, liquid]
+  assert.equal(isCompletePack(lines), true)
+  const totals = computeTotals({ lines, promoCode: 'PACK15' })
+  assert.equal(totals.promo.code, 'PACK15')
+  assert.equal(totals.discount, 12)
+  assert.equal(totals.total, 68)
+})
+
 test('regular promo codes keep working outside packs', () => {
   const totals = computeTotals({ lines: [device], promoCode: 'THEKLOPE10' })
   assert.equal(totals.discount, 4)
@@ -34,11 +44,11 @@ test('PACK15 discounts one configured pack, not extra quantities or unrelated it
     { ...device, qty: 2 },
     accessory,
     liquid,
-    { category: 'resistance', price: 30, qty: 3 },
+    { ...resistance, qty: 3 },
   ]
-  assert.equal(getCompletePackSubtotal(lines), 70)
+  assert.equal(getCompletePackSubtotal(lines), 80)
   const totals = computeTotals({ lines, promoCode: 'PACK15' })
   assert.equal(totals.subtotal, 200)
-  assert.equal(totals.discount, 10.5)
-  assert.equal(totals.total, 189.5)
+  assert.equal(totals.discount, 12)
+  assert.equal(totals.total, 188)
 })

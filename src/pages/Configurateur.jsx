@@ -5,6 +5,7 @@ import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
+import { isResistanceProduct } from '../data/catalog.js'
 
 export default function Configurateur() {
   const { products, addItemsToCart, applyPromo } = useStore()
@@ -26,14 +27,10 @@ export default function Configurateur() {
     )
   }, [products])
 
-  // 2. Filtrer les clearomiseurs (accessoires type réservoir/cartouche/pod). Si
-  // aucun ne correspond aux mots-clés, on retombe sur tous les accessoires pour
-  // ne jamais bloquer l'utilisateur avec une étape vide.
+  // 2. La catégorie resistance est canonique ; le helper conserve aussi les
+  // anciennes références encore classées comme accessoires.
   const clearomizers = useMemo(() => {
-    const accessoires = products.filter((p) => p.category === 'accessoire' && p.stock > 0)
-    const keywords = ['nautilus', 'ce5', 'apex', 'tpp', 'luxe', 'cartouche', 'pod', 'clearomiseur', 'reservoir', 'réservoir', 'resistance', 'résistance']
-    const matched = accessoires.filter((p) => keywords.some((k) => p.name.toLowerCase().includes(k)))
-    return matched.length ? matched : accessoires
+    return products.filter((p) => p.stock > 0 && isResistanceProduct(p))
   }, [products])
 
   // 3. Filtrer les e-liquides
@@ -144,7 +141,7 @@ export default function Configurateur() {
           Configurez un pack compatible
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-          Choisissez votre batterie, votre réservoir et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble !
+          Choisissez votre batterie, votre résistance ou cartouche et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble !
         </p>
       </div>
 
@@ -152,7 +149,7 @@ export default function Configurateur() {
       <div className="mx-auto max-w-3xl mt-10 mb-8 flex items-center gap-2">
         {[
           { num: 1, label: 'La Box', desc: selectedBox ? selectedBox.name : 'Choisir' },
-          { num: 2, label: 'Le Réservoir', desc: selectedClearomizer ? selectedClearomizer.name : 'Choisir' },
+          { num: 2, label: 'Résistance', desc: selectedClearomizer ? selectedClearomizer.name : 'Choisir' },
           { num: 3, label: 'Le Liquide', desc: selectedEliquid ? selectedEliquid.name : 'Choisir' },
           { num: 4, label: 'Recap', desc: 'Commander' },
         ].map((s) => (
@@ -201,7 +198,7 @@ export default function Configurateur() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={`Rechercher un ${
-                    step === 1 ? 'matériel/box' : step === 2 ? 'clearomiseur/réservoir' : 'e-liquide'
+                    step === 1 ? 'matériel/box' : step === 2 ? 'résistance/cartouche' : 'e-liquide'
                   }...`}
                   className="input flex-1 bg-white/[0.03]"
                 />
@@ -326,7 +323,7 @@ export default function Configurateur() {
                       className="h-16 w-16 object-cover bg-carbon rounded-lg p-1"
                     />
                     <div className="flex-1">
-                      <p className="text-xs text-neon uppercase font-semibold">Étape 2 · Réservoir</p>
+                      <p className="text-xs text-neon uppercase font-semibold">Étape 2 · Résistance/cartouche</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedClearomizer.name}</h3>
                       <p className="text-xs text-faint">{selectedClearomizer.brand}</p>
                     </div>
@@ -385,7 +382,7 @@ export default function Configurateur() {
               {/* Clearomizer summary line */}
               <div className="flex justify-between text-xs py-1 border-b border-white/5">
                 <span className="text-muted truncate max-w-[180px]">
-                  2. Réservoir : {selectedClearomizer ? selectedClearomizer.name : <em className="text-faint">Non choisi</em>}
+                  2. Résistance : {selectedClearomizer ? selectedClearomizer.name : <em className="text-faint">Non choisi</em>}
                 </span>
                 <span className="font-semibold text-white">
                   {selectedClearomizer ? formatPrice(clearomizerPrice) : '--'}
