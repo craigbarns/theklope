@@ -16,6 +16,7 @@
     { "source": "/fr/:path*", "destination": "/:path*", "permanent": true },
     { "source": "/contact-us", "destination": "/contact", "permanent": true },
     { "source": "/contactez-nous", "destination": "/contact", "permanent": true },
+    { "source": "/magasins", "destination": "/boutique-vape-marseille", "permanent": true },
     { "source": "/cart", "destination": "/panier", "permanent": true },
     { "source": "/search", "destination": "/boutique", "permanent": true },
 
