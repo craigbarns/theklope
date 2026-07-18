@@ -215,6 +215,9 @@ export function StoreProvider({ children }) {
   const [adminSession, setAdminSession] = useState(null)
   const [syncStatus, setSyncStatus] = useState(isSupabaseConfigured ? 'connecting' : 'local')
   const [syncError, setSyncError] = useState(null)
+  // Un cache absent ou incomplet ne prouve pas qu'un produit n'existe pas.
+  // Cette valeur ne passe à true qu'après résolution d'une source catalogue.
+  const [catalogReady, setCatalogReady] = useState(false)
 
   // UI
   const [searchOpen, setSearchOpen] = useState(false)
@@ -263,8 +266,9 @@ export function StoreProvider({ children }) {
     try {
       const catalog = await loadStaticCatalog()
       setProducts(catalog.map(normalizeProduct))
+      return true
     } catch {
-      /* ignore — le catalogue restera vide */
+      return false
     }
   }, [])
 
@@ -275,13 +279,22 @@ export function StoreProvider({ children }) {
     }
 
     try {
+      setCatalogReady(false)
       setSyncStatus('syncing')
       setSyncError(null)
 
       const sb = await getSupabase()
       if (!sb) {
-        setSyncStatus('local')
-        await loadFallbackCatalog()
+        const fallbackLoaded = await loadFallbackCatalog()
+        setSyncStatus('error')
+        setSyncError(
+          fallbackLoaded
+            ? 'Catalogue distant indisponible. Affichage du catalogue de secours.'
+            : 'Catalogue distant et catalogue de secours indisponibles.',
+        )
+        // Le fallback peut afficher un produit connu, mais son absence ne prouve
+        // pas qu'un produit Supabase récent n'existe pas.
+        setCatalogReady(false)
         return
       }
 
@@ -307,23 +320,44 @@ export function StoreProvider({ children }) {
       }
 
       setSyncStatus('online')
+      setCatalogReady(true)
     } catch (error) {
-      setSyncStatus('error')
       setSyncError(error.message || 'Synchronisation Supabase impossible.')
       await loadFallbackCatalog()
+      setSyncStatus('error')
+      setCatalogReady(false)
     }
   }, [adminSession, loadFallbackCatalog])
 
   // En mode local (sans Supabase), on charge le catalogue de référence si rien en cache.
   useEffect(() => {
-    if (!isSupabaseConfigured && products.length === 0) {
-      loadFallbackCatalog()
+    if (isSupabaseConfigured) return undefined
+
+    let active = true
+    const initializeLocalCatalog = async () => {
+      if (products.length > 0) {
+        if (active) setCatalogReady(true)
+        return
+      }
+
+      setSyncStatus('syncing')
+      const fallbackLoaded = await loadFallbackCatalog()
+      if (!active) return
+
+      setSyncStatus(fallbackLoaded ? 'local' : 'error')
+      setSyncError(fallbackLoaded ? null : 'Catalogue de secours indisponible.')
+      setCatalogReady(fallbackLoaded)
+    }
+
+    initializeLocalCatalog()
+    return () => {
+      active = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [loadFallbackCatalog])
 
   useEffect(() => {
-    refreshRemoteData()
+    if (isSupabaseConfigured) refreshRemoteData()
   }, [refreshRemoteData])
 
   // Le stock est global au produit, même lorsque le panier contient plusieurs
@@ -713,6 +747,7 @@ export function StoreProvider({ children }) {
     signOutAdmin,
     syncStatus,
     syncError,
+    catalogReady,
     refreshRemoteData,
     products,
     catalogMeta,
