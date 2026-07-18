@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
+import { markPageSeoReady } from '../lib/pageReadiness.js'
 
 // Met à jour le titre, les balises OpenGraph et injecte le JSON-LD structuré pour le SEO/GEO.
 export default function Seo({ title, description, schema, canonical, noindex = false }) {
+  const location = useLocation()
+
   useEffect(() => {
     // 0. Indexation : les pages back-office / tunnel ne doivent pas être indexées.
     updateMeta('robots', noindex ? 'noindex, nofollow' : 'index, follow')
@@ -45,7 +49,11 @@ export default function Seo({ title, description, schema, canonical, noindex = f
         scriptTag.remove()
       }
     }
-  }, [title, description, schema, canonical, noindex])
+
+    // Signale que le titre de cette route est final. ConsentManager peut alors
+    // envoyer la page_view sans capturer le titre de la route précédente.
+    markPageSeoReady(location.pathname)
+  }, [title, description, schema, canonical, noindex, location.pathname])
 
   return null
 }

@@ -11,6 +11,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
+import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
 import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import {
   IconHeart,
@@ -25,7 +26,17 @@ import {
 
 export default function Product() {
   const { id } = useParams()
-  const { products, cart, getProduct, addToCart, toggleFavorite, isFavorite, cookiesChoice } = useStore()
+  const {
+    products,
+    cart,
+    getProduct,
+    addToCart,
+    toggleFavorite,
+    isFavorite,
+    cookiesChoice,
+    catalogReady,
+    syncStatus,
+  } = useStore()
   const product = getProduct(id)
 
   const [activeImg, setActiveImg] = useState(0)
@@ -161,7 +172,10 @@ export default function Product() {
     setQty((current) => Math.min(current, Math.max(1, remainingStock)))
   }, [product, remainingStock])
 
-  if (!product) return <NotFound />
+  const pageState = getProductPageState({ product, catalogReady, syncStatus })
+  if (pageState === PRODUCT_PAGE_STATE.loading) return <ProductLoading />
+  if (pageState === PRODUCT_PAGE_STATE.error) return <CatalogUnavailable />
+  if (pageState === PRODUCT_PAGE_STATE.notFound) return <NotFound />
 
   const fav = isFavorite(product.id)
   const outOfStock = product.stock <= 0
@@ -447,6 +461,36 @@ export default function Product() {
         </div>
       </div>
     </>
+  )
+}
+
+function ProductLoading() {
+  return (
+    <div
+      className="container-page flex min-h-[60vh] items-center justify-center py-20"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="text-center">
+        <span className="mx-auto block h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-neon" />
+        <p className="mt-4 text-sm text-muted">Chargement du produit…</p>
+      </div>
+    </div>
+  )
+}
+
+function CatalogUnavailable() {
+  return (
+    <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
+      <Seo title="Catalogue temporairement indisponible" noindex />
+      <div>
+        <h1 className="font-display text-2xl font-bold text-white">Catalogue temporairement indisponible</h1>
+        <p className="mt-2 text-muted">Nous n’avons pas pu vérifier cette fiche produit. Veuillez réessayer.</p>
+        <button type="button" className="btn-primary mt-7" onClick={() => window.location.reload()}>
+          Réessayer
+        </button>
+      </div>
+    </div>
   )
 }
 
