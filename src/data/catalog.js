@@ -21,7 +21,7 @@ export const CATEGORIES = [
 export const BADGES = {
   nouveau: { label: 'Nouveau', className: 'bg-electric text-white' },
   'best-seller': { label: 'Best-seller', className: 'bg-neon text-noir' },
-  promo: { label: 'Promo', className: 'bg-rose-500 text-white' },
+  promo: { label: 'PRIX ROUGE', className: 'bg-rose-500 text-white' },
   'stock-limite': { label: 'Stock limité', className: 'bg-amber-400 text-noir' },
 }
 

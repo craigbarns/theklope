@@ -146,7 +146,7 @@ src/
 - Pop-up de **vérification d'âge** (+18) au premier accès
 - Menu **sticky**, **barre de recherche**, **panier** et **favoris** dans le header
 - **Filtres** boutique (catégorie, prix, marque, type, taux de nicotine, saveur) et **tri**
-- **Badges** produits : Nouveau, Best-seller, Promo, Stock limité
+- **Badges** produits : Nouveau, Best-seller, PRIX ROUGE, Stock limité
 - **Panier** complet : quantités, code promo, livraison offerte dès 49€, totaux
 - **Checkout** en 3 étapes (coordonnées → livraison → paiement Mollie)
 - **Dashboard admin** `/admin` : création produit, édition catalogue, suivi des ventes,

@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { isResistanceProduct, productMatchesCategory, productsByCategorySlugFrom } from './catalog.js'
+import { BADGES, isResistanceProduct, productMatchesCategory, productsByCategorySlugFrom } from './catalog.js'
+
+test('the persisted promo badge displays the PRIX ROUGE label', () => {
+  assert.equal(BADGES.promo.label, 'PRIX ROUGE')
+  assert.equal(BADGES['prix-rouge'], undefined)
+})
 
 test('products explicitly assigned to the resistance category are always visible', () => {
   const product = {
