@@ -558,7 +558,7 @@ export function StoreProvider({ children }) {
   }, [])
   const isFavorite = useCallback((productId) => favorites.includes(productId), [favorites])
 
-  // ----- Promo -----
+  // ----- Codes promotionnels -----
   const applyPromo = useCallback((code, { eligibilityLines } = {}) => {
     const clean = (code || '').trim().toUpperCase()
     const definition = PROMO_CODES[clean]
