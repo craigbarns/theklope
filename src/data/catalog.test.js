@@ -1,7 +1,15 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { BADGES, isResistanceProduct, productMatchesCategory, productsByCategorySlugFrom } from './catalog.js'
+import {
+  BADGES,
+  CATEGORIES,
+  getProductCategoryKey,
+  isDiyProduct,
+  isResistanceProduct,
+  productMatchesCategory,
+  productsByCategorySlugFrom,
+} from './catalog.js'
 
 test('the persisted promo badge displays the PRIX ROUGE label', () => {
   assert.equal(BADGES.promo.label, 'PRIX ROUGE')
@@ -44,4 +52,38 @@ test('resistance keywords never move products out of another explicit category',
 
   assert.equal(isResistanceProduct(product), false)
   assert.equal(productMatchesCategory(product, 'resistance'), false)
+})
+
+test('DIY is a product category and filters independently from accessories', () => {
+  const diyCategory = CATEGORIES.find(({ slug }) => slug === 'diy')
+  const products = [
+    { id: 'base-50-50', name: 'Base 50/50', category: 'diy' },
+    { id: 'chargeur-usb', name: 'Chargeur USB', category: 'accessoire' },
+  ]
+
+  assert.deepEqual(diyCategory, {
+    slug: 'diy',
+    key: 'diy',
+    name: 'DIY',
+    tagline: 'Bases, boosters, arômes & flacons',
+  })
+  assert.equal(productMatchesCategory(products[0], 'diy'), true)
+  assert.deepEqual(productsByCategorySlugFrom(products, 'diy'), [products[0]])
+  assert.deepEqual(productsByCategorySlugFrom(products, 'accessoires'), [products[1]])
+})
+
+test('legacy DIY components are removed from accessories and exposed in DIY', () => {
+  const legacyDiyProducts = [
+    { id: 'booster', name: 'Booster Sel de Nicotine 20 mg', category: 'accessoire' },
+    { id: 'bottle', name: 'Bouteille Vide 200 ml', category: 'accessoire' },
+    { id: 'base', name: 'Base DIY 1 Litre', category: 'accessoire' },
+    { id: 'pack', name: 'Pack DIY 6 mg 200 ml', category: 'accessoire' },
+  ]
+  const accessory = { id: 'charger', name: 'Chargeur MC2 Xtar', category: 'accessoire' }
+  const products = [...legacyDiyProducts, accessory]
+
+  assert.ok(legacyDiyProducts.every(isDiyProduct))
+  assert.ok(legacyDiyProducts.every((product) => getProductCategoryKey(product) === 'diy'))
+  assert.deepEqual(productsByCategorySlugFrom(products, 'diy'), legacyDiyProducts)
+  assert.deepEqual(productsByCategorySlugFrom(products, 'accessoires'), [accessory])
 })

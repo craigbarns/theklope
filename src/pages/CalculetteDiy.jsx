@@ -379,14 +379,14 @@ export default function CalculetteDiy() {
           <div className="card p-5 border-white/8 bg-white/[0.01]">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Acheter mes composants</h4>
             <p className="text-[11px] text-muted mb-4 leading-relaxed">
-              Retrouvez nos e-liquides de qualité ainsi que nos accessoires et packs de résistances directement dans notre boutique.
+              Retrouvez nos bases, boosters, arômes, flacons et accessoires directement dans la boutique.
             </p>
             <div className="grid grid-cols-2 gap-2">
-              <Link to="/categorie/e-liquides" className="btn-ghost py-2 px-3 text-center text-[10px] min-h-0">
-                Nos E-liquides
+              <Link to="/categorie/diy" className="btn-primary min-h-0 px-3 py-2 text-center text-[10px] text-noir">
+                Produits DIY
               </Link>
-              <Link to="/categorie/accessoires" className="btn-primary py-2 px-3 text-center text-[10px] min-h-0 text-noir">
-                Nos Accessoires
+              <Link to="/categorie/accessoires" className="btn-ghost min-h-0 px-3 py-2 text-center text-[10px]">
+                Accessoires
               </Link>
             </div>
           </div>

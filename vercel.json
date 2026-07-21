@@ -19,6 +19,7 @@
     { "source": "/magasins", "destination": "/boutique-vape-marseille", "permanent": true },
     { "source": "/cart", "destination": "/panier", "permanent": true },
     { "source": "/search", "destination": "/boutique", "permanent": true },
+    { "source": "/diy", "destination": "/categorie/diy", "permanent": true },
 
     { "source": "/content/1-:slug", "destination": "/livraison-retours", "permanent": true },
     { "source": "/content/2-:slug", "destination": "/legal/mentions-legales", "permanent": true },

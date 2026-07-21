@@ -4,15 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Logo from './Logo.jsx'
 import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser } from './icons.jsx'
 import { CATEGORIES } from '../data/catalog.js'
-
-const NAV = [
-  { to: '/boutique', label: 'Boutique' },
-  { to: '/categorie/e-liquides', label: 'E-liquides' },
-  { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
-  { to: '/categorie/resistances', label: 'Résistances' },
-  { to: '/guides', label: 'Guides' },
-  { to: '/boutique-vape-marseille', label: 'Marseille' },
-]
+import { MAIN_NAV } from '../data/navigation.js'
 
 export default function Header() {
   const { cartCount, favorites, setSearchOpen, setCartOpen } = useStore()
@@ -73,22 +65,25 @@ export default function Header() {
         <div className="container-page flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              className="focus-ring grid h-10 w-10 place-items-center rounded-xl text-white lg:hidden"
+              type="button"
+              className="focus-ring grid h-10 w-10 place-items-center rounded-xl text-white xl:hidden"
               onClick={() => setMobileOpen((v) => !v)}
               aria-label="Menu"
+              aria-expanded={mobileOpen}
+              aria-controls="mobile-navigation"
             >
               {mobileOpen ? <IconClose /> : <IconMenu />}
             </button>
             <Logo />
           </div>
 
-          <nav className="hidden items-center gap-1 lg:flex">
-            {NAV.map((item) => (
+          <nav className="hidden items-center gap-0.5 xl:flex">
+            {MAIN_NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 className={({ isActive }) =>
-                  `rounded-full px-3.5 py-2 text-sm font-medium transition ${
+                  `rounded-full px-2.5 py-2 text-xs font-medium transition 2xl:px-3.5 2xl:text-sm ${
                     isActive ? 'text-neon' : 'text-ash/75 hover:text-white'
                   }`
                 }
@@ -136,10 +131,26 @@ export default function Header() {
       
       {/* Menu mobile plein écran */}
       {mobileOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-16 z-50 animate-fade-in bg-noir/95 backdrop-blur-2xl lg:hidden overflow-y-auto">
-          <nav className="container-page flex flex-col py-6 space-y-1">
+        <div
+          id="mobile-navigation"
+          role="dialog"
+          aria-label="Navigation principale"
+          className="fixed inset-0 z-50 animate-fade-in overflow-y-auto bg-noir/95 backdrop-blur-2xl xl:hidden"
+        >
+          <div className="container-page flex h-16 items-center gap-3">
+            <button
+              type="button"
+              className="focus-ring grid h-10 w-10 place-items-center rounded-xl text-white"
+              onClick={() => setMobileOpen(false)}
+              aria-label="Fermer le menu"
+            >
+              <IconClose />
+            </button>
+            <Logo />
+          </div>
+          <nav className="container-page flex flex-col space-y-1 pb-6 pt-2">
             <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Navigation</p>
-            {NAV.map((item) => (
+            {MAIN_NAV.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}

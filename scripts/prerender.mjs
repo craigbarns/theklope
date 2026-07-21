@@ -25,8 +25,11 @@ const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').rep
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
-const PRODUCTS = (await loadProducts()).map(enrichProductCopy)
-const { CATEGORIES, categoryName, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const { CATEGORIES, categoryName, getProductCategoryKey, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
+  ...product,
+  category: getProductCategoryKey(product),
+}))
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
@@ -106,7 +109,7 @@ let count = 0
 
 // ---- Produits ----
 for (const p of PRODUCTS) {
-  const catLabel = categoryName(p.category)
+  const catLabel = categoryName(getProductCategoryKey(p))
   const title = `${p.name} — ${catLabel} | THEKLOPE`
   const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
   const path = `/produit/${p.id}`
@@ -231,8 +234,8 @@ for (const b of BLOG_POSTS) {
 
 // ---- Pages statiques clés ----
 const STATIC_PAGES = [
-  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, résistances et accessoires pour adultes. Livraison France.' },
-  { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, accessoires et packs débutants.' },
+  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.' },
+  { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, produits DIY, accessoires et packs débutants.' },
   { path: '/configurateur', title: 'Configurateur de pack sur mesure (-15%) | THEKLOPE', description: 'Composez un pack cigarette électronique compatible (batterie + réservoir + e-liquide) et profitez de -15% sur le pack complet.' },
   { path: '/calculette-diy', title: 'Calculette DIY & booster de nicotine | THEKLOPE', description: 'Calculez facilement vos dosages pour fabriquer votre e-liquide maison (base, boosters, arômes) avec la calculette DIY THEKLOPE.' },
   { path: '/guides', title: 'Guides vape responsables | THEKLOPE', description: 'Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes.' },
@@ -306,7 +309,7 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 
 // ---- Page d'accueil (/) ----
 const homeTitle = 'THEKLOPE — Boutique vape en ligne pour adultes'
-const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
+const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -359,7 +362,7 @@ const homeSchema = {
 
 const homeContent = `
   <h1>THEKLOPE — Boutique vape en ligne pour adultes</h1>
-  <p>Cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.</p>
+  <p>Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.</p>
   
   <h2>Nos Catégories de Produits Vape</h2>
   <ul>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { categoryName } from '../data/catalog.js'
+import { categoryName, getProductCategoryKey } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY, STORE_REVIEW_SNIPPETS } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
@@ -207,7 +207,7 @@ export default function Product() {
   return (
     <>
       <Seo
-        title={`${product.name} — ${categoryName(product.category)} | THEKLOPE`}
+        title={`${product.name} — ${categoryName(getProductCategoryKey(product))} | THEKLOPE`}
         description={product.short}
         schema={productSchema}
       />
@@ -215,7 +215,7 @@ export default function Product() {
         <Breadcrumbs
           items={[
             { label: 'Boutique', to: '/boutique' },
-            { label: categoryName(product.category) },
+            { label: categoryName(getProductCategoryKey(product)) },
             { label: product.name },
           ]}
         />
