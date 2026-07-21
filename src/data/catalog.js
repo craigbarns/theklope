@@ -48,10 +48,19 @@ export const isAlternativePuffProduct = (p = {}) => {
   return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target)\b/i.test(normalizedProductText(p))
 }
 
+export const isDiyProduct = (p = {}) => {
+  if (p.category === 'diy') return true
+  if (p.category !== 'accessoire') return false
+  const text = normalizedProductText(p)
+  return /\b(diy|boosters?|bases?\s+(?:neutres?|pg|vg|\d+\s*\/\s*\d+)|bouteilles?\s+vides?|flacons?\s+vides?|fioles?\s+gradu[eé]es?|ar[oô]mes?\s+concentr[eé]s?)\b/i.test(text)
+}
+
+export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
+
 export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'resistance') return isResistanceProduct(product)
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
-  return product?.category === categoryKey
+  return getProductCategoryKey(product) === categoryKey
 }
 
 export const getCatalogMeta = (products = []) => ({

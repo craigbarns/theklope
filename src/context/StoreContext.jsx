@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState, useCallback } from 'react'
-import { getCatalogMeta, getProductFrom } from '../data/catalog.js'
+import { getCatalogMeta, getProductCategoryKey, getProductFrom } from '../data/catalog.js'
 import { enrichProductCopy } from '../data/productCopy.js'
 import { isSupabaseConfigured, getSupabase } from '../lib/supabase.js'
 import {
@@ -79,7 +79,7 @@ const normalizeProduct = (product) => {
   const id = product.id?.trim() || slugify(product.name)
   const images = normalizeArray(product.images)
   const image = product.image || images[0] || DEFAULT_PRODUCT_IMAGE
-  return enrichProductCopy({
+  const normalized = {
     id,
     name: product.name?.trim() || 'Nouveau produit',
     category: product.category || 'eliquide',
@@ -103,7 +103,9 @@ const normalizeProduct = (product) => {
     images: images.length ? images : [image],
     image,
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, id),
-  })
+  }
+  normalized.category = getProductCategoryKey(normalized)
+  return enrichProductCopy(normalized)
 }
 
 const productToRow = (product) => ({

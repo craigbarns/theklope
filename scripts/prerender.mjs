@@ -25,8 +25,11 @@ const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').rep
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
-const PRODUCTS = (await loadProducts()).map(enrichProductCopy)
-const { CATEGORIES, categoryName, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const { CATEGORIES, categoryName, getProductCategoryKey, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
+  ...product,
+  category: getProductCategoryKey(product),
+}))
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
@@ -106,7 +109,7 @@ let count = 0
 
 // ---- Produits ----
 for (const p of PRODUCTS) {
-  const catLabel = categoryName(p.category)
+  const catLabel = categoryName(getProductCategoryKey(p))
   const title = `${p.name} — ${catLabel} | THEKLOPE`
   const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
   const path = `/produit/${p.id}`
