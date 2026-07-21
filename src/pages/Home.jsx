@@ -6,7 +6,7 @@ import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import GoogleReviews from '../components/GoogleReviews.jsx'
 import Newsletter from '../components/Newsletter.jsx'
-import { featuredProducts, isResistanceProduct } from '../data/catalog.js'
+import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import {
   IconArrowRight,
@@ -43,7 +43,7 @@ const GUIDE_LINKS = [
 export default function Home() {
   const { products } = useStore()
   const { bestSellers, newArrivals, starterPacks } = useMemo(() => featuredProducts(products), [products])
-  const heroProduct = bestSellers[0] || products[0]
+  const heroProduct = useMemo(() => selectHomeHeroProduct(products), [products])
   const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
 
   const homeSchema = useMemo(() => ({
@@ -141,9 +141,20 @@ export default function Home() {
               <div className="relative mx-auto max-w-md">
                 {/* Halos de fond colorés et dynamiques */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-tr from-neon/20 to-electric/20 blur-3xl rounded-full scale-95 animate-pulse-slow" />
-                <div className="card overflow-hidden rounded-3xl border-white/10 p-2 shadow-card aspect-square">
-                  <ProductImage src={heroProduct.image} alt={heroProduct.name} fetchpriority="high" className="w-full h-full object-cover rounded-2xl animate-fade-in" width={448} height={448} />
-                </div>
+                <Link
+                  to={`/produit/${heroProduct.id}`}
+                  aria-label={`Voir ${heroProduct.name}`}
+                  data-testid="home-hero-product"
+                  data-product-id={heroProduct.id}
+                  className="card group block aspect-square overflow-hidden rounded-3xl border-white/10 p-2 shadow-card"
+                >
+                  <ProductImage key={heroProduct.id} src={heroProduct.image} alt={heroProduct.name} fetchpriority="high" className="h-full w-full rounded-2xl object-cover animate-fade-in transition duration-500 group-hover:scale-[1.02]" width={448} height={448} />
+                </Link>
+                {heroProduct.badge === 'nouveau' && (
+                  <span className="absolute left-4 top-4 rounded-full bg-electric px-3 py-1.5 text-xs font-bold text-white shadow-glow-blue">
+                    Nouveauté
+                  </span>
+                )}
                 {featuredProduct && (
                   <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
                     <ProductImage src={featuredProduct.image} alt="" loading="lazy" className="h-14 w-14 rounded-xl object-cover" width={56} height={56} />

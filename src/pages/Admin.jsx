@@ -607,6 +607,9 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
               ))}
             </select>
           </label>
+          <p className="-mt-2 text-xs leading-relaxed text-muted">
+            La nouveauté créée le plus récemment utilise automatiquement son image principale en haut de l’accueil.
+          </p>
 
           <RelatedProductsPicker
             products={products}

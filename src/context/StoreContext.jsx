@@ -82,6 +82,7 @@ const normalizeProduct = (product) => {
   const normalized = {
     id,
     name: product.name?.trim() || 'Nouveau produit',
+    createdAt: product.createdAt || product.created_at || null,
     category: product.category || 'eliquide',
     brand: product.brand?.trim() || 'THEKLOPE',
     type: product.type?.trim() || 'Produit',
@@ -159,6 +160,7 @@ const productFromRow = (row) =>
     images: row.images,
     image: row.image,
     relatedProductIds: row.related_product_ids,
+    createdAt: row.created_at,
   })
 
 const orderFromRow = (row) => ({
@@ -437,7 +439,12 @@ export function StoreProvider({ children }) {
     if (!originalId && products.some((product) => product.id === requestedId)) {
       throw new Error('Cet identifiant URL est déjà utilisé par un autre produit.')
     }
-    const nextProduct = normalizeProduct({ ...input, id: requestedId })
+    const existingProduct = products.find((product) => product.id === requestedId)
+    const nextProduct = normalizeProduct({
+      ...input,
+      id: requestedId,
+      createdAt: existingProduct?.createdAt || input.createdAt || (existingProduct ? null : new Date().toISOString()),
+    })
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
