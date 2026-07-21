@@ -53,6 +53,53 @@ const makePost = ({
 
 export const BLOG_POSTS = [
   makePost({
+    slug: 'comment-choisir-sa-resistance',
+    title: 'Comment choisir sa résistance de cigarette électronique ?',
+    description:
+      'Guide pour choisir sa résistance : valeur en ohm, plage de watts, tirage serré ou aérien et compatibilité avec le matériel.',
+    date: '21 Juillet 2026',
+    isoDate: '2026-07-21T08:00:00+02:00',
+    readTime: '5 min',
+    category: 'Matériel',
+    image: '/products/resistances-gti-mesh-015020405-vaporesso-pack-de-5.jpg',
+    summary:
+      'La valeur en ohm, la plage de puissance indiquée par le fabricant et le tirage recherché sont les trois critères à croiser avant d’acheter une résistance.',
+    intro:
+      'Choisir une résistance ne se limite pas à reprendre la même valeur que la précédente. Ohm, watts recommandés et tirage doivent être cohérents avec le matériel et l’usage.',
+    sections: [
+      {
+        title: 'Comprendre la valeur en ohm',
+        text:
+          'Une résistance basse (autour de 0,15 à 0,5 ohm) demande plus de puissance et convient généralement à un tirage aérien avec une vapeur plus dense. Une résistance plus haute (1 ohm et plus) fonctionne à puissance modérée et correspond souvent à un tirage serré.',
+      },
+      {
+        title: 'Respecter la plage de watts recommandée',
+        text:
+          'Chaque résistance est imprimée avec une plage de puissance conseillée par le fabricant. Rester dans cette plage limite le risque de goût de brûlé et prolonge la durée de vie du coton.',
+      },
+      {
+        title: 'Vérifier la compatibilité avant achat',
+        text:
+          'La valeur en ohm ne suffit pas : la série et la marque doivent correspondre au réservoir ou au pod utilisé. Deux résistances de même valeur mais de séries différentes peuvent ne pas se clipser correctement.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelle valeur d’ohm choisir pour un tirage serré ?',
+        a: 'Une résistance plus haute, souvent supérieure à 1 ohm, convient généralement mieux à un tirage serré et à une puissance modérée.',
+      },
+      {
+        q: 'Une résistance basse consomme-t-elle plus de e-liquide ?',
+        a: 'Oui, généralement. Une résistance basse fonctionne à plus forte puissance et produit plus de vapeur, ce qui augmente la consommation de e-liquide.',
+      },
+    ],
+    relatedProductIds: [
+      'gti-mesh-015020405-vaporesso-pack-de-5-300',
+      'ito-v2-0-7-1-2-voopoo-pack-de-5-301',
+      'pnp-x-015020304506ohm-voopoo-pack-de-5-302',
+    ],
+  }),
+  makePost({
     slug: 'quelle-cigarette-electronique-choisir',
     title: 'Quelle cigarette électronique choisir en 2026 ? Guide responsable',
     description:
