@@ -27,3 +27,10 @@ test('sitemap rejects invalid product dates', () => {
     /Date de sitemap invalide/,
   )
 })
+
+test('sitemap includes the DIY and accessories category pages', () => {
+  const locations = buildSitemapEntries([], '2026-07-21').map(({ loc }) => loc)
+
+  assert.ok(locations.includes('/categorie/diy'))
+  assert.ok(locations.includes('/categorie/accessoires'))
+})

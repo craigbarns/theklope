@@ -11,6 +11,7 @@ const COLUMNS = [
       { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
       { to: '/categorie/pods', label: 'Pods' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
+      { to: '/categorie/diy', label: 'Produits DIY' },
       { to: '/categorie/resistances', label: 'Résistances' },
       { to: '/categorie/alternatives-puffs', label: 'Alternatives aux puffs' },
       { to: '/categorie/accessoires', label: 'Accessoires' },

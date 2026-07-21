@@ -104,6 +104,11 @@ export default function CategoryPage() {
         <p className="eyebrow mb-2">Catégorie</p>
         <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">{seo?.h1 || category.name}</h1>
         <p className="mt-2 max-w-2xl text-muted">{seo?.intro || category.tagline}</p>
+        {slug === 'diy' && (
+          <Link to="/calculette-diy" className="btn-ghost mt-5">
+            Calculer mon dosage DIY
+          </Link>
+        )}
       </div>
 
       {seo?.sections?.length > 0 && (

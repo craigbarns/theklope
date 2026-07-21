@@ -56,6 +56,12 @@ const emptyProduct = {
   relatedProductIds: [],
 }
 
+const DIY_PRODUCT_DEFAULTS = {
+  type: 'Produit DIY',
+  nicotine: '',
+  specsText: 'Composition: À renseigner\nContenance: À renseigner\nConseils: Respecter les indications du fabricant',
+}
+
 const statusLabel = Object.fromEntries(ORDER_STATUSES.map((status) => [status.value, status.label]))
 
 export default function Admin() {
@@ -514,6 +520,19 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   const isExisting = Boolean(product.id)
 
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
+  const updateCategory = (e) => {
+    const category = e.target.value
+    setForm((prev) => {
+      if (category !== 'diy') return { ...prev, category }
+      return {
+        ...prev,
+        category,
+        type: prev.type === emptyProduct.type ? DIY_PRODUCT_DEFAULTS.type : prev.type,
+        nicotine: prev.nicotine === emptyProduct.nicotine ? DIY_PRODUCT_DEFAULTS.nicotine : prev.nicotine,
+        specsText: prev.specsText === emptyProduct.specsText ? DIY_PRODUCT_DEFAULTS.specsText : prev.specsText,
+      }
+    })
+  }
   const submit = (e) => {
     e.preventDefault()
     const imageList = form.images
@@ -566,7 +585,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
 
           <label className="block">
             <span className="mb-1.5 block text-xs font-medium text-muted">Catégorie</span>
-            <select value={form.category} onChange={update('category')} className="input">
+            <select value={form.category} onChange={updateCategory} className="input">
               {PRODUCT_CATEGORIES.map((category) => (
                 <option key={category.key} value={category.key}>{category.name}</option>
               ))}
@@ -608,19 +627,14 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
             productId={form.id}
             productName={form.name}
           />
-          <Field label="Nicotine" value={form.nicotine} onChange={update('nicotine')} placeholder="0, 3, 6, 12" />
+          <Field label="Nicotine (mg/ml, si applicable)" value={form.nicotine} onChange={update('nicotine')} placeholder="20 pour un booster, vide sinon" />
           <Field label="Saveurs" value={form.flavors} onChange={update('flavors')} placeholder="Menthe, Classic, Fruits rouges" />
           <Field label="Couleurs" value={form.colors} onChange={update('colors')} placeholder="Noir, Argent, Bleu" />
           <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className="mb-1.5 block text-xs font-medium text-muted">Volume (e-liquide)</span>
-              <select value={form.volume || ''} onChange={update('volume')} className="input">
-                <option value="">—</option>
-                <option value="10ml">10 ml</option>
-                <option value="50ml">50 ml</option>
-                <option value="100ml">100 ml</option>
-              </select>
-            </label>
+            <Field label="Volume / contenance" value={form.volume || ''} onChange={update('volume')} list="volumes" placeholder="10ml, 200ml, 1L…" />
+            <datalist id="volumes">
+              {['10ml', '30ml', '50ml', '100ml', '200ml', '500ml', '1L'].map((volume) => <option key={volume} value={volume} />)}
+            </datalist>
             <Field label="Ohm (résistance)" value={form.ohm || ''} onChange={update('ohm')} placeholder="0.8Ω, 1.2Ω…" />
           </div>
           <Field

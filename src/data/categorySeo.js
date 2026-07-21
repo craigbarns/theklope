@@ -101,6 +101,40 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  diy: {
+    seoTitle: 'DIY e-liquide : bases, boosters et arômes',
+    metaDescription:
+      'Produits DIY pour e-liquide : bases neutres, boosters de nicotine, arômes concentrés et accessoires de préparation. Vente réservée aux adultes.',
+    h1: 'DIY e-liquide : bases, boosters et arômes',
+    intro:
+      'Composez votre e-liquide avec une sélection de bases PG/VG, boosters de nicotine, arômes concentrés et accessoires de préparation. Respectez toujours les dosages du fabricant et les précautions d’utilisation.',
+    sections: [
+      {
+        title: 'Les indispensables pour préparer un e-liquide DIY',
+        text:
+          'Une préparation DIY utilise une base adaptée, un arôme concentré, un booster éventuel et un flacon compatible. Vérifiez la composition, la contenance et les recommandations indiquées sur chaque fiche produit.',
+      },
+      {
+        title: 'Dosage, compatibilité et sécurité',
+        text:
+          'Suivez les indications du fabricant et utilisez la calculette DIY pour estimer vos proportions. Un arôme concentré ne doit jamais être vapoté seul. La nicotine doit être manipulée avec précaution et conservée hors de portée des enfants.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Que faut-il pour préparer un e-liquide DIY ?',
+        a: 'Prévoyez une base PG/VG, un arôme concentré, un flacon adapté et, si nécessaire, un booster de nicotine. Respectez le dosage et le temps de maturation recommandés par le fabricant.',
+      },
+      {
+        q: 'Comment calculer la quantité de booster ?',
+        a: 'La calculette DIY THEKLOPE estime les volumes de base, de booster et d’arôme selon le volume final et le taux souhaités. Vérifiez ensuite le résultat avec les indications du fabricant.',
+      },
+      {
+        q: 'Peut-on vapoter un arôme concentré seul ?',
+        a: 'Non. Un arôme concentré doit être dilué dans une base adaptée selon les recommandations du fabricant et ne doit jamais être vapoté seul.',
+      },
+    ],
+  },
   resistances: {
     seoTitle: 'Résistances cigarette électronique',
     metaDescription:

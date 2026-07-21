@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { BADGES, isResistanceProduct, productMatchesCategory, productsByCategorySlugFrom } from './catalog.js'
+import { BADGES, CATEGORIES, isResistanceProduct, productMatchesCategory, productsByCategorySlugFrom } from './catalog.js'
 
 test('the persisted promo badge displays the PRIX ROUGE label', () => {
   assert.equal(BADGES.promo.label, 'PRIX ROUGE')
@@ -44,4 +44,22 @@ test('resistance keywords never move products out of another explicit category',
 
   assert.equal(isResistanceProduct(product), false)
   assert.equal(productMatchesCategory(product, 'resistance'), false)
+})
+
+test('DIY is a product category and filters independently from accessories', () => {
+  const diyCategory = CATEGORIES.find(({ slug }) => slug === 'diy')
+  const products = [
+    { id: 'base-50-50', name: 'Base 50/50', category: 'diy' },
+    { id: 'flacon-vide', name: 'Flacon vide', category: 'accessoire' },
+  ]
+
+  assert.deepEqual(diyCategory, {
+    slug: 'diy',
+    key: 'diy',
+    name: 'DIY',
+    tagline: 'Bases, boosters, arômes & flacons',
+  })
+  assert.equal(productMatchesCategory(products[0], 'diy'), true)
+  assert.deepEqual(productsByCategorySlugFrom(products, 'diy'), [products[0]])
+  assert.deepEqual(productsByCategorySlugFrom(products, 'accessoires'), [products[1]])
 })

@@ -9,6 +9,7 @@ const CATEGORY_LABELS = {
   ecig: 'cigarette électronique',
   pod: 'pod rechargeable',
   eliquide: 'e-liquide',
+  diy: 'produit DIY',
   resistance: 'résistance ou cartouche',
   accessoire: 'accessoire',
   pack: 'pack débutant',
@@ -83,6 +84,11 @@ export function buildProductShort(product) {
     return `${name} de ${brand} est un ${category}${flavor}, proposé en ${format}${base}.`
   }
 
+  if (product.category === 'diy') {
+    const format = compact(specs.Contenance) || compact(product.volume)
+    return `${name} de ${brand} est un produit DIY destiné à la préparation de e-liquides${format ? `, proposé en ${format}` : ''}. Utilisez-le selon les indications du fabricant.`
+  }
+
   if (product.category === 'ecig' || product.category === 'pod') {
     const charge = compact(specs.Charge)
     const activation = compact(specs.Activation)
@@ -120,6 +126,14 @@ export function buildProductLong(product) {
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push(nicotinePhrase(product))
     details.push('Un choix adapté aux vapoteurs majeurs qui veulent comparer rapidement les saveurs, le ratio et les dosages avant de commander.')
+    return details.filter(Boolean).join(' ')
+  }
+
+  if (product.category === 'diy') {
+    details.push(`${name} est un produit DIY ${brand} destiné à la préparation de e-liquides par des adultes.`)
+    details.push(flavorPhrase(product))
+    details.push(specs ? `Caractéristiques : ${specs}.` : '')
+    details.push('Respectez les dosages et précautions du fabricant. Un arôme concentré ne doit jamais être vapoté seul et la nicotine doit être manipulée avec précaution.')
     return details.filter(Boolean).join(' ')
   }
 

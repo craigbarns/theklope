@@ -100,7 +100,7 @@ export default function Home() {
     <>
       <Seo
         title="Boutique vape en ligne pour adultes"
-        description="THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé."
+        description="THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé."
         schema={homeSchema}
       />
 
@@ -118,7 +118,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-ash/70 sm:text-lg">
-              Cigarettes électroniques, e-liquides, pods, résistances et accessoires sélectionnés pour leur
+              Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour leur
               fiabilité, leur compatibilité et la clarté des informations produit.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
