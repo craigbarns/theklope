@@ -90,6 +90,23 @@ export const featuredProducts = (products = []) => {
   }
 }
 
+const createdAtTime = (product = {}) => {
+  const timestamp = Date.parse(product.createdAt || product.created_at || '')
+  return Number.isFinite(timestamp) ? timestamp : 0
+}
+
+export const selectHomeHeroProduct = (products = []) => {
+  const newProducts = products.filter((product) => product.badge === 'nouveau')
+  const latestNewProduct = newProducts.reduce((selected, product) => {
+    if (!selected) return product
+    return createdAtTime(product) > createdAtTime(selected) ? product : selected
+  }, null)
+
+  return latestNewProduct
+    || products.find((product) => product.badge === 'best-seller')
+    || products[0]
+}
+
 export function productsByCategorySlugFrom(products = [], slug) {
   const featured = featuredProducts(products)
   if (slug === 'nouveautes') return featured.newArrivals

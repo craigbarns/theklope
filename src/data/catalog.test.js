@@ -9,6 +9,7 @@ import {
   isResistanceProduct,
   productMatchesCategory,
   productsByCategorySlugFrom,
+  selectHomeHeroProduct,
 } from './catalog.js'
 
 test('the persisted promo badge displays the PRIX ROUGE label', () => {
@@ -86,4 +87,30 @@ test('legacy DIY components are removed from accessories and exposed in DIY', ()
   assert.ok(legacyDiyProducts.every((product) => getProductCategoryKey(product) === 'diy'))
   assert.deepEqual(productsByCategorySlugFrom(products, 'diy'), legacyDiyProducts)
   assert.deepEqual(productsByCategorySlugFrom(products, 'accessoires'), [accessory])
+})
+
+test('the newest explicitly new product drives the home hero', () => {
+  const products = [
+    { id: 'best', badge: 'best-seller', createdAt: '2026-07-21T10:00:00.000Z' },
+    { id: 'older-new', badge: 'nouveau', createdAt: '2026-07-19T10:00:00.000Z' },
+    { id: 'latest-new', badge: 'nouveau', createdAt: '2026-07-20T10:00:00.000Z' },
+  ]
+
+  assert.equal(selectHomeHeroProduct(products)?.id, 'latest-new')
+})
+
+test('home hero selection ignores stock update timestamps and has stable fallbacks', () => {
+  const newProducts = [
+    { id: 'created-latest', badge: 'nouveau', createdAt: '2026-07-20', updatedAt: '2026-07-20' },
+    { id: 'stock-updated', badge: 'nouveau', createdAt: '2026-07-19', updatedAt: '2026-07-21' },
+  ]
+  const fallbackProducts = [
+    { id: 'regular' },
+    { id: 'best', badge: 'best-seller' },
+  ]
+
+  assert.equal(selectHomeHeroProduct(newProducts)?.id, 'created-latest')
+  assert.equal(selectHomeHeroProduct(fallbackProducts)?.id, 'best')
+  assert.equal(selectHomeHeroProduct([{ id: 'first' }, { id: 'second' }])?.id, 'first')
+  assert.equal(selectHomeHeroProduct([]), undefined)
 })
