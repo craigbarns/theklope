@@ -148,6 +148,31 @@
   .focus-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon/70 focus-visible:ring-offset-2 focus-visible:ring-offset-noir;
   }
+
+  /* Bloc SEO pré-rendu réaffiché pendant le chargement du catalogue
+     (voir src/lib/prerenderSnapshot.js) : HTML brut, on le rend présentable. */
+  .prerender-seo {
+    @apply mx-auto max-w-3xl text-left text-sm leading-relaxed text-muted;
+  }
+  .prerender-seo h1 {
+    @apply font-display text-2xl font-bold text-white;
+  }
+  .prerender-seo h2,
+  .prerender-seo h3 {
+    @apply mt-6 font-display text-lg font-semibold text-white;
+  }
+  .prerender-seo p {
+    @apply mt-3;
+  }
+  .prerender-seo ul {
+    @apply mt-3 list-disc space-y-1 pl-5;
+  }
+  .prerender-seo a {
+    @apply text-neon underline-offset-2 hover:underline;
+  }
+  .prerender-seo nav {
+    @apply mb-4 text-xs text-faint;
+  }
 }
 
 @layer utilities {

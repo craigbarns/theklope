@@ -12,6 +12,7 @@ import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
+import { getPrerenderSnapshot } from '../lib/prerenderSnapshot.js'
 import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import {
   IconHeart,
@@ -464,32 +465,56 @@ export default function Product() {
   )
 }
 
-function ProductLoading() {
+// Réaffiche le bloc SEO pré-rendu (titre, prix, description, liens) pendant que
+// le catalogue se charge : la page garde un contenu réel pour les visiteurs
+// comme pour les crawlers, au lieu d'un simple spinner classé « Soft 404 ».
+function PrerenderContent({ html }) {
   return (
     <div
-      className="container-page flex min-h-[60vh] items-center justify-center py-20"
-      role="status"
-      aria-live="polite"
-    >
-      <div className="text-center">
-        <span className="mx-auto block h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-neon" />
-        <p className="mt-4 text-sm text-muted">Chargement du produit…</p>
+      className="container-page prerender-seo py-8"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  )
+}
+
+function ProductLoading() {
+  const snapshot = getPrerenderSnapshot(window.location.pathname)
+  return (
+    <div className="container-page py-8">
+      <div
+        className={`flex items-center justify-center ${snapshot ? 'py-6' : 'min-h-[60vh] py-20'}`}
+        role="status"
+        aria-live="polite"
+      >
+        <div className="text-center">
+          <span className="mx-auto block h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-neon" />
+          <p className="mt-4 text-sm text-muted">Chargement du produit…</p>
+        </div>
       </div>
+      {snapshot && <PrerenderContent html={snapshot} />}
     </div>
   )
 }
 
 function CatalogUnavailable() {
+  // Si la fiche a été pré-rendue, on réaffiche son contenu réel et on la laisse
+  // indexable : une panne passagère ne doit pas désindexer un produit valide.
+  const snapshot = getPrerenderSnapshot(window.location.pathname)
   return (
-    <div className="container-page grid min-h-[60vh] place-items-center py-16 text-center">
-      <Seo title="Catalogue temporairement indisponible" noindex />
-      <div>
-        <h1 className="font-display text-2xl font-bold text-white">Catalogue temporairement indisponible</h1>
-        <p className="mt-2 text-muted">Nous n’avons pas pu vérifier cette fiche produit. Veuillez réessayer.</p>
-        <button type="button" className="btn-primary mt-7" onClick={() => window.location.reload()}>
-          Réessayer
-        </button>
+    <div className="container-page py-16 text-center">
+      {/* Sans instantané : page d'erreur pure, noindex. Avec instantané : on
+          conserve le <title>/canonical pré-rendus de la fiche, déjà corrects. */}
+      {!snapshot && <Seo title="Catalogue temporairement indisponible" noindex />}
+      <div className={snapshot ? '' : 'grid min-h-[60vh] place-items-center'}>
+        <div>
+          <h1 className="font-display text-2xl font-bold text-white">Catalogue temporairement indisponible</h1>
+          <p className="mt-2 text-muted">Nous n’avons pas pu vérifier cette fiche produit. Veuillez réessayer.</p>
+          <button type="button" className="btn-primary mt-7" onClick={() => window.location.reload()}>
+            Réessayer
+          </button>
+        </div>
       </div>
+      {snapshot && <PrerenderContent html={snapshot} />}
     </div>
   )
 }

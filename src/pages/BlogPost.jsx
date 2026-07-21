@@ -4,6 +4,7 @@ import { getBlogPost } from '../data/blog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
+import NotFound from './NotFound.jsx'
 
 export default function BlogPost() {
   const { slug } = useParams()
@@ -63,18 +64,9 @@ export default function BlogPost() {
     }
   }, [post])
 
-  if (!post) {
-    return (
-      <div className="container-page py-16 text-center">
-        <Seo title="Article non trouvé" />
-        <h1 className="text-xl font-bold text-white">Article introuvable</h1>
-        <p className="mt-2 text-muted">Ce guide de vape n'existe pas ou a été déplacé.</p>
-        <Link to="/guides" className="btn-primary mt-6">
-          Retour aux guides
-        </Link>
-      </div>
-    )
-  }
+  // Un guide inconnu doit se comporter comme un vrai 404 (noindex) : une page
+  // « introuvable » indexable en 200 est signalée « Soft 404 » par Google.
+  if (!post) return <NotFound />
 
   return (
     <>

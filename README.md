@@ -185,8 +185,9 @@ src/
 
 ## Déploiement
 
-Le projet est prêt pour **Vercel** ou **Netlify** (fichiers `vercel.json` et `public/_redirects`
-inclus pour le routage SPA).
+Le projet est déployé sur **Vercel** (`vercel.json` : redirections, réécritures et en-têtes).
+Le routage repose sur les pages pré-rendues + `404.html` : pas de fallback SPA « tout en 200 »,
+qui ferait répondre 200 aux URL inexistantes (Soft 404 dans la Search Console).
 
 ```bash
 npm run build      # génère /dist
