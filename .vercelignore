@@ -11,3 +11,6 @@ pulp-liquides-images/
 
 _*.jpg
 _*.png
+
+# Les tests ne doivent jamais devenir des fonctions serverless
+api/**/*.test.js
