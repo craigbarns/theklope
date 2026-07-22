@@ -31,8 +31,6 @@ export async function loadProducts() {
           ohm: row.ohm,
           price: row.price,
           oldPrice: row.old_price,
-          rating: row.rating,
-          reviews: row.reviews,
           stock: row.stock,
           badge: row.badge,
           nicotine: row.nicotine,

@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
+  "crons": [
+    { "path": "/api/cleanup-checkouts", "schedule": "20 3 * * *" }
+  ],
   "trailingSlash": false,
   "redirects": [
     {
@@ -42,6 +45,9 @@
     { "source": "/accus", "destination": "/categorie/accessoires", "permanent": true },
     { "source": "/brand/9-innokin", "destination": "/boutique?q=Innokin", "permanent": true },
     { "source": "/brand/8-smok", "destination": "/boutique?q=Smok", "permanent": true },
+
+    { "source": "/produit/classico-grege-50-ml-freaks", "destination": "/produit/grege-68", "permanent": true },
+    { "source": "/produit/e-liquide-cafe-10ml-liquidarom", "destination": "/produit/cafe-liquid-arom-209", "permanent": true },
 
     { "source": "/e-liquides-france/306-peche-abricot-50-ml-freaks.html", "destination": "/produit/peche-abricot-50ml-0mg-zhc-297", "permanent": true },
     { "source": "/e-liquides-france/139-melon-50-ml-freaks.html", "destination": "/produit/melon-de-cavaillon-50ml-0mg-293", "permanent": true },

@@ -6,13 +6,40 @@ export const MAX_LINE_QUANTITY = 100
 
 const VARIANT_FIELDS = [
   ['color', 'colors', 'couleur'],
-  ['flavor', 'flavors', 'saveur'],
-  ['nicotine', 'nicotine', 'taux de nicotine'],
+  ['flavor', 'flavors', 'saveur', ['eliquide', 'diy']],
+  ['nicotine', 'nicotine', 'taux de nicotine', ['eliquide', 'diy']],
   ['ohm', 'ohmOptions', 'resistance'],
 ]
 
 const comparable = (value) => String(value ?? '').trim().toLocaleLowerCase('fr-FR')
 const compact = (value, max = 220) => String(value ?? '').trim().slice(0, max)
+
+// Canonicalizes only the options explicitly chosen by the client. This shape
+// is safe to hash before reading the live catalog, so a durable checkout replay
+// is not invalidated by later product/price/option changes.
+export function normalizeVariantIntent(input = {}) {
+  if (input != null && (typeof input !== 'object' || Array.isArray(input))) {
+    return { ok: false, error: 'Options produit invalides.' }
+  }
+  const source = input || {}
+  const knownKeys = VARIANT_FIELDS.map(([key]) => key)
+  const unknownKey = Object.keys(source).find((key) => !knownKeys.includes(key))
+  if (unknownKey) {
+    return { ok: false, error: `Option produit inconnue : ${unknownKey}.` }
+  }
+
+  const variant = {}
+  for (const key of knownKeys) {
+    const raw = source[key]
+    if (raw === undefined || raw === null || raw === '') continue
+    if (!['string', 'number'].includes(typeof raw) || !Number.isFinite(Number(raw)) && typeof raw === 'number') {
+      return { ok: false, error: `Option produit invalide : ${key}.` }
+    }
+    const value = compact(raw)
+    if (value) variant[key] = value.toLocaleLowerCase('fr-FR')
+  }
+  return { ok: true, variant }
+}
 
 function normalizeDeliveryInstructions(value) {
   if (value === undefined || value === null || value === '') return { ok: true, value: '' }
@@ -48,8 +75,11 @@ export function normalizeVariant(product, input = {}) {
   }
 
   const variant = {}
-  for (const [key, productField, label] of VARIANT_FIELDS) {
-    const allowed = Array.isArray(product?.[productField]) ? product[productField].filter((value) => value !== '' && value != null) : []
+  for (const [key, productField, label, categories] of VARIANT_FIELDS) {
+    const fieldApplies = !categories || categories.includes(product?.category)
+    const allowed = fieldApplies && Array.isArray(product?.[productField])
+      ? product[productField].filter((value) => value !== '' && value != null)
+      : []
     const provided = source[key]
 
     if (allowed.length === 0) {
@@ -59,9 +89,13 @@ export function normalizeVariant(product, input = {}) {
       continue
     }
 
-    // Les ajouts rapides utilisent la premiere option quand aucun choix n'a
-    // encore ete fait. Une valeur envoyee explicitement doit, elle, exister.
+    // Une dimension ambiguë doit être choisie explicitement. Cela empêche un
+    // client direct (ou un ancien quick-add) de commander silencieusement la
+    // première nicotine/couleur/résistance. Une option unique reste implicite.
     if (provided === undefined || provided === null || provided === '') {
+      if (allowed.length > 1) {
+        return { ok: false, error: `Choisissez une option de ${label} pour ${product.name}.` }
+      }
       variant[key] = allowed[0]
       continue
     }

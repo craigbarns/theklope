@@ -5,12 +5,14 @@ import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
 import {
   aggregateQuantities,
   normalizeVariant,
+  normalizeVariantIntent,
   parseQuantity,
   validateFulfillment,
 } from './orderValidation.js'
 
 const product = {
   name: 'Produit test',
+  category: 'eliquide',
   colors: ['Noir', 'Rouge'],
   flavors: [],
   nicotine: [0, 3, 6],
@@ -22,9 +24,19 @@ test('variant values are canonicalized against catalog options', () => {
   assert.deepEqual(result, { ok: true, variant: { color: 'Rouge', nicotine: 3, ohm: '0.8' } })
 })
 
-test('missing quick-add variants use catalog defaults', () => {
+test('missing ambiguous variants are rejected and a sole option stays implicit', () => {
   const result = normalizeVariant(product, {})
-  assert.deepEqual(result.variant, { color: 'Noir', nicotine: 0, ohm: '0.8' })
+  assert.equal(result.ok, false)
+  assert.match(result.error, /couleur/i)
+
+  const singleChoice = normalizeVariant({
+    name: 'Résistance test',
+    colors: [],
+    flavors: [],
+    nicotine: [],
+    ohmOptions: ['0.8'],
+  }, {})
+  assert.deepEqual(singleChoice, { ok: true, variant: { ohm: '0.8' } })
 })
 
 test('impossible and unknown variants are rejected', () => {
@@ -32,6 +44,31 @@ test('impossible and unknown variants are rejected', () => {
   assert.equal(normalizeVariant(product, { size: 'XL' }).ok, false)
   assert.equal(normalizeVariant(product, { flavor: 'Menthe' }).ok, false)
   assert.equal(normalizeVariant(product, 'Rouge').ok, false)
+})
+
+test('variant intent can be hashed before catalog lookup', () => {
+  assert.deepEqual(normalizeVariantIntent({ nicotine: 3, color: ' Noir ' }), {
+    ok: true,
+    variant: { color: 'noir', nicotine: '3' },
+  })
+  assert.equal(normalizeVariantIntent({ hiddenPrice: '1' }).ok, false)
+  assert.equal(normalizeVariantIntent('nicotine=3').ok, false)
+})
+
+test('legacy liquid fields on hardware never become purchasable variants', () => {
+  const hardware = {
+    name: 'Kit test',
+    category: 'ecig',
+    colors: ['Noir'],
+    flavors: ['Valeur générée'],
+    nicotine: [0, 3, 6],
+    ohmOptions: [],
+  }
+  assert.deepEqual(normalizeVariant(hardware, { color: 'Noir' }), {
+    ok: true,
+    variant: { color: 'Noir' },
+  })
+  assert.equal(normalizeVariant(hardware, { color: 'Noir', nicotine: 3 }).ok, false)
 })
 
 test('quantities are strict and aggregate across variant lines', () => {

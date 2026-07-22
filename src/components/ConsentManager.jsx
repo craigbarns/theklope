@@ -36,8 +36,16 @@ export default function ConsentManager() {
   }, [location.pathname])
 
   useEffect(() => {
-    setOptionalServicesConsent({ analytics: analyticsAllowed, reviews: reviewsAllowed })
-    revokeOptionalServices({ analytics: !analyticsAllowed, reviews: !reviewsAllowed })
+    setOptionalServicesConsent({
+      analytics: analyticsAllowed,
+      reviews: reviewsAllowed,
+      analyticsDecision: cookiesChoice,
+    })
+    revokeOptionalServices({
+      analytics: !analyticsAllowed,
+      reviews: !reviewsAllowed,
+      analyticsDecision: cookiesChoice,
+    })
 
     let active = true
     let pageViewTimer = null
@@ -58,7 +66,7 @@ export default function ConsentManager() {
       active = false
       if (pageViewTimer !== null) window.clearTimeout(pageViewTimer)
     }
-  }, [analyticsAllowed, pageReady, path, reviewsAllowed])
+  }, [analyticsAllowed, cookiesChoice, pageReady, path, reviewsAllowed])
 
   return analyticsAllowed ? <Analytics /> : null
 }

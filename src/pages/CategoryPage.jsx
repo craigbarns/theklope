@@ -4,13 +4,13 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES, productsByCategorySlugFrom } from '../data/catalog.js'
+import { CATEGORIES, productsByCategorySlugFrom, sortProductsByMerchandising } from '../data/catalog.js'
 import { CATEGORY_SEO } from '../data/categorySeo.js'
 import { IconChevronDown } from '../components/icons.jsx'
 import NotFound from './NotFound.jsx'
 
 const SORTS = [
-  { value: 'popularite', label: 'Popularité' },
+  { value: 'selection', label: 'Sélection THEKLOPE' },
   { value: 'prix-asc', label: 'Prix croissant' },
   { value: 'prix-desc', label: 'Prix décroissant' },
 ]
@@ -19,7 +19,7 @@ const PAGE_SIZE = 24
 export default function CategoryPage() {
   const { slug } = useParams()
   const { products: allProducts } = useStore()
-  const [sort, setSort] = useState('popularite')
+  const [sort, setSort] = useState('selection')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
 
   const category = CATEGORIES.find((c) => c.slug === slug)
@@ -28,7 +28,7 @@ export default function CategoryPage() {
     let list = productsByCategorySlugFrom(allProducts, slug)
     if (sort === 'prix-asc') list = [...list].sort((a, b) => a.price - b.price)
     if (sort === 'prix-desc') list = [...list].sort((a, b) => b.price - a.price)
-    if (sort === 'popularite') list = [...list].sort((a, b) => b.reviews - a.reviews)
+    if (sort === 'selection') list = sortProductsByMerchandising(list)
     return list
   }, [allProducts, slug, sort])
   const visibleProducts = useMemo(() => products.slice(0, visibleCount), [products, visibleCount])

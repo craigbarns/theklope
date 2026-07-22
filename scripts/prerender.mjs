@@ -25,7 +25,14 @@ const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').rep
 const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
-const { CATEGORIES, categoryName, getProductCategoryKey, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const {
+  CATEGORIES,
+  categoryName,
+  featuredProducts,
+  getProductCategoryKey,
+  productMatchesCategory,
+  selectHomeHeroProduct,
+} = await import(resolve(root, 'src/data/catalog.js'))
 const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
   ...product,
   category: getProductCategoryKey(product),
@@ -33,7 +40,6 @@ const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
-const { STORE_REVIEW_SUMMARY } = await import(resolve(root, 'src/data/reviews.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -46,12 +52,23 @@ const esc = (s) =>
 
 const fmtPrice = (n) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0)
 const abs = (path) => `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
-const absImg = (img) => (!img ? DEFAULT_OG : /^https?:/.test(img) ? img : abs(img))
+const absImg = (img) => encodeURI(!img ? DEFAULT_OG : /^https?:/.test(img) ? img : abs(img))
 
 // Remplace le contenu d'une balise meta/link/title dans le template HTML.
 const replaceAttr = (html, re, value) => html.replace(re, (_m, p1, p2) => `${p1}${esc(value)}${p2}`)
 
-function buildPage({ title, description, canonicalPath, ogImage, ogType = 'website', jsonLd, content = '', noindex = false }) {
+function buildPage({
+  title,
+  description,
+  canonicalPath,
+  ogImage,
+  ogType = 'website',
+  jsonLd,
+  content = '',
+  noindex = false,
+  catalogBootstrap = [],
+  prerenderPaddingTop = '8rem',
+}) {
   const fullTitle = title
   const canonical = canonicalPath ? abs(canonicalPath) : null
   const image = ogImage || DEFAULT_OG
@@ -67,9 +84,15 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
     html = html.replace(/\s*<meta\s+property="og:url"[^>]*>/, '')
   }
   html = replaceAttr(html, /(<meta\s+property="og:image"\s+content=")[^"]*(")/, image)
+  html = replaceAttr(html, /(<meta\s+property="og:image:alt"\s+content=")[^"]*(")/, fullTitle)
   html = replaceAttr(html, /(<meta\s+name="twitter:title"\s+content=")[^"]*(")/, fullTitle)
   html = replaceAttr(html, /(<meta\s+name="twitter:description"\s+content=")[^"]*(")/, description)
   html = replaceAttr(html, /(<meta\s+name="twitter:image"\s+content=")[^"]*(")/, image)
+  if (image !== DEFAULT_OG) {
+    // Les visuels produit n'ont pas tous un ratio 1200×630 : annoncer une
+    // dimension erronée dégrade les aperçus sociaux.
+    html = html.replace(/\s*<meta\s+property="og:image:(?:width|height)"[^>]*>/g, '')
+  }
   if (canonical) {
     html = replaceAttr(html, /(<link\s+rel="canonical"\s+href=")[^"]*(")/, canonical)
   } else {
@@ -80,6 +103,14 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
     /(<meta\s+name="robots"\s+content=")[^"]*(")/,
     noindex ? 'noindex, nofollow' : 'index, follow',
   )
+
+  if (catalogBootstrap.length > 0) {
+    const bootstrapJson = JSON.stringify(catalogBootstrap).replace(/</g, '\\u003c')
+    html = html.replace(
+      '</head>',
+      () => `    <script id="theklope-catalog-bootstrap" data-prerender-path="${esc(canonicalPath || '')}" type="application/json">${bootstrapJson}</script>\n  </head>`,
+    )
+  }
 
   if (jsonLd) {
     const json = JSON.stringify(jsonLd).replace(/</g, '\\u003c')
@@ -92,7 +123,7 @@ function buildPage({ title, description, canonicalPath, ogImage, ogType = 'websi
     // Contenu injecté dans #root : lu par les crawlers, remplacé par React au chargement.
     html = html.replace(
       '<div id="root"></div>',
-      () => `<div id="root"><div data-prerender="seo">${content}</div></div>`,
+      () => `<div id="root"><div data-prerender="seo" data-prerender-path="${esc(canonicalPath || '')}" class="container-page prerender-seo py-8" style="min-height:100vh;padding-top:${esc(prerenderPaddingTop)}">${content}</div></div>`,
     )
   }
   return html
@@ -148,18 +179,31 @@ for (const p of PRODUCTS) {
         returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
       },
     },
-    ...(p.reviews > 0
-      ? { aggregateRating: { '@type': 'AggregateRating', ratingValue: (Number(p.rating) || 0).toFixed(1), reviewCount: p.reviews } }
-      : {}),
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <span>${esc(catLabel)}</span></nav>
-    <h1>${esc(p.name)}</h1>
-    <p>${esc(p.brand || 'THEKLOPE')} · ${esc(p.type || catLabel)}</p>
-    <p><strong>${esc(fmtPrice(p.price))}</strong>${p.oldPrice ? ` <s>${esc(fmtPrice(p.oldPrice))}</s>` : ''}</p>
-    <p>${esc(p.long || p.short || '')}</p>
-    <p><a href="/boutique">Voir toute la boutique THEKLOPE</a></p>`
-  writePage(path, buildPage({ title, description, canonicalPath: path, ogImage: absImg(p.image), ogType: 'product', jsonLd, content }))
+    <div class="mt-6 grid gap-10 lg:grid-cols-2">
+      <div><div class="card relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-2">
+        <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(p.name)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
+      </div></div>
+      <div>
+        <p class="text-xs uppercase tracking-wider text-faint">${esc(p.brand || 'THEKLOPE')} · ${esc(p.type || catLabel)}</p>
+        <h1 class="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">${esc(p.name)}</h1>
+        <p class="mt-5"><strong>${esc(fmtPrice(p.price))}</strong>${p.oldPrice ? ` <s>${esc(fmtPrice(p.oldPrice))}</s>` : ''}</p>
+        <p class="mt-5">${esc(p.long || p.short || '')}</p>
+        <p class="mt-7"><a href="/boutique">Voir toute la boutique THEKLOPE</a></p>
+      </div>
+    </div>`
+  writePage(path, buildPage({
+    title,
+    description,
+    canonicalPath: path,
+    ogImage: absImg(p.image),
+    ogType: 'product',
+    jsonLd,
+    content,
+    catalogBootstrap: [p],
+  }))
   count++
 }
 
@@ -202,7 +246,7 @@ for (const c of CATEGORIES) {
     ${sections}
     <ul>${links}</ul>`
     + faq
-  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content, catalogBootstrap: inCat }))
   count++
 }
 
@@ -234,9 +278,9 @@ for (const b of BLOG_POSTS) {
 
 // ---- Pages statiques clés ----
 const STATIC_PAGES = [
-  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.' },
+  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.', catalogBootstrap: PRODUCTS },
   { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, produits DIY, accessoires et packs débutants.' },
-  { path: '/configurateur', title: 'Configurateur de pack sur mesure (-15%) | THEKLOPE', description: 'Composez un pack cigarette électronique compatible (batterie + réservoir + e-liquide) et profitez de -15% sur le pack complet.' },
+  { path: '/configurateur', title: 'Configurateur de pack sur mesure (-15%) | THEKLOPE', description: 'Composez votre pack (appareil + accessoire + e-liquide) et profitez de -15% sur une composition éligible. Vérifiez les références fabricant : le configurateur ne valide pas la compatibilité technique.', catalogBootstrap: PRODUCTS },
   { path: '/calculette-diy', title: 'Calculette DIY & booster de nicotine | THEKLOPE', description: 'Calculez facilement vos dosages pour fabriquer votre e-liquide maison (base, boosters, arômes) avec la calculette DIY THEKLOPE.' },
   { path: '/guides', title: 'Guides vape responsables | THEKLOPE', description: 'Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes.' },
   { path: '/a-propos', title: 'À propos | THEKLOPE', description: 'THEKLOPE, boutique de vape née à Marseille (188 rue de Rome). Une sélection premium, un conseil d’expert et une expérience simple et élégante.' },
@@ -246,10 +290,21 @@ const STATIC_PAGES = [
   { path: '/legal/cgv', title: 'Conditions générales de vente | THEKLOPE', description: 'Conditions générales de vente du site THEKLOPE.' },
   { path: '/legal/confidentialite', title: 'Politique de confidentialité | THEKLOPE', description: 'Politique de confidentialité et gestion des données personnelles (RGPD) de THEKLOPE.' },
   { path: '/legal/retour', title: 'Politique de retour | THEKLOPE', description: 'Modalités de retour et de remboursement des produits THEKLOPE.' },
+  { path: '/panier', title: 'Panier | THEKLOPE', description: 'Vérifiez votre panier THEKLOPE avant de commander.', noindex: true, catalogBootstrap: PRODUCTS },
+  { path: '/checkout', title: 'Paiement sécurisé | THEKLOPE', description: 'Finalisez votre commande THEKLOPE avec le paiement sécurisé Mollie.', noindex: true, catalogBootstrap: PRODUCTS },
+  { path: '/checkout/retour', title: 'Confirmation de commande | THEKLOPE', description: 'Confirmation de votre commande THEKLOPE.', noindex: true },
 ]
 for (const s of STATIC_PAGES) {
   const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>`
-  writePage(s.path, buildPage({ title: s.title, description: s.description, canonicalPath: s.path, content }))
+  writePage(s.path, buildPage({
+    title: s.title,
+    description: s.description,
+    canonicalPath: s.path,
+    content,
+    noindex: s.noindex,
+    catalogBootstrap: s.catalogBootstrap,
+    prerenderPaddingTop: s.path.startsWith('/checkout') ? '6rem' : undefined,
+  }))
   count++
 }
 
@@ -333,11 +388,6 @@ const homeSchema = {
         latitude: 43.2905,
         longitude: 5.3801,
       },
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: STORE_REVIEW_SUMMARY.rating.toFixed(1),
-        reviewCount: STORE_REVIEW_SUMMARY.count,
-      },
     },
     {
       '@type': 'WebSite',
@@ -360,9 +410,27 @@ const homeSchema = {
   ],
 }
 
+const homeFeatured = featuredProducts(PRODUCTS)
+const homeHero = selectHomeHeroProduct(PRODUCTS)
+const homeBootstrap = [...new Map([
+  homeHero,
+  ...homeFeatured.bestSellers,
+  ...homeFeatured.newArrivals,
+  ...homeFeatured.starterPacks,
+].filter(Boolean).map((product) => [product.id, product])).values()]
+
 const homeContent = `
-  <h1>THEKLOPE — Boutique vape en ligne pour adultes</h1>
-  <p>Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.</p>
+  <section class="relative overflow-hidden">
+    <div class="relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
+      <div>
+        <span class="chip mb-6 border-neon/30 text-neon">Boutique vape française · +18</span>
+        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE<br>Boutique vape en ligne pour adultes</h1>
+        <p class="mt-6 max-w-lg text-base leading-relaxed sm:text-lg">Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour adultes.</p>
+        <p class="mt-8"><a href="/boutique">Découvrir la boutique</a></p>
+      </div>
+      ${homeHero ? `<div class="mx-auto w-full max-w-md"><img src="${esc(homeHero.image)}" alt="${esc(homeHero.name)}" width="448" height="448" class="aspect-square h-full w-full rounded-3xl object-cover"></div>` : ''}
+    </div>
+  </section>
   
   <h2>Nos Catégories de Produits Vape</h2>
   <ul>
@@ -389,7 +457,15 @@ const homeContent = `
   </ul>
 `
 
-writePage('/', buildPage({ title: homeTitle, description: homeDescription, canonicalPath: '/', jsonLd: homeSchema, content: homeContent }))
+writePage('/', buildPage({
+  title: homeTitle,
+  description: homeDescription,
+  canonicalPath: '/',
+  jsonLd: homeSchema,
+  content: homeContent,
+  catalogBootstrap: homeBootstrap,
+  prerenderPaddingTop: '6rem',
+}))
 count++
 
 // Vercel sert automatiquement 404.html avec un vrai statut HTTP 404 lorsque

@@ -5,7 +5,7 @@
 // confiance au corps : on refait un appel API Mollie pour lire le vrai statut,
 // puis on met la commande à jour. C'est la source de vérité du paiement.
 // =============================================================================
-import { syncOrderFromMolliePayment } from './_lib/orders.js'
+import { retryOrderConfirmationEmails, syncOrderFromMolliePayment } from './_lib/orders.js'
 import { setNoStore } from './_lib/httpSecurity.js'
 
 export const config = { api: { bodyParser: false } }
@@ -42,10 +42,21 @@ export default async function handler(req, res) {
     if (!['paid', 'pending', 'failed'].includes(result.status)) {
       throw new Error('Paiement Mollie non rattache a une commande.')
     }
+    // The shared synchronizer attempts delivery best-effort, while the webhook
+    // deliberately propagates an e-mail failure so Mollie retries this event.
+    // Recipient-level durable markers and Resend idempotency prevent duplicates.
+    if (result.status === 'paid' && result.orderId) {
+      await retryOrderConfirmationEmails(result.orderId)
+    }
     // Mollie attend un 200 ; sinon il réessaie plus tard.
     return res.status(200).json({ received: true })
   } catch (err) {
     console.error('mollie-webhook error:', err)
+    if (err.code === 'multiple_payments_for_order') {
+      // The mismatch is already persisted for manual reconciliation. Ack the
+      // webhook so Mollie does not retry an event automation must never apply.
+      return res.status(200).json({ received: true, reviewRequired: true })
+    }
     return res.status(err.statusCode || 500).json({ error: err.message })
   }
 }

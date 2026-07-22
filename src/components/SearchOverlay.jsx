@@ -1,19 +1,27 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { IconSearch, IconClose } from './icons.jsx'
+import { useDialogFocus } from '../lib/useDialogFocus.js'
 
 export default function SearchOverlay() {
   const { searchOpen, setSearchOpen, products } = useStore()
   const [q, setQ] = useState('')
   const navigate = useNavigate()
+  const dialogRef = useRef(null)
+  const inputRef = useRef(null)
+  const close = useCallback(() => setSearchOpen(false), [setSearchOpen])
+
+  useDialogFocus({
+    open: searchOpen,
+    dialogRef,
+    initialFocusRef: inputRef,
+    onClose: close,
+  })
 
   useEffect(() => {
     if (!searchOpen) setQ('')
-    const onKey = (e) => e.key === 'Escape' && setSearchOpen(false)
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [searchOpen, setSearchOpen])
+  }, [searchOpen])
 
   const results = useMemo(() => {
     const term = q.trim().toLowerCase()
@@ -35,13 +43,21 @@ export default function SearchOverlay() {
   }
 
   return (
-    <div className="fixed inset-0 z-[90] bg-noir/80 backdrop-blur-sm" onClick={() => setSearchOpen(false)}>
+    <div className="fixed inset-0 z-[90] bg-noir/80 backdrop-blur-sm" onClick={close}>
       <div className="container-page pt-24" onClick={(e) => e.stopPropagation()}>
-        <div className="mx-auto max-w-2xl animate-fade-up">
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="search-dialog-title"
+          tabIndex={-1}
+          className="mx-auto max-w-2xl animate-fade-up"
+        >
+          <h2 id="search-dialog-title" className="sr-only">Rechercher dans la boutique</h2>
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-anthracite px-5 py-4 shadow-card">
             <IconSearch className="text-neon" width={22} height={22} />
             <input
-              autoFocus
+              ref={inputRef}
               value={q}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => {
@@ -51,15 +67,19 @@ export default function SearchOverlay() {
                 }
               }}
               placeholder="Rechercher un produit, une saveur, une marque…"
+              aria-label="Rechercher un produit"
+              aria-controls="search-results"
+              aria-expanded={Boolean(q)}
+              autoComplete="off"
               className="flex-1 bg-transparent text-base text-white placeholder-faint outline-none"
             />
-            <button onClick={() => setSearchOpen(false)} aria-label="Fermer" className="text-muted hover:text-white">
+            <button type="button" onClick={close} aria-label="Fermer la recherche" className="text-muted hover:text-white">
               <IconClose />
             </button>
           </div>
 
           {q && (
-            <div className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-anthracite shadow-card">
+            <div id="search-results" aria-live="polite" className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-anthracite shadow-card">
               {results.length === 0 ? (
                 <p className="px-5 py-6 text-sm text-muted">Aucun résultat pour « {q} ».</p>
               ) : (

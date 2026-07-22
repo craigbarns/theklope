@@ -15,7 +15,8 @@ let snapshot = null
 export function capturePrerenderSnapshot() {
   if (typeof document === 'undefined') return
   const block = document.querySelector('#root [data-prerender="seo"]')
-  if (block) {
+  const renderedPath = block?.getAttribute('data-prerender-path')
+  if (block && (!renderedPath || renderedPath === window.location.pathname)) {
     snapshot = { pathname: window.location.pathname, html: block.innerHTML }
   }
 }

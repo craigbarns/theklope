@@ -10,6 +10,7 @@ import {
   productMatchesCategory,
   productsByCategorySlugFrom,
   selectHomeHeroProduct,
+  sortProductsByMerchandising,
 } from './catalog.js'
 
 test('the persisted promo badge displays the PRIX ROUGE label', () => {
@@ -113,4 +114,18 @@ test('home hero selection ignores stock update timestamps and has stable fallbac
   assert.equal(selectHomeHeroProduct(fallbackProducts)?.id, 'best')
   assert.equal(selectHomeHeroProduct([{ id: 'first' }, { id: 'second' }])?.id, 'first')
   assert.equal(selectHomeHeroProduct([]), undefined)
+})
+
+test('merchandising order uses explicit badges and never synthetic review counts', () => {
+  const products = [
+    { id: 'many-fake-reviews', stock: 10, reviews: 9999 },
+    { id: 'editorial-best', stock: 10, badge: 'best-seller', reviews: 0 },
+    { id: 'new', stock: 10, badge: 'nouveau', reviews: 0 },
+    { id: 'out', stock: 0, badge: 'best-seller', reviews: 9999 },
+  ]
+
+  assert.deepEqual(
+    sortProductsByMerchandising(products).map(({ id }) => id),
+    ['editorial-best', 'new', 'many-fake-reviews', 'out'],
+  )
 })

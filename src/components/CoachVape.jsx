@@ -1,6 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useCallback, useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
+import { productRequiresVariantSelection } from '../lib/cart.js'
+import { useDialogFocus } from '../lib/useDialogFocus.js'
+import { sortProductsByMerchandising } from '../data/catalog.js'
 
 export default function CoachVape() {
   const { products, addToCart, ageVerified, cookiesChoice, reviewsChoice } = useStore()
@@ -13,18 +16,16 @@ export default function CoachVape() {
   const [step, setStep] = useState('welcome') // welcome, smoking, flavor, type, recommended
   const [answers, setAnswers] = useState({ smoking: '', flavor: '', type: '' })
   const chatEndRef = useRef(null)
+  const dialogRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const close = useCallback(() => setIsOpen(false), [])
 
-  // Bloquer le défilement du corps de page en version mobile quand le chat est ouvert
-  useEffect(() => {
-    if (isOpen && window.innerWidth < 640) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
+  useDialogFocus({
+    open: isOpen,
+    dialogRef,
+    initialFocusRef: closeButtonRef,
+    onClose: close,
+  })
 
   useEffect(() => {
     setIsOpen(false)
@@ -259,7 +260,9 @@ export default function CoachVape() {
 
     // Si pas de correspondance directe ou trop peu, on ajoute des bestsellers
     if (matchedProducts.length < 2) {
-      const backupProducts = products.filter((p) => p.badge === 'best-seller' || p.rating >= 4.8)
+      const backupProducts = sortProductsByMerchandising(products)
+        .filter((p) => p.stock > 0)
+        .slice(0, 3)
       matchedProducts = [...matchedProducts, ...backupProducts]
     }
 
@@ -371,13 +374,16 @@ export default function CoachVape() {
     <>
       {/* Bouton de chat flottant */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
         className={`fixed right-4 z-[35] flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-neon to-electric text-noir shadow-glow transition hover:scale-110 active:scale-95 sm:bottom-6 sm:right-6 sm:z-40 ${
           isProductPage
             ? 'bottom-[calc(6.25rem+env(safe-area-inset-bottom))]'
             : 'bottom-[calc(1.25rem+env(safe-area-inset-bottom))]'
         }`}
-        aria-label="Ouvrir le Coach Vape"
+        aria-label={isOpen ? 'Fermer le Coach Vape' : 'Ouvrir le Coach Vape'}
+        aria-expanded={isOpen}
+        aria-controls="coach-vape-dialog"
       >
         {isOpen ? (
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.2">
@@ -399,7 +405,15 @@ export default function CoachVape() {
 
       {/* Fenêtre de chat */}
       {isOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-0 z-40 flex flex-col overflow-hidden bg-carbon/95 backdrop-blur-2xl animate-fade-up sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[500px] sm:w-[400px] sm:rounded-3xl sm:border sm:border-white/10 sm:bg-carbon/90 sm:backdrop-blur-xl sm:shadow-card">
+        <div
+          id="coach-vape-dialog"
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="coach-vape-title"
+          tabIndex={-1}
+          className="fixed inset-x-0 bottom-0 top-0 z-40 flex flex-col overflow-hidden bg-carbon/95 backdrop-blur-2xl animate-fade-up sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[500px] sm:w-[400px] sm:rounded-3xl sm:border sm:border-white/10 sm:bg-carbon/90 sm:backdrop-blur-xl sm:shadow-card"
+        >
           {/* Header */}
           <div className="flex items-center gap-3 bg-gradient-to-r from-noir/80 to-carbon/80 px-5 py-4 border-b border-white/8">
             <div className="relative h-10 w-10 shrink-0 rounded-full bg-neon/10 border border-neon/30 flex items-center justify-center text-neon">
@@ -409,13 +423,15 @@ export default function CoachVape() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="font-display text-sm font-bold text-white leading-tight">Coach Vape</h3>
+              <h2 id="coach-vape-title" className="font-display text-sm font-bold text-white leading-tight">Coach Vape</h2>
               <p className="text-[10px] text-neon font-semibold uppercase tracking-wider">Conseiller virtuel connecté</p>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              ref={closeButtonRef}
+              type="button"
+              onClick={close}
               className="text-faint hover:text-white"
-              aria-label="Fermer"
+              aria-label="Fermer le Coach Vape"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -424,7 +440,7 @@ export default function CoachVape() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 space-y-4" aria-live="polite">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -462,23 +478,35 @@ export default function CoachVape() {
                           <p className="text-xs font-semibold text-neon mt-1">{formatPrice(p.price)}</p>
                         </div>
                         <div className="flex flex-col gap-1.5 shrink-0">
-                          <button
-                            onClick={() => {
-                              const added = addToCart(p.id, 1)
-                              addMessage({
-                                isBot: true,
-                                content: added
-                                  ? `🛒 J'ai ajouté **${p.name}** à votre panier.`
-                                  : `La quantité maximale disponible de **${p.name}** est déjà dans votre panier.`,
-                              })
-                            }}
-                            className="rounded-full bg-neon/10 border border-neon/30 p-2 text-neon hover:bg-neon hover:text-noir transition"
-                            title="Ajouter au panier"
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                          </button>
+                          {productRequiresVariantSelection(p) ? (
+                            <Link
+                              to={`/produit/${p.id}`}
+                              onClick={() => setIsOpen(false)}
+                              className="rounded-full border border-neon/30 bg-neon/10 px-3 py-2 text-[10px] font-bold text-neon transition hover:bg-neon hover:text-noir"
+                              aria-label={`Choisir les options de ${p.name}`}
+                            >
+                              Choisir
+                            </Link>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const added = addToCart(p.id, 1)
+                                addMessage({
+                                  isBot: true,
+                                  content: added
+                                    ? `🛒 J'ai ajouté **${p.name}** à votre panier.`
+                                    : `La quantité maximale disponible de **${p.name}** est déjà dans votre panier.`,
+                                })
+                              }}
+                              className="rounded-full border border-neon/30 bg-neon/10 p-2 text-neon transition hover:bg-neon hover:text-noir"
+                              aria-label={`Ajouter ${p.name} au panier`}
+                            >
+                              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -518,6 +546,7 @@ export default function CoachVape() {
           <form onSubmit={handleSend} className="p-3 border-t border-white/8 bg-noir/20 flex gap-2">
             <input
               type="text"
+              aria-label="Votre question au Coach Vape"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={step === 'chat' || step === 'welcome' ? "Écrivez votre question ici..." : "Veuillez choisir une option ci-dessus"}
@@ -526,6 +555,7 @@ export default function CoachVape() {
             />
             <button
               type="submit"
+              aria-label="Envoyer la question"
               disabled={(step !== 'chat' && step !== 'welcome' && step !== 'recommended') || !input.trim()}
               className="rounded-2xl bg-neon text-noir p-2.5 disabled:opacity-30 disabled:hover:bg-neon transition hover:bg-neon/90"
             >

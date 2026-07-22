@@ -1,5 +1,5 @@
-import { Suspense, lazy } from 'react'
-import { Routes, Route, Navigate, useParams } from 'react-router-dom'
+import { Suspense } from 'react'
+import { Link, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import AgeGate from './components/AgeGate.jsx'
@@ -9,28 +9,33 @@ import CartDrawer from './components/CartDrawer.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
 import CoachVape from './components/CoachVape.jsx'
 import ConsentManager from './components/ConsentManager.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
+import Logo from './components/Logo.jsx'
+import { IconLock } from './components/icons.jsx'
+import { getPrerenderSnapshot } from './lib/prerenderSnapshot.js'
+import { lazyWithRetry } from './lib/lazyWithRetry.js'
 
 // Pages chargées à la demande (code-splitting) pour alléger le bundle initial.
-const Home = lazy(() => import('./pages/Home.jsx'))
-const Shop = lazy(() => import('./pages/Shop.jsx'))
-const Product = lazy(() => import('./pages/Product.jsx'))
-const Cart = lazy(() => import('./pages/Cart.jsx'))
-const Checkout = lazy(() => import('./pages/Checkout.jsx'))
-const CheckoutReturn = lazy(() => import('./pages/CheckoutReturn.jsx'))
-const Categories = lazy(() => import('./pages/Categories.jsx'))
-const CategoryPage = lazy(() => import('./pages/CategoryPage.jsx'))
-const Favorites = lazy(() => import('./pages/Favorites.jsx'))
-const About = lazy(() => import('./pages/About.jsx'))
-const Contact = lazy(() => import('./pages/Contact.jsx'))
-const FAQ = lazy(() => import('./pages/FAQ.jsx'))
-const Legal = lazy(() => import('./pages/Legal.jsx'))
-const Admin = lazy(() => import('./pages/Admin.jsx'))
+const Home = lazyWithRetry(() => import('./pages/Home.jsx'))
+const Shop = lazyWithRetry(() => import('./pages/Shop.jsx'))
+const Product = lazyWithRetry(() => import('./pages/Product.jsx'))
+const Cart = lazyWithRetry(() => import('./pages/Cart.jsx'))
+const Checkout = lazyWithRetry(() => import('./pages/Checkout.jsx'))
+const CheckoutReturn = lazyWithRetry(() => import('./pages/CheckoutReturn.jsx'))
+const Categories = lazyWithRetry(() => import('./pages/Categories.jsx'))
+const CategoryPage = lazyWithRetry(() => import('./pages/CategoryPage.jsx'))
+const Favorites = lazyWithRetry(() => import('./pages/Favorites.jsx'))
+const About = lazyWithRetry(() => import('./pages/About.jsx'))
+const Contact = lazyWithRetry(() => import('./pages/Contact.jsx'))
+const FAQ = lazyWithRetry(() => import('./pages/FAQ.jsx'))
+const Legal = lazyWithRetry(() => import('./pages/Legal.jsx'))
+const Admin = lazyWithRetry(() => import('./pages/Admin.jsx'))
 import NotFound from './pages/NotFound.jsx'
-const Configurateur = lazy(() => import('./pages/Configurateur.jsx'))
-const CalculetteDiy = lazy(() => import('./pages/CalculetteDiy.jsx'))
-const Blog = lazy(() => import('./pages/Blog.jsx'))
-const BlogPost = lazy(() => import('./pages/BlogPost.jsx'))
-const StaticSeoPage = lazy(() => import('./pages/StaticSeoPage.jsx'))
+const Configurateur = lazyWithRetry(() => import('./pages/Configurateur.jsx'))
+const CalculetteDiy = lazyWithRetry(() => import('./pages/CalculetteDiy.jsx'))
+const Blog = lazyWithRetry(() => import('./pages/Blog.jsx'))
+const BlogPost = lazyWithRetry(() => import('./pages/BlogPost.jsx'))
+const StaticSeoPage = lazyWithRetry(() => import('./pages/StaticSeoPage.jsx'))
 
 function BlogRedirect() {
   const { slug } = useParams()
@@ -38,6 +43,17 @@ function BlogRedirect() {
 }
 
 function PageFallback() {
+  const location = useLocation()
+  const snapshot = getPrerenderSnapshot(location.pathname)
+  if (snapshot) {
+    return (
+      <div
+        className={`container-page prerender-seo ${location.pathname === '/' ? '' : 'py-8'}`}
+        aria-busy="true"
+        dangerouslySetInnerHTML={{ __html: snapshot }}
+      />
+    )
+  }
   return (
     <div className="container-page flex min-h-[50vh] items-center justify-center py-20">
       <span className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-neon" aria-label="Chargement" />
@@ -45,19 +61,38 @@ function PageFallback() {
   )
 }
 
+function CheckoutHeader() {
+  return (
+    <header className="border-b border-white/10 bg-noir/90 backdrop-blur-xl">
+      <div className="container-page flex h-16 items-center justify-between gap-4">
+        <Logo />
+        <div className="flex items-center gap-2 text-xs font-medium text-muted">
+          <IconLock width={16} height={16} className="text-neon" />
+          <span className="hidden sm:inline">Paiement sécurisé par Mollie</span>
+          <Link to="/panier" className="text-neon hover:underline">Retour au panier</Link>
+        </div>
+      </div>
+    </header>
+  )
+}
+
 export default function App() {
+  const location = useLocation()
+  const checkoutShell = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/')
+
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
       <ScrollToTop />
       <AgeGate />
-      <Header />
-      <SearchOverlay />
-      <CartDrawer />
+      {checkoutShell ? <CheckoutHeader /> : <Header />}
+      {!checkoutShell && <SearchOverlay />}
+      {!checkoutShell && <CartDrawer />}
 
       <main id="contenu" className="flex-1">
-        <Suspense fallback={<PageFallback />}>
-          <Routes>
+        <ErrorBoundary variant="page" resetKey={`${location.pathname}${location.search}`}>
+          <Suspense fallback={<PageFallback />}>
+            <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/boutique" element={<Shop />} />
             <Route path="/configurateur" element={<Configurateur />} />
@@ -82,13 +117,14 @@ export default function App() {
             <Route path="/legal/:slug" element={<Legal />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </main>
 
-      <Footer />
+      {!checkoutShell && <Footer />}
       <CookieBanner />
-      <CoachVape />
+      {!checkoutShell && <CoachVape />}
       <ConsentManager />
     </div>
   )

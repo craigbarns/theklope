@@ -69,11 +69,6 @@ export default function Home() {
           latitude: 43.2905,
           longitude: 5.3801,
         },
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: STORE_REVIEW_SUMMARY.rating.toFixed(1),
-          reviewCount: STORE_REVIEW_SUMMARY.count,
-        },
       },
       {
         '@type': 'WebSite',

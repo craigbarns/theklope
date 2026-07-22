@@ -16,13 +16,14 @@ export const FROM_CHECKOUT = 'THEKLOPE <checkout@theklope.com>'
 export const INBOX_CONTACT = 'contact@theklope.com'
 export const INBOX_CHECKOUT = 'checkout@theklope.com'
 
-export async function sendEmail({ from, to, subject, html, replyTo }) {
+export async function sendEmail({ from, to, subject, html, replyTo, idempotencyKey }) {
   if (!hasResend) return { skipped: true }
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
+      ...(idempotencyKey ? { 'Idempotency-Key': String(idempotencyKey).slice(0, 256) } : {}),
     },
     body: JSON.stringify({
       from,

@@ -16,6 +16,8 @@ const expectedLegacyRedirects = {
   '/23-pyrex': '/categorie/accessoires',
   '/24-chargeurs': '/categorie/accessoires',
   '/content/5-:slug': '/livraison-retours',
+  '/produit/classico-grege-50-ml-freaks': '/produit/grege-68',
+  '/produit/e-liquide-cafe-10ml-liquidarom': '/produit/cafe-liquid-arom-209',
 }
 
 test('Vercel redirect sources are unique', () => {
@@ -33,4 +35,11 @@ test('high-traffic legacy URLs redirect to a relevant live page', () => {
 
 test('no explicit redirect is added for the case-mistyped admin URL', () => {
   assert.equal(redirectsBySource.has('/ADMIN'), false)
+})
+
+test('checkout cleanup is scheduled at most daily for Hobby compatibility', () => {
+  const cleanup = config.crons?.find((cron) => cron.path === '/api/cleanup-checkouts')
+  assert.ok(cleanup, 'Missing cleanup checkout cron')
+  assert.equal(cleanup.schedule, '20 3 * * *')
+  assert.equal(config.crons.filter((cron) => cron.path === cleanup.path).length, 1)
 })

@@ -10,8 +10,26 @@ import { syncOrderFromMolliePayment } from './_lib/orders.js'
 import { hasMollie } from './_lib/mollie.js'
 import { setNoStore } from './_lib/httpSecurity.js'
 import { enforceRequestRateLimits } from './_lib/rateLimit.js'
+import { CHECKOUT_ORDER_ID_RE } from './_lib/checkout.js'
 
-const ORDER_ID_RE = /^TK-(?:[A-F0-9]{16}|\d{6}-[A-Z0-9]{5})$/
+const ORDER_STATUS_FIELDS = 'id, payment_id, payment_status, status, total, shipping, refund_status, checkout_review_required_at, checkout_review_reason'
+
+export function publicPaymentStatus(order) {
+  return {
+    status: ['paid', 'refunded'].includes(order.payment_status)
+      ? 'paid'
+      : order.payment_status === 'failed' ? 'failed' : 'pending',
+    order: {
+      id: order.id,
+      total: order.total,
+      shipping: order.shipping,
+      status: order.status,
+      refundStatus: order.refund_status || null,
+      reviewRequired: Boolean(order.checkout_review_required_at || order.checkout_review_reason),
+      reviewReason: order.checkout_review_reason || null,
+    },
+  }
+}
 
 export default async function handler(req, res) {
   setNoStore(res)
@@ -22,7 +40,7 @@ export default async function handler(req, res) {
 
   const orderId = req.query?.order || new URL(req.url, 'http://x').searchParams.get('order')
   if (!orderId) return res.status(400).json({ error: 'Paramètre order manquant.' })
-  if (!ORDER_ID_RE.test(String(orderId))) {
+  if (!CHECKOUT_ORDER_ID_RE.test(String(orderId))) {
     return res.status(400).json({ error: 'Identifiant de commande invalide.' })
   }
 
@@ -38,27 +56,37 @@ export default async function handler(req, res) {
 
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, payment_id, payment_status, status, total, shipping')
+      .select(ORDER_STATUS_FIELDS)
       .eq('id', orderId)
       .maybeSingle()
 
     if (orderError) throw orderError
     if (!order) return res.status(404).json({ error: 'Commande introuvable.' })
 
-    let status = order.payment_status === 'paid' ? 'paid' : order.payment_status === 'failed' ? 'failed' : 'pending'
-
     // Si pas encore payée, on interroge Mollie pour rafraîchir (et finaliser).
-    let orderStatus = order.status
-    if (status === 'pending' && order.payment_id) {
-      const synced = await syncOrderFromMolliePayment(order.payment_id)
-      if (synced.status !== 'unknown') status = synced.status
-      if (synced.orderStatus) orderStatus = synced.orderStatus
+    const statusBeforeSync = publicPaymentStatus(order).status
+    const requiresRecovery = ['stock_issue', 'refund_pending', 'refund_failed'].includes(order.status)
+      || Boolean(order.refund_status)
+    const alreadyUnderReview = order.checkout_review_required_at || order.checkout_review_reason
+    let finalOrder = order
+    if (order.payment_id && !alreadyUnderReview && (statusBeforeSync === 'pending' || requiresRecovery)) {
+      try {
+        await syncOrderFromMolliePayment(order.payment_id)
+      } catch (syncError) {
+        // A second matching Mollie payment is durably latched for manual review.
+        // Return that safe public state instead of encouraging another payment.
+        if (syncError.code !== 'multiple_payments_for_order') throw syncError
+      }
+      const { data: refreshed, error: refreshError } = await supabaseAdmin
+        .from('orders')
+        .select(ORDER_STATUS_FIELDS)
+        .eq('id', orderId)
+        .maybeSingle()
+      if (refreshError) throw refreshError
+      if (refreshed) finalOrder = refreshed
     }
 
-    return res.status(200).json({
-      status,
-      order: { id: order.id, total: order.total, shipping: order.shipping, status: orderStatus },
-    })
+    return res.status(200).json(publicPaymentStatus(finalOrder))
   } catch (err) {
     console.error('payment-status error:', err)
     return res.status(500).json({ error: err.message })

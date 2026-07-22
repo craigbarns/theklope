@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
 
-import { buildProductLong, buildProductShort } from './productCopy.js'
+import {
+  buildProductLong,
+  buildProductShort,
+  enrichProductCopy,
+  sanitizeProductSpecs,
+} from './productCopy.js'
 
 const resistance = {
   name: 'Cartouches Xlim',
@@ -40,4 +45,35 @@ test('DIY fallback copy describes preparation without presenting a concentrate a
   assert.match(short, /produit DIY destiné à la préparation/i)
   assert.match(long, /ne doit jamais être vapoté seul/i)
   assert.doesNotMatch(`${short} ${long}`, /prêt à vapoter/i)
+})
+
+test('legacy synthetic product ratings are stripped from every enriched product', () => {
+  const product = enrichProductCopy({
+    name: 'Produit test',
+    brand: 'Marque',
+    category: 'accessoire',
+    short: 'Description vérifiée.',
+    long: 'Description longue vérifiée.',
+    rating: 4.9,
+    reviews: 999,
+  })
+
+  assert.equal('rating' in product, false)
+  assert.equal('reviews' in product, false)
+})
+
+test('generic universal compatibility claims are removed', () => {
+  assert.deepEqual(sanitizeProductSpecs({
+    Compatibilité: 'Standard universel',
+    Contenance: '3 ml',
+  }), { Contenance: '3 ml' })
+})
+
+test('hardware fallback copy uses correct French agreement', () => {
+  assert.match(buildProductShort({
+    name: 'Kit test',
+    brand: 'Marque',
+    category: 'ecig',
+    specs: {},
+  }), /cigarette électronique sélectionnée/)
 })
