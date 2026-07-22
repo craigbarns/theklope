@@ -187,18 +187,18 @@ export default function Home() {
             <Link
               key={c.slug}
               to={`/categorie/${c.slug}`}
-              className="card-interactive group relative flex h-44 items-end overflow-hidden p-6"
+              className="card-interactive group relative flex min-h-44 flex-col justify-between overflow-hidden p-6"
             >
               <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/25" />
               <ProductImage
                 src={catThumb(c.key, products)}
                 alt=""
                 loading="lazy"
-                className="absolute right-3 top-1/2 h-28 w-28 -translate-y-1/2 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
-                width={112}
-                height={112}
+                className="relative ml-auto h-24 w-24 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
+                width={96}
+                height={96}
               />
-              <div className="relative">
+              <div className="relative mt-4">
                 <h2 className="font-display text-xl font-semibold text-white">{c.name}</h2>
                 <span className="mt-1 inline-flex items-center gap-1 text-sm text-neon">
                   Explorer <IconArrowRight width={15} height={15} />
