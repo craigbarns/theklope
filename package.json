@@ -11,6 +11,7 @@
     "dev": "vite",
     "test": "node --test",
     "sitemap": "node scripts/generate-sitemap.mjs",
+    "indexnow": "node scripts/ping-indexnow.mjs",
     "prebuild": "node scripts/generate-sitemap.mjs && node scripts/generate-llms-full.mjs",
     "build": "vite build",
     "postbuild": "node scripts/prerender.mjs",
