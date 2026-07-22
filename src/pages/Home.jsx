@@ -94,7 +94,7 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="Boutique vape en ligne pour adultes"
+        title="Boutique vape en ligne"
         description="THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé."
         schema={homeSchema}
       />
@@ -109,7 +109,7 @@ export default function Home() {
             <h1 className="font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
               THEKLOPE
               <span className="mt-2 block bg-gradient-to-r from-neon to-electric bg-clip-text text-transparent">
-                Boutique vape en ligne pour adultes
+                Boutique vape en ligne
               </span>
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-ash/70 sm:text-lg">
