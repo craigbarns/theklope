@@ -41,6 +41,7 @@ const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
+const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -194,7 +195,13 @@ for (const p of PRODUCTS) {
         <p class="mt-5">${esc(p.long || p.short || '')}</p>
         <p class="mt-7"><a href="/boutique">Voir toute la boutique THEKLOPE</a></p>
       </div>
-    </div>`
+    </div>
+    ${(() => {
+      const guides = relatedGuidesForProduct(getProductCategoryKey(p), BLOG_POSTS)
+      if (!guides.length) return ''
+      const items = guides.map((g) => `<li><a href="/guides/${esc(g.slug)}">${esc(g.title)}</a></li>`).join('')
+      return `<section class="mt-16"><h2>Guides utiles</h2><ul>${items}</ul></section>`
+    })()}`
   writePage(path, buildPage({
     title,
     description,

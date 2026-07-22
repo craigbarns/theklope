@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName, getProductCategoryKey } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
@@ -14,6 +14,8 @@ import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
 import { getPrerenderSnapshot } from '../lib/prerenderSnapshot.js'
 import { resolveRelatedProducts } from '../lib/relatedProducts.js'
+import { relatedGuidesForProduct } from '../data/productGuides.js'
+import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
 import {
   IconHeart,
@@ -24,6 +26,7 @@ import {
   IconLock,
   IconShield,
   IconCheck,
+  IconArrowRight,
 } from '../components/icons.jsx'
 
 export default function Product() {
@@ -59,6 +62,10 @@ export default function Product() {
   const variantsRef = useRef(null)
 
   const relatedProducts = useMemo(() => resolveRelatedProducts(product, products), [product, products])
+  const relatedGuides = useMemo(
+    () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
+    [product],
+  )
 
   const productSchema = useMemo(() => {
     if (!product) return null
@@ -447,6 +454,25 @@ export default function Product() {
             <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
               {relatedProducts.map((p) => (
                 <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Guides utiles : maillage interne fiche → guides (SEO + réassurance) */}
+        {relatedGuides.length > 0 && (
+          <div className="mt-16">
+            <h2 className="mb-6 font-display text-2xl font-bold text-white">Guides utiles</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {relatedGuides.map((guide) => (
+                <Link
+                  key={guide.slug}
+                  to={`/guides/${guide.slug}`}
+                  className="group flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-sm text-ash transition hover:border-neon/40 hover:text-neon"
+                >
+                  <span>{guide.title}</span>
+                  <IconArrowRight width={15} height={15} className="shrink-0 opacity-60 transition group-hover:opacity-100" />
+                </Link>
               ))}
             </div>
           </div>
