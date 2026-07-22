@@ -159,6 +159,7 @@ for (const p of PRODUCTS) {
       url: abs(path),
       priceCurrency: 'EUR',
       price: (Number(p.price) || 0).toFixed(2),
+      validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
       priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
       itemCondition: 'https://schema.org/NewCondition',
       availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
@@ -166,6 +167,7 @@ for (const p of PRODUCTS) {
       shippingDetails: {
         '@type': 'OfferShippingDetails',
         shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+        shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',
           handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },

@@ -71,6 +71,9 @@ export default function Product() {
     if (!product) return null
     // priceValidUntil : Google recommande une date de validité du prix (≈ fin de l'année suivante).
     const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`
+    // priceValidFrom : début de validité du prix (date de mise en ligne du produit si connue).
+    const priceValidFrom = (product.created_at ? new Date(product.created_at) : new Date())
+      .toISOString().split('T')[0]
     const schema = {
       "@context": "https://schema.org",
       "@type": "Product",
@@ -89,6 +92,7 @@ export default function Product() {
         "url": `https://www.theklope.com/produit/${product.id}`,
         "priceCurrency": "EUR",
         "price": (Number(product.price) || 0).toFixed(2),
+        "validFrom": priceValidFrom,
         "priceValidUntil": priceValidUntil,
         "itemCondition": "https://schema.org/NewCondition",
         "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
@@ -101,6 +105,11 @@ export default function Product() {
           "shippingDestination": {
             "@type": "DefinedRegion",
             "addressCountry": "FR"
+          },
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "7.50",
+            "currency": "EUR"
           },
           "deliveryTime": {
             "@type": "ShippingDeliveryTime",
