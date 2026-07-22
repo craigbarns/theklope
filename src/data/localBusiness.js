@@ -14,24 +14,28 @@ export const STORE = {
     postalCode: '13006',
     addressCountry: 'FR',
   },
-  geo: { latitude: 43.2905, longitude: 5.3801 },
+  geo: { latitude: 43.287001, longitude: 5.3828625 },
   // Zone desservie : boutique à Marseille + e-commerce France entière.
   areaServed: ['Marseille', 'Bouches-du-Rhône', 'France'],
 }
 
 // Horaires d'ouverture de la boutique physique.
-// ⚠️ À COMPLÉTER avec les vrais horaires : dès qu'ils sont renseignés ici,
-// ils enrichissent automatiquement le schéma LocalBusiness (Google peut
-// alors afficher « Ouvert / Fermé » dans les résultats locaux).
-// Format schema.org OpeningHoursSpecification. Exemple (à adapter) :
-//   { days: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '10:00', closes: '19:00' },
-//   { days: ['Saturday'], opens: '10:00', closes: '19:00' },
-export const STORE_HOURS = []
+// Source : fiche Google Business « The Klope ». Lundi-vendredi 09:00-19:00,
+// fermé le week-end. Alimente le schéma LocalBusiness (Google peut afficher
+// « Ouvert / Fermé » dans les résultats locaux).
+export const STORE_HOURS = [
+  {
+    days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+    opens: '09:00',
+    closes: '19:00',
+  },
+]
 
 // Profils externes (fiche Google Business, réseaux sociaux) pour le champ sameAs.
-// ⚠️ À COMPLÉTER : ajouter l'URL de la fiche Google Business et des réseaux
-// une fois créés. Renforce l'entité et le référencement local.
-export const STORE_SAME_AS = []
+// Renforce l'entité et le référencement local.
+export const STORE_SAME_AS = [
+  'https://maps.google.com/?cid=16305250719771338856',
+]
 
 function openingHoursSpecification() {
   if (!Array.isArray(STORE_HOURS) || STORE_HOURS.length === 0) return undefined
