@@ -8,6 +8,7 @@ import GoogleReviews from '../components/GoogleReviews.jsx'
 import Newsletter from '../components/Newsletter.jsx'
 import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import {
   IconArrowRight,
   IconShield,
@@ -49,27 +50,7 @@ export default function Home() {
   const homeSchema = useMemo(() => ({
     '@context': 'https://schema.org',
     '@graph': [
-      {
-        '@type': 'LocalBusiness',
-        name: 'THEKLOPE',
-        image: 'https://www.theklope.com/og-image.jpg',
-        '@id': 'https://www.theklope.com/#store',
-        url: 'https://www.theklope.com',
-        telephone: '+33491555555',
-        priceRange: '$$',
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: '188 rue de Rome',
-          addressLocality: 'Marseille',
-          postalCode: '13006',
-          addressCountry: 'FR',
-        },
-        geo: {
-          '@type': 'GeoCoordinates',
-          latitude: 43.2905,
-          longitude: 5.3801,
-        },
-      },
+      buildLocalBusinessSchema(),
       {
         '@type': 'WebSite',
         '@id': 'https://www.theklope.com/#website',

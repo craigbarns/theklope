@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import { STATIC_SEO_PAGES } from '../data/staticSeoPages.js'
+import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import NotFound from './NotFound.jsx'
 
 export default function StaticSeoPage() {
@@ -43,21 +44,7 @@ export default function StaticSeoPage() {
     ]
 
     if (page.localBusiness) {
-      graph.push({
-        '@type': 'LocalBusiness',
-        '@id': 'https://www.theklope.com/#store',
-        name: 'THEKLOPE',
-        url: 'https://www.theklope.com',
-        image: 'https://www.theklope.com/og-image.jpg',
-        address: {
-          '@type': 'PostalAddress',
-          streetAddress: '188 rue de Rome',
-          addressLocality: 'Marseille',
-          postalCode: '13006',
-          addressCountry: 'FR',
-        },
-        priceRange: '$$',
-      })
+      graph.push(buildLocalBusinessSchema())
     }
 
     return {
