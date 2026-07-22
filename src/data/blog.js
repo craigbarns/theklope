@@ -962,3 +962,14 @@ export const BLOG_POSTS = [
 ]
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
+
+// Maillage interne : suggère d'autres guides de la même catégorie pour
+// garder le lecteur sur le site et renforcer le contexte thématique.
+export const getRelatedPosts = (slug, limit = 3) => {
+  const current = getBlogPost(slug)
+  if (!current) return []
+  return BLOG_POSTS.filter((p) => p.slug !== slug && p.category === current.category).slice(
+    0,
+    limit,
+  )
+}
