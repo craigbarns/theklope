@@ -363,7 +363,7 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 }
 
 // ---- Page d'accueil (/) ----
-const homeTitle = 'THEKLOPE — Boutique vape en ligne pour adultes'
+const homeTitle = 'THEKLOPE — Boutique vape en ligne'
 const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
 const homeSchema = {
   '@context': 'https://schema.org',
@@ -424,7 +424,7 @@ const homeContent = `
     <div class="relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
       <div>
         <span class="chip mb-6 border-neon/30 text-neon">Boutique vape française · +18</span>
-        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE<br>Boutique vape en ligne pour adultes</h1>
+        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE<br>Boutique vape en ligne</h1>
         <p class="mt-6 max-w-lg text-base leading-relaxed sm:text-lg">Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour adultes.</p>
         <p class="mt-8"><a href="/boutique">Découvrir la boutique</a></p>
       </div>
