@@ -354,27 +354,7 @@ const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes élect
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
-    {
-      '@type': 'LocalBusiness',
-      name: 'THEKLOPE',
-      image: `${BASE_URL}/og-image.jpg`,
-      '@id': 'https://www.theklope.com/#store',
-      url: 'https://www.theklope.com',
-      telephone: '+33491555555',
-      priceRange: '$$',
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: '188 rue de Rome',
-        addressLocality: 'Marseille',
-        postalCode: '13006',
-        addressCountry: 'FR',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: 43.2905,
-        longitude: 5.3801,
-      },
-    },
+    buildLocalBusinessSchema(),
     {
       '@type': 'WebSite',
       '@id': 'https://www.theklope.com/#website',
