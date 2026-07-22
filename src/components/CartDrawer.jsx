@@ -1,17 +1,55 @@
 import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import { featuredProducts } from '../data/catalog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
+import {
+  getProductVariantChoices,
+  isCartCatalogResolved,
+  isCartCatalogVerified,
+  productRequiresVariantSelection,
+  resolveProductVariant,
+} from '../lib/cart.js'
+import { useDialogFocus } from '../lib/useDialogFocus.js'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
 export default function CartDrawer() {
-  const { cartOpen, setCartOpen, cartDetailed, updateQty, removeItem, totals, cartCount, products, addToCart } = useStore()
+  const {
+    cartOpen,
+    setCartOpen,
+    cartDetailed,
+    cart,
+    updateQty,
+    updateCartVariant,
+    removeItem,
+    totals,
+    cartCount,
+    products,
+    addToCart,
+    catalogReady,
+    syncStatus,
+    refreshRemoteData,
+  } = useStore()
+  const dialogRef = useRef(null)
+  const closeButtonRef = useRef(null)
+  const close = useCallback(() => setCartOpen(false), [setCartOpen])
+
+  useDialogFocus({
+    open: cartOpen,
+    dialogRef,
+    initialFocusRef: closeButtonRef,
+    onClose: close,
+  })
 
   const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
   const freeShippingPct = Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))
+  const itemsTotal = Math.max(0, totals.subtotal - totals.discount)
+  const cartState = { cart, cartDetailed, catalogReady }
+  const cartCatalogResolved = isCartCatalogResolved(cartState)
+  const cartNeedsVerification = !cartCatalogResolved
+  const cartHasVariantIssue = cartCatalogResolved && !isCartCatalogVerified(cartState)
 
   // Produits associés choisis manuellement, en stock et absents du panier.
   const crossSellSuggestions = useMemo(() => {
@@ -31,24 +69,45 @@ export default function CartDrawer() {
         className={`fixed inset-0 z-[95] bg-noir/70 backdrop-blur-sm transition-opacity duration-300 ${
           cartOpen ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
-        onClick={() => setCartOpen(false)}
+        onClick={close}
+        aria-hidden="true"
       />
       <aside
+        ref={dialogRef}
         className={`fixed right-0 top-0 z-[96] flex h-full w-full max-w-md flex-col border-l border-white/10 bg-anthracite shadow-card transition-transform duration-300 ${
           cartOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        aria-label="Panier"
+        role="dialog"
+        aria-modal={cartOpen ? 'true' : undefined}
+        aria-labelledby="cart-drawer-title"
+        aria-hidden={cartOpen ? undefined : 'true'}
+        inert={cartOpen ? undefined : ''}
+        tabIndex={-1}
       >
         <header className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-          <h2 className="font-display text-lg font-bold text-white">
+          <h2 id="cart-drawer-title" className="font-display text-lg font-bold text-white">
             Panier <span className="text-faint">({cartCount})</span>
           </h2>
-          <button onClick={() => setCartOpen(false)} aria-label="Fermer" className="text-muted hover:text-white">
+          <button ref={closeButtonRef} type="button" onClick={close} aria-label="Fermer le panier" className="text-muted hover:text-white">
             <IconClose />
           </button>
         </header>
 
-        {cartDetailed.length === 0 ? (
+        {cartNeedsVerification ? (
+          <div className="grid flex-1 place-items-center p-6 text-center" role="status" aria-live="polite">
+            <div>
+              <p className="font-display text-lg font-bold text-white">Vérification du panier</p>
+              <p className="mt-2 text-sm text-muted">
+                {syncStatus === 'error'
+                  ? 'Le catalogue live est indisponible. Le paiement reste bloqué pour protéger vos prix et vos articles.'
+                  : 'Synchronisation des prix, variantes et stocks en cours…'}
+              </p>
+              {syncStatus === 'error' && (
+                <button type="button" onClick={refreshRemoteData} className="btn-ghost mt-5">Réessayer</button>
+              )}
+            </div>
+          </div>
+        ) : cartDetailed.length === 0 ? (
           <div className="flex flex-1 flex-col justify-between p-6">
             <div className="flex flex-1 flex-col items-center justify-center text-center">
               <p className="text-muted text-sm">Votre panier est vide.</p>
@@ -65,12 +124,22 @@ export default function CartDrawer() {
                       <ProductImage src={p.image} alt="" className="aspect-square rounded-xl object-cover bg-carbon p-1" width={150} height={150} />
                       <h3 className="mt-2 truncate text-xs font-semibold text-white">{p.name}</h3>
                       <p className="text-[10px] text-faint mt-0.5">{formatPrice(p.price)}</p>
-                      <button
-                        onClick={() => addToCart(p.id, 1)}
-                        className="btn-ghost mt-3 text-[10px] py-1 px-3 min-h-0 w-full"
-                      >
-                        Ajouter
-                      </button>
+                      {productRequiresVariantSelection(p) ? (
+                        <Link
+                          to={`/produit/${p.id}`}
+                          onClick={() => setCartOpen(false)}
+                          className="btn-ghost mt-3 w-full min-h-0 px-3 py-1 text-[10px]"
+                        >
+                          Choisir les options
+                        </Link>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(p.id, 1)}
+                          className="btn-ghost mt-3 w-full min-h-0 px-3 py-1 text-[10px]"
+                        >
+                          Ajouter
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -93,6 +162,7 @@ export default function CartDrawer() {
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
                 <div className="h-full rounded-full bg-neon transition-all duration-500" style={{ width: `${freeShippingPct}%` }} />
               </div>
+              <p className="mt-2 text-[11px] text-faint">Retrait gratuit en boutique à Marseille, au choix lors du paiement.</p>
               {totals.bundleProgress?.length > 0 && (
                 <div className="mt-3">
                   <BundleProgress hints={totals.bundleProgress} compact />
@@ -120,7 +190,11 @@ export default function CartDrawer() {
                         <IconTrash width={17} height={17} />
                       </button>
                     </div>
-                    <VariantLabel variant={item.variant} />
+                    <VariantEditor
+                      product={item.product}
+                      variant={item.variant}
+                      onChange={(variant) => updateCartVariant(item.index, variant)}
+                    />
                     <div className="mt-2 flex items-center justify-between">
                       <div className="flex items-center rounded-full border border-white/10">
                         <button
@@ -162,12 +236,22 @@ export default function CartDrawer() {
                           </Link>
                           <p className="text-[10px] text-faint mt-0.5">{p.brand} · {formatPrice(p.price)}</p>
                         </div>
-                        <button
-                          onClick={() => addToCart(p.id, 1)}
-                          className="rounded-full bg-neon/10 border border-neon/30 hover:bg-neon hover:text-noir px-3 py-1.5 text-xs text-neon font-bold transition shrink-0"
-                        >
-                          Ajouter
-                        </button>
+                        {productRequiresVariantSelection(p) ? (
+                          <Link
+                            to={`/produit/${p.id}`}
+                            onClick={() => setCartOpen(false)}
+                            className="shrink-0 rounded-full border border-neon/30 bg-neon/10 px-3 py-1.5 text-xs font-bold text-neon transition hover:bg-neon hover:text-noir"
+                          >
+                            Choisir
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => addToCart(p.id, 1)}
+                            className="shrink-0 rounded-full border border-neon/30 bg-neon/10 px-3 py-1.5 text-xs font-bold text-neon transition hover:bg-neon hover:text-noir"
+                          >
+                            Ajouter
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -188,25 +272,35 @@ export default function CartDrawer() {
                       <dd className="font-semibold">- {formatPrice(totals.discount)}</dd>
                     </div>
                     {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
-                      <p key={d.key} className="-mt-1 text-[11px] text-neon/80">✓ {d.label}</p>
+                      <div key={d.key} className="-mt-1 text-[11px] text-neon/80">
+                        <dt className="sr-only">Remise automatique</dt>
+                        <dd>✓ {d.label}</dd>
+                      </div>
                     ))}
                   </>
                 )}
                 <div className="flex items-center justify-between">
                   <dt className="text-muted">Livraison</dt>
-                  <dd className="font-semibold text-white">{totals.shipping === 0 ? 'Offerte' : formatPrice(totals.shipping)}</dd>
+                  <dd className="text-right text-xs font-semibold text-white">Calculée ensuite</dd>
                 </div>
                 <div className="flex items-center justify-between border-t border-white/8 pt-2">
-                  <dt className="font-semibold text-white">Total</dt>
-                  <dd className="font-display text-lg font-bold text-white">{formatPrice(totals.total)}</dd>
+                  <dt className="font-semibold text-white">Avant livraison</dt>
+                  <dd className="font-display text-lg font-bold text-white">{formatPrice(itemsTotal)}</dd>
                 </div>
               </dl>
+              <p className="mb-3 text-center text-[11px] text-faint">Retrait boutique gratuit disponible.</p>
               <Link to="/panier" className="btn-ghost mb-2 w-full" onClick={() => setCartOpen(false)}>
                 Voir le panier
               </Link>
-              <Link to="/checkout" className="btn-primary w-full" onClick={() => setCartOpen(false)}>
-                Passer commande
-              </Link>
+              {cartHasVariantIssue ? (
+                <Link to="/panier" className="btn-primary w-full" onClick={() => setCartOpen(false)}>
+                  Choisir les options requises
+                </Link>
+              ) : (
+                <Link to="/checkout" className="btn-primary w-full" onClick={() => setCartOpen(false)}>
+                  Passer commande
+                </Link>
+              )}
               <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-faint">
                 <IconLock width={13} height={13} /> Paiement 100% sécurisé
               </p>
@@ -218,12 +312,49 @@ export default function CartDrawer() {
   )
 }
 
-function VariantLabel({ variant }) {
-  const parts = []
-  if (variant.color) parts.push(variant.color)
-  if (variant.flavor) parts.push(variant.flavor)
-  if (variant.nicotine != null) parts.push(`${variant.nicotine} mg`)
-  if (variant.ohm != null) parts.push(`${variant.ohm} Ω`)
-  if (!parts.length) return null
-  return <p className="mt-0.5 text-xs text-faint">{parts.join(' · ')}</p>
+function VariantEditor({ product, variant = {}, onChange }) {
+  const choices = getProductVariantChoices(product)
+  if (!choices.length) return null
+  const resolution = resolveProductVariant(product, variant)
+  const editableVariant = Object.fromEntries(choices.flatMap(({ key, options }) => {
+    const selected = options.find((option) => String(option) === String(variant[key]))
+    return selected === undefined ? [] : [[key, selected]]
+  }))
+
+  return (
+    <div className="mt-1.5" aria-label={`Options de ${product.name}`}>
+      <div className="flex flex-wrap gap-x-2 gap-y-1">
+      {choices.map(({ key, label, options, suffix = '' }) => {
+        const selected = options.find((option) => String(option) === String(variant[key]))
+        if (options.length === 1) {
+          return <span key={key} className="text-[11px] text-faint">{label} : {options[0]}{suffix}</span>
+        }
+
+        return (
+          <label key={key} className="flex items-center gap-1 text-[11px] text-faint">
+            <span>{label} :</span>
+            <select
+              value={selected === undefined ? '' : String(selected)}
+              onChange={(event) => {
+                const value = options.find((option) => String(option) === event.target.value)
+                if (value !== undefined) onChange({ ...editableVariant, [key]: value })
+              }}
+              aria-label={`${label} pour ${product.name}`}
+              aria-invalid={selected === undefined ? 'true' : undefined}
+              className="max-w-28 rounded-md border border-white/12 bg-carbon px-1.5 py-0.5 text-[11px] text-white outline-none focus:border-neon"
+            >
+              {selected === undefined && <option value="">Choisir</option>}
+              {options.map((option) => (
+                <option key={String(option)} value={String(option)}>{option}{suffix}</option>
+              ))}
+            </select>
+          </label>
+        )
+      })}
+      </div>
+      {!resolution.ok && (
+        <p role="alert" className="mt-1 text-[11px] text-amber-200">{resolution.error}</p>
+      )}
+    </div>
+  )
 }

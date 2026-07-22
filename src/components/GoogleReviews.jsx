@@ -5,7 +5,7 @@ export default function GoogleReviews() {
   const { reviewsChoice, setReviewsChoice } = useStore()
 
   return (
-    <section className="container-page py-14">
+    <section id="avis-clients" className="container-page scroll-mt-24 py-14">
       <div className="mb-8 text-center">
         <p className="eyebrow mb-2">Ils nous font confiance</p>
         <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">

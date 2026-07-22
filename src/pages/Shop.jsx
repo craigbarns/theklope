@@ -4,12 +4,12 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES, productMatchesCategory } from '../data/catalog.js'
+import { CATEGORIES, productMatchesCategory, sortProductsByMerchandising } from '../data/catalog.js'
 import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 
 const SORTS = [
-  { value: 'popularite', label: 'Popularité' },
+  { value: 'selection', label: 'Sélection THEKLOPE' },
   { value: 'prix-asc', label: 'Prix croissant' },
   { value: 'prix-desc', label: 'Prix décroissant' },
   { value: 'nouveautes', label: 'Nouveautés' },
@@ -31,7 +31,7 @@ export default function Shop() {
   const [nicotine, setNicotine] = useState([])
   const [flavors, setFlavors] = useState([])
   const [maxPrice, setMaxPrice] = useState(maxAvailablePrice)
-  const [sort, setSort] = useState('popularite')
+  const [sort, setSort] = useState('selection')
   const [mobileFilters, setMobileFilters] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const trackedListRef = useRef('')
@@ -85,7 +85,7 @@ export default function Shop() {
         list = [...list].sort((a, b) => (b.badge === 'nouveau' ? 1 : 0) - (a.badge === 'nouveau' ? 1 : 0))
         break
       default:
-        list = [...list].sort((a, b) => b.reviews - a.reviews)
+        list = sortProductsByMerchandising(list)
     }
     return list
   }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort, products])

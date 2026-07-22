@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useStore } from '../context/StoreContext.jsx'
 import { IconShield } from './icons.jsx'
 import { verifyAdultBirthDate } from '../lib/ageVerification.js'
+import { useDialogFocus } from '../lib/useDialogFocus.js'
 
 export default function AgeGate() {
   const { ageVerified, setAgeVerified } = useStore()
@@ -10,10 +11,19 @@ export default function AgeGate() {
   const [month, setMonth] = useState('')
   const [year, setYear] = useState('')
   const [error, setError] = useState('')
+  const refused = ageVerified === 'no'
+  const dialogRef = useRef(null)
+  const dayInputRef = useRef(null)
+  const retryButtonRef = useRef(null)
+
+  useDialogFocus({
+    open: ageVerified !== true,
+    dialogRef,
+    initialFocusRef: refused ? retryButtonRef : dayInputRef,
+    closeOnEscape: false,
+  })
 
   if (ageVerified === true) return null
-
-  const refused = ageVerified === 'no'
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -34,7 +44,15 @@ export default function AgeGate() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-noir/60 px-5 backdrop-blur-sm">
-      <div className="w-full max-w-md animate-fade-up rounded-3xl border border-white/10 bg-anthracite p-8 text-center shadow-card sm:p-10">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="age-gate-title"
+        aria-describedby="age-gate-description"
+        tabIndex={-1}
+        className="w-full max-w-md animate-fade-up rounded-3xl border border-white/10 bg-anthracite p-8 text-center shadow-card sm:p-10"
+      >
         <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-2xl border border-neon/30 bg-neon/10 text-neon">
           <IconShield width={30} height={30} />
         </div>
@@ -42,10 +60,10 @@ export default function AgeGate() {
 
         {!refused ? (
           <>
-            <h2 className="font-display text-2xl font-bold text-white leading-snug">
+            <h2 id="age-gate-title" className="font-display text-2xl font-bold text-white leading-snug">
               Ce site est réservé aux personnes majeures.
             </h2>
-            <p className="mt-2 text-xs text-ash/70 leading-relaxed">
+            <p id="age-gate-description" className="mt-2 text-xs text-ash/70 leading-relaxed">
               La vente de produits de vapotage est strictement interdite aux mineurs. Veuillez saisir votre date de naissance pour entrer.
             </p>
 
@@ -54,6 +72,7 @@ export default function AgeGate() {
                 <label className="block text-left">
                   <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Jour</span>
                   <input
+                    ref={dayInputRef}
                     type="number"
                     min="1"
                     max="31"
@@ -92,7 +111,7 @@ export default function AgeGate() {
                 </label>
               </div>
 
-              {error && <p className="mt-3 text-xs text-rose-400 font-semibold">{error}</p>}
+              {error && <p className="mt-3 text-xs text-rose-400 font-semibold" role="alert">{error}</p>}
 
               <div className="mt-6 flex flex-col gap-3">
                 <button type="submit" className="btn-primary w-full py-3 font-semibold">
@@ -114,11 +133,13 @@ export default function AgeGate() {
           </>
         ) : (
           <>
-            <h2 className="font-display text-2xl font-bold text-white">Accès refusé</h2>
-            <p className="mt-3 text-sm leading-relaxed text-ash/70">
+            <h2 id="age-gate-title" className="font-display text-2xl font-bold text-white">Accès refusé</h2>
+            <p id="age-gate-description" className="mt-3 text-sm leading-relaxed text-ash/70">
               Vous devez être majeur pour accéder à notre boutique de cigarette électronique. L'accès vous a été refusé.
             </p>
             <button
+              ref={retryButtonRef}
+              type="button"
               className="btn-ghost mt-7 w-full"
               onClick={() => {
                 setAgeVerified(null)

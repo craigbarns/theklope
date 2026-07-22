@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName, getProductCategoryKey } from '../data/catalog.js'
-import { STORE_REVIEW_SUMMARY, STORE_REVIEW_SNIPPETS } from '../data/reviews.js'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -14,6 +14,7 @@ import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
 import { getPrerenderSnapshot } from '../lib/prerenderSnapshot.js'
 import { resolveRelatedProducts } from '../lib/relatedProducts.js'
+import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
 import {
   IconHeart,
   IconCart,
@@ -40,15 +41,22 @@ export default function Product() {
   } = useStore()
   const product = getProduct(id)
 
+  const onlyChoice = (options) => (Array.isArray(options) && options.length === 1 ? options[0] : null)
+  const colorOptions = getProductVariantOptions(product, 'color')
+  const flavorOptions = getProductVariantOptions(product, 'flavor')
+  const nicotineOptions = getProductVariantOptions(product, 'nicotine')
+  const ohmOptions = getProductVariantOptions(product, 'ohm')
+
   const [activeImg, setActiveImg] = useState(0)
   const [qty, setQty] = useState(1)
-  const [color, setColor] = useState(product?.colors?.[0] || null)
-  const [flavor, setFlavor] = useState(product?.flavors?.[0] || null)
-  const [nicotine, setNicotine] = useState(product?.nicotine?.[0] ?? null)
-  const [ohm, setOhm] = useState(product?.ohmOptions?.[0] ?? null)
+  const [color, setColor] = useState(onlyChoice(colorOptions))
+  const [flavor, setFlavor] = useState(onlyChoice(flavorOptions))
+  const [nicotine, setNicotine] = useState(onlyChoice(nicotineOptions))
+  const [ohm, setOhm] = useState(onlyChoice(ohmOptions))
   const [added, setAdded] = useState(false)
   const [addError, setAddError] = useState('')
   const trackedProductRef = useRef(null)
+  const variantsRef = useRef(null)
 
   const relatedProducts = useMemo(() => resolveRelatedProducts(product, products), [product, products])
 
@@ -113,14 +121,6 @@ export default function Product() {
         }
       }
     }
-    // On n'expose des données d'avis structurées QUE si des avis réels existent.
-    if (product.reviews > 0) {
-      schema.aggregateRating = {
-        "@type": "AggregateRating",
-        "ratingValue": (Number(product.rating) || 0).toFixed(1),
-        "reviewCount": product.reviews,
-      }
-    }
     return schema
   }, [product])
 
@@ -128,10 +128,11 @@ export default function Product() {
     if (!product) return
     setActiveImg(0)
     setQty(1)
-    setColor(product.colors?.[0] || null)
-    setFlavor(product.flavors?.[0] || null)
-    setNicotine(product.nicotine?.[0] ?? null)
-    setOhm(product.ohmOptions?.[0] ?? null)
+    setColor(onlyChoice(getProductVariantOptions(product, 'color')))
+    setFlavor(onlyChoice(getProductVariantOptions(product, 'flavor')))
+    setNicotine(onlyChoice(getProductVariantOptions(product, 'nicotine')))
+    setOhm(onlyChoice(getProductVariantOptions(product, 'ohm')))
+    setAddError('')
   }, [product])
 
   useEffect(() => {
@@ -182,19 +183,26 @@ export default function Product() {
   const outOfStock = product.stock <= 0
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
-  const hasNicotine = Array.isArray(product.nicotine) && product.nicotine.some((n) => Number(n) > 0)
+  const hasNicotine = nicotineOptions.some((n) => Number(n) > 0)
+  const selectedVariant = {
+    ...(color != null ? { color } : {}),
+    ...(flavor != null ? { flavor } : {}),
+    ...(nicotine != null ? { nicotine } : {}),
+    ...(ohm != null ? { ohm } : {}),
+  }
+  const variantResolution = resolveProductVariant(product, selectedVariant)
 
   const handleAdd = (requestedQty = qty) => {
     if (outOfStock || stockLimitReached) {
       setAddError('La quantité maximale disponible est déjà dans votre panier.')
       return false
     }
-    const variant = {}
-    if (color) variant.color = color
-    if (flavor) variant.flavor = flavor
-    if (nicotine != null) variant.nicotine = nicotine
-    if (ohm != null) variant.ohm = ohm
-    const wasAdded = addToCart(product.id, Math.min(requestedQty, maxQty), variant)
+    if (!variantResolution.ok) {
+      setAddError(variantResolution.error || 'Choisissez les options du produit.')
+      variantsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return false
+    }
+    const wasAdded = addToCart(product.id, Math.min(requestedQty, maxQty), variantResolution.variant)
     if (!wasAdded) {
       setAddError('Le stock vient d’évoluer. Vérifiez votre panier avant de réessayer.')
       return false
@@ -210,6 +218,9 @@ export default function Product() {
       <Seo
         title={`${product.name} — ${categoryName(getProductCategoryKey(product))} | THEKLOPE`}
         description={product.short}
+        image={product.image}
+        imageAlt={`${product.name} — ${product.brand}`}
+        type="product"
         schema={productSchema}
       />
       <div className="container-page py-8 pb-28 lg:pb-8">
@@ -264,7 +275,10 @@ export default function Product() {
           <div>
             <p className="text-xs uppercase tracking-wider text-faint">{product.brand} · {product.type}</p>
             <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{product.name}</h1>
-            <div className="mt-3"><Stars rating={product.rating} reviews={product.reviews} size={16} /></div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
+              <span className="text-xs text-muted">Note de la boutique sur Google, pas du produit.</span>
+            </div>
 
             <div className="mt-5 flex items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
@@ -281,28 +295,28 @@ export default function Product() {
             <p className="mt-5 text-ash/70">{product.short}</p>
 
             {/* Variantes */}
-            <div className="mt-7 space-y-5">
-              {product.colors?.length > 0 && (
-                <VariantPicker label="Couleur" options={product.colors} value={color} onChange={setColor} />
+            <div ref={variantsRef} className="mt-7 scroll-mt-28 space-y-5">
+              {colorOptions.length > 0 && (
+                <VariantPicker label="Couleur" options={colorOptions} value={color} onChange={(value) => { setColor(value); setAddError('') }} />
               )}
-              {product.flavors?.length > 0 && (
-                <VariantPicker label="Saveur" options={product.flavors} value={flavor} onChange={setFlavor} />
+              {flavorOptions.length > 0 && (
+                <VariantPicker label="Saveur" options={flavorOptions} value={flavor} onChange={(value) => { setFlavor(value); setAddError('') }} />
               )}
-              {product.nicotine?.length > 0 && (
+              {nicotineOptions.length > 0 && (
                 <VariantPicker
                   label="Taux de nicotine"
-                  options={product.nicotine}
+                  options={nicotineOptions}
                   value={nicotine}
-                  onChange={setNicotine}
+                  onChange={(value) => { setNicotine(value); setAddError('') }}
                   render={(n) => `${n} mg`}
                 />
               )}
-              {product.ohmOptions?.length > 0 && (
+              {ohmOptions.length > 0 && (
                 <VariantPicker
                   label="Résistance (Ω)"
-                  options={product.ohmOptions}
+                  options={ohmOptions}
                   value={ohm}
-                  onChange={setOhm}
+                  onChange={(value) => { setOhm(value); setAddError('') }}
                   render={(v) => `${v} Ω`}
                 />
               )}
@@ -349,7 +363,7 @@ export default function Product() {
                   : `Plus que ${remainingStock} disponible${remainingStock > 1 ? 's' : ''} à ajouter`}
             </p>
 
-            {addError && <p className="mt-2 text-xs text-rose-300">{addError}</p>}
+            {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
 
             {!outOfStock && (
               <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-neon/10 border border-neon/30 px-3.5 py-2.5 text-xs text-neon font-medium max-w-sm">
@@ -419,14 +433,10 @@ export default function Product() {
             <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
             <p className="text-sm text-muted">Avis boutique THEKLOPE réels, collectés sur Google.</p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {STORE_REVIEW_SNIPPETS.map((r) => (
-              <div key={r.name} className="card p-5">
-                <Stars rating={r.rating} showCount={false} />
-                <p className="mt-3 text-sm leading-relaxed text-ash/70">“{r.text}”</p>
-                <p className="mt-4 text-xs text-faint">{r.name} · {r.date} · {r.source}</p>
-              </div>
-            ))}
+          <div className="card p-5 text-sm leading-relaxed text-ash/70">
+            Cette note concerne l’expérience globale en boutique, et non ce produit en particulier.
+            Les avis Google complets sont affichés sur la page d’accueil après votre accord pour le service d’avis externe.
+            <a href="/#avis-clients" className="ml-1 font-semibold text-neon hover:underline">Voir les avis clients</a>
           </div>
         </div>
 
@@ -479,10 +489,17 @@ function PrerenderContent({ html }) {
 
 function ProductLoading() {
   const snapshot = getPrerenderSnapshot(window.location.pathname)
+  if (snapshot) {
+    return (
+      <div role="status" aria-live="polite" aria-label="Chargement du produit">
+        <PrerenderContent html={snapshot} />
+      </div>
+    )
+  }
   return (
     <div className="container-page py-8">
       <div
-        className={`flex items-center justify-center ${snapshot ? 'py-6' : 'min-h-[60vh] py-20'}`}
+        className="flex min-h-[60vh] items-center justify-center py-20"
         role="status"
         aria-live="polite"
       >
@@ -491,7 +508,6 @@ function ProductLoading() {
           <p className="mt-4 text-sm text-muted">Chargement du produit…</p>
         </div>
       </div>
-      {snapshot && <PrerenderContent html={snapshot} />}
     </div>
   )
 }
@@ -500,12 +516,25 @@ function CatalogUnavailable() {
   // Si la fiche a été pré-rendue, on réaffiche son contenu réel et on la laisse
   // indexable : une panne passagère ne doit pas désindexer un produit valide.
   const snapshot = getPrerenderSnapshot(window.location.pathname)
+  if (snapshot) {
+    return (
+      <>
+        <PrerenderContent html={snapshot} />
+        <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-lg rounded-2xl border border-amber-400/25 bg-anthracite p-4 shadow-card" role="alert">
+          <p className="text-sm text-white">Les disponibilités live n'ont pas pu être actualisées.</p>
+          <button type="button" className="mt-2 text-xs font-semibold text-neon hover:underline" onClick={() => window.location.reload()}>
+            Réessayer la synchronisation
+          </button>
+        </div>
+      </>
+    )
+  }
   return (
     <div className="container-page py-16 text-center">
       {/* Sans instantané : page d'erreur pure, noindex. Avec instantané : on
           conserve le <title>/canonical pré-rendus de la fiche, déjà corrects. */}
-      {!snapshot && <Seo title="Catalogue temporairement indisponible" noindex />}
-      <div className={snapshot ? '' : 'grid min-h-[60vh] place-items-center'}>
+      <Seo title="Catalogue temporairement indisponible" noindex />
+      <div className="grid min-h-[60vh] place-items-center">
         <div>
           <h1 className="font-display text-2xl font-bold text-white">Catalogue temporairement indisponible</h1>
           <p className="mt-2 text-muted">Nous n’avons pas pu vérifier cette fiche produit. Veuillez réessayer.</p>
@@ -514,22 +543,26 @@ function CatalogUnavailable() {
           </button>
         </div>
       </div>
-      {snapshot && <PrerenderContent html={snapshot} />}
     </div>
   )
 }
 
 function VariantPicker({ label, options, value, onChange, render = (x) => x }) {
   return (
-    <div>
-      <p className="mb-2 text-sm font-medium text-white">
-        {label} <span className="text-faint">· {render(value)}</span>
-      </p>
+    <fieldset>
+      <legend className="mb-2 text-sm font-medium text-white">
+        {label}{' '}
+        <span className={value == null ? 'text-amber-300' : 'text-faint'}>
+          · {value == null ? 'À choisir' : render(value)}
+        </span>
+      </legend>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => (
           <button
+            type="button"
             key={String(opt)}
             onClick={() => onChange(opt)}
+            aria-pressed={value === opt}
             className={`rounded-full border px-4 py-2 text-sm transition ${
               value === opt
                 ? 'border-neon bg-neon/15 text-neon'
@@ -540,7 +573,7 @@ function VariantPicker({ label, options, value, onChange, render = (x) => x }) {
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   )
 }
 

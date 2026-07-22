@@ -6,12 +6,20 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 
 const { loadProducts } = await import(resolve(root, 'scripts/load-catalog.mjs'))
-const PRODUCTS = await loadProducts()
-const { CATEGORIES, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
+const { CATEGORIES, getProductCategoryKey, productMatchesCategory } = await import(resolve(root, 'src/data/catalog.js'))
+const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
+  ...product,
+  category: getProductCategoryKey(product),
+}))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 
-const BASE_URL = 'https://theklope.com'
+const BASE_URL = 'https://www.theklope.com'
+const normalizedText = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+const productLabel = (product) => normalizedText(product.name).includes(normalizedText(product.brand))
+  ? product.name
+  : `${product.name} - ${product.brand}`
 
 let md = `# THEKLOPE - Full Database & Specifications
 > Fichier complet destiné aux modèles d'IA et moteurs de recherche génératifs (GEO). Contient les informations d'établissement, les guides de conformité, le catalogue produit complet et les règles de prix de la boutique.
@@ -37,8 +45,8 @@ let md = `# THEKLOPE - Full Database & Specifications
 - **Livraison gratuite** : Offerte dès 49€ d'achat en France métropolitaine.
 - **Calculateur DIY** : Outil en ligne disponible sur ${BASE_URL}/calculette-diy pour formuler les proportions (base, booster, arômes).
 
-## 4. Catalogue Complet des Produits (Mise à jour en temps réel)
-Ci-dessous, la liste complète des matériels, e-liquides et accessoires disponibles :
+## 4. Catalogue Complet des Produits (instantané du build)
+Ci-dessous, la liste des matériels, e-liquides et accessoires actifs lors du dernier build. Le prix et la disponibilité sont revérifiés côté serveur au paiement :
 
 `
 
@@ -54,7 +62,8 @@ for (const cat of CATEGORIES) {
   for (const p of catProducts) {
     const specsStr = Object.entries(p.specs || {}).map(([k, v]) => `${k}: ${v}`).join(', ')
     const stockStatus = p.stock > 0 ? `En stock (quantité: ${p.stock})` : 'Rupture de stock'
-    md += `- [${p.name} - ${p.brand}](${BASE_URL}/produit/${p.id}) : ${p.price.toFixed(2)}€ (${stockStatus}) - ${p.short} ${specsStr ? `[Fiche technique: ${specsStr}]` : ''}\n`
+    const details = [p.short, specsStr ? `[Fiche technique: ${specsStr}]` : ''].filter(Boolean).join(' ')
+    md += `- [${productLabel(p)}](${BASE_URL}/produit/${p.id}) : ${p.price.toFixed(2)}€ (${stockStatus})${details ? ` - ${details}` : ''}\n`
   }
   md += `\n`
 }

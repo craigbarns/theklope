@@ -10602,9 +10602,13 @@ PRODUCTS.forEach((p) => {
   const nameLower = p.name.toLowerCase();
 
   // Category classification: ecig/pod kits become packs
-  if ((p.category === 'ecig' || p.category === 'pod') && (nameLower.includes('kit') || ['aegis-boost-3', 'aegis-max-4', 'aegis-mini-5-5', 'aegis-mini-6', 'armour-ultra-11'].includes(p.id))) {
+  if ((p.category === 'ecig' || p.category === 'pod') && /\bkit\b/.test(nameLower)) {
     p.category = 'pack';
   }
+
+  // Ne jamais écraser une marque explicitement relue dans la source. Les
+  // heuristiques ci-dessous ne servent qu'aux anciennes lignes non renseignées.
+  if (p.brand && p.brand !== 'THEKLOPE') return;
 
   // Brand classification based on keywords in name
   if (nameLower.includes('geekvape') || nameLower.includes('geek-vape') || nameLower.includes('aegis') || nameLower.includes('obelisk') || nameLower.includes('wenax') || nameLower.includes('zeus')) {
@@ -10643,14 +10647,96 @@ PRODUCTS.forEach((p) => {
     p.brand = 'Selad';
   }
 
-  // Fallback brand mapping if still default "THEKLOPE"
-  if (p.brand === 'THEKLOPE') {
-    if (p.category === 'eliquide') {
-      p.brand = 'Liquidarom';
-    } else if (p.category === 'ecig' || p.category === 'pod' || p.category === 'pack') {
-      p.brand = 'Geekvape';
-    } else if (p.category === 'accessoire') {
-      p.brand = 'Aspire';
-    }
-  }
+  // Une marque inconnue reste explicitement THEKLOPE : inventer un fabricant
+  // à partir de la catégorie rend les filtres et les fiches trompeurs.
+});
+
+// Corrections commerciales vérifiées contre le catalogue live. Ce fichier ne
+// sert qu'au développement local ; les déploiements chargent Supabase, mais le
+// mode local ne doit pas proposer du matériel à 5,90 € comme un e-liquide.
+const STATIC_CATALOG_CORRECTIONS = {
+  'dual-coil-56': {
+    name: 'Résistances Dual Coil - Kangertech Pack de 5', category: 'resistance', brand: 'Kangertech', type: 'Résistances',
+    volume: null, price: 15, oldPrice: null, stock: 20, nicotine: [], flavors: [], colors: [], ohmOptions: [], specs: {}, short: '', long: '',
+  },
+  'kit-zelos-81': {
+    name: 'Zelos 3 - Aspire', category: 'ecig', brand: 'Aspire', type: 'Cigarette électronique',
+    volume: null, price: 59.9, oldPrice: null, stock: 20, nicotine: [], flavors: [], colors: ['Noir'], ohmOptions: [],
+    specs: { Charge: 'USB-C', Batterie: '3200 mah', Puissance: '80 watts' }, short: '', long: '',
+  },
+  'kit-gtx-one-pro-vaporesso-90': {
+    name: 'Kit GTX One Pro - Vaporesso', category: 'ecig', brand: 'Vaporesso', type: 'Cigarette électronique',
+    volume: null, price: 46.9, oldPrice: null, stock: 20, nicotine: [], flavors: [], colors: ['Noir', 'Gris', 'Rose', 'Bleu'], ohmOptions: [],
+    specs: { Charge: 'USB-C', Batterie: '3000 Mah', Puissance: '40 watts' }, short: '', long: '',
+  },
+  're-sistances-j-series-5pcs-geekvape-153': {
+    name: 'Résistances J Series - GeekVape Pack de 5', category: 'resistance', brand: 'Geekvape', type: 'Résistances',
+    volume: null, price: 15, oldPrice: null, stock: 20, nicotine: [], flavors: [], colors: [], ohmOptions: ['0.4', '0.6', '0.8'], specs: {}, short: '', long: '',
+  },
+  'red-astaire-50-ml-149': {
+    name: 'Red Astaire 50 ml - Tjuice', category: 'eliquide', brand: 'Tjuice', type: 'E-liquide', volume: '50ml',
+    price: 19.9, oldPrice: null, stock: 50, nicotine: [0], flavors: ['Red Astaire'], colors: [], ohmOptions: [],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué au Royaume Uni', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'zenith-pro-190': {
+    name: 'Résistance série Z Pro - Innokin', category: 'resistance', brand: 'Innokin', type: 'Résistances',
+    volume: null, price: 15, oldPrice: null, stock: 30, nicotine: [], flavors: [], colors: [], ohmOptions: [], specs: {}, short: '', long: '',
+  },
+  'zenith-191': {
+    name: 'Résistances série Z Zenith - Innokin Pack de 5', category: 'resistance', brand: 'Innokin', type: 'Résistances',
+    volume: null, price: 15, oldPrice: null, stock: 50, nicotine: [], flavors: [], colors: [], ohmOptions: ['0.3', '0.5', '0.8', '1.0', '1.6'], specs: {}, short: '', long: '',
+  },
+  'coco-miam-42': {
+    name: 'Coco Miam 10 ml - Freaks', brand: 'Freaks', volume: '10ml', price: 5.9, stock: 100, nicotine: [3, 6, 12], flavors: ['Coco Miam'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '10 ml' }, short: '', long: '',
+  },
+  'coco-miam-43': {
+    name: 'Coco Miam 50 ml - Freaks', brand: 'Freaks', volume: '50ml', price: 19.9, stock: 20, nicotine: [0], flavors: ['Coco Miam'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'macada-miam-109': {
+    name: 'Macada Miam 10 ml - Freaks', brand: 'Freaks', volume: '10ml', price: 5.9, stock: 1000, nicotine: [3, 6, 12], flavors: ['Macada Miam'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '10 ml' }, short: '', long: '',
+  },
+  'macada-miam-110': {
+    name: 'Macada Miam 50 ml - Freaks', brand: 'Freaks', volume: '50ml', price: 19.9, stock: 100, nicotine: [0], flavors: ['Macada Miam'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'mantaro-116': {
+    name: 'Mantaro 50 ml - Amazone', brand: 'E-tasty', volume: '50ml', price: 19.9, stock: 20, nicotine: [0], flavors: ['Mantaro'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'senois-1-156': {
+    name: 'Classico Senois 10 ml - Freaks', brand: 'Freaks', volume: '10ml', price: 5.9, stock: 200, nicotine: [3, 6, 11], flavors: ['Classico Senois'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '10 ml' }, short: '', long: '',
+  },
+  'senois-157': {
+    name: 'Classico Senois 50 ml - Freaks', brand: 'Freaks', volume: '50ml', price: 19.9, stock: 100, nicotine: [0], flavors: ['Classico Senois'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'grege-1-67': {
+    name: 'Classico Grège 10 ml - Freaks', brand: 'Freaks', volume: '10ml', price: 5.9, stock: 1000, nicotine: [3, 6, 11], flavors: ['Classico Grège'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '10 ml' }, short: '', long: '',
+  },
+  'grege-68': {
+    name: 'Classico Grège 50 ml - Freaks', brand: 'Freaks', volume: '50ml', price: 19.9, stock: 100, nicotine: [0], flavors: ['Classico Grège'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  'cafe-liquid-arom-209': {
+    name: 'Café 10 ml - Liquidarom', brand: 'Liquidarom', volume: '10ml', price: 5.9, stock: 1000, nicotine: [3, 6, 12], flavors: ['Café'],
+    specs: { Ratio: '70 PG / 30 VG', Origine: 'Fabriqué en France', Contenance: '10 ml' }, short: '', long: '',
+  },
+  'cerise-griotte-50ml-0mg-217': {
+    name: 'Cerise Griotte 50 ml - Freaks', brand: 'Freaks', volume: '50ml', price: 19.9, stock: 100, nicotine: [0], flavors: ['Cerise Griotte'],
+    specs: { Ratio: '50 PG / 50 VG', Origine: 'Fabriqué en France', Contenance: '50 ml' }, short: '', long: '',
+  },
+  // Ces anciennes références n'existent plus dans le catalogue live. Elles
+  // restent consultables en local mais ne peuvent plus être ajoutées au panier.
+  'gtx-70': { stock: 0, badge: null },
+  'kit-digi-max-geekvape-89': { stock: 0, badge: null },
+};
+
+PRODUCTS.forEach((product) => {
+  const correction = STATIC_CATALOG_CORRECTIONS[product.id];
+  if (correction) Object.assign(product, correction);
 });

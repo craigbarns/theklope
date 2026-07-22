@@ -1,2 +1,7 @@
 export const getPaidOrders = (orders = []) =>
-  orders.filter((order) => order.paymentStatus === 'paid' && order.status !== 'cancelled')
+  orders.filter((order) => (
+    order.paymentStatus === 'paid'
+    && order.status !== 'cancelled'
+    && !order.checkoutReviewRequiredAt
+    && !order.checkoutReviewReason
+  ))

@@ -3,7 +3,42 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import { IconCheck, IconLock } from '../components/icons.jsx'
-import { trackEvent } from '../lib/analytics.js'
+import {
+  getStoredAcquisition,
+  parsePurchaseSnapshot,
+  trackEventWhenReady,
+} from '../lib/analytics.js'
+import {
+  CHECKOUT_RETURN_STATE,
+  isPurchaseTrackable,
+  resolveCheckoutReturnState,
+  shouldClearCartForPaymentReturn,
+} from '../lib/paymentReturn.js'
+import { clearPaymentAttemptForOrder } from '../lib/checkoutAttempt.js'
+
+const storageGet = (storageName, key) => {
+  try {
+    return window[storageName]?.getItem(key) || null
+  } catch {
+    return null
+  }
+}
+
+const storageSet = (storageName, key, value) => {
+  try {
+    window[storageName]?.setItem(key, value)
+  } catch {
+    // Chaque stockage est indépendant : l'autre peut encore dédupliquer.
+  }
+}
+
+const storageRemove = (storageName, key) => {
+  try {
+    window[storageName]?.removeItem(key)
+  } catch {
+    // Un snapshot fonctionnel peut rester si le stockage est verrouillé.
+  }
+}
 
 // Page affichée au retour de Mollie. Elle interroge /api/payment-status qui relit
 // le vrai statut du paiement (et finalise la commande si payée).
@@ -12,9 +47,11 @@ export default function CheckoutReturn() {
   const orderId = params.get('order')
   const { clearCart, cookiesChoice } = useStore()
 
-  const [state, setState] = useState('pending') // 'pending' | 'paid' | 'failed' | 'delayed' | 'error'
+  const [state, setState] = useState(CHECKOUT_RETURN_STATE.pending)
   const [order, setOrder] = useState(null)
+  const [reviewPaymentReceived, setReviewPaymentReceived] = useState(false)
   const clearedRef = useRef(false)
+  const purchaseTrackingRef = useRef(null)
 
   useEffect(() => {
     if (!orderId) {
@@ -34,16 +71,41 @@ export default function CheckoutReturn() {
         if (!res.ok) throw new Error(data.error || 'Statut indisponible')
         if (data.order) setOrder(data.order)
 
+        const resolvedState = resolveCheckoutReturnState({
+          paymentStatus: data.status,
+          order: data.order,
+        })
+        if (resolvedState === CHECKOUT_RETURN_STATE.reviewRequired) {
+          const paymentReceived = data.status === 'paid'
+          setReviewPaymentReceived(paymentReceived)
+          setState(resolvedState)
+          if (paymentReceived) {
+            const attemptMatched = clearPaymentAttemptForOrder(orderId)
+            if (shouldClearCartForPaymentReturn({
+              attemptMatched,
+              alreadyCleared: clearedRef.current,
+            })) {
+              clearedRef.current = true
+              clearCart()
+            }
+          }
+          return
+        }
+
         if (data.status === 'paid') {
-          setState('paid')
-          if (!clearedRef.current) {
+          const attemptMatched = clearPaymentAttemptForOrder(orderId)
+          setState(resolvedState)
+          if (shouldClearCartForPaymentReturn({
+            attemptMatched,
+            alreadyCleared: clearedRef.current,
+          })) {
             clearedRef.current = true
-            
             clearCart()
           }
           return
         }
         if (data.status === 'failed') {
+          clearPaymentAttemptForOrder(orderId)
           setState('failed')
           return
         }
@@ -64,31 +126,91 @@ export default function CheckoutReturn() {
   }, [orderId, clearCart])
 
   useEffect(() => {
-    if (state !== 'paid' || !order || cookiesChoice !== 'accepted') return
+    if (!isPurchaseTrackable(state) || !order || cookiesChoice !== 'accepted') return undefined
 
-    const trackedKey = `tk_purchase_tracked_${order.id || orderId}`
-    try {
-      if (window.sessionStorage.getItem(trackedKey)) return
-      const raw = window.sessionStorage.getItem(`tk_purchase_${order.id || orderId}`)
-      const snapshot = raw ? JSON.parse(raw) : null
-      const fallbackShipping = typeof order.shipping === 'number'
-        ? order.shipping
-        : Number(order.shipping?.price || order.shipping?.cost || 0)
+    const transactionId = order.id || orderId
+    if (!transactionId || purchaseTrackingRef.current === transactionId) return undefined
+    purchaseTrackingRef.current = transactionId
+    let active = true
 
-      if (trackEvent('purchase', {
-        transaction_id: order.id || orderId,
-        value: Number(order.total) || 0,
-        tax: 0,
-        shipping: Number(snapshot?.totals?.shipping ?? fallbackShipping) || 0,
-        currency: 'EUR',
-        coupon: snapshot?.coupon,
-        items: Array.isArray(snapshot?.items) ? snapshot.items : [],
-      })) {
-        window.sessionStorage.setItem(trackedKey, '1')
-        window.sessionStorage.removeItem(`tk_purchase_${order.id || orderId}`)
+    const trackPurchase = async () => {
+      const trackedKey = `tk_purchase_tracked_${transactionId}`
+      const snapshotKey = `tk_purchase_${transactionId}`
+      try {
+        // localStorage empêche un double achat GA4 si l'URL de confirmation est
+        // rouverte plus tard ; sessionStorage conserve la compatibilité existante.
+        if (storageGet('localStorage', trackedKey) || storageGet('sessionStorage', trackedKey)) return
+        const raw = storageGet('sessionStorage', snapshotKey) || storageGet('localStorage', snapshotKey)
+        const snapshot = parsePurchaseSnapshot(raw)
+        if (raw && !snapshot) {
+          storageRemove('sessionStorage', snapshotKey)
+          storageRemove('localStorage', snapshotKey)
+        }
+        const fallbackShipping = typeof order.shipping === 'number'
+          ? order.shipping
+          : Number(order.shipping?.price || order.shipping?.cost || 0)
+        const acquisition = getStoredAcquisition()?.lastTouch || {}
+
+        const tracked = await trackEventWhenReady('purchase', {
+          transaction_id: transactionId,
+          value: Number(order.total) || 0,
+          tax: 0,
+          shipping: Number(snapshot?.totals?.shipping ?? fallbackShipping) || 0,
+          currency: 'EUR',
+          coupon: snapshot?.coupon,
+          items: Array.isArray(snapshot?.items) ? snapshot.items : [],
+          campaign_id: acquisition.utm_id,
+          campaign: acquisition.utm_campaign,
+          source: acquisition.utm_source,
+          medium: acquisition.utm_medium,
+          term: acquisition.utm_term,
+          content: acquisition.utm_content,
+        })
+
+        if (!active || !tracked) return
+        storageSet('localStorage', trackedKey, '1')
+        storageSet('sessionStorage', trackedKey, '1')
+        storageRemove('sessionStorage', snapshotKey)
+        storageRemove('localStorage', snapshotKey)
+      } catch {
+        // Le statut de commande ne dépend jamais de la mesure d'audience. Le
+        // snapshot reste disponible afin qu'une actualisation puisse réessayer.
+      } finally {
+        if (active) purchaseTrackingRef.current = null
       }
-    } catch {
-      // Le statut de commande ne dépend jamais de la mesure d'audience.
+    }
+
+    trackPurchase()
+    return () => {
+      active = false
+    }
+  }, [cookiesChoice, order, orderId, state])
+
+  // Si une commande déjà mesurée comme achat est remboursée plus tard puis que
+  // le client rouvre cette URL, GA4 reçoit un refund dédupliqué. Une commande
+  // arrivée directement dans l'état remboursé n'émet jamais de purchase.
+  useEffect(() => {
+    if (state !== CHECKOUT_RETURN_STATE.refunded || !order || cookiesChoice !== 'accepted') return undefined
+    const transactionId = order.id || orderId
+    if (!transactionId) return undefined
+    const purchaseKey = `tk_purchase_tracked_${transactionId}`
+    const refundKey = `tk_refund_tracked_${transactionId}`
+    if (!storageGet('localStorage', purchaseKey) && !storageGet('sessionStorage', purchaseKey)) return undefined
+    if (storageGet('localStorage', refundKey) || storageGet('sessionStorage', refundKey)) return undefined
+
+    let active = true
+    trackEventWhenReady('refund', {
+      transaction_id: transactionId,
+      value: Number(order.total) || 0,
+      currency: 'EUR',
+    }).then((tracked) => {
+      if (!active || !tracked) return
+      storageSet('localStorage', refundKey, '1')
+      storageSet('sessionStorage', refundKey, '1')
+    }).catch(() => {})
+
+    return () => {
+      active = false
     }
   }, [cookiesChoice, order, orderId, state])
 
@@ -96,7 +218,7 @@ export default function CheckoutReturn() {
     <div className="container-page py-16">
       <Seo title="Confirmation de commande" noindex />
       <div className="mx-auto max-w-lg card p-10 text-center">
-        {state === 'paid' && (
+        {state === CHECKOUT_RETURN_STATE.paid && (
           <>
             <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-neon/30 bg-neon/10 text-neon">
               <IconCheck width={32} height={32} />
@@ -105,17 +227,86 @@ export default function CheckoutReturn() {
             <p className="mt-3 text-muted">
               Votre commande <strong className="text-neon">{order?.id || orderId}</strong> a bien été payée et confirmée.
             </p>
-            {order?.status === 'stock_issue' && (
-              <p className="mt-3 rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-                Une vérification manuelle est en cours sur la disponibilité d'un produit. L'équipe THEKLOPE vous contacte rapidement si une adaptation est nécessaire.
-              </p>
-            )}
             {order?.total != null && (
               <div className="mt-6 rounded-2xl border border-white/8 bg-white/5 p-4 text-left text-sm">
                 <div className="flex justify-between py-1"><span className="text-muted">Montant payé</span><span className="font-semibold text-white">{formatPrice(order.total)}</span></div>
               </div>
             )}
             <Link to="/boutique" className="btn-primary mt-7 w-full">Continuer mes achats</Link>
+          </>
+        )}
+
+        {state === CHECKOUT_RETURN_STATE.stockIssue && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-amber-400/25 bg-amber-400/10 text-amber-200">
+              <IconLock width={26} height={26} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Vérification de disponibilité en cours</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Le paiement de la commande <strong className="text-white">{order?.id || orderId}</strong> a été reçu,
+              mais un article nécessite une vérification. Ne relancez pas le paiement : l'équipe vous contacte ou déclenche le remboursement.
+            </p>
+            <Link to="/contact" className="btn-primary mt-7 w-full">Contacter l'équipe</Link>
+          </>
+        )}
+
+        {state === CHECKOUT_RETURN_STATE.reviewRequired && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-amber-400/25 bg-amber-400/10 text-amber-200">
+              <IconLock width={26} height={26} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Vérification manuelle en cours</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              {reviewPaymentReceived
+                ? <>Le paiement de la commande <strong className="text-white">{order?.id || orderId}</strong> a été reçu, mais l'opération doit être contrôlée par notre équipe.</>
+                : <>La commande <strong className="text-white">{order?.id || orderId}</strong> doit être contrôlée par notre équipe avant toute nouvelle tentative.</>}
+              {' '}Ne relancez pas le paiement. Nous vérifierons la commande et vous contacterons si nécessaire.
+            </p>
+            <Link to="/contact" className="btn-primary mt-7 w-full">Contacter l'équipe</Link>
+          </>
+        )}
+
+        {state === CHECKOUT_RETURN_STATE.refundPending && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-amber-400/25 bg-amber-400/10 text-amber-200">
+              <IconLock width={26} height={26} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Remboursement en cours</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              La commande <strong className="text-white">{order?.id || orderId}</strong> ne peut pas être finalisée.
+              Le remboursement de {order?.total != null ? formatPrice(order.total) : 'votre paiement'} est en cours chez Mollie.
+              Ne relancez pas le paiement.
+            </p>
+            <Link to="/contact" className="btn-ghost mt-7 w-full">Nous contacter</Link>
+          </>
+        )}
+
+        {state === CHECKOUT_RETURN_STATE.refunded && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-white/15 text-neon">
+              <IconCheck width={30} height={30} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Commande remboursée</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Le remboursement de la commande <strong className="text-white">{order?.id || orderId}</strong>
+              {order?.total != null ? ` (${formatPrice(order.total)})` : ''} a été confirmé par Mollie.
+              Le délai d'affichage dépend ensuite de votre banque.
+            </p>
+            <Link to="/boutique" className="btn-primary mt-7 w-full">Retour à la boutique</Link>
+          </>
+        )}
+
+        {state === CHECKOUT_RETURN_STATE.refundFailed && (
+          <>
+            <div className="mx-auto mb-6 grid h-16 w-16 place-items-center rounded-full border border-rose-400/25 bg-rose-400/10 text-rose-200">
+              <IconLock width={26} height={26} />
+            </div>
+            <h1 className="font-display text-xl font-bold text-white">Remboursement à vérifier</h1>
+            <p className="mt-3 text-sm leading-relaxed text-muted">
+              Mollie n'a pas encore confirmé le remboursement de la commande <strong className="text-white">{order?.id || orderId}</strong>.
+              Ne relancez pas le paiement ; notre équipe doit vérifier l'opération.
+            </p>
+            <Link to="/contact" className="btn-primary mt-7 w-full">Contacter le service client</Link>
           </>
         )}
 

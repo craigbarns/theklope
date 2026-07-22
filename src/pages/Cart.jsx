@@ -8,10 +8,30 @@ import { featuredProducts } from '../data/catalog.js'
 import ProductImage from '../components/ProductImage.jsx'
 import BundleProgress from '../components/BundleProgress.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
+import {
+  getProductVariantChoices,
+  isCartCatalogResolved,
+  isCartCatalogVerified,
+  resolveProductVariant,
+} from '../lib/cart.js'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
-  const { cartDetailed, updateQty, removeItem, totals, promo, applyPromo, removePromo, products } = useStore()
+  const {
+    cart,
+    cartDetailed,
+    updateQty,
+    updateCartVariant,
+    removeItem,
+    totals,
+    promo,
+    applyPromo,
+    removePromo,
+    products,
+    catalogReady,
+    syncStatus,
+    refreshRemoteData,
+  } = useStore()
   const [code, setCode] = useState('')
   const [feedback, setFeedback] = useState(null)
 
@@ -25,6 +45,33 @@ export default function Cart() {
     const res = applyPromo(code)
     setFeedback(res)
     if (res.ok) setCode('')
+  }
+
+  const cartState = { cart, cartDetailed, catalogReady }
+  const cartCatalogResolved = isCartCatalogResolved(cartState)
+  const cartNeedsVerification = !cartCatalogResolved
+  const cartHasVariantIssue = cartCatalogResolved && !isCartCatalogVerified(cartState)
+
+  if (cartNeedsVerification) {
+    return (
+      <div className="container-page py-8">
+        <Seo title="Panier" noindex />
+        <Breadcrumbs items={[{ label: 'Panier' }]} />
+        <div className="mt-10 card grid min-h-56 place-items-center p-8 text-center" role="status" aria-live="polite">
+          <div>
+            <h1 className="font-display text-2xl font-bold text-white">Vérification de votre panier</h1>
+            <p className="mt-2 text-sm text-muted">
+              {syncStatus === 'error'
+                ? 'Le catalogue live est temporairement indisponible. Aucun prix ni produit ne sera omis de votre commande.'
+                : 'Nous vérifions les prix, les variantes et le stock live avant de poursuivre.'}
+            </p>
+            {syncStatus === 'error' && (
+              <button type="button" onClick={refreshRemoteData} className="btn-ghost mt-5">Réessayer</button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (cartDetailed.length === 0) {
@@ -56,6 +103,7 @@ export default function Cart() {
   }
 
   const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
+  const itemsTotal = Math.max(0, totals.subtotal - totals.discount)
 
   return (
     <div className="container-page py-8">
@@ -66,27 +114,44 @@ export default function Cart() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         {/* Lignes */}
         <div className="space-y-4">
-          {remainingForFreeShipping > 0 && (
-            <div className="flex items-center gap-3 rounded-2xl border border-neon/20 bg-neon/5 px-4 py-3 text-sm text-ash/80">
+          <div className="rounded-2xl border border-neon/20 bg-neon/5 px-4 py-3 text-sm text-ash/80">
+            <p className="flex items-center gap-3">
               <IconTruck width={18} height={18} className="text-neon" />
-              Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte !
-            </div>
-          )}
+              {remainingForFreeShipping > 0 ? (
+                <span>
+                  Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison standard offerte.
+                </span>
+              ) : (
+                <strong className="text-neon">Livraison standard offerte débloquée.</strong>
+              )}
+            </p>
+            <p className="mt-1 pl-[30px] text-xs text-muted">Retrait gratuit en boutique à Marseille, disponible à l’étape suivante.</p>
+          </div>
 
           <BundleProgress hints={totals.bundleProgress} />
+
+          {cartHasVariantIssue && (
+            <p role="alert" className="rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+              Une option de votre panier n'est plus disponible. Choisissez une option proposée ci-dessous avant de passer commande.
+            </p>
+          )}
 
           {cartDetailed.map((item) => (
             <div key={item.index} className="card flex gap-4 p-4">
               <Link to={`/produit/${item.product.id}`} className="shrink-0">
                 <ProductImage src={item.product.image} alt="" loading="lazy" className="h-24 w-24 rounded-xl object-cover" width={96} height={96} />
               </Link>
-              <div className="flex flex-1 flex-col">
+              <div className="min-w-0 flex flex-1 flex-col">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <Link to={`/produit/${item.product.id}`} className="font-medium text-white hover:text-neon">
                       {item.product.name}
                     </Link>
-                    <VariantLabel variant={item.variant} />
+                    <VariantEditor
+                      product={item.product}
+                      variant={item.variant}
+                      onChange={(variant) => updateCartVariant(item.index, variant)}
+                    />
                   </div>
                   <button onClick={() => removeItem(item.index)} aria-label="Retirer" className="text-faint hover:text-rose-400">
                     <IconTrash width={18} height={18} />
@@ -149,18 +214,31 @@ export default function Cart() {
               <Row label="Sous-total" value={formatPrice(totals.subtotal)} />
               {totals.discount > 0 && <Row label="Remise" value={`- ${formatPrice(totals.discount)}`} accent />}
               {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
-                <p key={d.key} className="-mt-1 text-[11px] text-neon/80">✓ {d.label}</p>
+                <div key={d.key} className="-mt-1 text-[11px] text-neon/80">
+                  <dt className="sr-only">Remise automatique</dt>
+                  <dd>✓ {d.label}</dd>
+                </div>
               ))}
-              <Row label="Livraison" value={totals.shipping === 0 ? 'Offerte' : formatPrice(totals.shipping)} />
+              <Row label="Livraison" value="Calculée à l’étape suivante" />
               <div className="flex items-center justify-between border-t border-white/8 pt-4">
-                <dt className="font-semibold text-white">Total</dt>
-                <dd className="font-display text-xl font-bold text-white">{formatPrice(totals.total)}</dd>
+                <dt className="font-semibold text-white">Total avant livraison</dt>
+                <dd className="font-display text-xl font-bold text-white">{formatPrice(itemsTotal)}</dd>
               </div>
             </dl>
 
-            <Link to="/checkout" className="btn-primary mt-6 w-full">
-              Passer commande <IconArrowRight width={18} height={18} />
-            </Link>
+            <p className="mt-3 text-xs leading-relaxed text-faint">
+              Retrait boutique gratuit disponible. Le tarif exact dépendra du mode de livraison choisi.
+            </p>
+
+            {cartHasVariantIssue ? (
+              <button type="button" disabled className="btn-primary mt-6 w-full cursor-not-allowed opacity-50">
+                Choisissez les options requises
+              </button>
+            ) : (
+              <Link to="/checkout" className="btn-primary mt-6 w-full">
+                Passer commande <IconArrowRight width={18} height={18} />
+              </Link>
+            )}
             <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-faint">
               <IconLock width={13} height={13} /> Paiement sécurisé · Données chiffrées
             </p>
@@ -176,19 +254,60 @@ export default function Cart() {
 
 function Row({ label, value, accent }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-4">
       <dt className="text-muted">{label}</dt>
-      <dd className={accent ? 'text-neon' : 'text-white'}>{value}</dd>
+      <dd className={`text-right ${accent ? 'text-neon' : 'text-white'}`}>{value}</dd>
     </div>
   )
 }
 
-function VariantLabel({ variant }) {
-  const parts = []
-  if (variant.color) parts.push(variant.color)
-  if (variant.flavor) parts.push(variant.flavor)
-  if (variant.nicotine != null) parts.push(`${variant.nicotine} mg`)
-  if (variant.ohm != null) parts.push(`${variant.ohm} Ω`)
-  if (!parts.length) return null
-  return <p className="mt-1 text-xs text-faint">{parts.join(' · ')}</p>
+function VariantEditor({ product, variant = {}, onChange }) {
+  const choices = getProductVariantChoices(product)
+  if (!choices.length) return null
+  const resolution = resolveProductVariant(product, variant)
+  const editableVariant = Object.fromEntries(choices.flatMap(({ key, options }) => {
+    const selected = options.find((option) => String(option) === String(variant[key]))
+    return selected === undefined ? [] : [[key, selected]]
+  }))
+
+  return (
+    <div className="mt-2" aria-label={`Options de ${product.name}`}>
+      <div className="flex flex-wrap gap-2">
+      {choices.map(({ key, label, options, suffix = '' }) => {
+        const selected = options.find((option) => String(option) === String(variant[key]))
+        if (options.length === 1) {
+          return (
+            <span key={key} className="text-xs text-faint">
+              {label} : {options[0]}{suffix}
+            </span>
+          )
+        }
+
+        return (
+          <label key={key} className="flex items-center gap-1 text-xs text-faint">
+            <span>{label} :</span>
+            <select
+              value={selected === undefined ? '' : String(selected)}
+              onChange={(event) => {
+                const value = options.find((option) => String(option) === event.target.value)
+                if (value !== undefined) onChange({ ...editableVariant, [key]: value })
+              }}
+              aria-label={`${label} pour ${product.name}`}
+              aria-invalid={selected === undefined ? 'true' : undefined}
+              className="rounded-lg border border-white/12 bg-carbon px-2 py-1 text-xs text-white outline-none focus:border-neon"
+            >
+              {selected === undefined && <option value="">Choisir</option>}
+              {options.map((option) => (
+                <option key={String(option)} value={String(option)}>{option}{suffix}</option>
+              ))}
+            </select>
+          </label>
+        )
+      })}
+      </div>
+      {!resolution.ok && (
+        <p role="alert" className="mt-1 text-xs text-amber-200">{resolution.error}</p>
+      )}
+    </div>
+  )
 }

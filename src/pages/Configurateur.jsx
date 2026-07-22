@@ -6,6 +6,17 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
 import { isResistanceProduct } from '../data/catalog.js'
+import { getProductVariantChoices, resolveProductVariant } from '../lib/cart.js'
+
+const singleChoiceDefaults = (product) => Object.fromEntries(
+  getProductVariantChoices(product)
+    .filter(({ options }) => options.length === 1)
+    .map(({ key, options }) => [key, options[0]]),
+)
+
+const hasCompleteVariant = (product, variant) => getProductVariantChoices(product).every(
+  ({ key, options }) => options.some((option) => String(option) === String(variant?.[key])),
+)
 
 export default function Configurateur() {
   const { products, addItemsToCart, applyPromo } = useStore()
@@ -13,10 +24,11 @@ export default function Configurateur() {
 
   const [step, setStep] = useState(1) // 1: Box, 2: Clearomiseur, 3: E-liquide, 4: Recap
   const [selectedBox, setSelectedBox] = useState(null)
-  const [selectedBoxColor, setSelectedBoxColor] = useState('')
+  const [selectedBoxVariant, setSelectedBoxVariant] = useState({})
   const [selectedClearomizer, setSelectedClearomizer] = useState(null)
+  const [selectedClearomizerVariant, setSelectedClearomizerVariant] = useState({})
   const [selectedEliquid, setSelectedEliquid] = useState(null)
-  const [selectedNicotine, setSelectedNicotine] = useState(null) // in mg/ml
+  const [selectedEliquidVariant, setSelectedEliquidVariant] = useState({})
   const [searchQuery, setSearchQuery] = useState('')
   const [addError, setAddError] = useState('')
 
@@ -64,6 +76,10 @@ export default function Configurateur() {
   const finalPrice = Math.round((subtotal - discount) * 100) / 100
 
   const configComplete = Boolean(selectedBox && selectedClearomizer && selectedEliquid)
+  const variantChoicesComplete = configComplete
+    && hasCompleteVariant(selectedBox, selectedBoxVariant)
+    && hasCompleteVariant(selectedClearomizer, selectedClearomizerVariant)
+    && hasCompleteVariant(selectedEliquid, selectedEliquidVariant)
   // Empêche de valider « Étape suivante » sans avoir choisi le produit de l'étape.
   const nextDisabled =
     (step === 1 && !selectedBox) ||
@@ -72,26 +88,31 @@ export default function Configurateur() {
 
   const handleSelectBox = (box) => {
     setSelectedBox(box)
-    setSelectedBoxColor(box.colors?.[0] || '')
+    setSelectedBoxVariant(singleChoiceDefaults(box))
     setSearchQuery('')
     setStep(2)
   }
 
   const handleSelectClearomizer = (clearomizer) => {
     setSelectedClearomizer(clearomizer)
+    setSelectedClearomizerVariant(singleChoiceDefaults(clearomizer))
     setSearchQuery('')
     setStep(3)
   }
 
   const handleSelectEliquid = (eliquid) => {
     setSelectedEliquid(eliquid)
-    setSelectedNicotine(eliquid.nicotine?.[0] ?? 0)
+    setSelectedEliquidVariant(singleChoiceDefaults(eliquid))
     setSearchQuery('')
     setStep(4)
   }
 
   const handleAddToCart = () => {
     if (!selectedBox || !selectedClearomizer || !selectedEliquid) return
+    if (!variantChoicesComplete) {
+      setAddError('Choisissez chaque option du pack avant de l’ajouter au panier.')
+      return
+    }
 
     const currentBox = products.find((product) => product.id === selectedBox.id)
     const currentClearomizer = products.find((product) => product.id === selectedClearomizer.id)
@@ -101,10 +122,20 @@ export default function Configurateur() {
       return
     }
 
+    const normalizedBoxVariant = resolveProductVariant(currentBox, selectedBoxVariant)
+    const normalizedClearomizerVariant = resolveProductVariant(currentClearomizer, selectedClearomizerVariant)
+    const normalizedEliquidVariant = resolveProductVariant(currentEliquid, selectedEliquidVariant)
+    const invalidVariant = [normalizedBoxVariant, normalizedClearomizerVariant, normalizedEliquidVariant]
+      .find((result) => !result.ok)
+    if (invalidVariant) {
+      setAddError(invalidVariant.error || 'Une option du pack n’est plus disponible.')
+      return
+    }
+
     const added = addItemsToCart([
-      { productId: currentBox.id, qty: 1, variant: selectedBoxColor ? { color: selectedBoxColor } : {} },
-      { productId: currentClearomizer.id, qty: 1 },
-      { productId: currentEliquid.id, qty: 1, variant: { nicotine: selectedNicotine } },
+      { productId: currentBox.id, qty: 1, variant: normalizedBoxVariant.variant },
+      { productId: currentClearomizer.id, qty: 1, variant: normalizedClearomizerVariant.variant },
+      { productId: currentEliquid.id, qty: 1, variant: normalizedEliquidVariant.variant },
     ])
     if (!added) {
       setAddError("Le stock d'un article a évolué. Le panier n'a pas été modifié.")
@@ -128,7 +159,7 @@ export default function Configurateur() {
     <div className="container-page py-8">
       <Seo
         title="Configurateur de pack sur mesure (-15%) | THEKLOPE"
-        description="Composez un pack cigarette électronique compatible et bénéficiez de -15% sur le pack complet."
+        description="Composez votre pack cigarette électronique et bénéficiez de -15% sur le pack complet."
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Configurateur' }]} />
 
@@ -138,10 +169,13 @@ export default function Configurateur() {
         <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-blue-500/5 blur-[80px]" />
         <span className="eyebrow">Pack sur mesure</span>
         <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mt-2">
-          Configurez un pack compatible
+          Composez votre pack
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-          Choisissez votre batterie, votre résistance ou cartouche et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble !
+          Choisissez votre batterie, votre résistance ou cartouche et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble.
+        </p>
+        <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-amber-200/80">
+          Le configurateur ne vérifie pas la compatibilité technique. Avant de commander, comparez la référence de la résistance avec celle acceptée par votre appareil ou demandez conseil à l’équipe.
         </p>
       </div>
 
@@ -174,12 +208,12 @@ export default function Configurateur() {
               >
                 {step > s.num ? <IconCheck width={14} height={14} /> : s.num}
               </span>
-              <div className="hidden text-left sm:block">
-                <p className={`text-xs font-semibold leading-none ${step === s.num ? 'text-white' : 'text-faint'}`}>
+              <span className="hidden text-left sm:block">
+                <span className={`block text-xs font-semibold leading-none ${step === s.num ? 'text-white' : 'text-faint'}`}>
                   {s.label}
-                </p>
-                <p className="text-[10px] text-muted truncate max-w-[120px] mt-0.5">{s.desc}</p>
-              </div>
+                </span>
+                <span className="mt-0.5 block max-w-[120px] truncate text-[10px] text-muted">{s.desc}</span>
+              </span>
               {s.num < 4 && <span className="h-px flex-1 bg-white/10 hidden sm:block ml-2" />}
             </button>
           </div>
@@ -225,11 +259,22 @@ export default function Configurateur() {
                     return (
                       <div
                         key={p.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => {
                           if (step === 1) handleSelectBox(p)
                           else if (step === 2) handleSelectClearomizer(p)
                           else if (step === 3) handleSelectEliquid(p)
                         }}
+                        onKeyDown={(event) => {
+                          if (event.key !== 'Enter' && event.key !== ' ') return
+                          event.preventDefault()
+                          if (step === 1) handleSelectBox(p)
+                          else if (step === 2) handleSelectClearomizer(p)
+                          else if (step === 3) handleSelectEliquid(p)
+                        }}
+                        aria-pressed={isSelected}
+                        aria-label={`Choisir ${p.name}`}
                         className={`group cursor-pointer rounded-2xl border p-4 transition-all duration-300 ${
                           isSelected
                             ? 'border-neon bg-neon/[0.03] shadow-[0_0_15px_rgba(53,255,138,0.08)]'
@@ -295,22 +340,14 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 1 · Box/Batterie</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedBox.name}</h3>
                       <p className="text-xs text-faint">{selectedBox.brand}</p>
-                      {selectedBox.colors?.length > 0 && (
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <span className="text-[10px] text-muted">Couleur :</span>
-                          <select
-                            value={selectedBoxColor}
-                            onChange={(e) => setSelectedBoxColor(e.target.value)}
-                            className="bg-carbon border border-white/10 text-xs text-white rounded px-2 py-0.5 outline-none focus:border-neon"
-                          >
-                            {selectedBox.colors.map((c) => (
-                              <option key={c} value={c}>
-                                {c}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      )}
+                      <VariantChoices
+                        product={selectedBox}
+                        variant={selectedBoxVariant}
+                        onChange={(variant) => {
+                          setAddError('')
+                          setSelectedBoxVariant(variant)
+                        }}
+                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedBox.price)}</span>
                   </div>
@@ -326,6 +363,14 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 2 · Résistance/cartouche</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedClearomizer.name}</h3>
                       <p className="text-xs text-faint">{selectedClearomizer.brand}</p>
+                      <VariantChoices
+                        product={selectedClearomizer}
+                        variant={selectedClearomizerVariant}
+                        onChange={(variant) => {
+                          setAddError('')
+                          setSelectedClearomizerVariant(variant)
+                        }}
+                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedClearomizer.price)}</span>
                   </div>
@@ -337,26 +382,14 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 3 · E-liquide</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedEliquid.name}</h3>
                       <p className="text-xs text-faint">{selectedEliquid.brand}</p>
-                      {selectedEliquid.nicotine?.length > 0 && (
-                        <div className="mt-2 flex items-center gap-1.5">
-                          <span className="text-[10px] text-muted">Nicotine :</span>
-                          <div className="flex flex-wrap gap-1">
-                            {selectedEliquid.nicotine.map((n) => (
-                              <button
-                                key={n}
-                                onClick={() => setSelectedNicotine(n)}
-                                className={`text-[10px] px-2 py-0.5 rounded transition ${
-                                  selectedNicotine === n
-                                    ? 'bg-neon text-noir font-bold'
-                                    : 'bg-white/5 text-ash border border-white/8 hover:border-white/20'
-                                }`}
-                              >
-                                {n} mg
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <VariantChoices
+                        product={selectedEliquid}
+                        variant={selectedEliquidVariant}
+                        onChange={(variant) => {
+                          setAddError('')
+                          setSelectedEliquidVariant(variant)
+                        }}
+                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedEliquid.price)}</span>
                   </div>
@@ -415,12 +448,21 @@ export default function Configurateur() {
             {step === 4 ? (
               <>
                 {addError && (
-                  <p className="mt-5 rounded-lg border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                  <p role="alert" className="mt-5 rounded-lg border border-rose-400/25 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
                     {addError}
                   </p>
                 )}
-                <button onClick={handleAddToCart} className="btn-primary mt-6 w-full py-3 text-center text-xs">
-                  Ajouter le pack & Payer
+                {!variantChoicesComplete && (
+                  <p className="mt-5 text-xs leading-relaxed text-amber-200/80">
+                    Choisissez toutes les options affichées (dont la résistance en ohms) pour continuer.
+                  </p>
+                )}
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!variantChoicesComplete}
+                  className="btn-primary mt-6 w-full py-3 text-center text-xs disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Ajouter le pack au panier
                 </button>
               </>
             ) : (
@@ -444,6 +486,43 @@ export default function Configurateur() {
           </div>
         </aside>
       </div>
+    </div>
+  )
+}
+
+function VariantChoices({ product, variant = {}, onChange }) {
+  const choices = getProductVariantChoices(product)
+  if (!choices.length) return null
+
+  return (
+    <div className="mt-2 space-y-2">
+      {choices.map(({ key, label, options, suffix = '' }) => (
+        <div key={key} className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[10px] text-muted">{label} :</span>
+          {options.length === 1 ? (
+            <span className="text-[10px] font-medium text-ash">{options[0]}{suffix}</span>
+          ) : (
+            options.map((option) => {
+              const selected = String(variant[key]) === String(option)
+              return (
+                <button
+                  key={String(option)}
+                  type="button"
+                  onClick={() => onChange({ ...variant, [key]: option })}
+                  aria-pressed={selected}
+                  className={`rounded px-2 py-0.5 text-[10px] transition ${
+                    selected
+                      ? 'bg-neon font-bold text-noir'
+                      : 'border border-white/8 bg-white/5 text-ash hover:border-white/20'
+                  }`}
+                >
+                  {option}{suffix}
+                </button>
+              )
+            })
+          )}
+        </div>
+      ))}
     </div>
   )
 }

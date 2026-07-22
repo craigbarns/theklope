@@ -64,19 +64,19 @@ export default function Contact() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom" required value={form.name} onChange={update('name')} />
-                <Field label="E-mail" type="email" required value={form.email} onChange={update('email')} />
+                <Field label="Nom" name="name" autoComplete="name" required value={form.name} onChange={update('name')} />
+                <Field label="E-mail" name="email" autoComplete="email" type="email" required value={form.email} onChange={update('email')} />
               </div>
-              <Field label="Sujet" required value={form.subject} onChange={update('subject')} />
+              <Field label="Sujet" name="subject" required value={form.subject} onChange={update('subject')} />
               <label className="block">
                 <span className="mb-1.5 block text-xs font-medium text-muted">Message</span>
-                <textarea rows={5} required value={form.message} onChange={update('message')} className="input resize-none" />
+                <textarea name="message" rows={5} required value={form.message} onChange={update('message')} className="input resize-none" />
               </label>
               <label className="flex items-start gap-2.5 text-xs text-muted">
-                <input type="checkbox" required className="mt-0.5 accent-neon" />
+                <input name="privacyConsent" type="checkbox" required className="mt-0.5 accent-neon" />
                 J'accepte que mes données soient utilisées pour traiter ma demande.
               </label>
-              {error && <p className="text-xs text-rose-300">{error}</p>}
+              {error && <p role="alert" className="text-xs text-rose-300">{error}</p>}
               <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
                 {loading ? 'Envoi…' : 'Envoyer le message'}
               </button>

@@ -11,12 +11,18 @@ import {
   resolveVolume,
 } from '../lib/pricing.js'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
-import { buildCartAddition } from '../lib/cart.js'
+import {
+  buildCartAddition,
+  buildCartVariantUpdate,
+  reconcilePersistedProductVariant,
+} from '../lib/cart.js'
 import { getPaidOrders } from '../lib/dashboard.js'
 import { normalizeRelatedProductIds, removeProductAndReferences } from '../lib/relatedProducts.js'
+import { readCatalogBootstrap } from '../lib/catalogBootstrap.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
+const INITIAL_CATALOG_BOOTSTRAP = readCatalogBootstrap()
 
 // Le catalogue statique (~300 produits) est lourd : on ne le charge qu'à la
 // demande, en fallback, pour ne pas l'embarquer dans le bundle initial.
@@ -42,10 +48,15 @@ const read = (key, fallback) => {
 }
 
 export const ORDER_STATUSES = [
+  { value: 'pending_payment', label: 'En attente de paiement' },
   { value: 'processing', label: 'En préparation' },
+  { value: 'ready_for_pickup', label: 'Prête au retrait' },
   { value: 'shipped', label: 'Expédiée' },
   { value: 'delivered', label: 'Livrée' },
   { value: 'stock_issue', label: 'Incident stock' },
+  { value: 'refund_pending', label: 'Remboursement en cours' },
+  { value: 'refunded', label: 'Remboursée' },
+  { value: 'refund_failed', label: 'Échec du remboursement' },
   { value: 'cancelled', label: 'Annulée' },
 ]
 
@@ -58,6 +69,7 @@ const slugify = (value) =>
     .replace(/(^-|-$)/g, '')
     .slice(0, 80)
 const PRODUCT_ID_RE = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,158}[A-Za-z0-9])?$/
+const catalogConflictError = (message) => Object.assign(new Error(message), { code: 'catalog_conflict' })
 
 const toNumber = (value, fallback = 0) => {
   const n = Number(value)
@@ -83,6 +95,7 @@ const normalizeProduct = (product) => {
     id,
     name: product.name?.trim() || 'Nouveau produit',
     createdAt: product.createdAt || product.created_at || null,
+    updatedAt: product.updatedAt || product.updated_at || null,
     category: product.category || 'eliquide',
     brand: product.brand?.trim() || 'THEKLOPE',
     type: product.type?.trim() || 'Produit',
@@ -91,8 +104,6 @@ const normalizeProduct = (product) => {
     ohmOptions: normalizeArray(product.ohmOptions).map((v) => v.toString().trim()).filter(Boolean),
     price: Math.max(0, toNumber(product.price)),
     oldPrice: product.oldPrice ? Math.max(0, toNumber(product.oldPrice)) : null,
-    rating: Math.min(5, Math.max(0, toNumber(product.rating, 4.7))),
-    reviews: Math.max(0, Math.round(toNumber(product.reviews))),
     stock: Math.max(0, Math.round(toNumber(product.stock))),
     badge: product.badge || null,
     nicotine: normalizeArray(product.nicotine).map((n) => toNumber(n)).filter((n) => Number.isFinite(n)),
@@ -106,6 +117,10 @@ const normalizeProduct = (product) => {
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, id),
   }
   normalized.category = getProductCategoryKey(normalized)
+  if (!['eliquide', 'diy'].includes(normalized.category)) {
+    normalized.nicotine = []
+    normalized.flavors = []
+  }
   return enrichProductCopy(normalized)
 }
 
@@ -120,8 +135,6 @@ const productToRow = (product) => ({
   ohm_options: product.ohmOptions || [],
   price: product.price,
   old_price: product.oldPrice,
-  rating: product.rating,
-  reviews: product.reviews,
   stock: product.stock,
   badge: product.badge,
   nicotine: product.nicotine,
@@ -147,8 +160,6 @@ const productFromRow = (row) =>
     ohmOptions: row.ohm_options,
     price: row.price,
     oldPrice: row.old_price,
-    rating: row.rating,
-    reviews: row.reviews,
     stock: row.stock,
     badge: row.badge,
     nicotine: row.nicotine,
@@ -161,6 +172,7 @@ const productFromRow = (row) =>
     image: row.image,
     relatedProductIds: row.related_product_ids,
     createdAt: row.created_at,
+    updatedAt: row.updated_at,
   })
 
 const orderFromRow = (row) => ({
@@ -168,6 +180,11 @@ const orderFromRow = (row) => ({
   createdAt: row.created_at,
   status: row.status,
   paymentStatus: row.payment_status,
+  refundStatus: row.refund_status || null,
+  refundId: row.refund_id || null,
+  refundError: row.refund_error || null,
+  checkoutReviewRequiredAt: row.checkout_review_required_at || null,
+  checkoutReviewReason: row.checkout_review_reason || null,
   customer: row.customer || {},
   address: row.address || {},
   shipping: row.shipping || {},
@@ -203,13 +220,18 @@ export function StoreProvider({ children }) {
     return saved ?? read('tk_cookies', null)
   })
   const [products, setProducts] = useState(() => {
+    if (INITIAL_CATALOG_BOOTSTRAP.length > 0) return INITIAL_CATALOG_BOOTSTRAP.map(normalizeProduct)
+
     const saved = read('tk_products', null)
     const hasPacks = Array.isArray(saved) && saved.some((p) => p.category === 'pack')
-    // Si un catalogue valide est déjà en cache local, on l'utilise (zéro téléchargement).
-    // Sinon on démarre vide et on charge le catalogue de référence en différé.
-    return Array.isArray(saved) && saved.length && hasPacks ? saved.map(normalizeProduct) : []
+    // Le cache navigateur n'est une source catalogue qu'en mode local. En
+    // production, un cache ancien ne doit jamais réafficher un ancien prix.
+    return !isSupabaseConfigured && Array.isArray(saved) && saved.length && hasPacks
+      ? saved.map(normalizeProduct)
+      : []
   })
   const [orders, setOrders] = useState(() => {
+    if (isSupabaseConfigured) return []
     const saved = read('tk_orders', [])
     return Array.isArray(saved) ? saved : []
   })
@@ -230,8 +252,22 @@ export function StoreProvider({ children }) {
   useEffect(() => localStorage.setItem('tk_age', JSON.stringify(ageVerified)), [ageVerified])
   useEffect(() => localStorage.setItem('tk_cookies', JSON.stringify(cookiesChoice)), [cookiesChoice])
   useEffect(() => localStorage.setItem('tk_reviews_consent', JSON.stringify(reviewsChoice)), [reviewsChoice])
-  useEffect(() => localStorage.setItem('tk_products', JSON.stringify(products)), [products])
-  useEffect(() => localStorage.setItem('tk_orders', JSON.stringify(orders)), [orders])
+  useEffect(() => {
+    if (isSupabaseConfigured) {
+      localStorage.removeItem('tk_products')
+      return
+    }
+    localStorage.setItem('tk_products', JSON.stringify(products))
+  }, [products])
+  useEffect(() => {
+    if (isSupabaseConfigured) {
+      // Les commandes contiennent des données personnelles et ne doivent jamais
+      // survivre à la session admin dans le stockage durable du navigateur.
+      localStorage.removeItem('tk_orders')
+      return
+    }
+    localStorage.setItem('tk_orders', JSON.stringify(orders))
+  }, [orders])
   useEffect(() => localStorage.setItem('tk_cart', JSON.stringify(cart)), [cart])
   useEffect(() => localStorage.setItem('tk_favorites', JSON.stringify(favorites)), [favorites])
   useEffect(() => localStorage.setItem('tk_promo', JSON.stringify(promo)), [promo])
@@ -249,6 +285,7 @@ export function StoreProvider({ children }) {
       })
       const { data } = sb.auth.onAuthStateChange((_event, session) => {
         setAdminSession(null)
+        setOrders([])
         // Sortir du callback Auth avant d'interroger Supabase evite de bloquer
         // le verrou interne de gestion de session du client.
         setTimeout(() => {
@@ -326,6 +363,7 @@ export function StoreProvider({ children }) {
       setSyncStatus('online')
       setCatalogReady(true)
     } catch (error) {
+      if (isSupabaseConfigured) setOrders([])
       setSyncError(error.message || 'Synchronisation Supabase impossible.')
       await loadFallbackCatalog()
       setSyncStatus('error')
@@ -339,7 +377,7 @@ export function StoreProvider({ children }) {
 
     let active = true
     const initializeLocalCatalog = async () => {
-      if (products.length > 0) {
+      if (products.length > 0 && INITIAL_CATALOG_BOOTSTRAP.length === 0) {
         if (active) setCatalogReady(true)
         return
       }
@@ -367,6 +405,7 @@ export function StoreProvider({ children }) {
   // Le stock est global au produit, même lorsque le panier contient plusieurs
   // variantes. On réconcilie aussi les paniers restaurés depuis localStorage.
   useEffect(() => {
+    if (!catalogReady) return
     if (products.length === 0) {
       if (syncStatus === 'online') setCart([])
       return
@@ -392,14 +431,17 @@ export function StoreProvider({ children }) {
           changed = true
           continue
         }
-        if (qty !== item.qty) changed = true
+        const reconciledVariant = reconcilePersistedProductVariant(product, item.variant)
+        if (qty !== item.qty || reconciledVariant.changed) changed = true
         usedByProduct.set(item.productId, alreadyUsed + qty)
-        next.push(qty === item.qty ? item : { ...item, qty })
+        next.push(qty === item.qty && !reconciledVariant.changed
+          ? item
+          : { ...item, qty, variant: reconciledVariant.variant })
       }
 
       return changed ? next : previous
     })
-  }, [products, syncStatus])
+  }, [catalogReady, products, syncStatus])
 
   const getProduct = useCallback((id) => getProductFrom(products, id), [products])
 
@@ -440,16 +482,45 @@ export function StoreProvider({ children }) {
       throw new Error('Cet identifiant URL est déjà utilisé par un autre produit.')
     }
     const existingProduct = products.find((product) => product.id === requestedId)
-    const nextProduct = normalizeProduct({
+    let nextProduct = normalizeProduct({
       ...input,
       id: requestedId,
       createdAt: existingProduct?.createdAt || input.createdAt || (existingProduct ? null : new Date().toISOString()),
+      updatedAt: existingProduct?.updatedAt || input.updatedAt || null,
     })
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
-      const { error } = await sb.from('products').upsert(productToRow(nextProduct))
-      if (error) throw error
+      let savedRow
+      if (existingProduct) {
+        const expectedUpdatedAt = input.updatedAt || existingProduct.updatedAt
+        if (!expectedUpdatedAt) {
+          await refreshRemoteData()
+          throw catalogConflictError('Version catalogue manquante. Les données ont été resynchronisées : rouvrez la fiche, vérifiez puis recommencez.')
+        }
+        const { data, error } = await sb
+          .from('products')
+          .update(productToRow(nextProduct))
+          .eq('id', requestedId)
+          .eq('updated_at', expectedUpdatedAt)
+          .select('*')
+          .maybeSingle()
+        if (error) throw error
+        if (!data) {
+          await refreshRemoteData()
+          throw catalogConflictError('Ce produit a changé depuis l’ouverture de la fiche (stock, prix ou contenu). Les données ont été actualisées : rouvrez la fiche, vérifiez puis recommencez.')
+        }
+        savedRow = data
+      } else {
+        const { data, error } = await sb
+          .from('products')
+          .insert(productToRow(nextProduct))
+          .select('*')
+          .single()
+        if (error) throw error
+        savedRow = data
+      }
+      nextProduct = productFromRow(savedRow)
       setSyncStatus('online')
       setSyncError(null)
     }
@@ -460,19 +531,31 @@ export function StoreProvider({ children }) {
         : [nextProduct, ...prev]
     })
     return nextProduct
-  }, [adminSession, products])
+  }, [adminSession, products, refreshRemoteData])
 
   const deleteProduct = useCallback(async (productId) => {
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
-      const { error } = await sb.from('products').delete().eq('id', productId)
+      const { data, error } = await sb.rpc('delete_product_safely', {
+        p_product_id: productId,
+      })
       if (error) throw error
+      if (!data?.ok) {
+        if (data?.status === 'active_order') {
+          throw new Error('Ce produit appartient à une commande active. Terminez ou annulez cette commande avant de supprimer la référence.')
+        }
+        if (data?.status === 'not_found') {
+          await refreshRemoteData()
+          throw new Error('Ce produit a déjà été supprimé. Le catalogue a été actualisé.')
+        }
+        throw new Error(`Suppression refusée (${data?.status || 'unknown'}).`)
+      }
     }
     setProducts((prev) => removeProductAndReferences(prev, productId))
     setCart((prev) => prev.filter((item) => item.productId !== productId))
     setFavorites((prev) => prev.filter((id) => id !== productId))
-  }, [adminSession])
+  }, [adminSession, refreshRemoteData])
 
   const resetProducts = useCallback(async () => {
     const catalog = await loadStaticCatalog()
@@ -484,23 +567,58 @@ export function StoreProvider({ children }) {
     if (isSupabaseConfigured) {
       if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
       const sb = await getSupabase()
-      const { error } = await sb.from('products').upsert(defaults.map(productToRow))
-      if (error) throw error
+      const { data: liveRows, error: readError } = await sb
+        .from('products')
+        .select('id, related_product_ids')
+      if (readError) throw readError
+
+      const liveById = new Map((liveRows || []).map((row) => [row.id, row]))
+      const updates = defaults.flatMap((product) => {
+        const live = liveById.get(product.id)
+        if (!live) return []
+        const row = productToRow({
+          ...product,
+          relatedProductIds: live.related_product_ids || product.relatedProductIds,
+        })
+        // Liste blanche volontairement étroite : brand/category/volume/specs
+        // participent aux remises, et les options participent au fulfillment.
+        // Une maintenance éditoriale ne touche donc ni au prix, ni au stock,
+        // ni à aucun champ capable de modifier le montant ou la variante vendue.
+        const safeEditorialFields = {
+          name: row.name,
+          type: row.type,
+          short: row.short,
+          long: row.long,
+          images: row.images,
+          image: row.image,
+          related_product_ids: row.related_product_ids,
+        }
+        return [{ id: product.id, values: safeEditorialFields }]
+      })
+
+      // Petits lots pour ne pas saturer l'API Supabase sur un gros catalogue.
+      for (let index = 0; index < updates.length; index += 12) {
+        const batch = updates.slice(index, index + 12)
+        const results = await Promise.all(
+          batch.map(({ id, values }) => sb.from('products').update(values).eq('id', id)),
+        )
+        const failed = results.find((result) => result.error)
+        if (failed?.error) throw failed.error
+      }
+      await refreshRemoteData()
+      return
     }
     setProducts(defaults)
-  }, [adminSession, products])
+  }, [adminSession, products, refreshRemoteData])
 
   const clearAllProducts = useCallback(async () => {
     if (isSupabaseConfigured) {
-      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const sb = await getSupabase()
-      const { error } = await sb.from('products').delete().neq('id', '')
-      if (error) throw error
+      throw new Error('La suppression globale est désactivée sur le catalogue live.')
     }
     setProducts([])
     setCart([])
     setFavorites([])
-  }, [adminSession])
+  }, [])
 
   // ----- Cart -----
   const addItemsToCart = useCallback((entries = []) => {
@@ -553,6 +671,16 @@ export function StoreProvider({ children }) {
   const removeItem = useCallback((index) => {
     setCart((prev) => prev.filter((_, idx) => idx !== index))
   }, [])
+
+  const updateCartVariant = useCallback((index, variant) => {
+    const initial = buildCartVariantUpdate({ cart, products, index, variant })
+    if (!initial.ok) return false
+    setCart((previous) => {
+      const current = buildCartVariantUpdate({ cart: previous, products, index, variant })
+      return current.ok ? current.cart : previous
+    })
+    return true
+  }, [cart, products])
 
   const clearCart = useCallback(() => {
     setCart([])
@@ -679,13 +807,23 @@ export function StoreProvider({ children }) {
   )
 
   const updateOrderStatus = useCallback(async (orderId, status) => {
-    if (isSupabaseConfigured) {
-      if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
-      const sb = await getSupabase()
-      const { error } = await sb.from('orders').update({ status }).eq('id', orderId)
-      if (error) throw error
+    if (status !== 'delivered') {
+      throw new Error('Cette transition de commande doit passer par une action contrôlée.')
     }
-    setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, status } : order)))
+    const token = adminSession?.access_token
+    if (!token) throw new Error('Connexion admin requise.')
+    const res = await fetch('/api/mark-delivered', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ orderId }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || data.error) throw new Error(data.error || 'Confirmation de remise impossible.')
+    const nextStatus = data.status || 'delivered'
+    setOrders((prev) => prev.map((order) => (
+      order.id === orderId ? { ...order, status: nextStatus } : order
+    )))
+    return data
   }, [adminSession])
 
   // Marque une commande « expédiée », enregistre le suivi et notifie le client
@@ -700,10 +838,15 @@ export function StoreProvider({ children }) {
     })
     const data = await res.json().catch(() => ({}))
     if (!res.ok || data.error) throw new Error(data.error || "Envoi de l'e-mail d'expédition impossible.")
+    const nextStatus = data.status || 'shipped'
     setOrders((prev) =>
       prev.map((order) =>
         order.id === orderId
-          ? { ...order, status: 'shipped', shipping: { ...order.shipping, tracking, carrier } }
+          ? {
+              ...order,
+              status: nextStatus,
+              shipping: { ...order.shipping, tracking, carrier },
+            }
           : order,
       ),
     )
@@ -771,6 +914,7 @@ export function StoreProvider({ children }) {
     addToCart,
     addItemsToCart,
     updateQty,
+    updateCartVariant,
     removeItem,
     clearCart,
     favorites,

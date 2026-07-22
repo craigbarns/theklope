@@ -43,8 +43,12 @@ VITE_SUPABASE_PUBLISHABLE_KEY=votre_publishable_key
 
 2. Dans Supabase, ouvrez **SQL Editor** et exécutez `supabase/schema.sql`.
 
-Ce fichier crée les tables `products`, `orders`, `order_items`, les règles RLS et la fonction
-`finalize_paid_order` qui finalise une commande payée et décrémente le stock de façon atomique.
+Ce fichier crée les tables `products`, `orders`, `order_items`, les règles RLS et les fonctions
+qui réservent le stock atomiquement à la création du checkout puis consomment cette réservation au paiement.
+
+Pour une base THEKLOPE déjà en production, n'écrasez pas le schéma : appliquez dans l'ordre les fichiers
+`supabase/migrations/202607210001_harden_checkout_payments.sql`,
+`202607210002_fix_catalog_quality.sql`, puis `202607210003_product_optimistic_lock.sql`.
 
 3. Dans Supabase, créez un utilisateur admin :
 
@@ -52,9 +56,17 @@ Ce fichier crée les tables `products`, `orders`, `order_items`, les règles RLS
 Authentication > Users > Add user
 ```
 
-4. Lancez le site, ouvrez `/admin`, connectez-vous avec cet utilisateur, puis allez dans
-`Pilotage` et cliquez sur `Réinitialiser le catalogue` pour publier les produits initiaux
-dans Supabase.
+Puis ajoutez explicitement son UUID à l’allowlist SQL (la création du compte ne
+donne aucun droit à elle seule) :
+
+```sql
+insert into public.admin_users (user_id)
+values ('UUID_DE_AUTHENTICATION_USERS');
+```
+
+4. Chargez dans Supabase un catalogue relu (import SQL/CSV contrôlé), puis ouvrez `/admin`
+pour gérer les références. L’admin désactive volontairement les remises à zéro globales
+du catalogue live : un ancien snapshot ne doit jamais écraser les prix ou le stock de production.
 
 5. Sur Vercel, ajoutez les mêmes variables d'environnement :
 
@@ -70,7 +82,8 @@ Ne mettez jamais de `service_role_key` dans Vite ou dans le navigateur.
 Le paiement utilise **Mollie** (checkout hébergé, par redirection). Le montant
 est **toujours recalculé côté serveur** à partir des identifiants produits : le
 navigateur n'envoie jamais de prix. Le statut « payé » est confirmé uniquement
-par le **webhook Mollie** (source de vérité), impossible à falsifier côté client.
+à partir d'une réponse Mollie relue côté serveur, via le **webhook Mollie** ou
+l'endpoint de retour sécurisé ; il est impossible à déclarer payé côté client.
 
 ### Variables d'environnement (Vercel → Settings → Environment Variables)
 
@@ -81,21 +94,42 @@ par le **webhook Mollie** (source de vérité), impossible à falsifier côté c
 | `SUPABASE_URL` | serveur | (optionnel) si l'URL n'est pas déjà fournie |
 | `PUBLIC_BASE_URL` | serveur | URL publique du site (redirect + webhook Mollie) |
 | `RESEND_API_KEY` | serveur | (optionnel) e-mails transactionnels via Resend |
+| `CRON_SECRET` | serveur | Secret aléatoire (≥ 16 caractères) protégeant le nettoyage quotidien des réservations et la relance des e-mails |
+| `CHECKOUT_IDEMPOTENCY_SECRET` | serveur | Secret HMAC dédié aux tentatives sans clé client (recommandé) |
+| `RATE_LIMIT_SECRET` | serveur | Secret HMAC dédié aux limites anti-abus (recommandé) |
 | `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` | client | Catalogue + auth admin |
 
 > Aucune clé Mollie ni service_role ne doit être exposée au navigateur.
 
+Le cron déclaré dans `vercel.json` appelle chaque jour `/api/cleanup-checkouts`.
+Définissez impérativement `CRON_SECRET` en Production (par exemple avec une
+valeur générée par `openssl rand -hex 32`) : sans cette variable, l'endpoint
+échoue volontairement en `401` et aucune réservation ne sera réconciliée.
+
+Une commande signalée `multiple_payments_for_order` reste volontairement gelée :
+une page bornée de l'API Mollie ne permet pas de prouver qu'un ancien doublon
+n'existe plus. Après avoir contrôlé **tous** les paiements Mollie de la commande,
+remboursé ou annulé chaque doublon et conservé le paiement canonique, un opérateur
+peut seulement alors lever le gel depuis le SQL Editor Supabase :
+
+```sql
+select public.clear_multiple_payment_review('TK-IDENTIFIANT');
+```
+
+Ne lancez jamais cette fonction sur la seule base du scan automatique. Un gel
+`payment_chargeback_detected` ne peut pas être levé par cette fonction.
+
 ### Flux
 
-1. `POST /api/create-payment` : relit les prix, recalcule le total, crée le
-   paiement Mollie **et** une commande « en attente » dans Supabase, renvoie
-   l'URL de checkout.
+1. `POST /api/create-payment` : relit les prix, recalcule le total, crée
+   atomiquement la commande et sa réservation de stock, puis crée ou récupère
+   le paiement Mollie et renvoie l'URL de checkout.
 2. Le client est redirigé vers Mollie pour payer.
 3. Retour sur `/checkout/retour?order=…` : la page interroge
    `GET /api/payment-status` qui relit le vrai statut auprès de Mollie.
-4. `POST /api/mollie-webhook` : confirme le paiement, passe la commande à
-   « payée », décrémente le stock de façon atomique ou marque un incident stock
-   à traiter manuellement si le stock a bougé entre le panier et le paiement.
+4. `POST /api/mollie-webhook` : confirme le paiement et consomme la réservation.
+   Un paiement tardif ou incohérent est isolé puis remboursé sans redécrémenter
+   le stock ; chaque transition peut être rejouée sans créer une seconde commande.
 
 ### Tester en local
 
@@ -115,7 +149,7 @@ src/
 ├── data/
 │   ├── products.js          # catalogue produits de référence
 │   ├── productCopy.js       # enrichissement des descriptions produit
-│   └── reviews.js           # note Google et extraits d'avis boutique
+│   └── reviews.js           # résumé vérifié de la note Google de la boutique
 ├── components/
 │   ├── Header.jsx           # menu sticky, recherche, panier, favoris, menu mobile
 │   ├── Footer.jsx           # liens utiles + avertissement légal
@@ -124,7 +158,7 @@ src/
 │   ├── CartDrawer.jsx       # panier latéral
 │   ├── SearchOverlay.jsx    # recherche produit
 │   ├── Newsletter.jsx       # inscription newsletter
-│   ├── ProductCard.jsx      # carte produit (badge, note, favori, ajout panier)
+│   ├── ProductCard.jsx      # carte produit (badge, favori, ajout panier)
 │   ├── Badge / Stars / Logo / Seo / Breadcrumbs …
 └── pages/
     ├── Home.jsx             # accueil (hero, catégories, best-sellers, packs, nouveautés)

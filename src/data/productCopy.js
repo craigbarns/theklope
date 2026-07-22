@@ -39,6 +39,17 @@ const specsText = (specs = {}) =>
     .map(([key, value]) => `${key.toLowerCase()} ${value}`)
     .join(', ')
 
+export function sanitizeProductSpecs(specs = {}) {
+  if (!specs || typeof specs !== 'object' || Array.isArray(specs)) return {}
+  return Object.fromEntries(Object.entries(specs).filter(([key, value]) => {
+    const normalizedKey = normalize(key)
+    const normalizedValue = normalize(value)
+    // « Standard universel » venait d'un gabarit d'import. Une compatibilité
+    // vape doit citer une référence fabricant précise pour être affichée.
+    return !(normalizedKey === 'compatibilite' && normalizedValue === 'standard universel')
+  }))
+}
+
 export function isGenericProductCopy(value) {
   const text = normalize(value)
   return !text || GENERIC_MARKERS.some((marker) => text.includes(marker))
@@ -72,6 +83,7 @@ function ohmPhrase(product) {
 export function buildProductShort(product) {
   const name = compact(product.name)
   const brand = compact(product.brand) || 'THEKLOPE'
+  const brandedName = normalize(name).includes(normalize(brand)) ? name : `${name} de ${brand}`
   const category = CATEGORY_LABELS[product.category] || compact(product.type) || 'produit vape'
   const specs = product.specs || {}
 
@@ -81,29 +93,30 @@ export function buildProductShort(product) {
     const flavors = unique(product.flavors || [])
     const flavor = flavors.length ? `, saveur ${list(flavors)}` : ''
     const base = ratio ? ` avec un ratio ${ratio}` : ''
-    return `${name} de ${brand} est un ${category}${flavor}, proposé en ${format}${base}.`
+    return `${brandedName} est un ${category}${flavor}, proposé en ${format}${base}.`
   }
 
   if (product.category === 'diy') {
     const format = compact(specs.Contenance) || compact(product.volume)
-    return `${name} de ${brand} est un produit DIY destiné à la préparation de e-liquides${format ? `, proposé en ${format}` : ''}. Utilisez-le selon les indications du fabricant.`
+    return `${brandedName} est un produit DIY destiné à la préparation de e-liquides${format ? `, proposé en ${format}` : ''}. Utilisez-le selon les indications du fabricant.`
   }
 
   if (product.category === 'ecig' || product.category === 'pod') {
     const charge = compact(specs.Charge)
     const activation = compact(specs.Activation)
     const parts = [charge && `charge ${charge}`, activation && `activation ${activation.toLowerCase()}`].filter(Boolean)
-    return `${name} de ${brand} est ${product.category === 'pod' ? 'un pod compact' : 'une cigarette électronique'} sélectionné pour un usage quotidien${parts.length ? `, avec ${list(parts)}` : ''}.`
+    const description = product.category === 'pod' ? 'un pod compact sélectionné' : 'une cigarette électronique sélectionnée'
+    return `${brandedName} est ${description} pour un usage quotidien${parts.length ? `, avec ${list(parts)}` : ''}.`
   }
 
   if (product.category === 'accessoire') {
     const compatibility = compact(specs.Compatibilité || specs.Compatibility)
-    return `${name} de ${brand} est un accessoire vape${compatibility ? ` compatible ${compatibility}` : ''}, pratique pour entretenir ou compléter votre matériel.`
+    return `${brandedName} est un accessoire vape${compatibility ? ` compatible ${compatibility}` : ''}, pratique pour entretenir ou compléter votre matériel.`
   }
 
   if (product.category === 'resistance') {
     const compatibility = compact(specs.Compatibilité || specs.Compatibility)
-    return `${name} de ${brand} est une résistance ou cartouche de remplacement${compatibility ? ` compatible ${compatibility}` : ''}, conçue pour entretenir votre matériel de vape.`
+    return `${brandedName} est une résistance ou cartouche de remplacement${compatibility ? ` compatible ${compatibility}` : ''}, conçue pour entretenir votre matériel de vape.`
   }
 
   if (product.category === 'pack') {
@@ -116,12 +129,13 @@ export function buildProductShort(product) {
 export function buildProductLong(product) {
   const name = compact(product.name)
   const brand = compact(product.brand) || 'THEKLOPE'
+  const brandSuffix = normalize(name).includes(normalize(brand)) ? '' : ` ${brand}`
   const category = CATEGORY_LABELS[product.category] || compact(product.type) || 'produit vape'
   const specs = specsText(product.specs)
   const details = []
 
   if (product.category === 'eliquide') {
-    details.push(`${name} est un ${category} ${brand} choisi par THEKLOPE pour son profil clair et son format facile à intégrer dans une routine de vape.`)
+    details.push(`${name} est un ${category}${brandSuffix} choisi par THEKLOPE pour son profil clair et son format facile à intégrer dans une routine de vape.`)
     details.push(flavorPhrase(product))
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push(nicotinePhrase(product))
@@ -130,7 +144,7 @@ export function buildProductLong(product) {
   }
 
   if (product.category === 'diy') {
-    details.push(`${name} est un produit DIY ${brand} destiné à la préparation de e-liquides par des adultes.`)
+    details.push(`${name} est un produit DIY${brandSuffix} destiné à la préparation de e-liquides par des adultes.`)
     details.push(flavorPhrase(product))
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push('Respectez les dosages et précautions du fabricant. Un arôme concentré ne doit jamais être vapoté seul et la nicotine doit être manipulée avec précaution.')
@@ -138,7 +152,9 @@ export function buildProductLong(product) {
   }
 
   if (product.category === 'ecig' || product.category === 'pod') {
-    details.push(`${name} est ${product.category === 'pod' ? 'un pod rechargeable' : 'une cigarette électronique'} ${brand} sélectionné par THEKLOPE pour sa prise en main, sa régularité et son confort d'utilisation.`)
+    const description = product.category === 'pod' ? 'un pod rechargeable' : 'une cigarette électronique'
+    const selected = product.category === 'pod' ? 'sélectionné' : 'sélectionnée'
+    details.push(`${name} est ${description}${brandSuffix} ${selected} par THEKLOPE pour sa prise en main, sa régularité et son confort d'utilisation.`)
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push(colorPhrase(product))
     details.push('Ce matériel convient aux vapoteurs majeurs qui recherchent une solution simple à choisir, facile à transporter et prête pour un usage quotidien.')
@@ -146,14 +162,14 @@ export function buildProductLong(product) {
   }
 
   if (product.category === 'accessoire') {
-    details.push(`${name} est un accessoire ${brand} pensé pour compléter, protéger ou entretenir votre matériel de vape.`)
+    details.push(`${name} est un accessoire${brandSuffix} pensé pour compléter, protéger ou entretenir votre matériel de vape.`)
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push('Il aide à garder une expérience plus régulière au quotidien, avec une référence claire à retrouver dans la boutique THEKLOPE.')
     return details.filter(Boolean).join(' ')
   }
 
   if (product.category === 'resistance') {
-    details.push(`${name} est une résistance ou cartouche ${brand} destinée à remplacer un consommable usé et à conserver une vape régulière.`)
+    details.push(`${name} est une résistance ou cartouche${brandSuffix} destinée à remplacer un consommable usé et à conserver une vape régulière.`)
     details.push(ohmPhrase(product))
     details.push(specs ? `Caractéristiques : ${specs}.` : '')
     details.push('Vérifiez la compatibilité avec votre matériel et la plage de puissance recommandée avant de choisir votre référence.')
@@ -173,6 +189,11 @@ export function buildProductLong(product) {
 
 export function enrichProductCopy(product) {
   const base = { ...product }
+  // Le catalogue historique contient des notes/compteurs produit générés sans
+  // source vérifiable. Ils ne doivent jamais atteindre l'UI ou le bootstrap SEO.
+  delete base.rating
+  delete base.reviews
+  base.specs = sanitizeProductSpecs(base.specs)
   const short = compact(base.short)
   const long = compact(base.long)
 

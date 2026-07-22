@@ -81,11 +81,32 @@ function padList(base, extra, n) {
   return out
 }
 
+const MERCHANDISING_BADGE_RANK = Object.freeze({
+  'best-seller': 4,
+  nouveau: 3,
+  promo: 2,
+  'stock-limite': 1,
+})
+
+// Le catalogue ne contient pas de ventes/avis produit vérifiés. L'ordre par
+// défaut repose donc uniquement sur les sélections éditoriales explicites et
+// conserve l'ordre source à égalité, sans fabriquer une notion de popularité.
+export const sortProductsByMerchandising = (products = []) => products
+  .map((product, index) => ({ product, index }))
+  .sort((a, b) => {
+    const stockDelta = Number(b.product.stock > 0) - Number(a.product.stock > 0)
+    if (stockDelta) return stockDelta
+    const badgeDelta = (MERCHANDISING_BADGE_RANK[b.product.badge] || 0)
+      - (MERCHANDISING_BADGE_RANK[a.product.badge] || 0)
+    return badgeDelta || a.index - b.index
+  })
+  .map(({ product }) => product)
+
 export const featuredProducts = (products = []) => {
-  const byReviews = [...products].sort((a, b) => (b.reviews || 0) - (a.reviews || 0))
+  const merchandising = sortProductsByMerchandising(products)
   return {
-    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), byReviews, 8),
-    newArrivals: padList(products.filter((p) => p.badge === 'nouveau'), byReviews.filter((p) => p.oldPrice == null), 8),
+    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), merchandising, 8),
+    newArrivals: padList(products.filter((p) => p.badge === 'nouveau'), merchandising.filter((p) => p.oldPrice == null), 8),
     starterPacks: padList(products.filter((p) => p.category === 'pack'), products.filter((p) => p.category === 'ecig'), 6),
   }
 }

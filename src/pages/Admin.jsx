@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
 import { CATEGORIES, BADGES } from '../data/catalog.js'
+import { findCatalogIssues } from '../data/catalogQuality.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
 import GalleryUploader from '../components/GalleryUploader.jsx'
@@ -11,6 +12,7 @@ import {
   removeRelatedProductId,
   searchRelatedProducts,
 } from '../lib/relatedProducts.js'
+import { getPaidOrders } from '../lib/dashboard.js'
 import {
   IconArrowRight,
   IconBolt,
@@ -63,6 +65,30 @@ const DIY_PRODUCT_DEFAULTS = {
 }
 
 const statusLabel = Object.fromEntries(ORDER_STATUSES.map((status) => [status.value, status.label]))
+const refundStatusLabel = {
+  requested: 'Demandé',
+  queued: 'En file d’attente',
+  pending: 'En attente',
+  processing: 'En cours',
+  refunded: 'Remboursé',
+  failed: 'Échec',
+  canceled: 'Annulé par Mollie',
+}
+const checkoutReviewReasonLabel = {
+  ambiguous_payment_creation: 'création du paiement ambiguë',
+  payment_not_recoverable_safely: 'ancien paiement introuvable sans risque de doublon',
+  multiple_payments_for_order: 'plusieurs paiements Mollie peuvent correspondre à la commande',
+  payment_chargeback_detected: 'chargeback Mollie détecté',
+  partial_external_refund: 'remboursement Mollie partiel',
+  external_refund_proof_incomplete: 'preuve du remboursement Mollie incomplète',
+  external_refund_in_progress: 'autre remboursement Mollie déjà en cours',
+  refund_intent_exceeds_remaining: 'solde de remboursement modifié',
+  legacy_paid_cancelled_unreconciled: 'ancienne annulation payée à réconcilier',
+}
+// L'expédition ou la mise à disposition passe par /api/mark-shipped, la remise
+// par /api/mark-delivered et l'annulation par /api/cancel-order. Le select ne
+// sert qu'à confirmer que le transporteur ou la boutique a remis la commande.
+const MANUAL_FULFILLMENT_STATUSES = new Set(['shipped', 'ready_for_pickup'])
 
 export default function Admin() {
   const {
@@ -197,6 +223,7 @@ export default function Admin() {
               await upsertProduct(product)
               setEditing(null)
             } catch (error) {
+              if (error.code === 'catalog_conflict') setEditing(null)
               setActionError(error.message || 'Enregistrement impossible.')
             }
           }}
@@ -214,6 +241,22 @@ export default function Admin() {
             }
           }}
           markShipped={markShipped}
+          cancelOrder={adminSession ? async (orderId, reason) => {
+            const response = await fetch('/api/cancel-order', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${adminSession.access_token}`,
+              },
+              body: JSON.stringify({ orderId, reason }),
+            })
+            const payload = await response.json().catch(() => ({}))
+            if (!response.ok || payload.error) {
+              throw new Error(payload.error || 'Annulation impossible.')
+            }
+            await refreshRemoteData()
+            return payload
+          } : null}
         />
       )}
       {tab === 'settings' && (
@@ -297,9 +340,10 @@ function AdminLogin({ signInAdmin, syncError }) {
 }
 
 function Overview({ dashboard, orders, products }) {
-  const sales = useMemo(() => lastSevenDays(orders), [orders])
+  const paidOrders = useMemo(() => getPaidOrders(orders), [orders])
+  const sales = useMemo(() => lastSevenDays(paidOrders), [paidOrders])
   const maxSales = Math.max(1, ...sales.map((day) => day.total))
-  const recentOrders = orders.slice(0, 4)
+  const recentOrders = paidOrders.slice(0, 4)
 
   return (
     <div className="mt-8 space-y-6">
@@ -662,7 +706,8 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   )
 }
 
-function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
+function OrdersPanel({ orders, updateOrderStatus, markShipped, cancelOrder }) {
+  const reviewRequiredCount = orders.filter((order) => order.checkoutReviewRequiredAt).length
   return (
     <section className="card mt-8 p-5 sm:p-6">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -672,6 +717,12 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
         </div>
       </div>
 
+      {reviewRequiredCount > 0 && (
+        <p role="alert" className="mb-5 rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+          {reviewRequiredCount} commande{reviewRequiredCount > 1 ? 's nécessitent' : ' nécessite'} une vérification Mollie avant de libérer le stock.
+        </p>
+      )}
+
       {orders.length ? (
         <div className="space-y-4">
           {orders.map((order) => (
@@ -680,15 +731,38 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
                     <h3 className="font-display text-lg font-bold text-white">{order.id}</h3>
-                    <span className="rounded-full bg-neon/10 px-3 py-1 text-xs font-semibold text-neon">{statusLabel[order.status]}</span>
+                    <span className="rounded-full bg-neon/10 px-3 py-1 text-xs font-semibold text-neon">
+                      {statusLabel[order.status] || order.status}
+                    </span>
                   </div>
                   <p className="mt-1 text-sm text-muted">
                     {order.customer?.name || 'Client'} · {order.customer?.email || 'email non renseigné'}
                     {order.customer?.phone ? ` · ${order.customer.phone}` : ''} · {formatDate(order.createdAt)}
                   </p>
                   <p className="mt-1 text-xs text-faint">
-                    {order.address?.street}, {order.address?.zip} {order.address?.city} · {order.shipping?.label}
+                    {formatOrderDelivery(order)}
                   </p>
+                  {order.refundStatus && (
+                    <p className="mt-2 text-xs text-amber-200">
+                      Remboursement Mollie : {refundStatusLabel[order.refundStatus] || order.refundStatus}
+                      {order.refundId ? ` · ${order.refundId}` : ''}
+                    </p>
+                  )}
+                  {order.refundError && (
+                    <p role="alert" className="mt-2 max-w-2xl rounded-xl border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+                      Échec du remboursement : {order.refundError}
+                    </p>
+                  )}
+                  {order.checkoutReviewRequiredAt && (
+                    <p role="alert" className="mt-2 max-w-2xl rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-xs text-amber-100">
+                      Vérification Mollie requise : {checkoutReviewReasonLabel[order.checkoutReviewReason] || 'dossier financier ambigu'}.
+                      {order.checkoutReviewReason === 'multiple_payments_for_order'
+                        ? ' Toute transition automatique est bloquée : vérifiez et réconciliez chacun des paiements dans Mollie avant de traiter la commande.'
+                        : order.checkoutReviewReason === 'payment_chargeback_detected'
+                          ? ' Tout traitement automatique (remise, annulation ou remboursement) est bloqué : traitez d’abord le litige directement dans Mollie, puis réconciliez la commande manuellement.'
+                        : ' Toute remise au client est bloquée ; utilisez l’action de synchronisation ou d’annulation/remboursement ci-dessous.'}
+                    </p>
+                  )}
                   {typeof order.address?.deliveryInstructions === 'string' && order.address.deliveryInstructions.trim() && (
                     <div className="mt-3 max-w-2xl rounded-xl border border-neon/20 bg-neon/5 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-wide text-neon">Instructions client</p>
@@ -703,10 +777,21 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
                     value={order.status}
                     onChange={(e) => updateOrderStatus(order.id, e.target.value)}
                     className="input w-48"
+                    disabled={
+                      !MANUAL_FULFILLMENT_STATUSES.has(order.status)
+                      || Boolean(order.checkoutReviewRequiredAt)
+                    }
+                    aria-label={`Statut de la commande ${order.id}`}
                   >
-                    {ORDER_STATUSES.map((status) => (
-                      <option key={status.value} value={status.value}>{status.label}</option>
-                    ))}
+                    {MANUAL_FULFILLMENT_STATUSES.has(order.status) ? (
+                      ORDER_STATUSES.filter((status) => (
+                        status.value === order.status || status.value === 'delivered'
+                      )).map((status) => (
+                        <option key={status.value} value={status.value}>{status.label}</option>
+                      ))
+                    ) : (
+                      <option value={order.status}>{statusLabel[order.status] || order.status}</option>
+                    )}
                   </select>
                   <p className="font-display text-xl font-bold text-white">{formatPrice(order.total)}</p>
                 </div>
@@ -732,8 +817,16 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
                 <MiniTotal label="Paiement" value={order.paymentStatus === 'paid' ? 'Payé' : order.paymentStatus} />
               </dl>
 
-              {order.paymentStatus === 'paid' && ['processing', 'shipped'].includes(order.status) && (
+              {order.paymentStatus === 'paid'
+                && !order.checkoutReviewRequiredAt
+                && ['processing', 'ready_for_pickup', 'shipped'].includes(order.status) && (
                 <ShipControl order={order} markShipped={markShipped} />
+              )}
+
+              {cancelOrder
+                && !['multiple_payments_for_order', 'payment_chargeback_detected'].includes(order.checkoutReviewReason)
+                && ['pending_payment', 'processing', 'ready_for_pickup', 'stock_issue', 'refund_pending', 'refund_failed'].includes(order.status) && (
+                <CancelOrderControl order={order} cancelOrder={cancelOrder} />
               )}
             </article>
           ))}
@@ -745,22 +838,141 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped }) {
   )
 }
 
-// Saisie du numéro de suivi + envoi de l'e-mail « expédiée » au client.
+function CancelOrderControl({ order, cancelOrder }) {
+  const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const isPaid = order.paymentStatus === 'paid'
+  const isRefundPending = order.status === 'refund_pending'
+  const isRefundRetry = order.status === 'refund_failed'
+
+  const submit = async () => {
+    if (loading) return
+    let reason = 'Synchronisation manuelle du remboursement en cours'
+    if (!isRefundPending) {
+      reason = window.prompt(
+        isPaid
+          ? 'Motif du remboursement (visible dans le suivi interne) :'
+          : 'Motif de l’annulation (visible dans le suivi interne) :',
+      )
+      if (reason == null) return
+    }
+    const confirmed = window.confirm(
+      isRefundPending
+        ? 'Vérifier maintenant l’état du remboursement chez Mollie ?'
+        : isRefundRetry
+        ? 'Confirmer une nouvelle tentative de remboursement intégral chez Mollie ?'
+        : isPaid
+        ? 'Confirmer l’annulation et demander le remboursement intégral chez Mollie ?'
+        : 'Confirmer l’annulation de cette commande ?',
+    )
+    if (!confirmed) return
+
+    setLoading(true)
+    setFeedback(null)
+    try {
+      const result = await cancelOrder(order.id, reason.trim())
+      const action = String(result.action || '')
+      setFeedback({
+        ok: true,
+        message: ['refunded', 'already_refunded'].includes(action)
+          ? 'Remboursement intégral confirmé par Mollie.'
+          : action.startsWith('refund_')
+            ? 'Remboursement demandé. Son statut sera synchronisé automatiquement.'
+            : 'Commande annulée.',
+      })
+    } catch (error) {
+      setFeedback({ ok: false, message: error.message || 'Annulation impossible.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-rose-400/20 bg-rose-500/5 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-white">
+            {isRefundPending
+              ? 'Suivi du remboursement'
+              : isRefundRetry ? 'Réessayer le remboursement' : 'Annulation contrôlée'}
+          </p>
+          <p className="mt-1 text-xs text-muted">
+            {isRefundPending
+              ? 'Relit l’état Mollie et reprend la même tentative idempotente sans créer un second remboursement.'
+              : isRefundRetry
+              ? 'Lance une nouvelle tentative idempotente. Après trois échecs, vérifiez et traitez le dossier dans Mollie.'
+              : isPaid
+              ? 'Déclenche un remboursement intégral Mollie et suit son résultat sans modifier le statut à la main.'
+              : 'Annule le paiement en attente et libère les réservations associées.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={submit}
+          disabled={loading}
+          className="btn shrink-0 border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 disabled:opacity-60"
+        >
+          {loading
+            ? 'Traitement…'
+            : isRefundPending
+              ? 'Vérifier maintenant'
+              : isRefundRetry
+              ? 'Réessayer le remboursement'
+              : isPaid
+                ? 'Annuler et rembourser'
+                : 'Annuler la commande'}
+        </button>
+      </div>
+      {feedback && (
+        <p role="status" className={`mt-3 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-300'}`}>
+          {feedback.message}
+        </p>
+      )}
+    </div>
+  )
+}
+
+// Expédition avec suivi, ou notification distincte de mise à disposition pour
+// le retrait boutique. Le statut retourné par le serveur reste la source de vérité.
 function ShipControl({ order, markShipped }) {
+  const isPickup = order.shipping?.id === 'pickup'
   const [tracking, setTracking] = useState(order.shipping?.tracking || '')
   const [carrier, setCarrier] = useState(order.shipping?.carrier || '')
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
 
-  const shipped = order.status === 'shipped' || order.status === 'delivered'
+  const notified = isPickup
+    ? ['ready_for_pickup', 'delivered'].includes(order.status)
+    : ['shipped', 'delivered'].includes(order.status)
 
   const submit = async () => {
     if (loading) return
     setFeedback(null)
     setLoading(true)
     try {
-      await markShipped(order.id, { tracking: tracking.trim(), carrier: carrier.trim() })
-      setFeedback({ ok: true, message: 'Commande marquée expédiée — e-mail envoyé au client.' })
+      const result = await markShipped(order.id, { tracking: tracking.trim(), carrier: carrier.trim() })
+      if (result.emailSent) {
+        setFeedback({
+          ok: true,
+          message: isPickup
+            ? 'Commande prête au retrait — e-mail envoyé au client.'
+            : 'Commande expédiée — e-mail envoyé au client.',
+        })
+      } else if (result.emailAlreadySent) {
+        setFeedback({
+          ok: true,
+          message: isPickup
+            ? 'Commande prête au retrait — l’e-mail avait déjà été envoyé.'
+            : 'Commande expédiée — l’e-mail avait déjà été envoyé.',
+        })
+      } else {
+        setFeedback({
+          ok: false,
+          message: isPickup
+            ? 'Commande enregistrée comme prête, mais l’e-mail n’est pas parti. Réessayez avec « Renvoyer l’e-mail ».'
+            : 'Commande enregistrée comme expédiée, mais l’e-mail n’est pas parti. Réessayez avec « Renvoyer le suivi ».',
+        })
+      }
     } catch (err) {
       setFeedback({ ok: false, message: err.message || 'Échec de l’envoi.' })
     } finally {
@@ -770,16 +982,28 @@ function ShipControl({ order, markShipped }) {
 
   return (
     <div className="mt-4 flex flex-col gap-3 rounded-xl border border-white/8 bg-noir/30 p-4 sm:flex-row sm:items-end">
-      <label className="block flex-1">
-        <span className="mb-1.5 block text-xs font-medium text-muted">N° de suivi</span>
-        <input value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Ex : 6A12345678901" className="input" />
-      </label>
-      <label className="block sm:w-40">
-        <span className="mb-1.5 block text-xs font-medium text-muted">Transporteur</span>
-        <input value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="Colissimo, Mondial Relay…" className="input" />
-      </label>
+      {isPickup ? (
+        <div className="flex-1 text-xs leading-relaxed text-muted">
+          Prévenez le client lorsque sa commande est disponible au 188 rue de Rome, Marseille.
+        </div>
+      ) : (
+        <>
+          <label className="block flex-1">
+            <span className="mb-1.5 block text-xs font-medium text-muted">N° de suivi</span>
+            <input value={tracking} onChange={(e) => setTracking(e.target.value)} placeholder="Ex : 6A12345678901" className="input" />
+          </label>
+          <label className="block sm:w-40">
+            <span className="mb-1.5 block text-xs font-medium text-muted">Transporteur</span>
+            <input value={carrier} onChange={(e) => setCarrier(e.target.value)} placeholder="Colissimo, Mondial Relay…" className="input" />
+          </label>
+        </>
+      )}
       <button onClick={submit} disabled={loading} className="btn-primary shrink-0 disabled:opacity-60">
-        {loading ? 'Envoi…' : shipped ? 'Renvoyer le suivi' : 'Marquer expédiée & notifier'}
+        {loading
+          ? 'Envoi…'
+          : notified
+            ? isPickup ? 'Renvoyer l’e-mail' : 'Renvoyer le suivi'
+            : isPickup ? 'Marquer prête & notifier' : 'Marquer expédiée & notifier'}
       </button>
       {feedback && (
         <p className={`text-xs ${feedback.ok ? 'text-neon' : 'text-rose-400'} sm:ml-2 sm:self-center`}>{feedback.message}</p>
@@ -789,6 +1013,8 @@ function ShipControl({ order, markShipped }) {
 }
 
 function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setTab, supabaseEnabled }) {
+  const catalogIssues = useMemo(() => findCatalogIssues(products), [products])
+
   const exportData = () => {
     const payload = JSON.stringify({ products, orders, exportedAt: new Date().toISOString() }, null, 2)
     const blob = new Blob([payload], { type: 'application/json' })
@@ -802,6 +1028,36 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <section className={`card p-6 lg:col-span-3 ${catalogIssues.length ? 'border-rose-400/25 bg-rose-500/5' : 'border-neon/20 bg-neon/5'}`}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="eyebrow mb-2">Qualité des données</p>
+            <h2 className="font-display text-xl font-bold text-white">
+              {catalogIssues.length
+                ? `${catalogIssues.length} anomalie${catalogIssues.length > 1 ? 's' : ''} à corriger`
+                : 'Catalogue cohérent'}
+            </h2>
+          </div>
+          <span className={`chip ${catalogIssues.length ? 'border-rose-400/30 text-rose-300' : 'border-neon/30 text-neon'}`}>
+            {products.length} références contrôlées
+          </span>
+        </div>
+        {catalogIssues.length ? (
+          <ul className="mt-4 grid gap-2 text-sm text-rose-100/80 md:grid-cols-2">
+            {catalogIssues.slice(0, 8).map((issue, index) => (
+              <li key={`${issue.code}-${issue.productIds.join('-')}-${index}`} className="rounded-xl border border-rose-400/15 bg-noir/20 px-4 py-3">
+                {issue.message}
+              </li>
+            ))}
+            {catalogIssues.length > 8 && (
+              <li className="px-4 py-3 text-muted">+ {catalogIssues.length - 8} autre(s) anomalie(s)</li>
+            )}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-muted">Identifiants, prix actifs, volumes, catégories et doublons ont été vérifiés.</p>
+        )}
+      </section>
+
       <section className="card p-6 lg:col-span-2">
         <p className="eyebrow mb-2">Pilotage</p>
         <h2 className="font-display text-xl font-bold text-white">Actions rapides</h2>
@@ -825,18 +1081,26 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
         <p className="mt-3 text-sm text-muted">
           Le catalogue {supabaseEnabled ? 'Supabase' : 'local'} contient {products.length} produits.
         </p>
-        <button
-          onClick={() => window.confirm('Restaurer le catalogue initial ?') && resetProducts()}
-          className="btn-ghost mt-5 w-full"
-        >
-          Réinitialiser le catalogue par défaut
-        </button>
-        <button
-          onClick={() => window.confirm('⚠️ Supprimer TOUS les produits du catalogue ? Cette action est irréversible.') && clearAllProducts()}
-          className="btn bg-rose-500/10 border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 hover:border-rose-400/50 mt-3 w-full active:scale-[0.97] transition-all duration-300"
-        >
-          Tout supprimer du catalogue
-        </button>
+        {supabaseEnabled ? (
+          <div className="mt-5 rounded-xl border border-amber-400/20 bg-amber-400/5 px-4 py-3 text-xs leading-relaxed text-amber-100/80">
+            Les actions globales sont désactivées sur le catalogue live. Modifiez les références une par une ou utilisez une migration contrôlée afin de préserver prix, stock et historique.
+          </div>
+        ) : (
+          <>
+            <button
+              onClick={() => window.confirm('Restaurer le catalogue local de développement ?') && resetProducts()}
+              className="btn-ghost mt-5 w-full"
+            >
+              Restaurer le catalogue local
+            </button>
+            <button
+              onClick={() => window.confirm('Supprimer tous les produits du catalogue local ?') && clearAllProducts()}
+              className="btn mt-3 w-full border border-rose-500/30 bg-rose-500/10 text-rose-400 transition-all duration-300 hover:border-rose-400/50 hover:bg-rose-500/20 active:scale-[0.97]"
+            >
+              Vider le catalogue local
+            </button>
+          </>
+        )}
       </section>
 
       <section className="card border-amber-400/20 bg-amber-400/5 p-6 lg:col-span-3">
@@ -1035,6 +1299,13 @@ function variantLabel(variant = {}) {
   return parts.length ? parts.join(' · ') : 'Standard'
 }
 
+function formatOrderDelivery(order = {}) {
+  if (order.shipping?.id === 'pickup') return order.shipping.label || 'Retrait en boutique'
+  const city = [order.address?.zip, order.address?.city].filter(Boolean).join(' ')
+  const address = [order.address?.street, city].filter(Boolean).join(', ')
+  return [address, order.shipping?.label].filter(Boolean).join(' · ') || 'Livraison non renseignée'
+}
+
 function formatDate(value) {
   return new Intl.DateTimeFormat('fr-FR', {
     day: '2-digit',
@@ -1053,7 +1324,6 @@ function lastSevenDays(orders) {
     const next = new Date(date)
     next.setDate(date.getDate() + 1)
     const total = orders
-      .filter((order) => order.status !== 'cancelled')
       .filter((order) => {
         const created = new Date(order.createdAt)
         return created >= date && created < next

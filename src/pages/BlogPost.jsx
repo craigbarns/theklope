@@ -5,6 +5,7 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import NotFound from './NotFound.jsx'
+import { productRequiresVariantSelection } from '../lib/cart.js'
 
 export default function BlogPost() {
   const { slug } = useParams()
@@ -151,25 +152,26 @@ export default function BlogPost() {
                           {formatPrice(p.price)}
                         </p>
                       </div>
-                      <button
-                        onClick={() => addToCart(p.id, 1)}
-                        className="rounded-full bg-neon/10 border border-neon/30 p-2 text-neon hover:bg-neon hover:text-noir transition shrink-0"
-                        title="Ajouter au panier"
-                      >
-                        <svg
-                          className="w-3.5 h-3.5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
+                      {productRequiresVariantSelection(p) ? (
+                        <Link
+                          to={`/produit/${p.id}`}
+                          className="shrink-0 rounded-full border border-neon/30 bg-neon/10 px-3 py-2 text-[10px] font-bold text-neon transition hover:bg-neon hover:text-noir"
+                          aria-label={`Choisir les options de ${p.name}`}
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                          />
-                        </svg>
-                      </button>
+                          Choisir
+                        </Link>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => addToCart(p.id, 1)}
+                          className="shrink-0 rounded-full border border-neon/30 bg-neon/10 p-2 text-neon transition hover:bg-neon hover:text-noir"
+                          aria-label={`Ajouter ${p.name} au panier`}
+                        >
+                          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
