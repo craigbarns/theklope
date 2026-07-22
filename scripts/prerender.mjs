@@ -40,6 +40,7 @@ const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
+const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -333,22 +334,7 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
           acceptedAnswer: { '@type': 'Answer', text: item.a },
         })),
       },
-      ...(page.localBusiness
-        ? [{
-            '@type': 'LocalBusiness',
-            '@id': 'https://www.theklope.com/#store',
-            name: 'THEKLOPE',
-            url: 'https://www.theklope.com',
-            address: {
-              '@type': 'PostalAddress',
-              streetAddress: '188 rue de Rome',
-              addressLocality: 'Marseille',
-              postalCode: '13006',
-              addressCountry: 'FR',
-            },
-            priceRange: '$$',
-          }]
-        : []),
+      ...(page.localBusiness ? [buildLocalBusinessSchema()] : []),
     ],
   }
   const content = `

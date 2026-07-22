@@ -34,6 +34,7 @@ const COLUMNS = [
       { to: '/a-propos', label: 'À propos' },
       { to: '/guides', label: 'Guides vape responsables' },
       { to: '/boutique-vape-marseille', label: 'Boutique vape Marseille' },
+      { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique Marseille' },
       { to: '/conformite-vape', label: 'Conformité vape' },
       { to: '/categorie/nouveautes', label: 'Nouveautés' },
       { to: '/categorie/meilleures-ventes', label: 'Meilleures ventes' },

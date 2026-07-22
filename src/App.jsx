@@ -102,6 +102,7 @@ export default function App() {
             <Route path="/blog" element={<Navigate to="/guides" replace />} />
             <Route path="/blog/:slug" element={<BlogRedirect />} />
             <Route path="/boutique-vape-marseille" element={<StaticSeoPage />} />
+            <Route path="/cigarette-electronique-marseille" element={<StaticSeoPage />} />
             <Route path="/conformite-vape" element={<StaticSeoPage />} />
             <Route path="/livraison-retours" element={<StaticSeoPage />} />
             <Route path="/produit/:id" element={<Product />} />

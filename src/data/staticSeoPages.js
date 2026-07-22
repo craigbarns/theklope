@@ -10,39 +10,101 @@ export const STATIC_SEO_PAGES = {
     localBusiness: true,
     sections: [
       {
-        title: 'Une sélection pour vapoteurs adultes',
+        title: 'Boutique au 188 rue de Rome (13006)',
         text:
-          'La boutique met en avant des produits de vapotage réservés aux adultes : kits, pods rechargeables, e-liquides, résistances et consommables compatibles.',
+          'THEKLOPE est installé au 188 rue de Rome, dans le 6e arrondissement de Marseille, à deux pas du centre-ville. Vous y retrouvez une sélection de cigarettes électroniques, pods, e-liquides, résistances et accessoires pour vapoteurs majeurs.',
+      },
+      {
+        title: 'Retrait en boutique gratuit (Click & Collect)',
+        text:
+          'Commandez en ligne sur theklope.com et choisissez le retrait gratuit en boutique à Marseille lors du paiement. Votre commande est préparée selon le stock disponible : plus de frais de livraison, et vous récupérez vos produits sur place.',
       },
       {
         title: 'Conseil et compatibilité',
         text:
-          'Avant d’acheter une résistance, une cartouche ou un e-liquide, vous pouvez vérifier la compatibilité avec votre matériel auprès du service client THEKLOPE.',
+          'Avant d’acheter une résistance, une cartouche ou un e-liquide, vous pouvez vérifier la compatibilité avec votre matériel auprès de l’équipe THEKLOPE, en boutique ou via le service client.',
       },
       {
-        title: 'Livraison en France',
+        title: 'Livraison partout en France',
         text:
-          'Les commandes passées sur theklope.com sont préparées selon les stocks disponibles et les délais indiqués. Le paiement est traité via un checkout sécurisé Mollie.',
+          'Vous n’êtes pas sur Marseille ? Les commandes sont expédiées dans toute la France, livraison offerte dès 49€. Le paiement est traité via un checkout sécurisé Mollie.',
       },
     ],
     links: [
       { to: '/boutique', label: 'Voir la boutique' },
+      { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique à Marseille' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
       { to: '/categorie/resistances', label: 'Résistances' },
       { to: '/contact', label: 'Contacter THEKLOPE' },
     ],
     faq: [
       {
-        q: 'THEKLOPE est-il une boutique vape à Marseille ?',
-        a: 'Oui. THEKLOPE est associé à une adresse à Marseille et propose aussi une boutique en ligne pour le marché français.',
+        q: 'Où se trouve la boutique vape THEKLOPE à Marseille ?',
+        a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement). Vous pouvez y retirer gratuitement vos commandes passées en ligne.',
+      },
+      {
+        q: 'Puis-je retirer ma commande en boutique à Marseille ?',
+        a: 'Oui. Le retrait en boutique (Click & Collect) est gratuit : commandez en ligne, choisissez « retrait boutique » au paiement, et récupérez votre commande au 188 rue de Rome une fois préparée.',
       },
       {
         q: 'Peut-on commander des produits vape en ligne depuis Marseille ?',
-        a: 'Oui, les produits disponibles sur theklope.com peuvent être commandés en ligne selon le stock affiché et les conditions de livraison.',
+        a: 'Oui, les produits disponibles sur theklope.com peuvent être commandés en ligne selon le stock affiché, avec retrait boutique gratuit ou livraison en France.',
       },
       {
         q: 'Les produits sont-ils vendus aux mineurs ?',
         a: 'Non. THEKLOPE réserve la vente de produits de vapotage aux personnes majeures de 18 ans et plus.',
+      },
+    ],
+  },
+  'cigarette-electronique-marseille': {
+    title: 'Cigarette électronique à Marseille — kits, pods et retrait boutique',
+    metaDescription:
+      'Acheter une cigarette électronique à Marseille : kits débutants, pods rechargeables et box, en ligne avec retrait gratuit en boutique au 188 rue de Rome (13006).',
+    h1: 'Cigarette électronique à Marseille',
+    eyebrow: 'Marseille 13006',
+    intro:
+      'Vous cherchez une cigarette électronique à Marseille ? THEKLOPE propose une sélection de kits, pods et box pour vapoteurs majeurs, à commander en ligne avec retrait gratuit en boutique au 188 rue de Rome.',
+    localBusiness: true,
+    sections: [
+      {
+        title: 'Choisir sa première cigarette électronique',
+        text:
+          'Pour débuter, un pod rechargeable simple d’utilisation suffit souvent : compact, autonome et facile à entretenir. Les kits plus avancés (box) offrent plus de réglages et d’autonomie. En cas de doute, l’équipe THEKLOPE vous oriente selon votre usage.',
+      },
+      {
+        title: 'Retrait gratuit en boutique à Marseille',
+        text:
+          'Réservez votre cigarette électronique en ligne et récupérez-la gratuitement au 188 rue de Rome (13006 Marseille) grâce au Click & Collect. Vous vérifiez le produit sur place, sans frais de livraison.',
+      },
+      {
+        title: 'Résistances et e-liquides compatibles',
+        text:
+          'Une cigarette électronique se complète de résistances et d’e-liquides adaptés. Vérifiez la compatibilité de vos résistances avant l’achat et choisissez un taux de nicotine adapté à votre profil.',
+      },
+      {
+        title: 'Livraison en France si vous n’êtes pas sur place',
+        text:
+          'Hors de Marseille, votre commande est expédiée partout en France, livraison offerte dès 49€, avec paiement sécurisé Mollie.',
+      },
+    ],
+    links: [
+      { to: '/categorie/cigarettes-electroniques', label: 'Voir les cigarettes électroniques' },
+      { to: '/boutique-vape-marseille', label: 'La boutique de Marseille' },
+      { to: '/guides/quelle-cigarette-electronique-choisir', label: 'Guide : quelle e-cig choisir ?' },
+      { to: '/categorie/resistances', label: 'Résistances' },
+    ],
+    faq: [
+      {
+        q: 'Où acheter une cigarette électronique à Marseille ?',
+        a: 'Chez THEKLOPE, au 188 rue de Rome (13006 Marseille). Vous pouvez commander en ligne sur theklope.com et retirer gratuitement votre cigarette électronique en boutique.',
+      },
+      {
+        q: 'Quelle cigarette électronique choisir pour débuter ?',
+        a: 'Un pod rechargeable est idéal pour débuter : simple, compact et facile à entretenir. Notre guide et l’équipe en boutique peuvent vous conseiller selon votre usage.',
+      },
+      {
+        q: 'Le retrait en boutique est-il payant ?',
+        a: 'Non, le retrait en boutique (Click & Collect) à Marseille est gratuit. Vous choisissez cette option lors du paiement en ligne.',
       },
     ],
   },
