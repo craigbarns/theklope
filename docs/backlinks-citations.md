@@ -17,14 +17,21 @@ via des **citations locales** et des **annuaires**. Gratuit, effet durable.
 Google recoupe tes mentions sur le web (**N**ame, **A**ddress, **P**hone).
 Elles doivent être **strictement identiques partout**, à la virgule près.
 
-### ❗ À trancher avant de commencer
-Le nom diffère aujourd'hui entre les supports :
-- Fiche Google Business : `The Klope`
-- Site / mentions légales : `THEKLOPE`
+### ✅ Nom officiel retenu : `THEKLOPE`
 
-**Choisis une seule écriture** et aligne l'autre. Recommandation : garder
-`THEKLOPE` (identité du site, du logo et des mentions légales) et corriger le
-nom sur la fiche Google.
+Décision prise : **`THEKLOPE`** (en majuscules, en un seul mot) est le nom
+canonique à utiliser sur **toutes** les inscriptions, sans exception.
+
+État de l'alignement :
+- ✅ Site, logo et mentions légales : `THEKLOPE`
+- ✅ Page Contact : corrigée (affichait `The Klope`)
+- ⬜ **Fiche Google Business : encore `The Klope` → à renommer** (voir ci-dessous)
+
+#### Renommer la fiche Google Business
+1. Ouvrir [business.google.com](https://business.google.com) et sélectionner l'établissement.
+2. Onglet **« Profil de l'entreprise »** → **« Modifier le profil »** → champ **« Nom de l'entreprise »**.
+3. Remplacer `The Klope` par `THEKLOPE`, puis enregistrer.
+4. Google peut demander une **validation** du changement (quelques jours). C'est normal.
 
 ---
 
@@ -127,7 +134,7 @@ sanctionne les liens artificiels. Mieux vaut **10 citations sérieuses** que
 
 Coche au fur et à mesure :
 
-- [ ] Nom harmonisé (`THEKLOPE` partout, y compris fiche Google)
+- [ ] Fiche Google Business renommée `The Klope` → `THEKLOPE`
 - [ ] Bing Places for Business
 - [ ] Apple Business Connect
 - [ ] PagesJaunes

@@ -95,7 +95,7 @@ export default function Contact() {
               className="mb-3 flex items-start gap-3 text-sm text-ash/75 hover:text-neon"
             >
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg border border-white/10 text-neon"><IconPin width={17} height={17} /></span>
-              <span>The Klope — Boutique de Marseille<br />188 Rue de Rome, 13006 Marseille</span>
+              <span>THEKLOPE — Boutique de Marseille<br />188 Rue de Rome, 13006 Marseille</span>
             </a>
             <a href="mailto:contact@theklope.com" className="mb-3 flex items-center gap-3 text-sm text-ash/75 hover:text-neon">
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconMail width={17} height={17} /></span>
