@@ -53,6 +53,54 @@ const makePost = ({
 
 export const BLOG_POSTS = [
   makePost({
+    slug: 'entretenir-kit-classique-box',
+    title: 'Entretenir un kit classique ou une box de cigarette électronique',
+    description:
+      'Entretien d’un kit classique ou d’une box : nettoyage du clearomiseur, joints, pas de vis 510 et stockage de la batterie.',
+    date: '23 Juillet 2026',
+    isoDate: '2026-07-23T08:00:00+02:00',
+    readTime: '5 min',
+    category: 'Entretien',
+    image: '/products/kit-aegis-solo-3-geekvape.jpg',
+    summary:
+      'Un kit classique ou une box comportent plusieurs pièces démontables : un entretien régulier du clearomiseur, des joints et des contacts limite les fuites et les pertes de goût.',
+    intro:
+      'Contrairement à un pod, un kit classique ou une box se démontent en plusieurs pièces : clearomiseur, joints, résistance et batterie. Quelques gestes réguliers suffisent à limiter les fuites et les problèmes de contact.',
+    sections: [
+      {
+        title: 'Nettoyer le clearomiseur et la vitre',
+        text:
+          'Démontez régulièrement le clearomiseur pour rincer le réservoir à l’eau tiède, sans savon, puis laissez sécher complètement avant de remonter et de remettre du e-liquide. La vitre se nettoie avec un chiffon doux pour retirer les traces de liquide séché.',
+      },
+      {
+        title: 'Vérifier les joints (o-rings)',
+        text:
+          'Les joints assurent l’étanchéité entre la vitre, le réservoir et la résistance. Un joint durci, fendu ou manquant est la cause la plus fréquente de fuite. Inspectez-les à chaque changement de résistance et remplacez ceux qui semblent usés.',
+      },
+      {
+        title: 'Entretenir le pas de vis et les contacts',
+        text:
+          'Le pas de vis 510, entre le clearomiseur et la box, accumule parfois des résidus de e-liquide qui gênent le contact électrique. Essuyez-le avec un chiffon sec et évitez de trop serrer le clearomiseur, au risque d’endommager le filetage.',
+      },
+      {
+        title: 'Stocker la box et la batterie',
+        text:
+          'Rangez le matériel à l’abri de la chaleur et du plein soleil, et évitez les poches serrées qui peuvent appuyer sur le bouton d’activation. Sur une box à batterie amovible, retirez la batterie en cas de rangement prolongé et gardez le matériel hors de portée des enfants.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Pourquoi mon kit classique fuit-il au niveau de la vitre ?',
+        a: 'C’est le plus souvent un joint usé, mal positionné ou un clearomiseur trop serré. Vérifiez l’état des joints et le remontage avant d’envisager un changement de résistance.',
+      },
+      {
+        q: 'Faut-il retirer la batterie d’une box quand on ne l’utilise pas longtemps ?',
+        a: 'Sur les box à batterie(s) amovible(s), il est préférable de la retirer en cas de rangement prolongé et de vérifier régulièrement son état.',
+      },
+    ],
+    relatedProductIds: ['aegis-solo-3-geekvape-265', 'gti-mesh-015020405-vaporesso-pack-de-5-300'],
+  }),
+  makePost({
     slug: 'comment-choisir-sa-resistance',
     title: 'Comment choisir sa résistance de cigarette électronique ?',
     description:
