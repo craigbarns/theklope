@@ -20,7 +20,7 @@ export const STORE = {
 }
 
 // Horaires d'ouverture de la boutique physique.
-// Source : fiche Google Business « The Klope ». Lundi-vendredi 09:00-19:00,
+// Source : fiche Google Business de la boutique. Lundi-vendredi 09:00-19:00,
 // fermé le week-end. Alimente le schéma LocalBusiness (Google peut afficher
 // « Ouvert / Fermé » dans les résultats locaux).
 export const STORE_HOURS = [
