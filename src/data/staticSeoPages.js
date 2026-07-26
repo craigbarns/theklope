@@ -35,6 +35,7 @@ export const STATIC_SEO_PAGES = {
       { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique à Marseille' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
       { to: '/categorie/resistances', label: 'Résistances' },
+      { to: '/guides/compatibilite-resistances-cartouches', label: 'Guide : compatibilité résistances & cartouches' },
       { to: '/contact', label: 'Contacter THEKLOPE' },
     ],
     faq: [
@@ -192,6 +193,7 @@ export const STATIC_SEO_PAGES = {
       { to: '/contact', label: 'Contacter le support' },
       { to: '/legal/retour', label: 'Politique de retour' },
       { to: '/legal/cgv', label: 'CGV' },
+      { to: '/guides/livraison-produits-vape-france', label: 'Guide : livraison en France' },
     ],
     faq: [
       {
