@@ -115,7 +115,8 @@ export default function BlogPost() {
                 [&>blockquote]:border-l-4 [&>blockquote]:border-neon [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-6 [&>blockquote]:text-white
                 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1.5 [&>ul]:mb-4 [&>ul]:text-muted
                 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:space-y-1.5 [&>ol]:mb-4 [&>ol]:text-muted
-                [&>strong]:text-white [&>strong]:font-semibold"
+                [&>strong]:text-white [&>strong]:font-semibold
+                [&_a]:text-neon [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </article>

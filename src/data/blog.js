@@ -127,7 +127,7 @@ export const BLOG_POSTS = [
       {
         title: 'Vérifier les consommables',
         text:
-          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver.',
+          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver. En cas de doute, l’équipe de la <a href="/cigarette-electronique-marseille">boutique THEKLOPE à Marseille</a> peut vous conseiller sur place.',
       },
     ],
     faq: [
@@ -858,7 +858,7 @@ export const BLOG_POSTS = [
       {
         title: 'Communication responsable',
         text:
-          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit.',
+          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit. Voir aussi les <a href="/conformite-vape">engagements de conformité THEKLOPE</a>.',
       },
     ],
     faq: [
