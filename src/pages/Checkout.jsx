@@ -4,7 +4,7 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
-import { IconLock, IconCheck, IconTruck, IconBolt } from '../components/icons.jsx'
+import { IconLock, IconCheck, IconTruck, IconBolt, IconShield } from '../components/icons.jsx'
 import { SHIPPING_METHODS as SHARED_SHIPPING_METHODS } from '../lib/pricing.js'
 import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../lib/delivery.js'
 import {

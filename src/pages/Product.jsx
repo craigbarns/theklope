@@ -32,6 +32,7 @@ import {
 
 export default function Product() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const {
     products,
     cart,
@@ -248,8 +249,6 @@ export default function Product() {
     ...(ohm != null ? { ohm } : {}),
   }
   const variantResolution = resolveProductVariant(product, selectedVariant)
-
-  const navigate = useNavigate()
 
   const handleBuyNow = () => {
     if (handleAdd()) {
