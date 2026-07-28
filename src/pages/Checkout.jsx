@@ -42,7 +42,12 @@ export default function Checkout() {
     catalogReady,
     syncStatus,
     refreshRemoteData,
+    setCartOpen,
   } = useStore()
+
+  useEffect(() => {
+    setCartOpen(false)
+  }, [setCartOpen])
 
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('')

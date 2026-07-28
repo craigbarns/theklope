@@ -37,6 +37,7 @@ export default function Product() {
     cart,
     getProduct,
     addToCart,
+    setCartOpen,
     toggleFavorite,
     isFavorite,
     cookiesChoice,
@@ -252,6 +253,7 @@ export default function Product() {
 
   const handleBuyNow = () => {
     if (handleAdd()) {
+      setCartOpen(false)
       navigate('/checkout')
     }
   }
