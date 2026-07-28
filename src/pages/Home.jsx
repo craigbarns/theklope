@@ -1,14 +1,12 @@
 import { Link } from 'react-router-dom'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
-import GoogleReviews from '../components/GoogleReviews.jsx'
-import Newsletter from '../components/Newsletter.jsx'
 import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '../data/catalog.js'
-import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
+import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import {
   IconArrowRight,
   IconShield,
@@ -20,10 +18,10 @@ import {
 } from '../components/icons.jsx'
 
 const FEATURES = [
-  { icon: IconCheck, title: 'Produits testés et sélectionnés', text: 'Chaque référence est choisie pour sa fiabilité et sa qualité.' },
-  { icon: IconTruck, title: 'Livraison rapide en France', text: 'Expédition sous 24/48h, livraison offerte dès 49€.' },
-  { icon: IconLock, title: 'Paiement 100% sécurisé', text: 'Transactions chiffrées, vos données sont protégées.' },
-  { icon: IconHeadset, title: 'Service client réactif', text: 'Une équipe disponible pour vous accompagner.' },
+  { icon: IconCheck, title: 'Informations produit', text: 'Caractéristiques et options sont indiquées sur chaque fiche.' },
+  { icon: IconTruck, title: 'Livraison en France', text: 'Délai indicatif de 2 à 4 jours selon le transporteur et la destination.' },
+  { icon: IconLock, title: 'Paiement par Mollie', text: 'La saisie du paiement s’effectue dans l’environnement Mollie.' },
+  { icon: IconHeadset, title: 'Service client', text: 'Les coordonnées de contact et l’adresse de la boutique sont disponibles sur le site.' },
 ]
 
 const heroCats = [
@@ -42,10 +40,32 @@ const GUIDE_LINKS = [
 ]
 
 export default function Home() {
-  const { products } = useStore()
+  const { products, cookiesChoice } = useStore()
   const { bestSellers, newArrivals, starterPacks } = useMemo(() => featuredProducts(products), [products])
   const heroProduct = useMemo(() => selectHomeHeroProduct(products), [products])
   const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
+  const homeCatalogue = bestSellers.slice(0, 4)
+  const homeStarterPacks = starterPacks.slice(0, 2)
+  const homeNewArrivals = (newArrivals.length ? newArrivals : products.slice(-4)).slice(0, 4)
+
+  useProductListView({
+    cookiesChoice,
+    itemListId: 'home_catalogue',
+    itemListName: 'Produits sélectionnés',
+    products: homeCatalogue,
+  })
+  useProductListView({
+    cookiesChoice,
+    itemListId: 'home_starter_packs',
+    itemListName: 'Packs débutants',
+    products: homeStarterPacks,
+  })
+  useProductListView({
+    cookiesChoice,
+    itemListId: 'home_new_arrivals',
+    itemListName: 'Nouveautés',
+    products: homeNewArrivals,
+  })
 
   const homeSchema = useMemo(() => ({
     '@context': 'https://schema.org',
@@ -101,8 +121,8 @@ export default function Home() {
               <Link to="/boutique" className="btn-primary">
                 Découvrir la boutique <IconArrowRight width={18} height={18} />
               </Link>
-              <Link to="/categorie/meilleures-ventes" className="btn-ghost">
-                Voir les meilleures ventes
+              <Link to="/categories" className="btn-ghost">
+                Voir les catégories
               </Link>
             </div>
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
@@ -135,15 +155,11 @@ export default function Home() {
                   <div className="card absolute -bottom-5 -left-5 hidden items-center gap-3 rounded-2xl p-3 pr-5 shadow-card sm:flex">
                     <ProductImage src={featuredProduct.image} alt="" loading="lazy" className="h-14 w-14 rounded-xl object-cover" width={56} height={56} />
                     <div>
-                      <p className="text-xs text-muted">Best-seller</p>
+                      <p className="text-xs text-muted">Produit du catalogue</p>
                       <p className="max-w-[10rem] truncate text-sm font-semibold text-white">{featuredProduct.name}</p>
                     </div>
                   </div>
                 )}
-                <div className="card absolute -right-3 top-6 hidden rounded-2xl px-4 py-3 shadow-card md:block">
-                  <p className="font-display text-2xl font-bold text-neon">{STORE_REVIEW_SUMMARY.ratingLabel}</p>
-                  <p className="text-[11px] text-muted">{STORE_REVIEW_SUMMARY.countLabel}</p>
-                </div>
               </div>
             ) : (
               <div className="relative mx-auto max-w-md">
@@ -190,29 +206,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* BANNIÈRE PACK SUR MESURE & ESSENTIELS */}
-      <section className="container-page py-6">
-        <div className="relative overflow-hidden rounded-3xl border border-neon/30 bg-gradient-to-r from-neon/15 via-anthracite to-electric/20 p-8 sm:p-10 shadow-glow-green">
-          <div className="max-w-2xl">
-            <span className="chip mb-4 border-neon/40 text-neon font-bold">
-              🔥 Offre spéciale Pack Sur Mesure
-            </span>
-            <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
-              Composez votre Pack et économisez <span className="text-neon">-15% immédiats</span> !
-            </h2>
-            <p className="mt-4 text-sm text-ash/80 leading-relaxed sm:text-base">
-              Associez une cigarette électronique, un pack de résistances ou accessoires, et votre e-liquide préféré. La remise de 15% s’applique automatiquement à votre panier.
-            </p>
-            <div className="mt-6 flex flex-wrap items-center gap-4">
-              <Link to="/configurateur" className="btn-primary">
-                Créer mon Pack (-15%) <IconArrowRight width={18} height={18} />
-              </Link>
-              <span className="text-xs text-muted font-medium">✓ Remise appliquée automatiquement</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section className="container-page py-10">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
@@ -246,8 +239,8 @@ export default function Home() {
       {/* POURQUOI THEKLOPE */}
       <section className="container-page py-16">
         <div className="mb-10 text-center">
-          <p className="eyebrow mb-3">Confiance</p>
-          <h2 className="font-display text-3xl font-bold text-white">Pourquoi choisir THEKLOPE ?</h2>
+          <p className="eyebrow mb-3">Commande</p>
+          <h2 className="font-display text-3xl font-bold text-white">Informations pratiques</h2>
         </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f) => (
@@ -263,13 +256,14 @@ export default function Home() {
         <p className="mt-6 text-center text-sm text-faint">Boutique réservée aux majeurs.</p>
       </section>
 
-      {/* MEILLEURES VENTES */}
+      {/* SÉLECTION DU CATALOGUE */}
       {bestSellers.length > 0 && (
         <ProductRow
-          eyebrow="Plébiscités"
-          title="Meilleures ventes"
-          link="/categorie/meilleures-ventes"
-          products={bestSellers}
+          eyebrow="Catalogue"
+          title="Produits sélectionnés"
+          link="/boutique"
+          products={homeCatalogue}
+          itemListId="home_catalogue"
         />
       )}
 
@@ -283,15 +277,21 @@ export default function Home() {
                 <h2 className="font-display text-3xl font-bold text-white">Packs débutants</h2>
                 <p className="mt-3 max-w-md text-muted">
                   Tout ce qu'il faut pour commencer sereinement : kit, e-liquides et accessoires réunis dans une
-                  sélection avantageuse, pensée pour la première vape.
+                  sélection regroupée, avec le détail de chaque produit.
                 </p>
                 <Link to="/categorie/packs-debutants" className="btn-primary mt-6">
                   Voir les packs <IconArrowRight width={18} height={18} />
                 </Link>
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
-                {starterPacks.slice(0, 2).map((p) => (
-                  <ProductCard key={p.id} product={p} />
+                {homeStarterPacks.map((p, index) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    itemListId="home_starter_packs"
+                    itemListName="Packs débutants"
+                    index={index}
+                  />
                 ))}
               </div>
             </div>
@@ -305,7 +305,8 @@ export default function Home() {
           eyebrow="Tout juste arrivés"
           title="Nouveautés"
           link="/categorie/nouveautes"
-          products={newArrivals.length ? newArrivals : products.slice(-4)}
+          products={homeNewArrivals}
+          itemListId="home_new_arrivals"
         />
       )}
 
@@ -324,14 +325,31 @@ export default function Home() {
           </p>
         </div>
       </section>
-
-      <GoogleReviews />
-      <Newsletter />
     </>
   )
 }
 
-function ProductRow({ eyebrow, title, link, products }) {
+function useProductListView({ cookiesChoice, itemListId, itemListName, products }) {
+  const trackedRef = useRef('')
+
+  useEffect(() => {
+    if (products.length === 0) return
+    const signature = `${itemListId}|${products.map((product) => product.id).join('|')}`
+    if (trackedRef.current === signature) return
+    if (trackEvent('view_item_list', {
+      item_list_id: itemListId,
+      item_list_name: itemListName,
+      items: products.map((product, index) => ({
+        ...toAnalyticsItem(product),
+        index,
+      })),
+    })) {
+      trackedRef.current = signature
+    }
+  }, [cookiesChoice, itemListId, itemListName, products])
+}
+
+function ProductRow({ eyebrow, title, link, products, itemListId }) {
   return (
     <section className="container-page py-10">
       <div className="mb-8 flex items-end justify-between">
@@ -344,8 +362,14 @@ function ProductRow({ eyebrow, title, link, products }) {
         </Link>
       </div>
       <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-        {products.slice(0, 4).map((p) => (
-          <ProductCard key={p.id} product={p} />
+        {products.slice(0, 4).map((p, index) => (
+          <ProductCard
+            key={p.id}
+            product={p}
+            itemListId={itemListId}
+            itemListName={title}
+            index={index}
+          />
         ))}
       </div>
     </section>

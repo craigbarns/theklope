@@ -6,6 +6,7 @@ import { IconCheck, IconLock } from '../components/icons.jsx'
 import {
   getStoredAcquisition,
   parsePurchaseSnapshot,
+  trackPaymentError,
   trackEventWhenReady,
 } from '../lib/analytics.js'
 import {
@@ -52,6 +53,7 @@ export default function CheckoutReturn() {
   const [reviewPaymentReceived, setReviewPaymentReceived] = useState(false)
   const clearedRef = useRef(false)
   const purchaseTrackingRef = useRef(null)
+  const paymentErrorTrackingRef = useRef(null)
 
   useEffect(() => {
     if (!orderId) {
@@ -196,6 +198,25 @@ export default function CheckoutReturn() {
       active = false
     }
   }, [cookiesChoice, order, orderId, state])
+
+  useEffect(() => {
+    if (cookiesChoice !== 'accepted') return undefined
+    if (!['failed', 'delayed', 'error'].includes(state)) return undefined
+
+    const signature = `${orderId || 'unknown'}:${state}`
+    if (paymentErrorTrackingRef.current === signature) return undefined
+    paymentErrorTrackingRef.current = signature
+
+    const tracked = trackPaymentError({
+      errorCode: state,
+      paymentProvider: 'Mollie',
+      retryable: state !== 'failed',
+    })
+    if (!tracked) {
+      paymentErrorTrackingRef.current = null
+    }
+    return undefined
+  }, [cookiesChoice, orderId, state])
 
   // Si une commande déjà mesurée comme achat est remboursée plus tard puis que
   // le client rouvre cette URL, GA4 reçoit un refund dédupliqué. Une commande

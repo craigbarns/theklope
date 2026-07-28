@@ -2,14 +2,11 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName, getProductCategoryKey } from '../data/catalog.js'
-import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
-import Stars from '../components/Stars.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
-import ShippingCountdown from '../components/ShippingCountdown.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
@@ -69,45 +66,6 @@ export default function Product() {
     () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
     [product],
   )
-
-  const promoNotice = useMemo(() => {
-    if (!product) return null
-    const cat = getProductCategoryKey(product)
-    const vol = (product.volume || product.specs?.Contenance || product.specs?.contenance || '').toLowerCase()
-    const brand = (product.brand || '').toLowerCase()
-
-    if (vol.includes('50ml') || vol.includes('100ml')) {
-      return {
-        icon: '🎁',
-        title: 'Offre Dégressive : -25% dès 4 e-liquides',
-        desc: 'Mélangez vos marques ! -25% de remise s’applique automatiquement dès 4 flacons 50ml ou 100ml au panier.',
-      }
-    }
-    if (vol.includes('10ml')) {
-      if (brand.includes('liquidarom') || brand.includes('freaks')) {
-        return {
-          icon: '🎁',
-          title: 'Pack 20 e-liquides à 59€ (-50%)',
-          desc: 'Remise automatique : 20 flacons 10ml Liquidarom/Freaks pour 59€ au lieu de 118€.',
-        }
-      }
-      if (brand.includes('alfaliquid') || brand.includes('pulp')) {
-        return {
-          icon: '🎁',
-          title: 'Pack 20 e-liquides à 88,50€ (-25%)',
-          desc: 'Prix de lot automatique : 20 flacons 10ml Alfaliquid/Pulp pour 88,50€ au lieu de 118€.',
-        }
-      }
-    }
-    if (['ecig', 'pod'].includes(cat)) {
-      return {
-        icon: '⚡',
-        title: 'Économisez -15% avec le Pack Sur Mesure',
-        desc: 'Associez cet appareil avec une résistance/accessoire et un e-liquide pour déclencher automatiquement -15% sur votre pack.',
-      }
-    }
-    return null
-  }, [product])
 
   const productSchema = useMemo(() => {
     if (!product) return null
@@ -204,21 +162,6 @@ export default function Product() {
     }
   }, [cookiesChoice, product])
 
-  // Compte à rebours d'expédition (limite 14h00)
-  const shippingCountdown = useMemo(() => {
-    const now = new Date()
-    const hours = now.getHours()
-    const day = now.getDay()
-    const isWeekend = day === 0 || day === 6
-
-    if (hours < 14 && !isWeekend) {
-      const remainingHours = 14 - hours - 1
-      const remainingMinutes = 60 - now.getMinutes()
-      return `Expédition aujourd'hui ! Commandez dans les ${remainingHours}h ${remainingMinutes}min.`
-    }
-    return `Commandez maintenant pour une expédition dès demain (ou lundi) !`
-  }, [])
-
   const cartProductQty = product
     ? cart.reduce(
       (sum, item) => sum + (item.productId === product.id ? Number(item.qty) || 0 : 0),
@@ -303,7 +246,6 @@ export default function Product() {
             <div className="card relative overflow-hidden rounded-3xl p-2 aspect-square flex items-center justify-center">
               <div className="absolute left-4 top-4 z-10 flex gap-2">
                 {product.badge && <Badge type={product.badge} />}
-                {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
               <ProductImage
                 src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
@@ -340,36 +282,12 @@ export default function Product() {
           <div>
             <p className="text-xs uppercase tracking-wider text-faint">{product.brand} · {product.type}</p>
             <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{product.name}</h1>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
-              <span className="text-xs text-muted">Note de la boutique sur Google, pas du produit.</span>
-            </div>
 
             <div className="mt-5 flex items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
-              {product.oldPrice && (
-                <span className="text-lg text-faint line-through">{formatPrice(product.oldPrice)}</span>
-              )}
-              {product.oldPrice && (
-                <span className="rounded-full bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-400">
-                  -{Math.round((1 - product.price / product.oldPrice) * 100)}%
-                </span>
-              )}
             </div>
 
             <p className="mt-5 text-ash/70">{product.short}</p>
-
-            {promoNotice && (
-              <div className="mt-4 rounded-2xl border border-neon/30 bg-neon/10 p-4">
-                <div className="flex items-center gap-2 font-bold text-sm text-neon">
-                  <span>{promoNotice.icon}</span>
-                  <span>{promoNotice.title}</span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-ash/80">
-                  {promoNotice.desc}
-                </p>
-              </div>
-            )}
 
             {/* Variantes */}
             <div ref={variantsRef} className="mt-7 scroll-mt-28 space-y-5">
@@ -437,26 +355,20 @@ export default function Product() {
                   onClick={() => handleBuyNow()}
                   className="btn-ghost w-full border-neon/40 text-neon hover:bg-neon hover:text-noir transition font-bold py-3 text-sm flex items-center justify-center gap-2"
                 >
-                  ⚡ Acheter maintenant (Commande directe)
+                  Commander
                 </button>
               )}
             </div>
 
-            <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : remainingStock <= 5 ? 'text-amber-400 font-semibold' : 'text-muted'}`}>
+            <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : 'text-muted'}`}>
               {outOfStock
-                ? 'Rupture de stock — bientôt de retour'
+                ? 'Rupture de stock'
                 : stockLimitReached
                   ? 'Tout le stock disponible est déjà dans votre panier'
-                : remainingStock <= 5
-                  ? `🔥 Plus que ${remainingStock} exemplaire${remainingStock > 1 ? 's' : ''} en stock — Commandez vite !`
-                : remainingStock > 10
-                  ? 'En stock — expédition sous 24/48 h'
-                  : `Plus que ${remainingStock} disponible${remainingStock > 1 ? 's' : ''} à ajouter`}
+                  : `${remainingStock} exemplaire${remainingStock > 1 ? 's' : ''} disponible${remainingStock > 1 ? 's' : ''}`}
             </p>
 
             {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
-
-            {!outOfStock && <ShippingCountdown className="mt-4 max-w-md" />}
 
             {/* Réassurance */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -509,20 +421,6 @@ export default function Product() {
                 </div>
               ))}
             </dl>
-          </div>
-        </div>
-
-        {/* Avis */}
-        <div className="mt-14">
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-            <h2 className="font-display text-2xl font-bold text-white">Avis clients Google</h2>
-            <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
-            <p className="text-sm text-muted">Avis boutique THEKLOPE réels, collectés sur Google.</p>
-          </div>
-          <div className="card p-5 text-sm leading-relaxed text-ash/70">
-            Cette note concerne l’expérience globale en boutique, et non ce produit en particulier.
-            Les avis Google complets sont affichés sur la page d’accueil après votre accord pour le service d’avis externe.
-            <a href="/#avis-clients" className="ml-1 font-semibold text-neon hover:underline">Voir les avis clients</a>
           </div>
         </div>
 

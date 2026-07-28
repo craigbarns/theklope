@@ -1,8 +1,6 @@
 import { Link } from 'react-router-dom'
-import { useCallback, useMemo, useRef } from 'react'
-import { featuredProducts } from '../data/catalog.js'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import {
@@ -12,6 +10,12 @@ import {
   productRequiresVariantSelection,
   resolveProductVariant,
 } from '../lib/cart.js'
+import {
+  toAnalyticsItem,
+  trackEvent,
+  trackRemoveFromCart,
+  trackViewCart,
+} from '../lib/analytics.js'
 import { useDialogFocus } from '../lib/useDialogFocus.js'
 import { IconClose, IconMinus, IconPlus, IconTrash, IconLock, IconTruck } from './icons.jsx'
 
@@ -29,14 +33,15 @@ export default function CartDrawer() {
     products,
     addToCart,
     catalogReady,
+    cookiesChoice,
     syncStatus,
     refreshRemoteData,
     promo,
-    applyPromo,
     removePromo,
   } = useStore()
   const dialogRef = useRef(null)
   const closeButtonRef = useRef(null)
+  const cartViewTrackedRef = useRef(false)
   const close = useCallback(() => setCartOpen(false), [setCartOpen])
 
   useDialogFocus({
@@ -46,24 +51,78 @@ export default function CartDrawer() {
     onClose: close,
   })
 
-  const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
-  const freeShippingPct = Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))
   const itemsTotal = Math.max(0, totals.subtotal - totals.discount)
   const cartState = { cart, cartDetailed, catalogReady }
   const cartCatalogResolved = isCartCatalogResolved(cartState)
   const cartNeedsVerification = !cartCatalogResolved
   const cartHasVariantIssue = cartCatalogResolved && !isCartCatalogVerified(cartState)
 
+  useEffect(() => {
+    if (!cartOpen) {
+      cartViewTrackedRef.current = false
+      return
+    }
+    if (cartViewTrackedRef.current || cartNeedsVerification || cartDetailed.length === 0) return
+    if (trackViewCart({
+      items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
+      value: Math.max(0, totals.subtotal - totals.discount),
+      coupon: promo?.code,
+    })) {
+      cartViewTrackedRef.current = true
+    }
+  }, [
+    cartDetailed,
+    cartNeedsVerification,
+    cartOpen,
+    cookiesChoice,
+    promo?.code,
+    totals.discount,
+    totals.subtotal,
+  ])
+
+  const trackRemoval = (item, quantity) => {
+    trackRemoveFromCart({
+      product: item.product,
+      quantity,
+      variant: item.variant,
+      coupon: promo?.code,
+    })
+  }
+
+  const removeLine = (item) => {
+    trackRemoval(item, item.qty)
+    removeItem(item.index)
+  }
+
+  const decreaseQuantity = (item) => {
+    trackRemoval(item, 1)
+    updateQty(item.index, item.qty - 1)
+  }
+
+  const increaseQuantity = (item) => {
+    const productQuantity = cartDetailed.reduce(
+      (total, line) => total + (line.product.id === item.product.id ? line.qty : 0),
+      0,
+    )
+    if (productQuantity >= item.product.stock) return
+    trackEvent('add_to_cart', {
+      currency: 'EUR',
+      value: item.product.price,
+      items: [toAnalyticsItem(item.product, 1, item.variant)],
+    })
+    updateQty(item.index, item.qty + 1)
+  }
+
   // Produits associés choisis manuellement, en stock et absents du panier.
   const crossSellSuggestions = useMemo(() => {
     return resolveCartRelatedProducts(cartDetailed, products).slice(0, 3)
   }, [products, cartDetailed])
 
-  // Inspiration : meilleures ventes si le panier est vide
+  // Quelques produits disponibles si le panier est vide, sans signal de
+  // popularité qui ne serait pas étayé par les données de commande.
   const emptyCartInspirations = useMemo(() => {
     if (products.length === 0) return []
-    const { bestSellers } = featuredProducts(products)
-    return bestSellers.slice(0, 2)
+    return products.filter((product) => product.stock > 0).slice(0, 2)
   }, [products])
 
   return (
@@ -120,7 +179,7 @@ export default function CartDrawer() {
             </div>
             {emptyCartInspirations.length > 0 && (
               <div className="border-t border-white/8 pt-6">
-                <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Les préférés de la communauté</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Produits disponibles</p>
                 <div className="grid grid-cols-2 gap-3">
                   {emptyCartInspirations.map((p) => (
                     <div key={p.id} className="card p-3 flex flex-col justify-between hover:border-neon/30 transition">
@@ -152,25 +211,11 @@ export default function CartDrawer() {
         ) : (
           <>
             <div className="border-b border-white/10 px-5 py-3">
-              {remainingForFreeShipping > 0 ? (
-                <p className="flex items-center gap-2 text-xs text-ash/80">
-                  <IconTruck width={16} height={16} className="text-neon shrink-0" />
-                  Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte
-                </p>
-              ) : (
-                <p className="flex items-center gap-2 text-xs text-neon">
-                  <IconTruck width={16} height={16} className="shrink-0" /> Livraison offerte débloquée&nbsp;!
-                </p>
-              )}
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-neon transition-all duration-500" style={{ width: `${freeShippingPct}%` }} />
-              </div>
+              <p className="flex items-center gap-2 text-xs text-ash/80">
+                <IconTruck width={16} height={16} className="text-neon shrink-0" />
+                Livraison standard : 7,50 €, gratuite à partir de {formatPrice(totals.freeShippingThreshold)}.
+              </p>
               <p className="mt-2 text-[11px] text-faint">Retrait gratuit en boutique à Marseille, au choix lors du paiement.</p>
-              {totals.bundleProgress?.length > 0 && (
-                <div className="mt-3">
-                  <BundleProgress hints={totals.bundleProgress} compact />
-                </div>
-              )}
             </div>
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
@@ -186,7 +231,7 @@ export default function CartDrawer() {
                         {item.product.name}
                       </Link>
                       <button
-                        onClick={() => removeItem(item.index)}
+                        onClick={() => removeLine(item)}
                         aria-label="Retirer"
                         className="text-faint hover:text-rose-400"
                       >
@@ -201,7 +246,7 @@ export default function CartDrawer() {
                     <div className="mt-2 flex items-center justify-between">
                       <div className="flex items-center rounded-full border border-white/10">
                         <button
-                          onClick={() => updateQty(item.index, item.qty - 1)}
+                          onClick={() => decreaseQuantity(item)}
                           className="grid h-7 w-7 place-items-center text-ash/70 hover:text-white"
                           aria-label="Diminuer"
                         >
@@ -209,7 +254,7 @@ export default function CartDrawer() {
                         </button>
                         <span className="w-7 text-center text-sm text-white">{item.qty}</span>
                         <button
-                          onClick={() => updateQty(item.index, item.qty + 1)}
+                          onClick={() => increaseQuantity(item)}
                           className="grid h-7 w-7 place-items-center text-ash/70 hover:text-white"
                           aria-label="Augmenter"
                         >
@@ -224,7 +269,7 @@ export default function CartDrawer() {
               
               {crossSellSuggestions.length > 0 && (
                 <div className="mt-8 border-t border-white/8 pt-6">
-                  <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Complétez votre commande</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Produits associés au panier</p>
                   <div className="space-y-3">
                     {crossSellSuggestions.map((p) => (
                       <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.01] p-3 hover:border-neon/30 transition">
@@ -263,21 +308,7 @@ export default function CartDrawer() {
             </div>
 
             <footer className="border-t border-white/10 px-5 py-5">
-              {!promo ? (
-                <div className="mb-4 rounded-xl border border-neon/30 bg-neon/10 p-3 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-bold text-neon">Offre 1ère commande : -15%</p>
-                    <p className="text-[11px] text-ash/80">Code <span className="font-mono font-bold text-white">BIENVENUE</span></p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => applyPromo('BIENVENUE')}
-                    className="rounded-lg bg-neon px-3 py-1.5 text-xs font-bold text-noir transition hover:opacity-90 shrink-0"
-                  >
-                    Appliquer
-                  </button>
-                </div>
-              ) : (
+              {promo && (
                 <div className="mb-4 rounded-xl border border-neon/30 bg-neon/5 p-2.5 flex items-center justify-between text-xs text-neon">
                   <span className="font-medium">✓ Code <strong className="font-bold">{promo.code}</strong> ({promo.label})</span>
                   <button

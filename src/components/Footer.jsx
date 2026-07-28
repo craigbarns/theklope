@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
-import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import { useStore } from '../context/StoreContext.jsx'
 
 const COLUMNS = [
@@ -23,7 +22,7 @@ const COLUMNS = [
     links: [
       { to: '/faq', label: 'FAQ' },
       { to: '/contact', label: 'Contact' },
-      { to: '/configurateur', label: 'Configurateur de Pack' },
+      { to: '/configurateur', label: 'Configurateur' },
       { to: '/calculette-diy', label: 'Calculette DIY & Booster' },
       { to: '/livraison-retours', label: 'Livraison & retours' },
     ],
@@ -37,7 +36,7 @@ const COLUMNS = [
       { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique Marseille' },
       { to: '/conformite-vape', label: 'Conformité vape' },
       { to: '/categorie/nouveautes', label: 'Nouveautés' },
-      { to: '/categorie/meilleures-ventes', label: 'Meilleures ventes' },
+      { to: '/categorie/meilleures-ventes', label: 'Sélection du catalogue' },
     ],
   },
   {
@@ -71,7 +70,6 @@ export default function Footer() {
             </address>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">Boutique à Marseille</span>
-              <span className="chip">{STORE_REVIEW_SUMMARY.compactLabel}</span>
               <span className="chip">Paiement sécurisé</span>
               <span className="chip">+18 uniquement</span>
             </div>

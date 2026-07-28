@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
@@ -8,6 +8,7 @@ import { CATEGORIES, productsByCategorySlugFrom, sortProductsByMerchandising } f
 import { CATEGORY_SEO } from '../data/categorySeo.js'
 import { IconChevronDown } from '../components/icons.jsx'
 import NotFound from './NotFound.jsx'
+import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 
 const SORTS = [
   { value: 'selection', label: 'Sélection THEKLOPE' },
@@ -18,9 +19,10 @@ const PAGE_SIZE = 24
 
 export default function CategoryPage() {
   const { slug } = useParams()
-  const { products: allProducts } = useStore()
+  const { products: allProducts, cookiesChoice } = useStore()
   const [sort, setSort] = useState('selection')
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
+  const trackedListRef = useRef({ context: '', count: 0 })
 
   const category = CATEGORIES.find((c) => c.slug === slug)
   const seo = CATEGORY_SEO[slug]
@@ -36,6 +38,27 @@ export default function CategoryPage() {
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
   }, [slug, sort])
+
+  useEffect(() => {
+    if (!category || visibleProducts.length === 0) return
+    const itemListId = `category_${slug}`
+    const context = `${itemListId}|${sort}|${products.map((product) => product.id).join('|')}`
+    const startIndex = trackedListRef.current.context === context
+      ? trackedListRef.current.count
+      : 0
+    const newlyVisibleProducts = visibleProducts.slice(startIndex)
+    if (newlyVisibleProducts.length === 0) return
+    if (trackEvent('view_item_list', {
+      item_list_id: itemListId,
+      item_list_name: category.name,
+      items: newlyVisibleProducts.map((product, index) => ({
+        ...toAnalyticsItem(product),
+        index: startIndex + index,
+      })),
+    })) {
+      trackedListRef.current = { context, count: visibleProducts.length }
+    }
+  }, [category, cookiesChoice, products, slug, sort, visibleProducts])
 
   const schema = useMemo(() => {
     if (!category) return null
@@ -146,8 +169,14 @@ export default function CategoryPage() {
       ) : (
         <>
           <div id="category-products" className="mt-6 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
-            {visibleProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
+            {visibleProducts.map((p, index) => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                itemListId={`category_${slug}`}
+                itemListName={category.name}
+                index={index}
+              />
             ))}
           </div>
           <div className="mt-8 flex flex-col items-center gap-3">

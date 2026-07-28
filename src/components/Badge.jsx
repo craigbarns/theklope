@@ -1,6 +1,11 @@
 import { BADGES } from '../data/catalog.js'
 
+const PROMOTIONAL_BADGES = new Set(['best-seller', 'promo', 'stock-limite'])
+
 export default function Badge({ type, className = '' }) {
+  // Les anciens marqueurs de merchandising restent dans les données pour
+  // l'administration, mais ne sont plus utilisés comme accroches publiques.
+  if (PROMOTIONAL_BADGES.has(type)) return null
   const b = BADGES[type]
   if (!b) return null
   return (

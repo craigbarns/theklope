@@ -244,6 +244,10 @@ export function StoreProvider({ children }) {
   // Un cache absent ou incomplet ne prouve pas qu'un produit n'existe pas.
   // Cette valeur ne passe à true qu'après résolution d'une source catalogue.
   const [catalogReady, setCatalogReady] = useState(false)
+  // Le bootstrap SEO ne contient qu'une sélection de produits. La recherche
+  // attend donc soit le catalogue distant complet, soit le fallback statique
+  // effectivement chargé avant d'annoncer un résultat (ou un vrai zéro).
+  const [catalogSearchReady, setCatalogSearchReady] = useState(false)
 
   // UI
   const [searchOpen, setSearchOpen] = useState(false)
@@ -307,8 +311,10 @@ export function StoreProvider({ children }) {
     try {
       const catalog = await loadStaticCatalog()
       setProducts(catalog.map(normalizeProduct))
+      setCatalogSearchReady(true)
       return true
     } catch {
+      setCatalogSearchReady(false)
       return false
     }
   }, [])
@@ -321,6 +327,7 @@ export function StoreProvider({ children }) {
 
     try {
       setCatalogReady(false)
+      setCatalogSearchReady(false)
       setSyncStatus('syncing')
       setSyncError(null)
 
@@ -362,6 +369,7 @@ export function StoreProvider({ children }) {
 
       setSyncStatus('online')
       setCatalogReady(true)
+      setCatalogSearchReady(true)
     } catch (error) {
       if (isSupabaseConfigured) setOrders([])
       setSyncError(error.message || 'Synchronisation Supabase impossible.')
@@ -378,7 +386,10 @@ export function StoreProvider({ children }) {
     let active = true
     const initializeLocalCatalog = async () => {
       if (products.length > 0 && INITIAL_CATALOG_BOOTSTRAP.length === 0) {
-        if (active) setCatalogReady(true)
+        if (active) {
+          setCatalogReady(true)
+          setCatalogSearchReady(true)
+        }
         return
       }
 
@@ -621,7 +632,7 @@ export function StoreProvider({ children }) {
   }, [])
 
   // ----- Cart -----
-  const addItemsToCart = useCallback((entries = []) => {
+  const addItemsToCart = useCallback((entries = [], analyticsContext = {}) => {
     const initial = buildCartAddition({ cart, products, entries })
     if (!initial.ok) return false
 
@@ -635,14 +646,21 @@ export function StoreProvider({ children }) {
     trackEvent('add_to_cart', {
       currency: 'EUR',
       value: initial.prepared.reduce((sum, entry) => sum + entry.product.price * entry.qty, 0),
-      items: initial.prepared.map((entry) => toAnalyticsItem(entry.product, entry.qty, entry.variant)),
+      items: initial.prepared.map((entry, index) => ({
+        ...toAnalyticsItem(entry.product, entry.qty, entry.variant),
+        ...(analyticsContext.itemListId ? { item_list_id: String(analyticsContext.itemListId).slice(0, 100) } : {}),
+        ...(analyticsContext.itemListName ? { item_list_name: String(analyticsContext.itemListName).slice(0, 100) } : {}),
+        ...(Number.isInteger(analyticsContext.index) ? { index: analyticsContext.index + index } : {}),
+      })),
     })
     setCartOpen(true)
     return true
   }, [cart, products])
 
   const addToCart = useCallback(
-    (productId, qty = 1, variant = {}) => addItemsToCart([{ productId, qty, variant }]),
+    (productId, qty = 1, variant = {}, analyticsContext = {}) => (
+      addItemsToCart([{ productId, qty, variant }], analyticsContext)
+    ),
     [addItemsToCart],
   )
 
@@ -900,6 +918,7 @@ export function StoreProvider({ children }) {
     syncStatus,
     syncError,
     catalogReady,
+    catalogSearchReady,
     refreshRemoteData,
     products,
     catalogMeta,
