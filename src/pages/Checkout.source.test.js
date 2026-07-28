@@ -23,3 +23,10 @@ test('checkout imports every icon component it renders', async () => {
 
   assert.deepEqual(missingImports, [])
 })
+
+test('checkout never preselects the adult-age certification', async () => {
+  const source = await readFile(new URL('./Checkout.jsx', import.meta.url), 'utf8')
+
+  assert.match(source, /const \[ageAccepted,\s*setAgeAccepted\] = useState\(false\)/)
+  assert.doesNotMatch(source, /const \[ageAccepted,\s*setAgeAccepted\] = useState\(true\)/)
+})

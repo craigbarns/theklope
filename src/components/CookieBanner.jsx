@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../context/StoreContext.jsx'
 import { Link } from 'react-router-dom'
+import { setOptionalServicesConsent } from '../lib/analytics.js'
 
 export default function CookieBanner() {
   const {
     ageVerified,
     cookiesChoice,
     setCookiesChoice,
-    reviewsChoice,
     setReviewsChoice,
   } = useStore()
   const [analyticsEnabled, setAnalyticsEnabled] = useState(false)
-  const [reviewsEnabled, setReviewsEnabled] = useState(false)
-  const open = ageVerified === true && (!cookiesChoice || !reviewsChoice)
+  const open = ageVerified === true && !cookiesChoice
 
   useEffect(() => {
     if (!open) return
     setAnalyticsEnabled(cookiesChoice === 'accepted')
-    setReviewsEnabled(reviewsChoice === 'accepted')
-  }, [cookiesChoice, open, reviewsChoice])
+  }, [cookiesChoice, open])
 
-  const saveChoices = (analytics, reviews) => {
+  const saveChoices = (analytics) => {
+    setOptionalServicesConsent({
+      analytics,
+      reviews: false,
+      analyticsDecision: analytics ? 'accepted' : 'refused',
+    })
     setCookiesChoice(analytics ? 'accepted' : 'refused')
-    setReviewsChoice(reviews ? 'accepted' : 'refused')
+    setReviewsChoice('refused')
   }
 
   // On n'affiche le bandeau cookies qu'après la vérification d'âge.
@@ -39,13 +42,12 @@ export default function CookieBanner() {
         >
           <div className="min-w-0 flex-1">
             <p className="text-sm leading-relaxed text-ash/75">
-              Choisissez séparément la mesure d'audience et l'affichage des avis Google. Aucun de ces services
-              n'est nécessaire pour commander.{' '}
+              La mesure d'audience est facultative et n'est pas nécessaire pour commander.{' '}
               <Link to="/legal/confidentialite" className="whitespace-nowrap text-neon hover:underline">
                 En savoir plus
               </Link>
             </p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="mt-3">
               <label className="flex cursor-pointer items-center gap-2 text-xs text-ash/80">
                 <input
                   type="checkbox"
@@ -55,28 +57,19 @@ export default function CookieBanner() {
                 />
                 Mesure d'audience
               </label>
-              <label className="flex cursor-pointer items-center gap-2 text-xs text-ash/80">
-                <input
-                  type="checkbox"
-                  checked={reviewsEnabled}
-                  onChange={(event) => setReviewsEnabled(event.target.checked)}
-                  className="accent-neon"
-                />
-                Avis Google via Elfsight
-              </label>
             </div>
           </div>
           <div className="grid shrink-0 grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:justify-end">
-            <button className="btn-ghost min-w-0 px-4 py-2.5 text-xs" onClick={() => saveChoices(false, false)}>
+            <button className="btn-ghost min-w-0 px-4 py-2.5 text-xs" onClick={() => saveChoices(false)}>
               Tout refuser
             </button>
             <button
               className="btn-ghost min-w-0 px-4 py-2.5 text-xs"
-              onClick={() => saveChoices(analyticsEnabled, reviewsEnabled)}
+              onClick={() => saveChoices(analyticsEnabled)}
             >
               Enregistrer
             </button>
-            <button className="btn-primary min-w-0 px-4 py-2.5 text-xs" onClick={() => saveChoices(true, true)}>
+            <button className="btn-primary min-w-0 px-4 py-2.5 text-xs" onClick={() => saveChoices(true)}>
               Tout accepter
             </button>
           </div>

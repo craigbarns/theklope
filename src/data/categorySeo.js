@@ -246,9 +246,9 @@ export const CATEGORY_SEO = {
       'Les packs débutants rassemblent du matériel et des consommables compatibles pour simplifier le choix des vapoteurs majeurs qui veulent un ensemble cohérent.',
     sections: [
       {
-        title: 'Un pack pour limiter les erreurs',
+        title: 'Vérifier chaque élément',
         text:
-          'Un pack évite de mélanger un e-liquide inadapté, une résistance non compatible ou un accessoire manquant. Les éléments sont choisis pour fonctionner ensemble.',
+          'Avant de commander, vérifiez la compatibilité de l’appareil, de la résistance ou cartouche et du e-liquide indiqués dans la composition.',
       },
       {
         title: 'Conseils avant achat',
@@ -259,7 +259,7 @@ export const CATEGORY_SEO = {
     faq: [
       {
         q: 'Que contient un pack débutant ?',
-        a: 'Selon l’offre, un pack peut contenir un kit ou pod, un ou plusieurs e-liquides et des consommables compatibles. Le détail est indiqué sur chaque fiche produit.',
+        a: 'Selon la composition, un pack peut contenir un kit ou pod, un ou plusieurs e-liquides et des consommables. Le détail est indiqué sur chaque fiche produit.',
       },
       {
         q: 'Un pack débutant est-il adapté à tout le monde ?',
@@ -302,32 +302,32 @@ export const CATEGORY_SEO = {
     ],
   },
   'meilleures-ventes': {
-    seoTitle: 'Meilleures ventes vape',
+    seoTitle: 'Sélection du catalogue vape',
     metaDescription:
-      'Meilleures ventes THEKLOPE : cigarettes électroniques, e-liquides, pods et accessoires appréciés par les clients adultes. Livraison France.',
-    h1: 'Meilleures ventes vape',
+      'Sélection du catalogue THEKLOPE : cigarettes électroniques, e-liquides, pods et accessoires disponibles pour adultes.',
+    h1: 'Sélection du catalogue vape',
     intro:
-      'Découvrez les produits les plus consultés et commandés sur THEKLOPE : matériel, e-liquides et accessoires pour vapoteurs majeurs.',
+      'Cette page regroupe une sélection éditoriale de matériel, e-liquides et accessoires disponibles pour adultes.',
     sections: [
       {
-        title: 'Des références populaires',
+        title: 'Une sélection éditoriale',
         text:
-          'Les meilleures ventes regroupent des produits appréciés pour leur disponibilité, leur simplicité d’usage ou leur compatibilité avec les besoins courants.',
+          'Les références sont présentées avec leur prix actuel, leur disponibilité et leurs caractéristiques techniques.',
       },
       {
-        title: 'Popularité ne remplace pas compatibilité',
+        title: 'Vérifier la compatibilité',
         text:
-          'Un produit populaire n’est pas forcément adapté à chaque utilisateur. Vérifiez toujours les caractéristiques, le taux de nicotine et les consommables nécessaires.',
+          'Vérifiez toujours les caractéristiques, le taux de nicotine et les consommables nécessaires avant de commander.',
       },
     ],
     faq: [
       {
-        q: 'Les meilleures ventes sont-elles les meilleurs produits pour moi ?',
-        a: 'Pas forcément. Elles donnent une indication de popularité, mais le choix doit rester basé sur votre matériel, votre usage et les informations fabricant.',
+        q: 'Comment choisir un produit dans cette sélection ?',
+        a: 'Basez votre choix sur votre matériel, votre usage et les informations du fabricant, notamment les compatibilités indiquées.',
       },
       {
         q: 'Les avis affichés sont-ils réels ?',
-        a: 'THEKLOPE utilise des signaux d’avis réels lorsque ceux-ci sont disponibles, notamment des avis boutique collectés sur Google.',
+        a: 'Cette sélection ne repose pas sur une note ou un volume d’avis produit. Consultez les caractéristiques de chaque référence avant de choisir.',
       },
     ],
   },

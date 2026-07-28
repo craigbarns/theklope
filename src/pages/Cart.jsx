@@ -1,12 +1,10 @@
-import { useState, useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { featuredProducts } from '../data/catalog.js'
 import ProductImage from '../components/ProductImage.jsx'
-import BundleProgress from '../components/BundleProgress.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import {
   getProductVariantChoices,
@@ -14,6 +12,12 @@ import {
   isCartCatalogVerified,
   resolveProductVariant,
 } from '../lib/cart.js'
+import {
+  toAnalyticsItem,
+  trackEvent,
+  trackRemoveFromCart,
+  trackViewCart,
+} from '../lib/analytics.js'
 import { IconMinus, IconPlus, IconTrash, IconLock, IconTruck, IconArrowRight } from '../components/icons.jsx'
 
 export default function Cart() {
@@ -29,11 +33,13 @@ export default function Cart() {
     removePromo,
     products,
     catalogReady,
+    cookiesChoice,
     syncStatus,
     refreshRemoteData,
   } = useStore()
   const [code, setCode] = useState('')
   const [feedback, setFeedback] = useState(null)
+  const cartViewTrackedRef = useRef(false)
 
   // Produits associés choisis manuellement, en stock et absents du panier.
   const suggestions = useMemo(() => {
@@ -51,6 +57,50 @@ export default function Cart() {
   const cartCatalogResolved = isCartCatalogResolved(cartState)
   const cartNeedsVerification = !cartCatalogResolved
   const cartHasVariantIssue = cartCatalogResolved && !isCartCatalogVerified(cartState)
+
+  useEffect(() => {
+    if (cartViewTrackedRef.current || cartNeedsVerification || cartDetailed.length === 0) return
+    if (trackViewCart({
+      items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
+      value: Math.max(0, totals.subtotal - totals.discount),
+      coupon: promo?.code,
+    })) {
+      cartViewTrackedRef.current = true
+    }
+  }, [cartDetailed, cartNeedsVerification, cookiesChoice, promo?.code, totals.discount, totals.subtotal])
+
+  const trackRemoval = (item, quantity) => {
+    trackRemoveFromCart({
+      product: item.product,
+      quantity,
+      variant: item.variant,
+      coupon: promo?.code,
+    })
+  }
+
+  const removeLine = (item) => {
+    trackRemoval(item, item.qty)
+    removeItem(item.index)
+  }
+
+  const decreaseQuantity = (item) => {
+    trackRemoval(item, 1)
+    updateQty(item.index, item.qty - 1)
+  }
+
+  const increaseQuantity = (item) => {
+    const productQuantity = cartDetailed.reduce(
+      (total, line) => total + (line.product.id === item.product.id ? line.qty : 0),
+      0,
+    )
+    if (productQuantity >= item.product.stock) return
+    trackEvent('add_to_cart', {
+      currency: 'EUR',
+      value: item.product.price,
+      items: [toAnalyticsItem(item.product, 1, item.variant)],
+    })
+    updateQty(item.index, item.qty + 1)
+  }
 
   if (cartNeedsVerification) {
     return (
@@ -75,8 +125,7 @@ export default function Cart() {
   }
 
   if (cartDetailed.length === 0) {
-    const { bestSellers } = featuredProducts(products)
-    const inspirations = bestSellers.slice(0, 4)
+    const inspirations = products.filter((product) => product.stock > 0).slice(0, 4)
 
     return (
       <div className="container-page py-8">
@@ -90,7 +139,7 @@ export default function Cart() {
 
         {inspirations.length > 0 && (
           <div className="mt-12">
-            <h2 className="mb-6 font-display text-xl font-bold text-white text-center sm:text-left">Les coups de cœur de la communauté</h2>
+            <h2 className="mb-6 font-display text-xl font-bold text-white text-center sm:text-left">Produits disponibles</h2>
             <div className="grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
               {inspirations.map((p) => (
                 <ProductCard key={p.id} product={p} />
@@ -102,7 +151,6 @@ export default function Cart() {
     )
   }
 
-  const remainingForFreeShipping = totals.freeShippingThreshold - totals.subtotal
   const itemsTotal = Math.max(0, totals.subtotal - totals.discount)
 
   return (
@@ -117,18 +165,10 @@ export default function Cart() {
           <div className="rounded-2xl border border-neon/20 bg-neon/5 px-4 py-3 text-sm text-ash/80">
             <p className="flex items-center gap-3">
               <IconTruck width={18} height={18} className="text-neon" />
-              {remainingForFreeShipping > 0 ? (
-                <span>
-                  Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison standard offerte.
-                </span>
-              ) : (
-                <strong className="text-neon">Livraison standard offerte débloquée.</strong>
-              )}
+              <span>Livraison standard : 7,50 €, gratuite à partir de {formatPrice(totals.freeShippingThreshold)}.</span>
             </p>
             <p className="mt-1 pl-[30px] text-xs text-muted">Retrait gratuit en boutique à Marseille, disponible à l’étape suivante.</p>
           </div>
-
-          <BundleProgress hints={totals.bundleProgress} />
 
           {cartHasVariantIssue && (
             <p role="alert" className="rounded-2xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
@@ -153,17 +193,17 @@ export default function Cart() {
                       onChange={(variant) => updateCartVariant(item.index, variant)}
                     />
                   </div>
-                  <button onClick={() => removeItem(item.index)} aria-label="Retirer" className="text-faint hover:text-rose-400">
+                  <button onClick={() => removeLine(item)} aria-label="Retirer" className="text-faint hover:text-rose-400">
                     <IconTrash width={18} height={18} />
                   </button>
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-3">
                   <div className="flex items-center rounded-full border border-white/12">
-                    <button onClick={() => updateQty(item.index, item.qty - 1)} className="grid h-9 w-9 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
+                    <button onClick={() => decreaseQuantity(item)} className="grid h-9 w-9 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
                       <IconMinus width={15} height={15} />
                     </button>
                     <span className="w-9 text-center text-sm text-white">{item.qty}</span>
-                    <button onClick={() => updateQty(item.index, item.qty + 1)} className="grid h-9 w-9 place-items-center text-ash/70 hover:text-white" aria-label="Augmenter">
+                    <button onClick={() => increaseQuantity(item)} className="grid h-9 w-9 place-items-center text-ash/70 hover:text-white" aria-label="Augmenter">
                       <IconPlus width={15} height={15} />
                     </button>
                   </div>
@@ -178,7 +218,7 @@ export default function Cart() {
 
           {suggestions.length > 0 && (
             <div className="pt-6">
-              <h2 className="mb-4 font-display text-lg font-bold text-white">Complétez votre commande</h2>
+              <h2 className="mb-4 font-display text-lg font-bold text-white">Produits associés à votre panier</h2>
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {suggestions.map((p) => (
                   <ProductCard key={p.id} product={p} />
@@ -203,25 +243,6 @@ export default function Cart() {
                 <div className="flex gap-2">
                   <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Code promo" className="input" />
                   <button type="submit" className="btn-ghost shrink-0 px-5">OK</button>
-                </div>
-              )}
-              {!promo && (
-                <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-                  <span className="text-[11px] text-faint">Codes disponibles :</span>
-                  <button
-                    type="button"
-                    onClick={() => { applyPromo('BIENVENUE'); setFeedback(null); setCode('') }}
-                    className="chip border-neon/40 text-neon hover:bg-neon hover:text-noir text-[10px] py-1 px-2 font-bold transition"
-                  >
-                    BIENVENUE (-15%)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { applyPromo('THEKLOPE10'); setFeedback(null); setCode('') }}
-                    className="chip border-white/20 text-ash hover:border-white text-[10px] py-1 px-2 font-semibold transition"
-                  >
-                    THEKLOPE10 (-10%)
-                  </button>
                 </div>
               )}
               {feedback && !promo && (

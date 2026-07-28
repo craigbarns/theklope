@@ -99,7 +99,7 @@ export default function CoachVape() {
         setStep('chat')
         addMessage({
           isBot: true,
-          content: 'Pas de soucis ! Posez-moi vos questions. Vous pouvez me demander des conseils sur la nicotine, nos codes promos, la livraison ou le matériel.'
+          content: 'Posez-moi vos questions sur la nicotine, la livraison, les caractéristiques ou la compatibilité du matériel.'
         })
         break;
 
@@ -163,15 +163,6 @@ export default function CoachVape() {
             { text: 'Non, je vape déjà', action: 'smoking_vape' },
             { text: 'Non, je ne fume pas', action: 'smoking_none' }
           ]
-        })
-        break;
-
-      case 'ask_promos':
-        setStep('chat')
-        addMessage({
-          isBot: true,
-          content: 'Voici les codes promotionnels du moment :\n\n- 🏷️ **BIENVENUE** : -15% sur votre première commande.\n- 🏷️ **THEKLOPE10** : -10% sur toute la boutique.\n- 🏷️ **LIVRAISON** : livraison offerte sans minimum d\'achat.',
-          options: [{ text: 'Voir toute la boutique 🛒', action: 'go_shop' }]
         })
         break;
 
@@ -308,18 +299,18 @@ export default function CoachVape() {
         content: 'Bonjour ! Comment puis-je vous renseigner aujourd\'hui ? 😊',
         options: [
           { text: 'Lancer l’aide au choix', action: 'reset_quiz' },
-          { text: 'Quels sont les codes promos ? 🎁', action: 'ask_promos' }
+          { text: 'Voir la boutique', action: 'go_shop' }
         ]
       })
     } else if (/(promo|code|reduction|remise|soldes)/i.test(clean) || clean.includes('cadeau')) {
       addMessage({
         isBot: true,
-        content: 'Voici les codes promotionnels disponibles en ce moment :\n\n- 🏷️ **BIENVENUE** : -15% sur votre première commande.\n- 🏷️ **THEKLOPE10** : -10% sur toute la boutique.\n- 🏷️ **LIVRAISON** : Livraison offerte sans minimum d\'achat.'
+        content: 'Le panier affiche le prix de chaque article et tout ajustement tarifaire effectivement appliqué à votre sélection.'
       })
     } else if (/(livraison|envoi|delai|frais de port|frais d'envoi|expédition)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: '🚀 **Livraison en 2 à 4 jours en France métropolitaine.**\n\nLes frais de port standard sont de 7,50 €, et ils sont **totalement offerts** dès 49 € d\'achat.'
+        content: 'En France métropolitaine, le délai indicatif est de 2 à 4 jours. La livraison standard coûte 7,50 € et devient gratuite à partir de 49 €. Le retrait en boutique à Marseille est gratuit.'
       })
     } else if (/(nicotine|taux|dosage|mg)/i.test(clean)) {
       addMessage({
@@ -353,7 +344,7 @@ export default function CoachVape() {
         content: 'Avec plaisir ! C\'est un plaisir de vous accompagner. N\'hésitez pas si vous avez d\'autres questions ! 💨'
       })
     } else {
-      // Cas par défaut : offre de lancer l'aide au choix
+      // Cas par défaut : proposer les deux chemins d'information disponibles.
       addMessage({
         isBot: true,
         content: 'Je n\'ai pas trouvé de réponse exacte pour cela. Souhaitez-vous lancer l’aide au choix ou voir toute la boutique ?',

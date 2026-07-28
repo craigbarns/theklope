@@ -4,19 +4,36 @@ import Badge from './Badge.jsx'
 import ProductImage from './ProductImage.jsx'
 import { IconHeart, IconCart } from './icons.jsx'
 import { productRequiresVariantSelection, resolveProductVariant } from '../lib/cart.js'
+import { trackSelectItem } from '../lib/analytics.js'
 
-export default function ProductCard({ product }) {
+export default function ProductCard({
+  product,
+  itemListId = 'catalogue',
+  itemListName = 'Catalogue',
+  index,
+}) {
   const { addToCart, toggleFavorite, isFavorite } = useStore()
   const fav = isFavorite(product.id)
   const outOfStock = product.stock <= 0
-  const lowStock = product.stock > 0 && product.stock <= 10
   const requiresChoice = productRequiresVariantSelection(product)
   const productUrl = `/produit/${product.id}`
+  const handleSelect = () => trackSelectItem({
+    product,
+    itemListId,
+    itemListName,
+    index,
+  })
 
   const handleAdd = () => {
     if (outOfStock) return
     const normalized = resolveProductVariant(product)
-    if (normalized.ok) addToCart(product.id, 1, normalized.variant)
+    if (normalized.ok) {
+      addToCart(product.id, 1, normalized.variant, {
+        itemListId,
+        itemListName,
+        index,
+      })
+    }
   }
 
   return (
@@ -24,7 +41,7 @@ export default function ProductCard({ product }) {
       className="card-interactive focus-ring group relative flex flex-col overflow-hidden"
     >
       <div className="relative aspect-square overflow-hidden bg-gradient-to-b from-white/[0.03] to-transparent">
-        <Link to={productUrl} className="focus-ring block h-full w-full" aria-label={`Voir ${product.name}`}>
+        <Link to={productUrl} onClick={handleSelect} className="focus-ring block h-full w-full" aria-label={`Voir ${product.name}`}>
           <ProductImage
             src={product.image}
             alt={`${product.name} — ${product.type} ${product.brand}`}
@@ -37,7 +54,6 @@ export default function ProductCard({ product }) {
         </Link>
         <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5">
           {product.badge && <Badge type={product.badge} />}
-          {product.oldPrice && !product.badge && <Badge type="promo" />}
         </div>
         <button
           type="button"
@@ -56,7 +72,7 @@ export default function ProductCard({ product }) {
       <div className="flex flex-1 flex-col p-4">
         <span className="text-[11px] uppercase tracking-wider text-faint">{product.type}</span>
         <h3 className="mt-1 line-clamp-1 font-display text-base font-semibold text-white">
-          <Link to={productUrl} className="focus-ring rounded-sm hover:text-neon">
+          <Link to={productUrl} onClick={handleSelect} className="focus-ring rounded-sm hover:text-neon">
             {product.name}
           </Link>
         </h3>
@@ -65,13 +81,11 @@ export default function ProductCard({ product }) {
         <div className="mt-auto flex items-end justify-between pt-4">
           <div className="flex items-baseline gap-2">
             <span className="font-display text-lg font-bold text-white">{formatPrice(product.price)}</span>
-            {product.oldPrice && (
-              <span className="text-sm text-faint line-through">{formatPrice(product.oldPrice)}</span>
-            )}
           </div>
           {requiresChoice && !outOfStock ? (
             <Link
               to={productUrl}
+              onClick={handleSelect}
               aria-label={`Choisir les options de ${product.name}`}
               className="focus-ring flex h-10 items-center gap-1.5 rounded-full bg-neon px-3 text-[11px] font-bold text-noir transition hover:scale-105 hover:shadow-glow active:scale-95"
             >
@@ -89,13 +103,9 @@ export default function ProductCard({ product }) {
             </button>
           )}
         </div>
-        {outOfStock ? (
-          <p className="mt-2 text-[11px] font-medium text-rose-400">Rupture de stock</p>
-        ) : lowStock ? (
-          <p className="mt-2 text-[11px] font-medium text-amber-400">
-            Plus que {product.stock} en stock
-          </p>
-        ) : null}
+        <p className={`mt-2 text-[11px] ${outOfStock ? 'font-medium text-rose-400' : 'text-muted'}`}>
+          {outOfStock ? 'Rupture de stock' : 'En stock'}
+        </p>
       </div>
     </article>
   )

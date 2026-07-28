@@ -143,7 +143,7 @@ export default function Configurateur() {
     }
     setAddError('')
 
-    // Appliquer la promotion -15% automatiquement
+    // Appliquer l'ajustement tarifaire du pack, qui sera détaillé au panier.
     applyPromo('PACK15', {
       eligibilityLines: [currentBox, currentClearomizer, currentEliquid].map((product) => ({
         category: product.category,
@@ -158,8 +158,8 @@ export default function Configurateur() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="Configurateur de pack sur mesure (-15%) | THEKLOPE"
-        description="Composez votre pack cigarette électronique et bénéficiez de -15% sur le pack complet."
+        title="Configurateur de produits | THEKLOPE"
+        description="Sélectionnez un appareil, une résistance ou cartouche et un e-liquide dans un même parcours."
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Configurateur' }]} />
 
@@ -167,12 +167,12 @@ export default function Configurateur() {
       <div className="relative overflow-hidden rounded-3xl border border-white/8 bg-gradient-to-r from-carbon/40 to-noir/80 px-6 py-12 text-center shadow-card sm:px-12 mt-4">
         <div className="absolute -left-20 -top-20 h-64 w-64 rounded-full bg-neon/5 blur-[80px]" />
         <div className="absolute -right-20 -bottom-20 h-64 w-64 rounded-full bg-blue-500/5 blur-[80px]" />
-        <span className="eyebrow">Pack sur mesure</span>
+        <span className="eyebrow">Configurateur</span>
         <h1 className="font-display text-3xl font-extrabold text-white sm:text-4xl mt-2">
-          Composez votre pack
+          Composez votre sélection
         </h1>
         <p className="mx-auto mt-3 max-w-xl text-sm text-muted">
-          Choisissez votre batterie, votre résistance ou cartouche et votre e-liquide. Obtenez instantanément une remise de <strong className="text-neon">-15%</strong> sur l'ensemble.
+          Choisissez une batterie, une résistance ou cartouche et un e-liquide dans un même parcours.
         </p>
         <p className="mx-auto mt-3 max-w-2xl text-xs leading-relaxed text-amber-200/80">
           Le configurateur ne vérifie pas la compatibilité technique. Avant de commander, comparez la référence de la résistance avec celle acceptée par votre appareil ou demandez conseil à l’équipe.
@@ -402,7 +402,7 @@ export default function Configurateur() {
         {/* Barre latérale récapulative (Panier de config) */}
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card p-6">
-            <h2 className="font-display text-base font-bold text-white">Votre Pack</h2>
+            <h2 className="font-display text-base font-bold text-white">Votre sélection</h2>
 
             <div className="mt-4 space-y-3">
               {/* Box summary line */}
@@ -436,11 +436,11 @@ export default function Configurateur() {
                 <dd className="text-white">{formatPrice(subtotal)}</dd>
               </div>
               <div className="flex justify-between">
-                <dt className="text-muted">Remise pack (15%)</dt>
+                <dt className="text-muted">Ajustement tarifaire</dt>
                 <dd className="text-neon">{discount > 0 ? `- ${formatPrice(discount)}` : '0,00 €'}</dd>
               </div>
               <div className="flex justify-between border-t border-white/8 pt-3">
-                <dt className="font-semibold text-white">Total pack</dt>
+                <dt className="font-semibold text-white">Total</dt>
                 <dd className="font-display text-base font-bold text-white">{formatPrice(finalPrice)}</dd>
               </div>
             </dl>
@@ -462,7 +462,7 @@ export default function Configurateur() {
                   disabled={!variantChoicesComplete}
                   className="btn-primary mt-6 w-full py-3 text-center text-xs disabled:cursor-not-allowed disabled:opacity-40"
                 >
-                  Ajouter le pack au panier
+                  Ajouter la sélection au panier
                 </button>
               </>
             ) : (

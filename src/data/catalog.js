@@ -16,7 +16,7 @@ export const CATEGORIES = [
   { slug: 'alternatives-puffs', key: 'alternative-puff', name: 'Alternatives aux puffs jetables', tagline: 'Pods et modèles rechargeables conformes pour adultes' },
   { slug: 'packs-debutants', key: 'pack', name: 'Packs débutants', tagline: 'Tout pour bien démarrer' },
   { slug: 'nouveautes', key: 'new', name: 'Nouveautés', tagline: 'Les dernières arrivées' },
-  { slug: 'meilleures-ventes', key: 'best', name: 'Meilleures ventes', tagline: 'Les préférés de la communauté' },
+  { slug: 'meilleures-ventes', key: 'best', name: 'Sélection du catalogue', tagline: 'Références disponibles sélectionnées par la boutique' },
 ]
 
 export const BADGES = {

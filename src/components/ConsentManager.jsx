@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Analytics } from '@vercel/analytics/react'
 import { useStore } from '../context/StoreContext.jsx'
 import {
-  loadElfsight,
   loadGoogleAnalytics,
   revokeOptionalServices,
   setOptionalServicesConsent,
@@ -16,13 +14,12 @@ import {
 } from '../lib/pageReadiness.js'
 
 export default function ConsentManager() {
-  const { cookiesChoice, reviewsChoice } = useStore()
+  const { cookiesChoice } = useStore()
   const location = useLocation()
-  const path = `${location.pathname}${location.search}`
+  const path = location.pathname
   const [seoReadyPathname, setSeoReadyPathname] = useState(() => getPageSeoReadyPathname())
   const pageReady = isPageReadyForAnalytics(location.pathname, seoReadyPathname)
   const analyticsAllowed = cookiesChoice === 'accepted'
-  const reviewsAllowed = reviewsChoice === 'accepted'
 
   useEffect(() => {
     const syncSeoReadyPathname = (event) => {
@@ -38,18 +35,17 @@ export default function ConsentManager() {
   useEffect(() => {
     setOptionalServicesConsent({
       analytics: analyticsAllowed,
-      reviews: reviewsAllowed,
+      reviews: false,
       analyticsDecision: cookiesChoice,
     })
     revokeOptionalServices({
       analytics: !analyticsAllowed,
-      reviews: !reviewsAllowed,
+      reviews: true,
       analyticsDecision: cookiesChoice,
     })
 
     let active = true
     let pageViewTimer = null
-    if (reviewsAllowed) loadElfsight()
     if (analyticsAllowed) {
       loadGoogleAnalytics().then(() => {
         if (active && pageReady) {
@@ -66,7 +62,7 @@ export default function ConsentManager() {
       active = false
       if (pageViewTimer !== null) window.clearTimeout(pageViewTimer)
     }
-  }, [analyticsAllowed, cookiesChoice, pageReady, path, reviewsAllowed])
+  }, [analyticsAllowed, cookiesChoice, pageReady, path])
 
-  return analyticsAllowed ? <Analytics /> : null
+  return null
 }

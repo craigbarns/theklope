@@ -4,7 +4,6 @@ import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import AgeGate from './components/AgeGate.jsx'
 import CookieBanner from './components/CookieBanner.jsx'
-import ExitIntentModal from './components/ExitIntentModal.jsx'
 import SearchOverlay from './components/SearchOverlay.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
 import ScrollToTop from './components/ScrollToTop.jsx'
@@ -126,7 +125,6 @@ export default function App() {
 
       {!checkoutShell && <Footer />}
       <CookieBanner />
-      {!checkoutShell && <ExitIntentModal />}
       {!checkoutShell && <CoachVape />}
       <ConsentManager />
     </div>

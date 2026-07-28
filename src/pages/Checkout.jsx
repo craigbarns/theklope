@@ -11,7 +11,10 @@ import {
   getStoredAcquisition,
   serializePurchaseSnapshot,
   toAnalyticsItem,
+  trackAddPaymentInfo,
+  trackCheckoutError,
   trackEvent,
+  trackPaymentError,
 } from '../lib/analytics.js'
 import {
   getProductVariantChoices,
@@ -57,6 +60,7 @@ export default function Checkout() {
   const errorRef = useRef(null)
   const previousStepRef = useRef(step)
   const paymentAttemptRef = useRef({ fingerprint: '', key: '' })
+  const paymentInfoTrackedRef = useRef(false)
 
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || null
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
@@ -90,7 +94,7 @@ export default function Checkout() {
     country: 'France',
     deliveryInstructions: '',
   })
-  const [ageAccepted, setAgeAccepted] = useState(true)
+  const [ageAccepted, setAgeAccepted] = useState(false)
   const cleanPostcode = address.zip.trim()
   const isFrenchPostcode = FRENCH_POSTCODE.test(cleanPostcode)
   const isMarseillePostcode = MARSEILLE_POSTCODE.test(cleanPostcode)
@@ -125,12 +129,25 @@ export default function Checkout() {
     setAddress((prev) => ({ ...prev, [key]: e.target.value }))
   }
 
+  const reportCheckoutError = (message, errorCode, retryable = false) => {
+    setCheckoutError(message)
+    trackCheckoutError({
+      errorCode,
+      checkoutStep: step,
+      retryable,
+    })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setCheckoutError('')
 
     if (!cartVerified) {
-      setCheckoutError('Votre panier est encore en cours de vérification. Réessayez dans un instant.')
+      reportCheckoutError(
+        'Votre panier est encore en cours de vérification. Réessayez dans un instant.',
+        'cart_unverified',
+        true,
+      )
       return
     }
 
@@ -141,16 +158,25 @@ export default function Checkout() {
 
     if (step === 2) {
       if (!selectedShipping) {
-        setCheckoutError('Choisissez un mode de livraison ou le retrait gratuit en boutique.')
+        reportCheckoutError(
+          'Choisissez un mode de livraison ou le retrait gratuit en boutique.',
+          'shipping_missing',
+        )
         return
       }
       if (shipping !== 'pickup') {
         if (!isFrenchPostcode) {
-          setCheckoutError('Saisissez un code postal français à 5 chiffres.')
+          reportCheckoutError(
+            'Saisissez un code postal français à 5 chiffres.',
+            'invalid_postcode',
+          )
           return
         }
         if (shipping === 'coursier' && !isMarseillePostcode) {
-          setCheckoutError('La livraison par coursier est disponible uniquement pour les codes postaux 13001 à 13016.')
+          reportCheckoutError(
+            'La livraison par coursier est disponible uniquement pour les codes postaux 13001 à 13016.',
+            'courier_unavailable',
+          )
           return
         }
       }
@@ -167,12 +193,24 @@ export default function Checkout() {
     }
 
     if (!ageAccepted) {
-      setCheckoutError('Confirmez que vous avez au moins 18 ans pour continuer.')
+      reportCheckoutError(
+        'Confirmez que vous avez au moins 18 ans pour continuer.',
+        'age_unconfirmed',
+      )
       return
     }
 
     try {
       setSubmitting(true)
+
+      if (!paymentInfoTrackedRef.current && trackAddPaymentInfo({
+        items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
+        value: grandTotal,
+        coupon: promo?.code,
+        paymentType: 'Mollie',
+      })) {
+        paymentInfoTrackedRef.current = true
+      }
 
       // On envoie les IDENTIFIANTS produits + quantités, JAMAIS le montant.
       // Le serveur recalcule le total et crée le paiement Mollie.
@@ -256,6 +294,12 @@ export default function Checkout() {
       persistPaymentAttempt(paymentAttemptRef.current)
       window.location.href = data.checkoutUrl
     } catch (error) {
+      trackPaymentError({
+        errorCode: 'create_payment_failed',
+        checkoutStep: 3,
+        paymentProvider: 'Mollie',
+        retryable: true,
+      })
       setCheckoutError(error.message || 'Le paiement a échoué. Veuillez réessayer.')
       setSubmitting(false)
     }
