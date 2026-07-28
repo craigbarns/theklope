@@ -3,6 +3,29 @@ import { useStore } from '../context/StoreContext.jsx'
 import { IconClose, IconCheck, IconCart } from './icons.jsx'
 import { Link } from 'react-router-dom'
 
+const isBrowser = typeof window !== 'undefined'
+
+function getSessionItem(key) {
+  try {
+    if (isBrowser && window.sessionStorage) {
+      return window.sessionStorage.getItem(key)
+    }
+  } catch {
+    // Ignore storage restrictions
+  }
+  return null
+}
+
+function setSessionItem(key, value) {
+  try {
+    if (isBrowser && window.sessionStorage) {
+      window.sessionStorage.setItem(key, value)
+    }
+  } catch {
+    // Ignore storage restrictions
+  }
+}
+
 export default function ExitIntentModal() {
   const { promo, applyPromo, cartCount, ageVerified } = useStore()
   const [open, setOpen] = useState(false)
@@ -10,24 +33,22 @@ export default function ExitIntentModal() {
   const timerRef = useRef(null)
 
   useEffect(() => {
-    // N'afficher la modale que si l'âge est vérifié, aucun promo appliqué, et non déjà fermée cette session
-    if (!ageVerified || promo || sessionStorage.getItem('tk_exit_intent_dismissed')) {
+    if (!isBrowser || !ageVerified || promo || getSessionItem('tk_exit_intent_dismissed')) {
       return undefined
     }
 
     const handleMouseLeave = (e) => {
-      if (e.clientY <= 5 && !sessionStorage.getItem('tk_exit_intent_dismissed')) {
+      if (e.clientY <= 5 && !getSessionItem('tk_exit_intent_dismissed')) {
         setOpen(true)
-        sessionStorage.setItem('tk_exit_intent_dismissed', '1')
+        setSessionItem('tk_exit_intent_dismissed', '1')
       }
     }
 
-    // Sur mobile, déclencher doucement si le panier contient des articles et l'utilisateur reste inactif
     if (cartCount > 0) {
       timerRef.current = setTimeout(() => {
-        if (!sessionStorage.getItem('tk_exit_intent_dismissed') && !promo) {
+        if (!getSessionItem('tk_exit_intent_dismissed') && !promo) {
           setOpen(true)
-          sessionStorage.setItem('tk_exit_intent_dismissed', '1')
+          setSessionItem('tk_exit_intent_dismissed', '1')
         }
       }, 45000)
     }
@@ -42,7 +63,7 @@ export default function ExitIntentModal() {
 
   const close = () => {
     setOpen(false)
-    sessionStorage.setItem('tk_exit_intent_dismissed', '1')
+    setSessionItem('tk_exit_intent_dismissed', '1')
   }
 
   const handleApply = () => {
