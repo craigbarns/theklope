@@ -46,12 +46,28 @@ export default function Header() {
     }
   }, [mobileOpen])
 
+  const ANNOUNCEMENTS = [
+    '🎉 Code BIENVENUE : -15% sur votre 1ère commande avec le code BIENVENUE',
+    '🚚 Livraison OFFERTE dès 49€ d’achats en France metropolitaine',
+    '⚡ Expédition sous 24/48h · Boutique réservée aux personnes majeures (+18)',
+  ]
+  const [announcementIdx, setAnnouncementIdx] = useState(0)
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setAnnouncementIdx((prev) => (prev + 1) % ANNOUNCEMENTS.length)
+    }, 4500)
+    return () => clearInterval(timer)
+  }, [ANNOUNCEMENTS.length])
+
   return (
     <>
       {/* Bandeau promo */}
-      <div className="bg-neon text-noir">
-        <div className="container-page flex items-center justify-center gap-2 py-2 text-center text-[11px] font-semibold sm:text-xs">
-          Livraison offerte dès 49€ en France · Vente strictement réservée aux personnes majeures (+18)
+      <div className="bg-neon text-noir transition-all duration-300">
+        <div className="container-page flex items-center justify-center gap-2 py-2 text-center text-[11px] font-bold tracking-wide sm:text-xs">
+          <span key={announcementIdx} className="animate-fade-in inline-block">
+            {ANNOUNCEMENTS[announcementIdx]}
+          </span>
         </div>
       </div>
 

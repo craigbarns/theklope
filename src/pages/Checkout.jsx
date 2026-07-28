@@ -503,7 +503,7 @@ export default function Checkout() {
         </div>
 
         {/* Récap */}
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        <aside className="lg:sticky lg:top-24 lg:self-start space-y-4">
           <div className="card p-6">
             <h2 className="font-display text-lg font-bold text-white">Votre commande</h2>
             <OrderSummaryContent
@@ -514,6 +514,26 @@ export default function Checkout() {
               grandTotal={grandTotal}
               className="mt-4"
             />
+          </div>
+
+          <div className="card p-5 space-y-3 bg-anthracite/80 border-white/10">
+            <div className="flex items-center gap-2.5 text-xs font-bold text-white">
+              <IconLock width={16} height={16} className="text-neon" />
+              <span>Paiement 100% Sécurisé (Mollie)</span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-muted">
+              CB, Visa, Mastercard, Apple Pay. Données bancaires chiffrées de bout en bout (SSL 256 bits).
+            </p>
+            <div className="border-t border-white/8 pt-3 space-y-2 text-xs text-ash/80">
+              <div className="flex items-center gap-2">
+                <IconTruck width={15} height={15} className="text-neon shrink-0" />
+                <span>Expédition sous 24/48h depuis Marseille</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <IconShield width={15} height={15} className="text-neon shrink-0" />
+                <span>Retours sous 14 jours & support réactif</span>
+              </div>
+            </div>
           </div>
         </aside>
       </div>

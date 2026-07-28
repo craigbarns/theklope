@@ -205,6 +205,25 @@ export default function Cart() {
                   <button type="submit" className="btn-ghost shrink-0 px-5">OK</button>
                 </div>
               )}
+              {!promo && (
+                <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
+                  <span className="text-[11px] text-faint">Codes disponibles :</span>
+                  <button
+                    type="button"
+                    onClick={() => { applyPromo('BIENVENUE'); setFeedback(null); setCode('') }}
+                    className="chip border-neon/40 text-neon hover:bg-neon hover:text-noir text-[10px] py-1 px-2 font-bold transition"
+                  >
+                    BIENVENUE (-15%)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { applyPromo('THEKLOPE10'); setFeedback(null); setCode('') }}
+                    className="chip border-white/20 text-ash hover:border-white text-[10px] py-1 px-2 font-semibold transition"
+                  >
+                    THEKLOPE10 (-10%)
+                  </button>
+                </div>
+              )}
               {feedback && !promo && (
                 <p className={`mt-2 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-400'}`}>{feedback.message}</p>
               )}

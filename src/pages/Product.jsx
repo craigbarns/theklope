@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { categoryName, getProductCategoryKey } from '../data/catalog.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
@@ -66,6 +66,45 @@ export default function Product() {
     () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
     [product],
   )
+
+  const promoNotice = useMemo(() => {
+    if (!product) return null
+    const cat = getProductCategoryKey(product)
+    const vol = (product.volume || product.specs?.Contenance || product.specs?.contenance || '').toLowerCase()
+    const brand = (product.brand || '').toLowerCase()
+
+    if (vol.includes('50ml') || vol.includes('100ml')) {
+      return {
+        icon: '🎁',
+        title: 'Offre Dégressive : -25% dès 4 e-liquides',
+        desc: 'Mélangez vos marques ! -25% de remise s’applique automatiquement dès 4 flacons 50ml ou 100ml au panier.',
+      }
+    }
+    if (vol.includes('10ml')) {
+      if (brand.includes('liquidarom') || brand.includes('freaks')) {
+        return {
+          icon: '🎁',
+          title: 'Pack 20 e-liquides à 59€ (-50%)',
+          desc: 'Remise automatique : 20 flacons 10ml Liquidarom/Freaks pour 59€ au lieu de 118€.',
+        }
+      }
+      if (brand.includes('alfaliquid') || brand.includes('pulp')) {
+        return {
+          icon: '🎁',
+          title: 'Pack 20 e-liquides à 88,50€ (-25%)',
+          desc: 'Prix de lot automatique : 20 flacons 10ml Alfaliquid/Pulp pour 88,50€ au lieu de 118€.',
+        }
+      }
+    }
+    if (['ecig', 'pod'].includes(cat)) {
+      return {
+        icon: '⚡',
+        title: 'Économisez -15% avec le Pack Sur Mesure',
+        desc: 'Associez cet appareil avec une résistance/accessoire et un e-liquide pour déclencher automatiquement -15% sur votre pack.',
+      }
+    }
+    return null
+  }, [product])
 
   const productSchema = useMemo(() => {
     if (!product) return null
@@ -208,6 +247,14 @@ export default function Product() {
   }
   const variantResolution = resolveProductVariant(product, selectedVariant)
 
+  const navigate = useNavigate()
+
+  const handleBuyNow = () => {
+    if (handleAdd()) {
+      navigate('/checkout')
+    }
+  }
+
   const handleAdd = (requestedQty = qty) => {
     if (outOfStock || stockLimitReached) {
       setAddError('La quantité maximale disponible est déjà dans votre panier.')
@@ -310,6 +357,18 @@ export default function Product() {
 
             <p className="mt-5 text-ash/70">{product.short}</p>
 
+            {promoNotice && (
+              <div className="mt-4 rounded-2xl border border-neon/30 bg-neon/10 p-4">
+                <div className="flex items-center gap-2 font-bold text-sm text-neon">
+                  <span>{promoNotice.icon}</span>
+                  <span>{promoNotice.title}</span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-ash/80">
+                  {promoNotice.desc}
+                </p>
+              </div>
+            )}
+
             {/* Variantes */}
             <div ref={variantsRef} className="mt-7 scroll-mt-28 space-y-5">
               {colorOptions.length > 0 && (
@@ -339,41 +398,55 @@ export default function Product() {
             </div>
 
             {/* Quantité + CTA */}
-            <div className="mt-7 flex flex-wrap items-center gap-4">
-              <div className="flex items-center rounded-full border border-white/15">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
-                  <IconMinus width={16} height={16} />
+            <div className="mt-7 flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center rounded-full border border-white/15">
+                  <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
+                    <IconMinus width={16} height={16} />
+                  </button>
+                  <span className="w-10 text-center font-semibold text-white">{qty}</span>
+                  <button onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white disabled:opacity-30" aria-label="Augmenter">
+                    <IconPlus width={16} height={16} />
+                  </button>
+                </div>
+                <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:px-8">
+                  {outOfStock
+                    ? 'Rupture de stock'
+                    : stockLimitReached
+                      ? 'Stock maximum au panier'
+                      : added
+                        ? <><IconCheck width={18} height={18} /> Ajouté !</>
+                        : <><IconCart width={18} height={18} /> Ajouter au panier</>}
                 </button>
-                <span className="w-10 text-center font-semibold text-white">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white disabled:opacity-30" aria-label="Augmenter">
-                  <IconPlus width={16} height={16} />
+                <button
+                  onClick={() => toggleFavorite(product.id)}
+                  aria-label="Favori"
+                  className={`grid h-12 w-12 place-items-center rounded-full border transition ${
+                    fav ? 'border-neon/40 bg-neon/15 text-neon' : 'border-white/15 text-ash/70 hover:text-white'
+                  }`}
+                >
+                  <IconHeart filled={fav} />
                 </button>
               </div>
-              <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-10">
-                {outOfStock
-                  ? 'Rupture de stock'
-                  : stockLimitReached
-                    ? 'Stock maximum au panier'
-                    : added
-                      ? <><IconCheck width={18} height={18} /> Ajouté !</>
-                      : <><IconCart width={18} height={18} /> Ajouter au panier</>}
-              </button>
-              <button
-                onClick={() => toggleFavorite(product.id)}
-                aria-label="Favori"
-                className={`grid h-12 w-12 place-items-center rounded-full border transition ${
-                  fav ? 'border-neon/40 bg-neon/15 text-neon' : 'border-white/15 text-ash/70 hover:text-white'
-                }`}
-              >
-                <IconHeart filled={fav} />
-              </button>
+
+              {!outOfStock && !stockLimitReached && (
+                <button
+                  type="button"
+                  onClick={() => handleBuyNow()}
+                  className="btn-ghost w-full border-neon/40 text-neon hover:bg-neon hover:text-noir transition font-bold py-3 text-sm flex items-center justify-center gap-2"
+                >
+                  ⚡ Acheter maintenant (Commande directe)
+                </button>
+              )}
             </div>
 
-            <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : 'text-muted'}`}>
+            <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : remainingStock <= 5 ? 'text-amber-400 font-semibold' : 'text-muted'}`}>
               {outOfStock
                 ? 'Rupture de stock — bientôt de retour'
                 : stockLimitReached
                   ? 'Tout le stock disponible est déjà dans votre panier'
+                : remainingStock <= 5
+                  ? `🔥 Plus que ${remainingStock} exemplaire${remainingStock > 1 ? 's' : ''} en stock — Commandez vite !`
                 : remainingStock > 10
                   ? 'En stock — expédition sous 24/48 h'
                   : `Plus que ${remainingStock} disponible${remainingStock > 1 ? 's' : ''} à ajouter`}

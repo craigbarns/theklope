@@ -190,6 +190,29 @@ export default function Home() {
         </div>
       </section>
 
+      {/* BANNIÈRE PACK SUR MESURE & ESSENTIELS */}
+      <section className="container-page py-6">
+        <div className="relative overflow-hidden rounded-3xl border border-neon/30 bg-gradient-to-r from-neon/15 via-anthracite to-electric/20 p-8 sm:p-10 shadow-glow-green">
+          <div className="max-w-2xl">
+            <span className="chip mb-4 border-neon/40 text-neon font-bold">
+              🔥 Offre spéciale Pack Sur Mesure
+            </span>
+            <h2 className="font-display text-3xl font-bold text-white sm:text-4xl">
+              Composez votre Pack et économisez <span className="text-neon">-15% immédiats</span> !
+            </h2>
+            <p className="mt-4 text-sm text-ash/80 leading-relaxed sm:text-base">
+              Associez une cigarette électronique, un pack de résistances ou accessoires, et votre e-liquide préféré. La remise de 15% s’applique automatiquement à votre panier.
+            </p>
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              <Link to="/configurateur" className="btn-primary">
+                Créer mon Pack (-15%) <IconArrowRight width={18} height={18} />
+              </Link>
+              <span className="text-xs text-muted font-medium">✓ Remise appliquée automatiquement</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="container-page py-10">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">

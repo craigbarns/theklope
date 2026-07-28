@@ -31,6 +31,9 @@ export default function CartDrawer() {
     catalogReady,
     syncStatus,
     refreshRemoteData,
+    promo,
+    applyPromo,
+    removePromo,
   } = useStore()
   const dialogRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -260,6 +263,33 @@ export default function CartDrawer() {
             </div>
 
             <footer className="border-t border-white/10 px-5 py-5">
+              {!promo ? (
+                <div className="mb-4 rounded-xl border border-neon/30 bg-neon/10 p-3 flex items-center justify-between text-xs">
+                  <div>
+                    <p className="font-bold text-neon">Offre 1ère commande : -15%</p>
+                    <p className="text-[11px] text-ash/80">Code <span className="font-mono font-bold text-white">BIENVENUE</span></p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => applyPromo('BIENVENUE')}
+                    className="rounded-lg bg-neon px-3 py-1.5 text-xs font-bold text-noir transition hover:opacity-90 shrink-0"
+                  >
+                    Appliquer
+                  </button>
+                </div>
+              ) : (
+                <div className="mb-4 rounded-xl border border-neon/30 bg-neon/5 p-2.5 flex items-center justify-between text-xs text-neon">
+                  <span className="font-medium">✓ Code <strong className="font-bold">{promo.code}</strong> ({promo.label})</span>
+                  <button
+                    type="button"
+                    onClick={removePromo}
+                    className="text-[11px] text-ash/70 hover:text-white underline ml-2 shrink-0"
+                  >
+                    Retirer
+                  </button>
+                </div>
+              )}
+
               <dl className="mb-3 space-y-2 text-sm">
                 <div className="flex items-center justify-between">
                   <dt className="text-muted">Sous-total</dt>
