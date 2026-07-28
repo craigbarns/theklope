@@ -9,6 +9,7 @@ import Badge from '../components/Badge.jsx'
 import Stars from '../components/Stars.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
+import ShippingCountdown from '../components/ShippingCountdown.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
@@ -454,12 +455,7 @@ export default function Product() {
 
             {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
 
-            {!outOfStock && (
-              <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-neon/10 border border-neon/30 px-3.5 py-2.5 text-xs text-neon font-medium max-w-sm">
-                <IconTruck width={16} height={16} className="shrink-0" />
-                <span>{shippingCountdown}</span>
-              </div>
-            )}
+            {!outOfStock && <ShippingCountdown className="mt-4 max-w-md" />}
 
             {/* Réassurance */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
