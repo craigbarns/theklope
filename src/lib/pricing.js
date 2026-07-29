@@ -26,43 +26,61 @@ export const PROMO_CODES = {
 const PACK_CONSUMABLE_CATEGORIES = ['accessoire', 'resistance']
 
 // -----------------------------------------------------------------------------
-// Remises automatiques par marque / volume (e-liquides uniquement).
-//   - Paliers « 10ml » : X e-liquides 10ml de certaines marques → prix de lot fixe.
-//   - Paliers « 50ml / 100ml » : à partir de N e-liquides du même volume,
-//     TOUTES marques → % de remise.
-// Les marques sont comparées en minuscules/sans espaces superflus.
+// Tarifs automatiques par marque / volume (e-liquides uniquement).
+//   - 10ml : à partir de 20 unités dans un même groupe de marques.
+//   - 50ml / 100ml : à partir de 4 unités, formats et marques combinables.
+// Le pourcentage couvre toutes les unités éligibles dès que le seuil est atteint.
 // -----------------------------------------------------------------------------
 export const BUNDLE_TIERS_10ML = [
-  { key: 'A', brands: ['liquidarom', 'freaks'], packSize: 20, packPrice: 59, label: '20 e-liquides Liquidarom / Freaks', progressLabel: 'Liquidarom / Freaks', promoLabel: '-50%' },
-  { key: 'B', brands: ['alfaliquid', 'pulp'], packSize: 20, packPrice: 88.5, label: '20 e-liquides Alfaliquid / Pulp', progressLabel: 'Alfaliquid / Pulp', promoLabel: '-25%' },
+  {
+    key: '10ml-liquidarom-freaks-secret-garden',
+    brands: ['liquidarom', 'freaks', 'secret garden', 'secrets garden'],
+    minQty: 20,
+    rate: 0.5,
+    label: 'Tarif quantité 10ml · Liquidarom / Freaks / Secret Garden',
+    conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Liquidarom, Freaks et Secret Garden',
+    progressLabel: 'Liquidarom / Freaks / Secret Garden',
+    promoLabel: 'tarif quantité',
+  },
+  {
+    key: '10ml-alfaliquid-pulp',
+    brands: ['alfaliquid', 'pulp'],
+    minQty: 20,
+    rate: 0.25,
+    label: 'Tarif quantité 10ml · Alfaliquid / Pulp',
+    conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Alfaliquid et Pulp',
+    progressLabel: 'Alfaliquid / Pulp',
+    promoLabel: 'tarif quantité',
+  },
 ]
-export const BUNDLE_50ML = {
-  key: '50ml',
-  volume: '50ml',
-  // Toutes marques confondues (contrairement aux paliers 10ml, réservés aux 4 marques).
+export const BUNDLE_50_100ML = {
+  key: '50-100ml',
+  volumes: ['50ml', '100ml'],
   minQty: 4,
   rate: 0.25,
-  label: '4 e-liquides 50ml ou +',
-  progressLabel: 'en 50ml (toutes marques)',
-  promoLabel: '-25%',
+  label: 'Tarif quantité · 4 e-liquides 50/100ml ou +',
+  conditionLabel: 'À partir de 4 flacons 50ml ou 100ml combinables, toutes marques',
+  progressLabel: 'en 50/100ml (formats et marques combinables)',
+  promoLabel: 'tarif quantité',
 }
-export const BUNDLE_100ML = {
-  key: '100ml',
-  volume: '100ml',
-  minQty: BUNDLE_50ML.minQty,
-  rate: BUNDLE_50ML.rate,
-  label: '4 e-liquides 100ml ou +',
-  progressLabel: 'en 100ml (toutes marques)',
-  promoLabel: BUNDLE_50ML.promoLabel,
-}
-export const BUNDLE_VOLUME_TIERS = [BUNDLE_50ML, BUNDLE_100ML]
+export const BUNDLE_VOLUME_TIERS = [BUNDLE_50_100ML]
 
-const round2 = (n) => Math.round((Number(n) || 0) * 100) / 100
-const normBrand = (b) => String(b || '').trim().toLowerCase()
+const toCents = (n) => Math.round((Number(n) || 0) * 100)
+const fromCents = (n) => (Number(n) || 0) / 100
+const normBrand = (b) => String(b || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/['’]/g, '')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim()
 const normVolume = (v) => String(v || '').trim().toLowerCase().replace(/\s+/g, '')
 const is10ml = (l) => normVolume(l.volume) === '10ml'
-const isVolume = (l, volume) => normVolume(l.volume) === volume
+const isTierVolume = (l, volumes) => volumes.includes(normVolume(l.volume))
 const isEliquid = (l) => (l.category || 'eliquide') === 'eliquide'
+const lineSubtotalCents = (line) => (
+  toCents(line.price) * (Number(line.qty) || 0)
+)
 
 // Volume effectif d'un produit pour les remises : champ `volume` s'il est
 // renseigné, sinon dérivé de `specs.Contenance` (ex. « 10 ml »). Indispensable :
@@ -80,6 +98,25 @@ export const resolveVolume = (p = {}) => {
   // comme « 50ml / 100ml » reste non éligible plutôt que d'appliquer un palier
   // au hasard. Cela évite aussi de confondre 150ml ou 250ml avec 50ml.
   return unique.length === 1 ? unique[0] : normVolume(raw)
+}
+
+export function getQuantityPricingRule(product = {}) {
+  if (!isEliquid(product)) return null
+
+  const volume = resolveVolume(product)
+  const tier = volume === '10ml'
+    ? BUNDLE_TIERS_10ML.find((candidate) => candidate.brands.includes(normBrand(product.brand)))
+    : BUNDLE_VOLUME_TIERS.find((candidate) => candidate.volumes.includes(volume))
+  if (!tier) return null
+
+  const regularTotalCents = toCents(product.price) * tier.minQty
+  const adjustedTotalCents = regularTotalCents - Math.round(regularTotalCents * tier.rate)
+  return {
+    key: tier.key,
+    minQty: tier.minQty,
+    conditionLabel: tier.conditionLabel,
+    exampleTotal: fromCents(adjustedTotalCents),
+  }
 }
 
 export const getShippingMethod = (id) =>
@@ -104,19 +141,23 @@ export const isCompletePack = (lines = []) => {
 
 // Une remise PACK15 couvre un seul article de chaque famille du configurateur.
 // Les quantités supplémentaires et les autres articles restent au prix normal.
-export const getCompletePackSubtotal = (lines = []) => {
+const getCompletePackSubtotalCents = (lines = []) => {
   const active = lines.filter((line) => Number(line?.qty) > 0)
-  const highestPrice = (categories) => active
+  const highestPriceCents = (categories) => active
     .filter((line) => categories.includes(line.category))
-    .reduce((highest, line) => Math.max(highest, Number(line.price) || 0), 0)
+    .reduce((highest, line) => Math.max(highest, toCents(line.price)), 0)
 
   if (!isCompletePack(active)) return 0
-  return round2(
-    highestPrice(['ecig', 'pod'])
-      + highestPrice(PACK_CONSUMABLE_CATEGORIES)
-      + highestPrice(['eliquide']),
+  return (
+    highestPriceCents(['ecig', 'pod'])
+      + highestPriceCents(PACK_CONSUMABLE_CATEGORIES)
+      + highestPriceCents(['eliquide'])
   )
 }
+
+export const getCompletePackSubtotal = (lines = []) => (
+  fromCents(getCompletePackSubtotalCents(lines))
+)
 
 export const isPromoEligible = (promo, lines = []) => {
   if (!promo) return false
@@ -127,41 +168,38 @@ export const isPromoEligible = (promo, lines = []) => {
 // Calcule la remise automatique (paliers marque/volume). Renvoie le détail pour
 // pouvoir l'afficher au client.
 export function computeAutoDiscount(lines = []) {
-  let total = 0
+  let totalCents = 0
   const details = []
 
-  // Paliers 10ml (prix de lot fixe par tranche de packSize)
+  // Paliers 10ml : le groupe de marques est combinable et toutes les unités
+  // éligibles passent au pourcentage prévu une fois le seuil atteint.
   for (const tier of BUNDLE_TIERS_10ML) {
     const eligible = lines.filter((l) => isEliquid(l) && is10ml(l) && tier.brands.includes(normBrand(l.brand)))
     const units = eligible.reduce((s, l) => s + (Number(l.qty) || 0), 0)
-    if (units < tier.packSize) continue
-    const sumNormal = round2(eligible.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0))
-    const avg = sumNormal / units
-    const packs = Math.floor(units / tier.packSize)
-    const remainder = units - packs * tier.packSize
-    const newTotal = round2(packs * tier.packPrice + remainder * avg)
-    const saved = round2(Math.max(0, sumNormal - newTotal))
-    if (saved > 0) {
-      total += saved
-      details.push({ key: tier.key, label: tier.label, packs, amount: saved })
+    if (units < tier.minQty) continue
+    const eligibleSubtotalCents = eligible.reduce((sum, line) => sum + lineSubtotalCents(line), 0)
+    const savedCents = Math.max(0, Math.round(eligibleSubtotalCents * tier.rate))
+    if (savedCents > 0) {
+      totalCents += savedCents
+      details.push({ key: tier.key, label: tier.label, amount: fromCents(savedCents) })
     }
   }
 
-  // Paliers 50ml et 100ml : même seuil et même taux, calculés séparément afin
-  // qu'un panier doive atteindre quatre flacons dans le format concerné.
+  // Les 50ml et 100ml partagent un même seuil : 2 × 50ml + 2 × 100ml,
+  // même de marques différentes, constituent donc bien quatre unités.
   for (const tier of BUNDLE_VOLUME_TIERS) {
-    const eligible = lines.filter((l) => isEliquid(l) && isVolume(l, tier.volume))
+    const eligible = lines.filter((l) => isEliquid(l) && isTierVolume(l, tier.volumes))
     const units = eligible.reduce((s, l) => s + (Number(l.qty) || 0), 0)
     if (units < tier.minQty) continue
-    const sumNormal = round2(eligible.reduce((s, l) => s + (Number(l.price) || 0) * (Number(l.qty) || 0), 0))
-    const saved = round2(sumNormal * tier.rate)
-    if (saved > 0) {
-      total += saved
-      details.push({ key: tier.key, label: tier.label, amount: saved })
+    const eligibleSubtotalCents = eligible.reduce((sum, line) => sum + lineSubtotalCents(line), 0)
+    const savedCents = Math.max(0, Math.round(eligibleSubtotalCents * tier.rate))
+    if (savedCents > 0) {
+      totalCents += savedCents
+      details.push({ key: tier.key, label: tier.label, amount: fromCents(savedCents) })
     }
   }
 
-  return { total: round2(total), details }
+  return { total: fromCents(totalCents), details }
 }
 
 // Progression vers les paliers de remise NON encore atteints, pour inciter le
@@ -174,21 +212,21 @@ export function computeBundleProgress(lines = []) {
     const units = lines
       .filter((l) => isEliquid(l) && is10ml(l) && tier.brands.includes(normBrand(l.brand)))
       .reduce((s, l) => s + (Number(l.qty) || 0), 0)
-    if (units > 0 && units < tier.packSize) {
+    if (units > 0 && units < tier.minQty) {
       hints.push({
         key: tier.key,
         progressLabel: tier.progressLabel,
         promoLabel: tier.promoLabel,
         current: units,
-        target: tier.packSize,
-        remaining: tier.packSize - units,
+        target: tier.minQty,
+        remaining: tier.minQty - units,
       })
     }
   }
 
   for (const tier of BUNDLE_VOLUME_TIERS) {
     const units = lines
-      .filter((l) => isEliquid(l) && isVolume(l, tier.volume))
+      .filter((l) => isEliquid(l) && isTierVolume(l, tier.volumes))
       .reduce((s, l) => s + (Number(l.qty) || 0), 0)
     if (units > 0 && units < tier.minQty) {
       hints.push({
@@ -210,9 +248,8 @@ export function computeBundleProgress(lines = []) {
 //   shippingMethodId: 'poste' | 'coursier' | 'pickup' (optionnel)
 //   promoCode: chaîne (optionnel)
 export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) {
-  const subtotal = round2(
-    lines.reduce((sum, l) => sum + (Number(l.price) || 0) * (Number(l.qty) || 0), 0),
-  )
+  const subtotalCents = lines.reduce((sum, line) => sum + lineSubtotalCents(line), 0)
+  const subtotal = fromCents(subtotalCents)
 
   const requestedPromo = normalizePromo(promoCode)
   const promo = isPromoEligible(requestedPromo, lines) ? requestedPromo : null
@@ -220,31 +257,42 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) 
 
   // Livraison : gratuite dès le seuil (sauf Click & Collect déjà à 0) ou via un
   // code promo « livraison offerte ».
-  const freeByThreshold = subtotal === 0 || subtotal >= FREE_SHIPPING_THRESHOLD
-  let shipping = method.price
-  if (freeByThreshold) shipping = 0
-  if (promo?.type === 'shipping') shipping = 0
+  const freeByThreshold = subtotalCents === 0 || subtotalCents >= toCents(FREE_SHIPPING_THRESHOLD)
+  let shippingCents = toCents(method.price)
+  if (freeByThreshold) shippingCents = 0
+  if (promo?.type === 'shipping') shippingCents = 0
 
   // Remises : automatique (marque/volume) vs code promo % — on applique la plus
   // avantageuse pour le client (elles ne se cumulent PAS).
   const auto = computeAutoDiscount(lines)
-  const promoBase = promo?.code === 'PACK15' ? getCompletePackSubtotal(lines) : subtotal
-  const promoPercent = promo?.type === 'percent' ? round2((promoBase * promo.value) / 100) : 0
-  const discount = round2(Math.max(auto.total, promoPercent))
-  const discountSource = discount > 0 ? (auto.total >= promoPercent ? 'auto' : 'promo') : null
+  const autoCents = toCents(auto.total)
+  const promoBaseCents = promo?.code === 'PACK15'
+    ? getCompletePackSubtotalCents(lines)
+    : subtotalCents
+  const promoPercentCents = promo?.type === 'percent'
+    ? Math.round((promoBaseCents * promo.value) / 100)
+    : 0
+  const discountCents = Math.max(autoCents, promoPercentCents)
+  const discountSource = discountCents > 0
+    ? (autoCents >= promoPercentCents ? 'auto' : 'promo')
+    : null
+  const appliedPromo = promo && (promo.type === 'shipping' || discountSource === 'promo')
+    ? promo
+    : null
 
-  const total = round2(Math.max(0, subtotal - discount) + shipping)
+  const totalCents = Math.max(0, subtotalCents - discountCents) + shippingCents
 
   return {
     subtotal,
-    discount,
+    discount: fromCents(discountCents),
     discountSource, // 'auto' | 'promo' | null
     autoDiscount: auto,
-    shipping: round2(shipping),
-    total,
-    freeShipping: shipping === 0,
+    shipping: fromCents(shippingCents),
+    total: fromCents(totalCents),
+    freeShipping: shippingCents === 0,
     freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
     promo,
+    appliedPromo,
     promoRejected: Boolean(requestedPromo && !promo),
     shippingMethod: method,
   }

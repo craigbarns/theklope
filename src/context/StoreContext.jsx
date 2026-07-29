@@ -729,7 +729,7 @@ export function StoreProvider({ children }) {
     }
 
     setPromo({ code: clean, ...definition })
-    return { ok: true, message: `Code « ${clean} » appliqué (${definition.label}).` }
+    return { ok: true, message: `Code « ${clean} » enregistré. Le tarif le plus avantageux sera appliqué.` }
   }, [cart, products])
   const removePromo = useCallback(() => setPromo(null), [])
 
@@ -760,6 +760,7 @@ export function StoreProvider({ children }) {
       discount: t.discount,
       discountSource: t.discountSource,
       autoDiscount: t.autoDiscount,
+      appliedPromo: t.appliedPromo,
       shipping: t.shipping,
       total: t.total,
       freeShippingThreshold: FREE_SHIPPING_THRESHOLD,
@@ -804,7 +805,7 @@ export function StoreProvider({ children }) {
         discount: totals.discount,
         shippingCost,
         total,
-        promo: promo ? { code: promo.code, label: promo.label, type: promo.type, value: promo.value } : null,
+        promo: totals.appliedPromo,
       }
 
       setOrders((prev) => [order, ...prev])
@@ -821,7 +822,7 @@ export function StoreProvider({ children }) {
       clearCart()
       return order
     },
-    [cartDetailed, clearCart, promo, totals.discount, totals.subtotal],
+    [cartDetailed, clearCart, totals.appliedPromo, totals.discount, totals.subtotal],
   )
 
   const updateOrderStatus = useCallback(async (orderId, status) => {

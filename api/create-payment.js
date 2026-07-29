@@ -468,7 +468,9 @@ export default async function handler(req, res) {
       p_discount: totals.discount,
       p_shipping_cost: totals.shipping,
       p_total: totals.total,
-      p_promo: totals.promo,
+      // Un code valide mais moins avantageux qu'un tarif quantité ne doit pas
+      // être enregistré ni réserver inutilement un avantage première commande.
+      p_promo: totals.appliedPromo,
       p_acquisition: normalizedAcquisition.value,
       p_items: lines.map((line) => ({
         product_id: line.productId,

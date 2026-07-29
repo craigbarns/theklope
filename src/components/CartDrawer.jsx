@@ -66,7 +66,7 @@ export default function CartDrawer() {
     if (trackViewCart({
       items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
       value: Math.max(0, totals.subtotal - totals.discount),
-      coupon: promo?.code,
+      coupon: totals.appliedPromo?.code,
     })) {
       cartViewTrackedRef.current = true
     }
@@ -75,7 +75,7 @@ export default function CartDrawer() {
     cartNeedsVerification,
     cartOpen,
     cookiesChoice,
-    promo?.code,
+    totals.appliedPromo?.code,
     totals.discount,
     totals.subtotal,
   ])
@@ -85,7 +85,7 @@ export default function CartDrawer() {
       product: item.product,
       quantity,
       variant: item.variant,
-      coupon: promo?.code,
+      coupon: totals.appliedPromo?.code,
     })
   }
 
@@ -310,7 +310,11 @@ export default function CartDrawer() {
             <footer className="border-t border-white/10 px-5 py-5">
               {promo && (
                 <div className="mb-4 rounded-xl border border-neon/30 bg-neon/5 p-2.5 flex items-center justify-between text-xs text-neon">
-                  <span className="font-medium">✓ Code <strong className="font-bold">{promo.code}</strong> ({promo.label})</span>
+                  <span className="font-medium">
+                    Code <strong className="font-bold">{promo.code}</strong> · {totals.appliedPromo?.code === promo.code
+                      ? promo.label
+                      : 'enregistré, tarif quantité plus avantageux'}
+                  </span>
                   <button
                     type="button"
                     onClick={removePromo}
@@ -328,14 +332,14 @@ export default function CartDrawer() {
                 </div>
                 {totals.discount > 0 && (
                   <>
-                    <div className="flex items-center justify-between text-neon">
-                      <dt>Remise</dt>
+                    <div className={`flex items-center justify-between ${totals.discountSource === 'auto' ? 'text-ash/80' : 'text-neon'}`}>
+                      <dt>{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}</dt>
                       <dd className="font-semibold">- {formatPrice(totals.discount)}</dd>
                     </div>
                     {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
-                      <div key={d.key} className="-mt-1 text-[11px] text-neon/80">
-                        <dt className="sr-only">Remise automatique</dt>
-                        <dd>✓ {d.label}</dd>
+                      <div key={d.key} className="-mt-1 text-[11px] text-muted">
+                        <dt className="sr-only">Condition tarifaire appliquée</dt>
+                        <dd>{d.label}</dd>
                       </div>
                     ))}
                   </>

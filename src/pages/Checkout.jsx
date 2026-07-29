@@ -79,12 +79,12 @@ export default function Checkout() {
     if (trackEvent('begin_checkout', {
       currency: 'EUR',
       value: grandTotal,
-      coupon: promo?.code,
+      coupon: totals.appliedPromo?.code,
       items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
     })) {
       trackedRef.current = true
     }
-  }, [cartDetailed, cartVerified, cookiesChoice, grandTotal, promo?.code])
+  }, [cartDetailed, cartVerified, cookiesChoice, grandTotal, totals.appliedPromo?.code])
   const [customer, setCustomer] = useState({ firstName: '', lastName: '', email: '', phone: '' })
   const [address, setAddress] = useState({
     street: '',
@@ -185,7 +185,7 @@ export default function Checkout() {
         currency: 'EUR',
         value: grandTotal,
         shipping_tier: selectedShipping.label,
-        coupon: promo?.code,
+        coupon: totals.appliedPromo?.code,
         items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
       })
       setStep(3)
@@ -206,7 +206,7 @@ export default function Checkout() {
       if (!paymentInfoTrackedRef.current && trackAddPaymentInfo({
         items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
         value: grandTotal,
-        coupon: promo?.code,
+        coupon: totals.appliedPromo?.code,
         paymentType: 'Mollie',
       })) {
         paymentInfoTrackedRef.current = true
@@ -273,7 +273,7 @@ export default function Checkout() {
         const purchaseSnapshot = serializePurchaseSnapshot({
           items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
           totals: data.breakdown,
-          coupon: promo?.code || undefined,
+          coupon: totals.appliedPromo?.code || undefined,
         })
         for (const storageName of ['sessionStorage', 'localStorage']) {
           try {
@@ -625,7 +625,21 @@ function OrderSummaryContent({
       </div>
       <dl className="mt-5 space-y-2.5 border-t border-white/8 pt-5 text-sm">
         <div className="flex justify-between"><dt className="text-muted">Sous-total</dt><dd className="text-white">{formatPrice(totals.subtotal)}</dd></div>
-        {totals.discount > 0 && <div className="flex justify-between"><dt className="text-muted">Remise</dt><dd className="text-neon">- {formatPrice(totals.discount)}</dd></div>}
+        {totals.discount > 0 && (
+          <>
+            <div className="flex justify-between">
+              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}</dt>
+              <dd className={totals.discountSource === 'auto' ? 'text-white' : 'text-neon'}>
+                - {formatPrice(totals.discount)}
+              </dd>
+            </div>
+            {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((detail) => (
+              <div key={detail.key} className="flex justify-end text-[11px] text-muted">
+                {detail.label}
+              </div>
+            ))}
+          </>
+        )}
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Livraison</dt>
           <dd className="text-right text-white">

@@ -15,6 +15,7 @@ import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import { relatedGuidesForProduct } from '../data/productGuides.js'
 import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
+import { getQuantityPricingRule } from '../lib/pricing.js'
 import {
   IconHeart,
   IconCart,
@@ -181,6 +182,7 @@ export default function Product() {
   if (pageState === PRODUCT_PAGE_STATE.notFound) return <NotFound />
 
   const fav = isFavorite(product.id)
+  const quantityPricing = getQuantityPricingRule(product)
   const outOfStock = product.stock <= 0
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
@@ -286,6 +288,22 @@ export default function Product() {
             <div className="mt-5 flex items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
             </div>
+
+            {quantityPricing && (
+              <details className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
+                <summary className="cursor-pointer font-medium text-ash/80">
+                  Tarifs TTC selon la quantité
+                </summary>
+                <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-muted">
+                  <p>{quantityPricing.conditionLabel}.</p>
+                  <p>
+                    Exemple avec des références au prix affiché&nbsp;: {quantityPricing.minQty} flacons =
+                    {' '}{formatPrice(quantityPricing.exampleTotal)} TTC.
+                  </p>
+                  <p>Le total exact est recalculé automatiquement dans le panier selon les références éligibles.</p>
+                </div>
+              </details>
+            )}
 
             <p className="mt-5 text-ash/70">{product.short}</p>
 
