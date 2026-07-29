@@ -148,41 +148,54 @@ for (const p of PRODUCTS) {
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: p.name,
-    image: [absImg(p.image)],
-    description: p.long || p.short || p.name,
-    sku: p.id,
-    brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
-    offers: {
-      '@type': 'Offer',
-      url: abs(path),
-      priceCurrency: 'EUR',
-      price: (Number(p.price) || 0).toFixed(2),
-      validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
-      priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
-      itemCondition: 'https://schema.org/NewCondition',
-      availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'THEKLOPE' },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
-        shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
-          transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+    '@graph': [
+      {
+        '@type': 'Product',
+        name: p.name,
+        image: [absImg(p.image)],
+        description: p.long || p.short || p.name,
+        sku: p.id,
+        brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
+        offers: {
+          '@type': 'Offer',
+          url: abs(path),
+          priceCurrency: 'EUR',
+          price: (Number(p.price) || 0).toFixed(2),
+          validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
+          priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+          itemCondition: 'https://schema.org/NewCondition',
+          availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: 'THEKLOPE' },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+            shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+              transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+            },
+          },
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'FR',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 14,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+          },
         },
       },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'FR',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 14,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Boutique', item: `${BASE_URL}/boutique` },
+          { '@type': 'ListItem', position: 3, name: catLabel, item: `${BASE_URL}/categorie/${p.category}` },
+          { '@type': 'ListItem', position: 4, name: p.name, item: abs(path) },
+        ],
       },
-    },
+    ],
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <span>${esc(catLabel)}</span></nav>
@@ -237,6 +250,14 @@ for (const c of CATEGORIES) {
         name: seo?.h1 || c.name,
         description,
       },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Catégories', item: `${BASE_URL}/categories` },
+          { '@type': 'ListItem', position: 3, name: seo?.h1 || c.name, item: abs(path) },
+        ],
+      },
       ...(seo?.faq?.length
         ? [{
             '@type': 'FAQPage',
@@ -267,15 +288,27 @@ for (const b of BLOG_POSTS) {
   const path = `/guides/${b.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: b.title,
-    description: b.description || b.title,
-    image: absImg(b.image),
-    datePublished: b.isoDate,
-    dateModified: b.isoDate,
-    author: { '@type': 'Organization', name: 'THEKLOPE' },
-    publisher: { '@type': 'Organization', name: 'THEKLOPE' },
-    mainEntityOfPage: abs(path),
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: b.title,
+        description: b.description || b.title,
+        image: absImg(b.image),
+        datePublished: b.isoDate,
+        dateModified: b.isoDate,
+        author: { '@type': 'Organization', name: 'THEKLOPE' },
+        publisher: { '@type': 'Organization', name: 'THEKLOPE' },
+        mainEntityOfPage: abs(path),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Guides', item: `${BASE_URL}/guides` },
+          { '@type': 'ListItem', position: 3, name: b.title, item: abs(path) },
+        ],
+      },
+    ],
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/guides">Guides</a> › <span>${esc(b.title)}</span></nav>
@@ -336,6 +369,13 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
         description,
       },
       {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: page.h1, item: abs(path) },
+        ],
+      },
+      {
         '@type': 'FAQPage',
         mainEntity: page.faq.map((item) => ({
           '@type': 'Question',
@@ -358,8 +398,8 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 }
 
 // ---- Page d'accueil (/) ----
-const homeTitle = 'THEKLOPE — Boutique vape en ligne'
-const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
+const homeTitle = 'Vape Shop Marseille & Boutique Vape en Ligne | THEKLOPE'
+const homeDescription = "Boutique de vape et e-liquides à Marseille et en ligne. Découvrez nos kits, pods, e-liquides et produits DIY. Livraison rapide 24/48h et conseils d'experts."
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -399,7 +439,7 @@ const homeContent = `
     <div class="relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
       <div>
         <span class="chip mb-6 border-neon/30 text-neon">Boutique vape française · +18</span>
-        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE<br>Boutique vape en ligne</h1>
+        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE — Boutique vape en ligne</h1>
         <p class="mt-6 max-w-lg text-base leading-relaxed sm:text-lg">Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour adultes.</p>
         <p class="mt-8"><a href="/boutique">Découvrir la boutique</a></p>
       </div>

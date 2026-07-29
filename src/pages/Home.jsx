@@ -95,8 +95,8 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="Boutique vape en ligne"
-        description="THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé."
+        title="Vape Shop Marseille & Boutique Vape en Ligne | THEKLOPE"
+        description="Boutique de vape et e-liquides à Marseille et en ligne. Découvrez nos kits, pods, e-liquides et produits DIY. Livraison rapide 24/48h et conseils d'experts."
         schema={homeSchema}
       />
 
@@ -108,9 +108,9 @@ export default function Home() {
               <IconLeaf width={14} height={14} /> Boutique vape française · +18
             </span>
             <h1 className="font-display text-4xl font-bold leading-[1.05] text-white sm:text-5xl lg:text-6xl">
-              THEKLOPE
+              THEKLOPE{' '}
               <span className="mt-2 block bg-gradient-to-r from-neon to-electric bg-clip-text text-transparent">
-                Boutique vape en ligne
+                — Boutique vape en ligne
               </span>
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-ash/70 sm:text-lg">
