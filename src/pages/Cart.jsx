@@ -63,18 +63,18 @@ export default function Cart() {
     if (trackViewCart({
       items: cartDetailed.map((item) => toAnalyticsItem(item.product, item.qty, item.variant)),
       value: Math.max(0, totals.subtotal - totals.discount),
-      coupon: promo?.code,
+      coupon: totals.appliedPromo?.code,
     })) {
       cartViewTrackedRef.current = true
     }
-  }, [cartDetailed, cartNeedsVerification, cookiesChoice, promo?.code, totals.discount, totals.subtotal])
+  }, [cartDetailed, cartNeedsVerification, cookiesChoice, totals.appliedPromo?.code, totals.discount, totals.subtotal])
 
   const trackRemoval = (item, quantity) => {
     trackRemoveFromCart({
       product: item.product,
       quantity,
       variant: item.variant,
-      coupon: promo?.code,
+      coupon: totals.appliedPromo?.code,
     })
   }
 
@@ -236,7 +236,11 @@ export default function Cart() {
             <form onSubmit={submitPromo} className="mt-4">
               {promo ? (
                 <div className="flex items-center justify-between rounded-xl border border-neon/30 bg-neon/10 px-4 py-3 text-sm">
-                  <span className="text-neon">Code « {promo.code} » · {promo.label}</span>
+                  <span className="text-ash/80">
+                    Code « {promo.code} » · {totals.appliedPromo?.code === promo.code
+                      ? promo.label
+                      : 'enregistré, tarif quantité plus avantageux'}
+                  </span>
                   <button type="button" onClick={() => { removePromo(); setFeedback(null) }} className="text-muted hover:text-white">Retirer</button>
                 </div>
               ) : (
@@ -252,11 +256,17 @@ export default function Cart() {
 
             <dl className="mt-5 space-y-3 border-t border-white/8 pt-5 text-sm">
               <Row label="Sous-total" value={formatPrice(totals.subtotal)} />
-              {totals.discount > 0 && <Row label="Remise" value={`- ${formatPrice(totals.discount)}`} accent />}
+              {totals.discount > 0 && (
+                <Row
+                  label={totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}
+                  value={`- ${formatPrice(totals.discount)}`}
+                  accent={totals.discountSource !== 'auto'}
+                />
+              )}
               {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
-                <div key={d.key} className="-mt-1 text-[11px] text-neon/80">
-                  <dt className="sr-only">Remise automatique</dt>
-                  <dd>✓ {d.label}</dd>
+                <div key={d.key} className="-mt-1 text-[11px] text-muted">
+                  <dt className="sr-only">Condition tarifaire appliquée</dt>
+                  <dd>{d.label}</dd>
                 </div>
               ))}
               <Row label="Livraison" value="Calculée à l’étape suivante" />
