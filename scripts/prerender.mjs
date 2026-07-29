@@ -337,12 +337,104 @@ const STATIC_PAGES = [
   { path: '/checkout', title: 'Paiement sécurisé | THEKLOPE', description: 'Finalisez votre commande THEKLOPE avec le paiement sécurisé Mollie.', noindex: true, catalogBootstrap: PRODUCTS },
   { path: '/checkout/retour', title: 'Confirmation de commande | THEKLOPE', description: 'Confirmation de votre commande THEKLOPE.', noindex: true },
 ]
+function buildStaticPageJsonLd(s) {
+  const path = s.path
+  const name = s.title.split(' | ')[0].split(' — ')[0]
+  const graph = [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+        { '@type': 'ListItem', position: 2, name, item: abs(path) },
+      ],
+    },
+  ]
+
+  if (path === '/faq') {
+    graph.unshift({
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Quels sont les délais de livraison THEKLOPE ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Les commandes sont préparées selon le stock disponible et expédiées sous 24/48h en France.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Les produits THEKLOPE sont-ils vendus aux mineurs ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Non. La vente de produits de vapotage est strictement réservée aux personnes majeures de 18 ans et plus.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Où se trouve la boutique physique THEKLOPE ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Notre boutique physique est située au 188 rue de Rome, 13006 Marseille.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Puis-je retirer ma commande gratuitement en boutique ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Oui, le retrait en boutique Click & Collect au 188 rue de Rome à Marseille est 100% gratuit.' },
+        },
+      ],
+    })
+  } else if (path === '/calculette-diy') {
+    graph.unshift({
+      '@type': 'WebApplication',
+      name: 'Calculette DIY e-liquide THEKLOPE',
+      applicationCategory: 'UtilityApplication',
+      operatingSystem: 'All',
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (path === '/configurateur') {
+    graph.unshift({
+      '@type': 'WebApplication',
+      name: 'Configurateur de pack cigarette électronique THEKLOPE',
+      applicationCategory: 'ShoppingApplication',
+      operatingSystem: 'All',
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (path === '/contact') {
+    graph.unshift({
+      '@type': 'ContactPage',
+      name: 'Contact THEKLOPE',
+      url: abs(path),
+      description: s.description,
+    }, buildLocalBusinessSchema())
+  } else if (path === '/a-propos') {
+    graph.unshift({
+      '@type': 'AboutPage',
+      name: 'À propos de THEKLOPE',
+      url: abs(path),
+      description: s.description,
+    }, buildLocalBusinessSchema())
+  } else if (['/boutique', '/categories', '/guides'].includes(path)) {
+    graph.unshift({
+      '@type': 'CollectionPage',
+      name,
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (!s.noindex) {
+    graph.unshift({
+      '@type': 'WebPage',
+      name,
+      url: abs(path),
+      description: s.description,
+    })
+  }
+
+  return { '@context': 'https://schema.org', '@graph': graph }
+}
+
 for (const s of STATIC_PAGES) {
   const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>`
+  const jsonLd = buildStaticPageJsonLd(s)
   writePage(s.path, buildPage({
     title: s.title,
     description: s.description,
     canonicalPath: s.path,
+    jsonLd,
     content,
     noindex: s.noindex,
     catalogBootstrap: s.catalogBootstrap,
