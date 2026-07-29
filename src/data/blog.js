@@ -101,43 +101,76 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'quelle-cigarette-electronique-choisir',
-    title: 'Quelle cigarette électronique choisir en 2026 ? Guide responsable',
+    title: 'Quelle cigarette électronique choisir en 2026 ? Guide Ultime et Comparatif par Profil',
     description:
-      'Guide responsable pour choisir une cigarette électronique pour adulte : format, autonomie, tirage, compatibilité e-liquide et consommables.',
-    date: '9 Juillet 2026',
-    isoDate: '2026-07-09T08:00:00+02:00',
-    readTime: '6 min',
-    category: 'Guides responsables',
+      'Guide d’achat complet 2026 pour choisir sa cigarette électronique : comparatif des formats (pods, kits, box), profils de fumeur (petit, moyen, gros), autonomie mAh, tirage MTL/DL et conseils d’experts THEKLOPE Marseille.',
+    date: '29 Juillet 2026',
+    isoDate: '2026-07-29T08:00:00+02:00',
+    readTime: '12 min',
+    category: 'Guides d’achat',
     image: '/products/kit-xros-pro-2_1.jpg',
     summary:
-      'Pod, kit compact, box plus puissante : voici les critères utiles pour comparer les formats sans promesse médicale et avec les précautions nécessaires.',
+      'Comment bien choisir sa cigarette électronique en 2026 ? Retrouvez notre guide complet par profil de fumeur, comparatif technique (Pods vs Kits vs Boxs), autonomie en mAh, type de tirage et choix du e-liquide idéal.',
     intro:
-      'Choisir une cigarette électronique revient d’abord à choisir un format compatible avec son usage, son niveau d’expérience et les e-liquides envisagés.',
+      'Passer à la cigarette électronique en 2026 nécessite de se poser les bonnes questions : quel format adopter ? Quelle autonomie choisir en mAh ? Quel tirage (serré ou aérien) convient le mieux à vos habitudes ? L’équipe d’experts THEKLOPE (boutique vape à Marseille et en ligne) a rédigé ce guide d’achat complet pour vous accompagner pas à pas vers le matériel idéal selon votre profil de consommation.',
     sections: [
       {
-        title: 'Comparer les formats',
+        title: '1. Choisir selon son profil de fumeur : Quel vapoteur êtes-vous ?',
         text:
-          'Un pod rechargeable est compact et simple. Un kit tubulaire ou une box offre souvent plus d’autonomie, plus de puissance et davantage de réglages. Le bon choix dépend du confort recherché et de la compatibilité des consommables.',
+          'La réussite de votre passage à la vape dépend directement de l’adéquation entre votre consommation de tabac et la puissance de votre cigarette électronique :\n\n' +
+          '• **Profil Petit Fumeur (moins de 5 à 8 cigarettes/jour)** : Privilégiez un **Pod compact rechargeable** (ex: Vaporesso XROS, Voopoo Argus G2 Mini). Ces appareils discrets offrent une autonomie de 800 à 1200 mAh, idéale pour une journée d’utilisation modérée avec un e-liquide nicotiné en 6 mg/ml ou en sels de nicotine.\n\n' +
+          '• **Profil Moyen Fumeur (8 à 15 cigarettes/jour)** : Un **Kit tubulaire ou Pod avancé** (ex: Justfog Q16 Pro, Vaporesso Luxe XR Max, Voopoo Doric) disposant d’une batterie de 1500 à 2500 mAh apportera le compromis parfait entre compacité et autonomie, compatible avec des e-liquides en 9 à 12 mg/ml.\n\n' +
+          '• **Profil Gros Fumeur (plus de 15 à 20 cigarettes/jour)** : Optez pour un **Kit Box puissant avec accu interchangeable 18650/21700** (ex: GeekVape Aegis, Vaporesso Gen 80S). Une autonomie supérieure à 3000 mAh vous permettra de tenir toute la journée sans recharger, tout en profitant d’un réservoir généreux.',
       },
       {
-        title: 'Regarder l’autonomie et le tirage',
+        title: '2. Comparatif des formats : Pod, Kit Tube ou Box Électronique ?',
         text:
-          'L’autonomie s’exprime en mAh et doit être cohérente avec la fréquence d’utilisation. Le tirage serré consomme généralement moins qu’un tirage très aérien, qui demande plus de puissance et de liquide.',
+          'Chaque format de vapoteuse répond à des attentes spécifiques en termes de transportabilité, de réglages et d’entretien :\n\n' +
+          '• **Le Pod Rechargeable** : C’est le format le plus populaire en 2026. Équipé de cartouches amovibles ou rechargeables, il ne nécessite aucun réglage complexe. Idéal pour les débutants et les vapoteurs recherchant la discrétion.\n\n' +
+          '• **Le Kit Tube ou Stylopote** : De forme cylindrique, il combine une batterie intégrée et un clearomiseur classique vissé. Très ergonomique, il offre un excellent rendu des saveurs avec des résistances interchangeables.\n\n' +
+          '• **La Box Électronique (Mod)** : Équipée d’un écran OLED et de boutons de variation de puissance (Watts), la box permet de personnaliser au watt près la température et la densité de vapeur. Elle accepte de nombreux atomiseurs et clearomiseurs.',
       },
       {
-        title: 'Vérifier les consommables',
+        title: '3. Comprendre les types de tirage : MTL (Serré) vs DL (Aérien)',
         text:
-          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver.',
+          'Le tirage détermine la manière dont vous aspirez la vapeur :\n\n' +
+          '• **Inhalation Indirecte (MTL — Mouth-To-Lung)** : Tirage serré similaire à une cigarette traditionnelle. La vapeur passe d’abord par la bouche avant d’atteindre les poumons. C’est le tirage conseillé pour les débutants car il procure le "hit" (sensation en gorge) nécessaire avec des e-liquides à taux de nicotine moyen à élevé (9 à 18 mg/ml).\n\n' +
+          '• **Inhalation Directe (DL — Direct-To-Lung)** : Tirage aérien produisant de gros nuages de vapeur. La vapeur va directement aux poumons comme avec une chicha. Ce tirage s’utilise avec des résistances basses (< 0.5 ohm) et des e-liquides faibles en nicotine (3 à 6 mg/ml) riches en Glycérine Végétale (VG).\n\n' +
+          '• **Inhalation Restreinte (RDL)** : Le compromis parfait entre vapeur généreuse et rendu des saveurs préservé.',
+      },
+      {
+        title: '4. Quelle autonomie en mAh et quelle puissance choisir ?',
+        text:
+          'L’autonomie d’une cigarette électronique s’exprime en Milliampères-heures (mAh) :\n' +
+          '• **Moins de 1000 mAh** : Pour un usage d’appoint ou petit fumeur.\n' +
+          '• **Entre 1000 et 2000 mAh** : Pour une journée d’utilisation classique en tirage MTL.\n' +
+          '• **Plus de 2500 mAh ou Accus séparés (18650)** : Pour les vapoteurs intensifs ou les matériels puissants DL.\n\n' +
+          'Conseil d’expert THEKLOPE : Si vous choisissez un modèle à batterie intégrée, veillez à ce qu’il dispose de la recharge rapide USB-C pour limiter le temps de charge.',
+      },
+      {
+        title: '5. Associer son matériel avec le bon E-Liquide et le bon Taux de Nicotine',
+        text:
+          'Un matériel performant associé à un e-liquide inadapté peut provoquer des fuites ou un goût de brûlé. Respectez la règle du ratio PG/VG :\n\n' +
+          '• **Résistances élevées (> 0.8 ohm — tirage MTL)** : Utilisez des e-liquides fluides au ratio **50/50 PG/VG** ou **70/30 PG/VG**. Ce ratio est idéal pour restituer les arômes et convient parfaitement aux e-liquides au sel de nicotine.\n' +
+          '• **Résistances basses (< 0.4 ohm — tirage DL)** : Utilisez des e-liquides plus épais avec un ratio **30/70 PG/VG** pour éviter les fuites et obtenir une vapeur dense.',
       },
     ],
     faq: [
       {
-        q: 'Quelle cigarette électronique choisir pour une première utilisation ?',
-        a: 'Un pod ou un kit simple, avec peu de réglages et des consommables faciles à identifier, est souvent plus accessible pour un adulte qui découvre la vape.',
+        q: 'Quelle cigarette électronique choisir pour débuter en 2026 ?',
+        a: 'Pour débuter facilement, un Pod rechargeable comme le Vaporesso XROS Pro ou un Kit compact comme le Justfog Q16 Pro est recommandé. Ils offrent une prise en main immédiate, un tirage serré proche de la cigarette et nécessitent très peu d’entretien.',
       },
       {
-        q: 'La cigarette électronique est-elle sans risque ?',
-        a: 'Non. Les produits de vapotage ne doivent pas être présentés comme totalement sans risque. Les produits nicotinés créent une dépendance et sont interdits aux mineurs.',
+        q: 'Combien coûte une bonne cigarette électronique ?',
+        a: 'Un kit ou pod débutant de qualité coûte entre 15 € et 35 €. Un matériel avancé ou une box double accu varie entre 40 € et 80 €. À terme, la vape coûte environ 4 à 5 fois moins cher que le tabac traditionnel.',
+      },
+      {
+        q: 'Quelle est la durée de vie d’une résistance ?',
+        a: 'Une résistance dure en moyenne 2 à 3 semaines selon votre rythme de consommation et la sucrosité de votre e-liquide. Elle se remplace dès que vous ressentez une baisse de vapeur ou un goût altéré.',
+      },
+      {
+        q: 'Où se faire conseiller en magasin à Marseille ?',
+        a: 'Retrouvez l’équipe THEKLOPE dans notre boutique physique située au 188 Rue de Rome, 13006 Marseille. Nos conseillers vous accompagnent pour tester les matériels et choisir le dosage idéal.',
       },
     ],
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'q16-pro-146', 'doric-astra-2500mah-voopoo-271'],
