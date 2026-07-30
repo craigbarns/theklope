@@ -48,7 +48,7 @@ export default function BlogPost() {
       },
       headline: post.title,
       description: post.description,
-      image: `https://www.theklope.com${post.image}`,
+      image: post.image.startsWith('http') ? post.image : `https://www.theklope.com${post.image}`,
       datePublished: post.isoDate,
       dateModified: post.isoDate,
       author: {
