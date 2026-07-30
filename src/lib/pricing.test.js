@@ -62,6 +62,14 @@ test('percentage promo codes round half cents deterministically', () => {
   })
   assert.equal(fifteenPercent.discount, 1.04)
   assert.equal(fifteenPercent.total, 5.86)
+
+  const fifteenPercentAlias = computeTotals({
+    lines: [{ category: 'ecig', price: 6.9, qty: 1 }],
+    shippingMethodId: 'pickup',
+    promoCode: 'bienvenue15',
+  })
+  assert.equal(fifteenPercentAlias.discount, 1.04)
+  assert.equal(fifteenPercentAlias.total, 5.86)
 })
 
 test('PACK15 discounts one configured pack, not extra quantities or unrelated items', () => {

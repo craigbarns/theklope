@@ -19,6 +19,7 @@ export const SHIPPING_METHODS = [
 export const PROMO_CODES = {
   THEKLOPE10: { type: 'percent', value: 10, label: '-10%' },
   BIENVENUE: { type: 'percent', value: 15, label: '-15% première commande' },
+  BIENVENUE15: { type: 'percent', value: 15, label: '-15% première commande' },
   LIVRAISON: { type: 'shipping', value: 0, label: 'Livraison offerte' },
   PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure', eligibility: 'complete-pack' },
 }
