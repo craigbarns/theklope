@@ -992,6 +992,80 @@ export const BLOG_POSTS = [
     ],
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'gti-mesh-015020405-vaporesso-pack-de-5-300'],
   }),
+  makePost({
+    slug: 'meilleure-cigarette-electronique',
+    title: 'Meilleure Cigarette Électronique : Quel Kit Acheter en 2026 ?',
+    description: 'Le comparatif ultime pour trouver la meilleure cigarette électronique adaptée à votre profil. Pods compacts, kits puissance ou tirage serré.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T10:00:00Z',
+    readTime: '6 min',
+    category: 'Matériel',
+    image: 'https://images.unsplash.com/photo-1572097962657-3a45c71dbff8?w=800&q=80',
+    summary: 'Découvrez notre classement des meilleures e-cigarettes actuelles. Que vous soyez petit, moyen ou grand fumeur, trouvez le kit parfait pour vous.',
+    intro: 'Choisir sa première (ou sa nouvelle) cigarette électronique peut s’apparenter à un parcours du combattant face à la multitude de modèles. Pour vous simplifier la vie, nos experts ont sélectionné les meilleurs matériels actuels, reconnus pour leur fiabilité, leur rendu de saveur et leur simplicité d’utilisation.',
+    sections: [
+      {
+        title: 'Le Top pour débuter (Petit Fumeur)',
+        text: 'Pour les petits fumeurs (moins de 10 cigarettes/jour), les Pods sont aujourd’hui la norme. Ils sont compacts, ne fuient pas et ne demandent aucun réglage complexe. Le Vaporesso XROS 4 Mini et la série Pixo d’Aspire sont actuellement les stars incontestées de cette catégorie.',
+      },
+      {
+        title: 'Le meilleur compromis (Fumeur Moyen)',
+        text: 'Entre 10 et 15 cigarettes par jour, vous avez besoin de plus d’autonomie (batterie > 1000 mAh). Les kits intermédiaires comme le Luxe XR Max (Vaporesso) ou le Argus (Voopoo) offrent une excellente tenue de charge et un rendu de saveur exceptionnel.',
+      },
+      {
+        title: 'La machine à vapeur (Gros Fumeur & Cloud Chasing)',
+        text: 'Si vous fumez plus d’un paquet par jour ou que vous aimez les gros volumes de vapeur (tirage DL), orientez-vous vers des kits à double accu avec de gros clearomiseurs. Le Kit Gen Max de Vaporesso couplé au iTank est une référence absolue en la matière.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Combien coûte une bonne cigarette électronique ?',
+        a: 'Un excellent pod pour débuter coûte entre 15€ et 25€. Un kit intermédiaire autour de 35€-45€, et les modèles surpuissants vont de 50€ à 80€.',
+      },
+      {
+        q: 'Quel est le meilleur tirage pour arrêter de fumer ?',
+        a: 'Le tirage MTL (indirect, serré) est le plus recommandé car il reproduit fidèlement la sensation de tirage d’une cigarette traditionnelle.',
+      },
+    ],
+    relatedProductIds: ['pixo-aura-2-301', 'xros-4-mini-269', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
+  }),
+  makePost({
+    slug: 'top-10-meilleurs-eliquides',
+    title: 'Top des Meilleurs E-Liquides : Le Classement 2026',
+    description: 'Découvrez notre sélection des meilleurs e-liquides fruités, gourmands, frais et classic pour votre cigarette électronique.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T10:15:00Z',
+    readTime: '5 min',
+    category: 'E-liquides',
+    image: 'https://images.unsplash.com/photo-1620063255146-5db2e650d5ec?w=800&q=80',
+    summary: 'Fruités rouges, menthe glaciale ou classic blond ? Retrouvez les références incontournables qui séduisent des milliers de vapoteurs.',
+    intro: 'Le choix du e-liquide est responsable à 80% de la réussite de votre sevrage. S’il est à votre goût et contient le bon taux de nicotine, vous ne retoucherez pas à la cigarette. Voici les grands favoris de la communauté THEKLOPE.',
+    sections: [
+      {
+        title: 'Les Meilleurs "Classics" (Goût Tabac)',
+        text: 'Pour retrouver la sensation brute sans les goudrons, les classics blonds secs comme le FR-M d’Alfaliquid ou le Classico Grège restent des piliers indétrônables pour débuter sereinement.',
+      },
+      {
+        title: 'Les Meilleurs Fruités',
+        text: 'Les fruits rouges dominent le marché. Le légendaire Fruits Rouges de Liquidarom ou les mélanges Pêche Abricot (Freaks) offrent des explosions de saveurs très fidèles qui ne lassent pas tout au long de la journée.',
+      },
+      {
+        title: 'Les Stars de la Menthe & du Frais',
+        text: 'Pour les amateurs de sensations fortes et de "hit" en gorge, les e-liquides Menthe Glaciale (Pulp, Alfaliquid) ou les Fruités Givrés (Freeze Dragon) apportent une fraîcheur intense particulièrement agréable.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Faut-il commencer par un goût Tabac ou Fruité ?',
+        a: 'Environ 70% des débutants commencent par un goût "Classic" (tabac) pour ne pas être dépaysés, puis migrent vers la menthe ou les fruits au bout de quelques semaines.',
+      },
+      {
+        q: 'Quelle marque choisir ?',
+        a: 'Toutes les marques françaises (Alfaliquid, Pulp, Liquidarom, Petit Nuage) répondent à des normes sanitaires extrêmement strictes et garantissent une qualité irréprochable.',
+      },
+    ],
+    relatedProductIds: ['fr-m-10ml-alfaliquid-76', 'fruits-rouges-liquid-arom-211', 'menthe-glaciale-10ml-alfaliquid-81', 'grege-68'],
+  }),
 ]
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
