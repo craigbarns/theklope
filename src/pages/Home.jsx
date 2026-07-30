@@ -267,6 +267,24 @@ export default function Home() {
         />
       )}
 
+      {/* BANNIÈRE CONFIGURATEUR PACK SUR MESURE */}
+      <section className="container-page py-6">
+        <div className="relative overflow-hidden rounded-3xl border border-neon/30 bg-gradient-to-r from-neon/10 via-anthracite to-electric/10 p-8 lg:p-10 shadow-glow">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div>
+              <span className="chip border-neon/30 text-neon mb-3 inline-block">✨ Offre Signature -15%</span>
+              <h2 className="font-display text-2xl sm:text-3xl font-bold text-white">Créez votre Pack Vape Sur-Mesure</h2>
+              <p className="mt-2 text-sm text-ash/80 max-w-xl">
+                Composez votre pack idéal (Cigarette électronique + Résistance + E-liquide au choix) et bénéficiez de <strong className="text-neon">-15% de remise immédiate</strong> automatique.
+              </p>
+            </div>
+            <Link to="/configurateur" className="btn-primary shrink-0 py-3.5 px-6 font-bold shadow-glow text-base">
+              Composer mon Pack -15% <IconArrowRight width={18} height={18} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* PACKS DÉBUTANTS */}
       {starterPacks.length > 0 && (
         <section className="container-page py-8">
