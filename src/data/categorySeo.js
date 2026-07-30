@@ -1,3 +1,5 @@
+import { CATEGORIES } from './catalog.js'
+
 export const CATEGORY_SEO = {
   'cigarettes-electroniques': {
     seoTitle: 'Cigarettes électroniques pour adultes',
@@ -134,7 +136,7 @@ export const CATEGORY_SEO = {
   'e-liquides-50ml': {
     seoTitle: 'E-liquides 50 ml pas chers à booster',
     metaDescription:
-      'Découvrez notre sélection de e-liquides 50 ml en grand format économique (Mix & Vape). Ajoutez vos boosters pour obtenir votre taux de nicotine. Vente aux adultes.',
+      'E-liquides 50 ml en grand format économique (Mix & Vape). Ajoutez vos boosters pour choisir votre taux de nicotine. Vente réservée aux adultes.',
     h1: 'E-liquides 50 ml : Les grands formats économiques',
     intro:
       'Les e-liquides 50 ml (ou "Mix & Vape" / "Shake & Vape") sont le format le plus économique pour les gros vapoteurs. La loi interdisant la vente de flacons de plus de 10 ml contenant de la nicotine, ces liquides sont vendus sans nicotine, surdosés en arômes, prêts à être boostés.',
@@ -144,11 +146,20 @@ export const CATEGORY_SEO = {
         text:
           'C\'est très simple : le e-liquide 50 ml est généralement conditionné dans un flacon de 60 ml ou 70 ml. Il vous suffit de retirer l\'embout, de verser un ou deux boosters de nicotine, de secouer, et votre liquide est prêt !',
       },
+      {
+        title: 'Pourquoi choisir le format 50 ml ?',
+        text:
+          'Le format 50 ml offre un prix au millilitre nettement plus avantageux que les flacons de 10 ml prêts à vapoter, tout en permettant un réglage sur-mesure de votre taux de nicotine.',
+      },
     ],
     faq: [
       {
         q: 'Combien de boosters faut-il pour faire du 3mg ou 6mg ?',
         a: 'Pour 50 ml de e-liquide : ajoutez 1 booster (10 ml à 20 mg) pour obtenir 60 ml en 3 mg/ml. Ajoutez 2 boosters pour obtenir 70 ml en 6 mg/ml.',
+      },
+      {
+        q: 'Faut-il laisser reposer un e-liquide 50 ml après ajout du booster ?',
+        a: 'Un bon mélange de 30 secondes suffit généralement. Vous pouvez vapoter immédiatement votre liquide boosté.',
       },
     ],
   },
@@ -165,11 +176,20 @@ export const CATEGORY_SEO = {
         text:
           'La valeur en ohm définit votre tirage. 1.2 ohm et 1.0 ohm : idéal pour un tirage serré (MTL) et les sels de nicotine. 0.8 ohm et 0.6 ohm : tirage polyvalent, plus de vapeur. 0.4 ohm : tirage aérien (RDL), uniquement compatible avec les modèles Pro et Max.',
       },
+      {
+        title: 'Durée de vie et entretien des cartouches XROS',
+        text:
+          'Une cartouche XROS dure généralement entre 2 et 3 semaines selon votre rythme de vape et le type de liquide utilisé. Remplacez-la dès que le rendu des saveurs diminue.',
+      },
     ],
     faq: [
       {
         q: 'Les cartouches XROS sont-elles compatibles avec tous les pods XROS ?',
         a: 'Oui, à l\'exception de la cartouche 0.4 ohm qui nécessite une batterie puissante (Xros Pro, Xros 4). Les cartouches 0.6, 0.8, 1.0 et 1.2 ohm sont universellement compatibles avec les Xros 3, Xros Mini, etc.',
+      },
+      {
+        q: 'Comment éviter les fuites avec une cartouche XROS ?',
+        a: 'Ne remplissez pas à ras bord et refermez bien le drip tip immédiatement après le remplissage pour préserver la pression interne.',
       },
     ],
   },
@@ -278,7 +298,7 @@ export const CATEGORY_SEO = {
   'puffs-rechargeables': {
     seoTitle: 'Puffs rechargeables & alternatives légales',
     metaDescription:
-      'Les puffs jetables sont interdites en France. Découvrez notre sélection de puffs rechargeables, big puffs et pods économiques, 100% légaux et réservés aux adultes.',
+      'Puffs jetables interdites : découvrez nos puffs rechargeables et pods économiques 100% légaux en France. Vente réservée aux adultes.',
     h1: 'Puffs rechargeables et alternatives légales',
     intro:
       'Suite à la loi du 24 février 2025, la vente de puffs jetables est interdite en France. THEKLOPE vous propose les meilleures alternatives légales : les puffs rechargeables et pods compacts, beaucoup plus économiques et respectueux de l’environnement.',
@@ -399,4 +419,37 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+}
+
+for (const cat of CATEGORIES) {
+  if (!CATEGORY_SEO[cat.slug]) {
+    const isBrand = cat.slug.startsWith('marque-')
+    const name = cat.name
+    CATEGORY_SEO[cat.slug] = {
+      seoTitle: isBrand ? `${name} : Matériel & E-liquides` : `${name} pour vape`,
+      metaDescription: `Retrouvez la sélection ${name} chez THEKLOPE. Produits garantis originaux, conseils d'experts et livraison 24/48h.`.slice(0, 155),
+      h1: isBrand ? `Boutique ${name}` : name,
+      intro: `Découvrez tous les produits ${name} disponibles chez THEKLOPE. Une sélection rigoureuse pour satisfaire les vapoteurs majeurs.`,
+      sections: [
+        {
+          title: `Pourquoi choisir ${name} ?`,
+          text: `La gamme ${name} se distingue par la qualité de sa fabrication, le respect des normes et une restitution optimale des saveurs.`,
+        },
+        {
+          title: `Conseils & Compatibilité ${name}`,
+          text: `Vérifiez toujours la compatibilité des consommables et du matériel ${name} avant votre achat. Notre équipe est disponible pour vous guider.`,
+        },
+      ],
+      faq: [
+        {
+          q: `Les références ${name} sont-elles d'origine ?`,
+          a: `Oui, l'ensemble des produits ${name} est issu des canaux de distribution officiels et certifiés.`,
+        },
+        {
+          q: `Quel est le délai d'expédition pour ${name} ?`,
+          a: `Toute commande validée avant 14h est expédiée le jour même depuis nos stocks en France.`,
+        },
+      ],
+    }
+  }
 }
