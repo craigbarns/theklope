@@ -362,7 +362,7 @@ export const CATEGORY_SEO = {
   nouveautes: {
     seoTitle: 'Nouveautés vape',
     metaDescription:
-      'Nouveautés vape THEKLOPE : derniers produits pour adultes, cigarettes électroniques, e-liquides, pods et accessoires. Livraison France.',
+      'Nouveautés vape THEKLOPE : derniers produits pour adultes, cigarettes électroniques, e-liquides, pods et accessoires. Livraison France, stock actualisé.',
     h1: 'Nouveautés vape',
     intro:
       'Suivez les dernières arrivées THEKLOPE : matériel, e-liquides, pods et accessoires sélectionnés pour les vapoteurs majeurs.',
