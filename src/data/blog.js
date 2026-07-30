@@ -218,6 +218,7 @@ export const BLOG_POSTS = [
       {
         title: '3. Comprendre les types de tirage : MTL (Serré) vs DL (Aérien)',
         text:
+          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver. En cas de doute, l’équipe de la <a href="/cigarette-electronique-marseille">boutique THEKLOPE à Marseille</a> peut vous conseiller sur place.',
           'Le tirage détermine la manière dont vous aspirez la vapeur :\n\n' +
           '• **Inhalation Indirecte (MTL — Mouth-To-Lung)** : Tirage serré similaire à une cigarette traditionnelle. La vapeur passe d’abord par la bouche avant d’atteindre les poumons. C’est le tirage conseillé pour les débutants car il procure le "hit" (sensation en gorge) nécessaire avec des e-liquides à taux de nicotine moyen à élevé (9 à 18 mg/ml).\n\n' +
           '• **Inhalation Directe (DL — Direct-To-Lung)** : Tirage aérien produisant de gros nuages de vapeur. La vapeur va directement aux poumons comme avec une chicha. Ce tirage s’utilise avec des résistances basses (< 0.5 ohm) et des e-liquides faibles en nicotine (3 à 6 mg/ml) riches en Glycérine Végétale (VG).\n\n' +
@@ -976,7 +977,7 @@ export const BLOG_POSTS = [
       {
         title: 'Communication responsable',
         text:
-          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit.',
+          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit. Voir aussi les <a href="/conformite-vape">engagements de conformité THEKLOPE</a>.',
       },
     ],
     faq: [
