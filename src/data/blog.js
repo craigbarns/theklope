@@ -53,6 +53,34 @@ const makePost = ({
 
 export const BLOG_POSTS = [
   makePost({
+    slug: 'stockage-eliquides-batterie-vape',
+    title: 'Comment bien conserver ses e-liquides et sa batterie ?',
+    description:
+      'Bonnes pratiques pour conserver ses e-liquides et sa batterie de cigarette électronique : chaleur, lumière et stockage en cas de pause.',
+    date: '25 Juillet 2026',
+    isoDate: '2026-07-25T08:00:00+02:00',
+    readTime: '4 min',
+    category: 'Entretien',
+    image: '/products/chargeur-mc1-xtar_1.jpg',
+    summary:
+      'La chaleur, la lumière directe et les variations de température abîment aussi bien les e-liquides que la batterie intégrée de votre matériel.',
+    intro:
+      'Bien conserver son matériel de vapotage évite les mauvaises surprises : altération du e-liquide, fuite ou batterie qui se décharge anormalement vite.',
+    sections: [
+      {
+        title: 'Protéger les e-liquides de la chaleur et de la lumière',
+        text:
+          'Conservez vos flacons de e-liquide à température ambiante, à l’abri du soleil direct et de sources de chaleur comme un radiateur ou une vitre de voiture en été. Une exposition prolongée à la chaleur ou à la lumière peut altérer la couleur, l’odeur et le goût du liquide. Refermez toujours bien le bouchon après usage.',
+      },
+      {
+        title: 'Bien s’occuper de la batterie intégrée',
+        text:
+          'La plupart des kits et box THEKLOPE intègrent une batterie rechargeable par câble USB-C. Évitez de la laisser en charge sans surveillance prolongée, de l’exposer à une chaleur excessive ou de la stocker totalement déchargée pendant plusieurs semaines. Utilisez de préférence le câble fourni ou un câble adapté à la puissance indiquée.',
+      },
+      {
+        title: 'Préparer une pause d’utilisation',
+        text:
+          'En cas de pause de plusieurs semaines, videz le réservoir ou la cartouche, rechargez partiellement la batterie et rangez le matériel dans un endroit sec, à température modérée. Vérifiez l’état des joints et des contacts avant de reprendre l’utilisation.',
     slug: 'entretenir-kit-classique-box',
     title: 'Entretenir un kit classique ou une box de cigarette électronique',
     description:
@@ -90,6 +118,15 @@ export const BLOG_POSTS = [
     ],
     faq: [
       {
+        q: 'Peut-on conserver un e-liquide au réfrigérateur ?',
+        a: 'Ce n’est pas nécessaire dans des conditions normales. Un endroit sec, tempéré et à l’abri de la lumière suffit généralement à conserver un e-liquide.',
+      },
+      {
+        q: 'Faut-il retirer la batterie avant un rangement prolongé ?',
+        a: 'Sur les kits à batterie intégrée, il suffit généralement de la recharger partiellement avant une longue pause et d’éviter une chaleur excessive pendant le stockage.',
+      },
+    ],
+    relatedProductIds: ['cherry-frost-50ml-35', 'caffe-latte-50ml-0mg-210', 'doric-astra-2500mah-voopoo-271'],
         q: 'Pourquoi mon kit classique fuit-il au niveau de la vitre ?',
         a: 'C’est le plus souvent un joint usé, mal positionné ou un clearomiseur trop serré. Vérifiez l’état des joints et le remontage avant d’envisager un changement de résistance.',
       },
