@@ -59,7 +59,7 @@ const FALLBACK_GUIDE_SLUGS = [
 
 // Renvoie jusqu'à `limit` guides { slug, title } pertinents pour un produit,
 // en ne gardant que ceux réellement présents dans blogPosts.
-export function relatedGuidesForProduct(categoryKey, blogPosts = [], limit = 3) {
+export function relatedGuidesForProduct(categoryKey, blogPosts = [], limit = 4) {
   const slugs = GUIDES_BY_CATEGORY[categoryKey] || FALLBACK_GUIDE_SLUGS
   const bySlug = new Map(blogPosts.map((p) => [p.slug, p]))
   const guides = []
