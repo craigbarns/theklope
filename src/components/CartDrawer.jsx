@@ -210,12 +210,29 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="border-b border-white/10 px-5 py-3">
-              <p className="flex items-center gap-2 text-xs text-ash/80">
-                <IconTruck width={16} height={16} className="text-neon shrink-0" />
-                Livraison standard : 7,50 €, gratuite à partir de {formatPrice(totals.freeShippingThreshold)}.
-              </p>
-              <p className="mt-2 text-[11px] text-faint">Retrait gratuit en boutique à Marseille, au choix lors du paiement.</p>
+            <div className="border-b border-white/10 px-5 py-3.5 bg-white/[0.02]">
+              {totals.subtotal >= totals.freeShippingThreshold ? (
+                <p className="flex items-center gap-2 text-xs font-bold text-neon">
+                  <IconTruck width={18} height={18} className="shrink-0" />
+                  🎉 Livraison OFFERTE débloquée !
+                </p>
+              ) : (
+                <div>
+                  <p className="flex items-center justify-between text-xs font-medium text-white">
+                    <span className="flex items-center gap-1.5">
+                      <IconTruck width={16} height={16} className="text-neon shrink-0" />
+                      Plus que <strong className="text-neon font-bold">{formatPrice(totals.freeShippingThreshold - totals.subtotal)}</strong> pour la livraison OFFERTE !
+                    </span>
+                  </p>
+                  <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className="h-full bg-gradient-to-r from-neon to-electric transition-all duration-500 rounded-full"
+                      style={{ width: `${Math.min(100, Math.round((totals.subtotal / totals.freeShippingThreshold) * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              <p className="mt-2 text-[11px] text-faint">Retrait gratuit en boutique à Marseille · Coursier jour même disponible</p>
             </div>
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
