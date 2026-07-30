@@ -6,7 +6,6 @@ export const STORE = {
   name: 'THEKLOPE',
   url: 'https://www.theklope.com',
   image: 'https://www.theklope.com/og-image.jpg',
-  telephone: '+33491555555',
   priceRange: '$$',
   address: {
     streetAddress: '188 rue de Rome',

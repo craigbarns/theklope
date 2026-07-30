@@ -101,10 +101,7 @@ export default function Contact() {
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconMail width={17} height={17} /></span>
               contact@theklope.com
             </a>
-            <a href="tel:+33491555555" className="mb-3 flex items-center gap-3 text-sm text-ash/75 hover:text-neon">
-              <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconPhone width={17} height={17} /></span>
-              04 91 55 55 55
-            </a>
+
             <div className="flex items-center gap-3 text-sm text-ash/75">
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconHeadset width={17} height={17} /></span>
               Lundi – Vendredi · 9h00 – 19h00

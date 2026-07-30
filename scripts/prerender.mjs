@@ -142,7 +142,10 @@ let count = 0
 
 // ---- Produits ----
 for (const p of PRODUCTS) {
-  const catLabel = categoryName(getProductCategoryKey(p))
+  const catKey = getProductCategoryKey(p)
+  const cat = CATEGORIES.find((c) => c.key === catKey)
+  const catLabel = cat ? cat.name : catKey
+  const catSlug = cat ? cat.slug : p.category
   const title = `${p.name} — ${catLabel} | THEKLOPE`
   const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
   const path = `/produit/${p.id}`
@@ -191,7 +194,7 @@ for (const p of PRODUCTS) {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
           { '@type': 'ListItem', position: 2, name: 'Boutique', item: `${BASE_URL}/boutique` },
-          { '@type': 'ListItem', position: 3, name: catLabel, item: `${BASE_URL}/categorie/${p.category}` },
+          { '@type': 'ListItem', position: 3, name: catLabel, item: `${BASE_URL}/categorie/${catSlug}` },
           { '@type': 'ListItem', position: 4, name: p.name, item: abs(path) },
         ],
       },

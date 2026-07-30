@@ -135,11 +135,12 @@ export function buildProductLong(product) {
   const details = []
 
   if (product.category === 'eliquide') {
-    details.push(`${name} est un ${category}${brandSuffix} choisi par THEKLOPE pour son profil clair et son format facile à intégrer dans une routine de vape.`)
+    const flavStr = (product.flavors || []).join(' et ').toLowerCase()
+    const flavorIntro = flavStr ? `aux notes de ${flavStr}` : `incontournable`
+    details.push(`Découvrez le ${name}${brandSuffix}, un e-liquide ${flavorIntro} pour votre e-cigarette.`)
     details.push(flavorPhrase(product))
-    details.push(specs ? `Caractéristiques : ${specs}.` : '')
+    details.push(specs ? `Fiche technique : ${specs}.` : '')
     details.push(nicotinePhrase(product))
-    details.push('Un choix adapté aux vapoteurs majeurs qui veulent comparer rapidement les saveurs, le ratio et les dosages avant de commander.')
     return details.filter(Boolean).join(' ')
   }
 

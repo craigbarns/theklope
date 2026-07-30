@@ -65,7 +65,6 @@ export default function Footer() {
             </p>
             <address className="mt-4 not-italic text-sm leading-relaxed text-muted">
               Boutique THEKLOPE — 188 Rue de Rome, 13006 Marseille<br />
-              <a href="tel:+33491555555" className="hover:text-neon">04 91 55 55 55</a> ·{' '}
               <a href="mailto:contact@theklope.com" className="hover:text-neon">contact@theklope.com</a>
             </address>
             <div className="mt-5 flex flex-wrap gap-2">

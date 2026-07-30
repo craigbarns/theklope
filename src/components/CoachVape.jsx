@@ -321,7 +321,7 @@ export default function CoachVape() {
     } else if (/(contact|telephone|mail|adresse|magasin|conseiller|service client)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.com\n- **Téléphone** : 04 91 55 55 55 (du lundi au vendredi de 9h à 19h)\n- **Boutique** : 188 rue de Rome, 13006 Marseille'
+        content: 'Notre équipe est à votre écoute ! 📞\n\n- **E-mail** : contact@theklope.com\n- **Boutique** : 188 rue de Rome, 13006 Marseille'
       })
     } else if (/(pod|kit|clearomiseur|clearomiseur|resistance|box|batterie)/i.test(clean)) {
       addMessage({
