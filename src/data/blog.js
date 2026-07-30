@@ -928,7 +928,7 @@ export const BLOG_POSTS = [
       {
         title: 'Produits sensibles',
         text:
-          'Les e-liquides et consommables ouverts ne sont généralement pas repris pour des raisons d’hygiène. Consultez la politique de retour avant commande.',
+          'Les e-liquides et consommables ouverts ne sont généralement pas repris pour des raisons d’hygiène. Consultez la <a href="/livraison-retours">politique de livraison et retours</a> avant commande.',
       },
       {
         title: 'Vérification à réception',
@@ -1062,7 +1062,7 @@ export const BLOG_POSTS = [
       {
         title: 'Utiliser les fiches produits',
         text:
-          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, demandez conseil avant commande.',
+          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, <a href="/boutique-vape-marseille">demandez conseil en boutique à Marseille</a> avant commande.',
       },
     ],
     faq: [
