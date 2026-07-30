@@ -152,7 +152,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-21T08:00:00+02:00',
     readTime: '5 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=800&q=80',
+    image: '/products/resistances-gti-mesh-015020405-vaporesso-pack-de-5.jpg',
     summary:
       'La valeur en ohm, la plage de puissance indiquée par le fabricant et le tirage recherché sont les trois critères à croiser avant d’acheter une résistance.',
     intro:
@@ -199,7 +199,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-29T08:00:00+02:00',
     readTime: '12 min',
     category: 'Guides d’achat',
-    image: 'https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=800&q=80',
+    image: '/products/kit-xros-pro-2_1.jpg',
     summary:
       'Comment bien choisir sa cigarette électronique en 2026 ? Retrouvez notre guide complet par profil de fumeur, comparatif technique (Pods vs Kits vs Boxs), autonomie en mAh, type de tirage et choix du e-liquide idéal.',
     intro:
@@ -275,7 +275,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-08T08:00:00+02:00',
     readTime: '5 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1563298723-dcfebaa392e3?w=800&q=80',
+    image: '/products/kit-pod-luxe-xr-max-2800mah-vaporesso.jpg',
     summary:
       'Le pod privilégie la simplicité et le format compact, tandis qu’un kit classique mise sur l’autonomie et les réglages.',
     intro:
@@ -318,7 +318,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-07T08:00:00+02:00',
     readTime: '6 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1620063255146-5db2e650d5ec?w=800&q=80',
+    image: '/products/alfaliquid-classique-california-10ml.webp',
     summary:
       'Le taux de nicotine doit être choisi avec prudence, en tenant compte du matériel, de la sensation recherchée et des précautions de santé.',
     intro:
@@ -361,7 +361,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-06T08:00:00+02:00',
     readTime: '5 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1518112390430-f4ab02e9c2c8?w=800&q=80',
+    image: '/products/e-liquide-cola-10ml-liquidarom_2.jpg',
     summary:
       'Le ratio PG/VG conditionne la fluidité du liquide, le rendu des saveurs, la vapeur et la compatibilité avec votre résistance.',
     intro:
@@ -404,7 +404,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-05T08:00:00+02:00',
     readTime: '5 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80',
+    image: '/products/resistances-ito-v2-0-7-1-2-voopoo-pack-de-5.webp',
     summary:
       'Une résistance usée se reconnaît souvent au goût, à la vapeur, aux fuites ou à une sensation moins régulière.',
     intro:
@@ -447,7 +447,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-04T08:00:00+02:00',
     readTime: '4 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
+    image: '/products/resistances-pnp-x-015020304506ohm-voopoo-pack-de-5.jpg',
     summary:
       'L’amorçage protège le coton de la résistance et limite le risque de goût de brûlé dès la première utilisation.',
     intro:
@@ -490,7 +490,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-03T08:00:00+02:00',
     readTime: '5 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?w=800&q=80',
+    image: '/products/BVC NAUTILUS.jpg',
     summary:
       'Les fuites viennent souvent d’un mauvais remplissage, d’une résistance usée, d’un e-liquide trop fluide ou d’un joint déplacé.',
     intro:
@@ -533,7 +533,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-02T08:00:00+02:00',
     readTime: '5 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1508253730651-e5ace80a7025?w=800&q=80',
+    image: '/products/resistance-dotcoil_3.jpg',
     summary:
       'Le goût de brûlé vient souvent d’un coton mal imbibé, d’une puissance trop forte ou d’une résistance arrivée en fin de vie.',
     intro:
@@ -576,7 +576,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-01T08:00:00+02:00',
     readTime: '4 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?w=800&q=80',
+    image: '/products/caffe-latte-50ml-0mg.jpg',
     summary:
       'Un e-liquide sans nicotine ne contient pas de nicotine, mais il reste un produit de vapotage réservé aux adultes.',
     intro:
@@ -619,7 +619,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-30T08:00:00+02:00',
     readTime: '5 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80',
+    image: '/products/CHERRY FROST 50ML.webp',
     summary:
       'Les saveurs influencent l’expérience, mais le choix doit aussi tenir compte du matériel, du taux de nicotine et du ratio PG/VG.',
     intro:
@@ -662,7 +662,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-29T08:00:00+02:00',
     readTime: '5 min',
     category: 'Guides responsables',
-    image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&q=80',
+    image: '/products/kit-xros-pro-2_2.jpg',
     summary:
       'Les pods rechargeables et kits compacts offrent une alternative réutilisable aux dispositifs jetables, sous réserve de conformité réglementaire.',
     intro:
@@ -705,7 +705,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-28T08:00:00+02:00',
     readTime: '4 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=800&q=80',
+    image: '/products/Kit Soul 2 - GeekVape.jpg',
     summary:
       'Un pod entretenu limite les fuites, garde des contacts propres et permet de mieux suivre l’usure des cartouches.',
     intro:
@@ -748,7 +748,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-27T08:00:00+02:00',
     readTime: '5 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1508253730651-e5ace80a7025?w=800&q=80',
+    image: '/products/Kit Q16 Pro Plus - Justfog.webp',
     summary:
       'Le tirage influence la puissance, la consommation de liquide, la sensation en gorge et le type de résistance à utiliser.',
     intro:
@@ -791,7 +791,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-26T08:00:00+02:00',
     readTime: '5 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=800&q=80',
+    image: '/products/kit-gen-80s-avec-itank-2-silver.webp',
     summary:
       'L’autonomie dépend de la batterie, de la puissance réglée, de la résistance et des habitudes d’utilisation.',
     intro:
@@ -834,7 +834,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-25T08:00:00+02:00',
     readTime: '6 min',
     category: 'Guides responsables',
-    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+    image: '/products/KIT ZELOS.webp',
     summary:
       'Un lexique clair pour comprendre les fiches produits et comparer le matériel sans jargon inutile.',
     intro:
@@ -877,7 +877,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-24T08:00:00+02:00',
     readTime: '4 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
+    image: '/products/TRIBECA.webp',
     summary:
       'Une bonne fiche e-liquide doit aider à vérifier la compatibilité, le taux, la contenance et les précautions d’utilisation.',
     intro:
@@ -920,7 +920,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-23T08:00:00+02:00',
     readTime: '4 min',
     category: 'Guides responsables',
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&q=80',
+    image: '/products/chargeur-mc2-xtar_1.webp',
     summary:
       'Avant de commander, vérifiez les délais de préparation, les conditions de retour et les restrictions liées aux produits de vapotage.',
     intro:
@@ -963,7 +963,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-22T08:00:00+02:00',
     readTime: '6 min',
     category: 'Réglementation',
-    image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
+    image: '/products/Kit Armour G MTL - Vaporesso.jpg',
     summary:
       'La vape est un secteur réglementé : vente aux mineurs interdite, encadrement des produits nicotinés et communication responsable.',
     intro:
@@ -1006,7 +1006,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-21T08:00:00+02:00',
     readTime: '5 min',
     category: 'Guides responsables',
-    image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&q=80',
+    image: '/products/DRAG S3.jpg',
     summary:
       'Les erreurs de départ viennent souvent d’un mauvais réglage ou d’une incompatibilité, pas forcément d’un produit défectueux.',
     intro:
@@ -1049,7 +1049,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-06-20T08:00:00+02:00',
     readTime: '5 min',
     category: 'Entretien',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&q=80',
+    image: '/products/Cartouches XROS Series 3ml (4pcs) - Vaporesso.webp',
     summary:
       'La compatibilité ne se devine pas à l’œil. Il faut comparer la marque, la série, la valeur en ohm et les indications fabricant.',
     intro:
