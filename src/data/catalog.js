@@ -55,11 +55,19 @@ export const isDiyProduct = (p = {}) => {
   return /\b(diy|boosters?|bases?\s+(?:neutres?|pg|vg|\d+\s*\/\s*\d+)|bouteilles?\s+vides?|flacons?\s+vides?|fioles?\s+gradu[eé]es?|ar[oô]mes?\s+concentr[eé]s?)\b/i.test(text)
 }
 
+export const isPackProduct = (p = {}) => {
+  if (p.category === 'pack') return true
+  // Tout kit (ecig/pod) est un excellent pack débutant potentiel.
+  if (p.category === 'ecig' || p.category === 'pod') return true
+  return false
+}
+
 export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
 
 export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'resistance') return isResistanceProduct(product)
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
+  if (categoryKey === 'pack') return isPackProduct(product)
   return getProductCategoryKey(product) === categoryKey
 }
 
