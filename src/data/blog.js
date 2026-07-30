@@ -81,6 +81,21 @@ export const BLOG_POSTS = [
         title: 'Préparer une pause d’utilisation',
         text:
           'En cas de pause de plusieurs semaines, videz le réservoir ou la cartouche, rechargez partiellement la batterie et rangez le matériel dans un endroit sec, à température modérée. Vérifiez l’état des joints et des contacts avant de reprendre l’utilisation.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Peut-on conserver un e-liquide au réfrigérateur ?',
+        a: 'Ce n’est pas nécessaire dans des conditions normales. Un endroit sec, tempéré et à l’abri de la lumière suffit généralement à conserver un e-liquide.',
+      },
+      {
+        q: 'Faut-il retirer la batterie avant un rangement prolongé ?',
+        a: 'Sur les kits à batterie intégrée, il suffit généralement de la recharger partiellement avant une longue pause et d’éviter une chaleur excessive pendant le stockage.',
+      },
+    ],
+    relatedProductIds: ['cherry-frost-50ml-35', 'caffe-latte-50ml-0mg-210', 'doric-astra-2500mah-voopoo-271'],
+  }),
+  makePost({
     slug: 'entretenir-kit-classique-box',
     title: 'Entretenir un kit classique ou une box de cigarette électronique',
     description:
@@ -118,15 +133,6 @@ export const BLOG_POSTS = [
     ],
     faq: [
       {
-        q: 'Peut-on conserver un e-liquide au réfrigérateur ?',
-        a: 'Ce n’est pas nécessaire dans des conditions normales. Un endroit sec, tempéré et à l’abri de la lumière suffit généralement à conserver un e-liquide.',
-      },
-      {
-        q: 'Faut-il retirer la batterie avant un rangement prolongé ?',
-        a: 'Sur les kits à batterie intégrée, il suffit généralement de la recharger partiellement avant une longue pause et d’éviter une chaleur excessive pendant le stockage.',
-      },
-    ],
-    relatedProductIds: ['cherry-frost-50ml-35', 'caffe-latte-50ml-0mg-210', 'doric-astra-2500mah-voopoo-271'],
         q: 'Pourquoi mon kit classique fuit-il au niveau de la vitre ?',
         a: 'C’est le plus souvent un joint usé, mal positionné ou un clearomiseur trop serré. Vérifiez l’état des joints et le remontage avant d’envisager un changement de résistance.',
       },
@@ -218,7 +224,6 @@ export const BLOG_POSTS = [
       {
         title: '3. Comprendre les types de tirage : MTL (Serré) vs DL (Aérien)',
         text:
-          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver. En cas de doute, l’équipe de la <a href="/cigarette-electronique-marseille">boutique THEKLOPE à Marseille</a> peut vous conseiller sur place.',
           'Le tirage détermine la manière dont vous aspirez la vapeur :\n\n' +
           '• **Inhalation Indirecte (MTL — Mouth-To-Lung)** : Tirage serré similaire à une cigarette traditionnelle. La vapeur passe d’abord par la bouche avant d’atteindre les poumons. C’est le tirage conseillé pour les débutants car il procure le "hit" (sensation en gorge) nécessaire avec des e-liquides à taux de nicotine moyen à élevé (9 à 18 mg/ml).\n\n' +
           '• **Inhalation Directe (DL — Direct-To-Lung)** : Tirage aérien produisant de gros nuages de vapeur. La vapeur va directement aux poumons comme avec une chicha. Ce tirage s’utilise avec des résistances basses (< 0.5 ohm) et des e-liquides faibles en nicotine (3 à 6 mg/ml) riches en Glycérine Végétale (VG).\n\n' +
@@ -929,7 +934,7 @@ export const BLOG_POSTS = [
       {
         title: 'Produits sensibles',
         text:
-          'Les e-liquides et consommables ouverts ne sont généralement pas repris pour des raisons d’hygiène. Consultez la <a href="/livraison-retours">politique de livraison et retours</a> avant commande.',
+          'Les e-liquides et consommables ouverts ne sont généralement pas repris pour des raisons d’hygiène. Consultez la politique de retour avant commande.',
       },
       {
         title: 'Vérification à réception',
@@ -1063,7 +1068,7 @@ export const BLOG_POSTS = [
       {
         title: 'Utiliser les fiches produits',
         text:
-          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, <a href="/boutique-vape-marseille">demandez conseil en boutique à Marseille</a> avant commande.',
+          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, demandez conseil avant commande.',
       },
     ],
     faq: [
@@ -1079,39 +1084,6 @@ export const BLOG_POSTS = [
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'gti-mesh-015020405-vaporesso-pack-de-5-300'],
   }),
   makePost({
-    slug: 'entretenir-kit-classique-box',
-    title: 'Entretenir un kit classique ou une box de cigarette électronique',
-    description:
-      'Entretien d’un kit classique ou d’une box : nettoyage du clearomiseur, joints, pas de vis 510, contacts et stockage de la batterie.',
-    date: '30 Juillet 2026',
-    isoDate: '2026-07-30T08:00:00+02:00',
-    readTime: '5 min',
-    category: 'Entretien',
-    image: '/products/kit-aegis-legend-3-200w-avec-z-fli-55ml-geekvape.jpg',
-    summary:
-      'Un clearomiseur propre, des joints en bon état et un pas de vis 510 sans résidu limitent les fuites et les faux contacts sur un kit classique ou une box.',
-    intro:
-      'Contrairement à un pod tout-en-un, un kit classique ou une box se démonte : clearomiseur, joints, pas de vis 510 et parfois batterie sont autant de points à vérifier régulièrement.',
-    sections: [
-      {
-        title: 'Nettoyer le clearomiseur',
-        text:
-          'Démontez le clearomiseur pour rincer le réservoir à l’eau claire lors d’un changement de saveur, puis séchez-le avant de remonter. Un dépôt persistant au fond du réservoir peut altérer le goût des e-liquides suivants.',
-      },
-      {
-        title: 'Vérifier les joints (o-rings)',
-        text:
-          'Les joints toriques assurent l’étanchéité entre le réservoir, la cheminée et la base. Un joint usé, fendu ou déplacé est une cause fréquente de fuite au niveau du pas de vis 510 ou de l’airflow.',
-      },
-      {
-        title: 'Entretenir le pas de vis 510 et les contacts',
-        text:
-          'Essuyez régulièrement le pas de vis 510 et le contact de la box avec un tissu sec pour retirer le e-liquide qui aurait pu couler. Un contact encrassé peut provoquer un faux contact ou empêcher la box de détecter le clearomiseur.',
-      },
-      {
-        title: 'Stocker la box et la batterie',
-        text:
-          'Rangez le kit à l’abri de la chaleur et du plein soleil, réservoir fermé. Sur une box à batterie amovible, retirez l’accu en cas d’arrêt prolongé et stockez-le séparément dans un étui isolant.',
     slug: 'meilleure-cigarette-electronique',
     title: 'Meilleure Cigarette Électronique : Quel Kit Acheter en 2026 ?',
     description: 'Le comparatif ultime pour trouver la meilleure cigarette électronique adaptée à votre profil. Pods compacts, kits puissance ou tirage serré.',
@@ -1175,18 +1147,6 @@ export const BLOG_POSTS = [
     ],
     faq: [
       {
-        q: 'À quelle fréquence nettoyer un clearomiseur ?',
-        a: 'À chaque changement de saveur ou de résistance, et dès qu’un dépôt ou un goût persistant est constaté au fond du réservoir.',
-      },
-      {
-        q: 'Que faire si la box ne détecte plus le clearomiseur ?',
-        a: 'Vérifiez d’abord que le pas de vis 510 et les contacts sont propres et secs. Si le problème persiste, contrôlez le vissage du clearomiseur et l’état de la résistance.',
-      },
-    ],
-    relatedProductIds: [
-      'aegis-legend-3-200w-avec-z-fli-55ml-geekvape-264',
-      'gen-80s-avec-itank-2-noir-272',
-    ],
         q: 'Faut-il commencer par un goût Tabac ou Fruité ?',
         a: 'Environ 70% des débutants commencent par un goût "Classic" (tabac) pour ne pas être dépaysés, puis migrent vers la menthe ou les fruits au bout de quelques semaines.',
       },
