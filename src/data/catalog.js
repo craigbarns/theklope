@@ -10,10 +10,13 @@ export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
   { slug: 'e-liquides', key: 'eliquide', name: 'E-liquides', tagline: 'Saveurs sélectionnées, dosage maîtrisé' },
+  { slug: 'e-liquides-sels-de-nicotine', key: 'sels-nicotine', name: 'E-liquides Sels de nicotine', tagline: 'Douceur en gorge et sevrage efficace' },
+  { slug: 'e-liquides-50ml', key: 'eliquide-50ml', name: 'E-liquides 50 ml', tagline: 'Grands formats économiques à booster' },
   { slug: 'diy', key: 'diy', name: 'DIY', tagline: 'Bases, boosters, arômes & flacons' },
   { slug: 'resistances', key: 'resistance', name: 'Résistances', tagline: 'Consommables compatibles pour entretenir votre matériel' },
+  { slug: 'cartouches-xros', key: 'cartouches-xros', name: 'Cartouches XROS', tagline: 'Toute la gamme pour pods Vaporesso XROS' },
   { slug: 'accessoires', key: 'accessoire', name: 'Accessoires', tagline: 'Résistances, batteries, chargeurs & étuis' },
-  { slug: 'alternatives-puffs', key: 'alternative-puff', name: 'Alternatives aux puffs jetables', tagline: 'Pods et modèles rechargeables conformes pour adultes' },
+  { slug: 'puffs-rechargeables', key: 'alternative-puff', name: 'Puffs rechargeables & alternatives', tagline: 'Systèmes légaux, économiques et écologiques' },
   { slug: 'packs-debutants', key: 'pack', name: 'Packs débutants', tagline: 'Tout pour bien démarrer' },
   { slug: 'nouveautes', key: 'new', name: 'Nouveautés', tagline: 'Les dernières arrivées' },
   { slug: 'meilleures-ventes', key: 'best', name: 'Sélection du catalogue', tagline: 'Références disponibles sélectionnées par la boutique' },
@@ -45,7 +48,7 @@ export const isResistanceProduct = (p = {}) => {
 
 export const isAlternativePuffProduct = (p = {}) => {
   if (!['pod', 'ecig', 'pack'].includes(p.category)) return false
-  return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target)\b/i.test(normalizedProductText(p))
+  return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target|dojo|jnr|tornado)\b/i.test(normalizedProductText(p))
 }
 
 export const isDiyProduct = (p = {}) => {
@@ -57,9 +60,23 @@ export const isDiyProduct = (p = {}) => {
 
 export const isPackProduct = (p = {}) => {
   if (p.category === 'pack') return true
-  // Tout kit (ecig/pod) est un excellent pack débutant potentiel.
   if (p.category === 'ecig' || p.category === 'pod') return true
   return false
+}
+
+export const isSelsNicotine = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  return /\b(sel|sels)\s+de\s+nicotine\b/i.test(normalizedProductText(p)) || p.nicotine?.includes(20)
+}
+
+export const isEliquide50ml = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  return /\b50\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 50
+}
+
+export const isCartouchesXros = (p = {}) => {
+  if (p.category !== 'resistance' && p.category !== 'accessoire') return false
+  return /\b(cartouches?)\s+(xros)\b/i.test(normalizedProductText(p))
 }
 
 export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
@@ -68,6 +85,9 @@ export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'resistance') return isResistanceProduct(product)
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
   if (categoryKey === 'pack') return isPackProduct(product)
+  if (categoryKey === 'sels-nicotine') return isSelsNicotine(product)
+  if (categoryKey === 'eliquide-50ml') return isEliquide50ml(product)
+  if (categoryKey === 'cartouches-xros') return isCartouchesXros(product)
   return getProductCategoryKey(product) === categoryKey
 }
 

@@ -101,6 +101,78 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  'e-liquides-sels-de-nicotine': {
+    seoTitle: 'E-liquides aux Sels de Nicotine',
+    metaDescription:
+      'Retrouvez la sensation des puffs avec les e-liquides aux sels de nicotine. Douceur en gorge, assimilation rapide et sevrage efficace. Réservé aux adultes.',
+    h1: 'E-liquides aux Sels de Nicotine',
+    intro:
+      'Les e-liquides aux sels de nicotine sont la solution idéale pour les vapoteurs cherchant une assimilation rapide de la nicotine avec un passage en gorge (hit) très doux. Ils reproduisent exactement la sensation des puffs jetables.',
+    sections: [
+      {
+        title: 'Pourquoi choisir les sels de nicotine ?',
+        text:
+          'Contrairement à la nicotine classique (freebase), le sel de nicotine permet de vapoter avec un taux élevé (10mg ou 20mg) sans irriter la gorge. C\'est le choix numéro un pour réussir son sevrage tabagique sans sensation de manque.',
+      },
+      {
+        title: 'Quel matériel utiliser avec des sels de nicotine ?',
+        text:
+          'Les e-liquides aux sels de nicotine doivent être utilisés avec du matériel peu puissant : des pods compacts ou des résistances supérieures à 1.0 ohm. Une puissance trop forte délivrerait trop de nicotine d\'un coup.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Est-ce le même liquide que dans les puffs ?',
+        a: 'Absolument. Les puffs jetables utilisaient massivement des sels de nicotine à 20 mg/ml pour offrir une grande douceur. En passant au sel de nicotine en flacon, vous retrouverez exactement la même vape.',
+      },
+      {
+        q: 'Peut-on vapoter du sel de nicotine toute la journée ?',
+        a: 'Oui, mais comme l\'assimilation est très rapide, vos besoins sont vite comblés. Il est conseillé d\'espacer un peu plus ses bouffées qu\'avec un e-liquide classique.',
+      },
+    ],
+  },
+  'e-liquides-50ml': {
+    seoTitle: 'E-liquides 50 ml pas chers à booster',
+    metaDescription:
+      'Découvrez notre sélection de e-liquides 50 ml en grand format économique (Mix & Vape). Ajoutez vos boosters pour obtenir votre taux de nicotine. Vente aux adultes.',
+    h1: 'E-liquides 50 ml : Les grands formats économiques',
+    intro:
+      'Les e-liquides 50 ml (ou "Mix & Vape" / "Shake & Vape") sont le format le plus économique pour les gros vapoteurs. La loi interdisant la vente de flacons de plus de 10 ml contenant de la nicotine, ces liquides sont vendus sans nicotine, surdosés en arômes, prêts à être boostés.',
+    sections: [
+      {
+        title: 'Comment booster un e-liquide 50 ml ?',
+        text:
+          'C\'est très simple : le e-liquide 50 ml est généralement conditionné dans un flacon de 60 ml ou 70 ml. Il vous suffit de retirer l\'embout, de verser un ou deux boosters de nicotine, de secouer, et votre liquide est prêt !',
+      },
+    ],
+    faq: [
+      {
+        q: 'Combien de boosters faut-il pour faire du 3mg ou 6mg ?',
+        a: 'Pour 50 ml de e-liquide : ajoutez 1 booster (10 ml à 20 mg) pour obtenir 60 ml en 3 mg/ml. Ajoutez 2 boosters pour obtenir 70 ml en 6 mg/ml.',
+      },
+    ],
+  },
+  'cartouches-xros': {
+    seoTitle: 'Cartouches Vaporesso XROS de remplacement',
+    metaDescription:
+      'Achetez vos cartouches XROS compatibles avec toute la gamme de pods Vaporesso XROS. Résistances Mesh 0.4 à 1.2 ohm pour MTL et RDL.',
+    h1: 'Cartouches Vaporesso XROS',
+    intro:
+      'Les cartouches XROS sont la référence des pods rechargeables Vaporesso. Grâce à la technologie Corex, elles offrent une excellente durée de vie et une restitution parfaite des saveurs, tout en évitant les fuites.',
+    sections: [
+      {
+        title: 'Quelle cartouche XROS choisir ?',
+        text:
+          'La valeur en ohm définit votre tirage. 1.2 ohm et 1.0 ohm : idéal pour un tirage serré (MTL) et les sels de nicotine. 0.8 ohm et 0.6 ohm : tirage polyvalent, plus de vapeur. 0.4 ohm : tirage aérien (RDL), uniquement compatible avec les modèles Pro et Max.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les cartouches XROS sont-elles compatibles avec tous les pods XROS ?',
+        a: 'Oui, à l\'exception de la cartouche 0.4 ohm qui nécessite une batterie puissante (Xros Pro, Xros 4). Les cartouches 0.6, 0.8, 1.0 et 1.2 ohm sont universellement compatibles avec les Xros 3, Xros Mini, etc.',
+      },
+    ],
+  },
   diy: {
     seoTitle: 'DIY e-liquide : bases, boosters et arômes',
     metaDescription:
@@ -203,37 +275,33 @@ export const CATEGORY_SEO = {
       },
     ],
   },
-  'alternatives-puffs': {
-    seoTitle: 'Alternatives aux puffs jetables',
+  'puffs-rechargeables': {
+    seoTitle: 'Puffs rechargeables & alternatives légales',
     metaDescription:
-      'Alternatives aux puffs jetables pour adultes : pods rechargeables et kits compacts conformes. Sélection responsable THEKLOPE, livraison en France.',
-    h1: 'Alternatives aux puffs jetables',
+      'Les puffs jetables sont interdites en France. Découvrez notre sélection de puffs rechargeables, big puffs et pods économiques, 100% légaux et réservés aux adultes.',
+    h1: 'Puffs rechargeables et alternatives légales',
     intro:
-      'THEKLOPE privilégie les solutions rechargeables et réutilisables pour les vapoteurs majeurs. Cette page présente des alternatives aux puffs jetables lorsque la réglementation applicable les autorise ou les encadre.',
+      'Suite à la loi du 24 février 2025, la vente de puffs jetables est interdite en France. THEKLOPE vous propose les meilleures alternatives légales : les puffs rechargeables et pods compacts, beaucoup plus économiques et respectueux de l’environnement.',
     sections: [
       {
-        title: 'Pourquoi choisir une alternative rechargeable ?',
+        title: 'Qu’est-ce qu’une puff rechargeable ?',
         text:
-          'Un pod rechargeable permet de remplacer la cartouche ou de remplir le réservoir, au lieu de jeter l’ensemble du dispositif. Il offre aussi plus de visibilité sur le e-liquide utilisé.',
+          'Une puff rechargeable (ou pod) conserve la simplicité d’une puff classique mais dispose d’une batterie rechargeable en USB-C et d’une cartouche remplissable. Vous ne jetez plus la batterie à chaque fois, ce qui divise votre budget vape par trois.',
       },
       {
-        title: 'Conformité et vente aux adultes',
+        title: 'Les puffs jetables sont-elles interdites ?',
         text:
-          'Les produits de vapotage sont réglementés. THEKLOPE ne cible pas les mineurs, ne fait pas de promesse médicale et met en avant les informations utiles pour un achat responsable.',
+          'Oui, la loi n° 2025-175 interdit la vente des dispositifs à usage unique. Les modèles présentés ici sont tous équipés d’un réservoir remplissable ou d’une cartouche remplaçable, en totale conformité avec la législation française actuelle.',
       },
     ],
     faq: [
       {
-        q: 'THEKLOPE vend-il des puffs jetables ?',
-        a: 'La disponibilité dépend de la réglementation en vigueur. THEKLOPE privilégie les alternatives rechargeables, conformes et réservées aux adultes.',
+        q: 'Quel modèle choisir pour remplacer ma puff jetable ?',
+        a: 'Les modèles avec tirage automatique (sans bouton) et cartouches intégrées comme les pods Vaporesso, Oxva ou les systèmes "Big Puff" rechargeables offrent exactement la même sensation.',
       },
       {
-        q: 'Quel produit choisir à la place d’une puff jetable ?',
-        a: 'Un pod rechargeable compact avec cartouches compatibles est souvent l’alternative la plus proche en simplicité, tout en réduisant le caractère jetable du produit.',
-      },
-      {
-        q: 'Une alternative rechargeable contient-elle forcément de la nicotine ?',
-        a: 'Non. Le taux dépend du e-liquide utilisé. Les produits nicotinés sont réservés aux adultes et créent une dépendance.',
+        q: 'Quel e-liquide utiliser pour retrouver le goût de ma puff ?',
+        a: 'Les puffs utilisent des "sels de nicotine". Pour retrouver cette douceur en gorge et ces saveurs intenses, orientez-vous vers notre catégorie E-liquides Sels de Nicotine.',
       },
     ],
   },
