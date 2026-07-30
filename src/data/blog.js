@@ -1091,7 +1091,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T10:00:00Z',
     readTime: '6 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1572097962657-3a45c71dbff8?w=800&q=80',
+    image: '/products/Kit Aegis Legend 5 et Z Subohm 5 - GeekVape.webp',
     summary: 'Découvrez notre classement des meilleures e-cigarettes actuelles. Que vous soyez petit, moyen ou grand fumeur, trouvez le kit parfait pour vous.',
     intro: 'Choisir sa première (ou sa nouvelle) cigarette électronique peut s’apparenter à un parcours du combattant face à la multitude de modèles. Pour vous simplifier la vie, nos experts ont sélectionné les meilleurs matériels actuels, reconnus pour leur fiabilité, leur rendu de saveur et leur simplicité d’utilisation.',
     sections: [
@@ -1128,7 +1128,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T10:15:00Z',
     readTime: '5 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1620063255146-5db2e650d5ec?w=800&q=80',
+    image: '/products/e-liquide-fruits-rouges-10ml-liquidarom.webp',
     summary: 'Fruités rouges, menthe glaciale ou classic blond ? Retrouvez les références incontournables qui séduisent des milliers de vapoteurs.',
     intro: 'Le choix du e-liquide est responsable à 80% de la réussite de votre sevrage. S’il est à votre goût et contient le bon taux de nicotine, vous ne retoucherez pas à la cigarette. Voici les grands favoris de la communauté THEKLOPE.',
     sections: [
@@ -1165,7 +1165,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T11:00:00Z',
     readTime: '6 min',
     category: 'Réglementation',
-    image: 'https://images.unsplash.com/photo-1527661591475-527312dd65f5?w=800&q=80',
+    image: '/products/kit-xros-pro-2_3.webp',
     summary: 'Promulguée le 24 février 2025, la loi interdisant les vapes jetables est pleinement en vigueur. Comment continuer à vapoter légalement et pour moins cher ?',
     intro: 'La loi n° 2025-175 du 24 février 2025 a tranché : la fabrication, la mise en vente et la distribution à titre gratuit des dispositifs électroniques de vapotage à usage unique (les "puffs") sont désormais strictement interdites en France sous peine de lourdes sanctions.',
     sections: [
@@ -1202,7 +1202,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T11:15:00Z',
     readTime: '5 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1534536281715-e28d76689b4d?w=800&q=80',
+    image: '/products/e-liquide-selad-bubble-gum-10ml_1.webp',
     summary: 'Moins d’irritation en gorge, absorption rapide et sensation proche de la cigarette classique : découvrez le secret des e-liquides aux sels de nicotine.',
     intro: 'Apparus massivement dans l’univers de la vape grâce aux puffs, les e-liquides aux sels de nicotine ont révolutionné le sevrage tabagique en permettant de consommer des taux élevés sans sensation de brûlure en gorge.',
     sections: [
@@ -1235,7 +1235,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T11:30:00Z',
     readTime: '7 min',
     category: 'DIY',
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&q=80',
+    image: '/products/booster-20-mg-clark-s_1.webp',
     summary: 'Le Do It Yourself (DIY) permet de personnaliser ses saveurs et de diviser par quatre le coût de sa vape. Suivez le guide pas à pas.',
     intro: 'Fabriquer son propre e-liquide est extrêmement simple et accessible à tous. En mélangeant une base neutre, des arômes concentrés et des boosters de nicotine, vous maîtrisez totalement la composition de votre vape.',
     sections: [
@@ -1268,7 +1268,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T11:45:00Z',
     readTime: '4 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1563298723-dcfebaa392e3?w=800&q=80',
+    image: '/products/kit-xros-pro-2_2.webp',
     summary: 'Vaporesso affine sa formule gagnante avec le XROS 6 Mini. Test complet d’un pod qui s’impose comme le compagnon idéal du quotidien.',
     intro: 'La série XROS de Vaporesso domine le marché du pod MTL depuis plusieurs années. Nous avons testé en profondeur le dernier-né de la gamme : le XROS 6 Mini.',
     sections: [
@@ -1301,7 +1301,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T12:00:00Z',
     readTime: '5 min',
     category: 'Matériel',
-    image: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&q=80',
+    image: '/products/kit-xros-pro-2_1.webp',
     summary: 'Vous hésitez entre les différents déclinaisons de la famille XROS ? Nous comparons l’autonomie, les fonctionnalités et les prix.',
     intro: 'La gamme XROS de Vaporesso offre plusieurs modèles pour répondre à tous les profils d’utilisateurs. Du modèle le plus simple au modèle le plus poussé, voici le guide pour faire le bon choix.',
     sections: [
@@ -1334,7 +1334,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T12:15:00Z',
     readTime: '5 min',
     category: 'Actualités',
-    image: 'https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=800&q=80',
+    image: '/products/kit-apex-vaporesso.webp',
     summary: 'Les puffs jetables BM600 ou Elfbar 600 ont disparu des linéaires. Mais les fabricants ont réagi en proposant des versions à cartouches rechargeables conformes.',
     intro: 'Suite à l’application de la loi n° 2025-175, les modèles jetables Lost Mary BM600 et Elf Bar 600 ne sont plus commercialisés en France. Cependant, les marques ont adapté leur catalogue.',
     sections: [
@@ -1363,7 +1363,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T12:30:00Z',
     readTime: '6 min',
     category: 'Accessoires',
-    image: 'https://images.unsplash.com/photo-1619725002198-6a689b72f41d?w=800&q=80',
+    image: '/products/chargeur-mc1-xtar_2.webp',
     summary: 'L’accu est le cœur énergétique de votre cigarette électronique. Choisir un accu adapté et respecter la sécurité est capital.',
     intro: 'Les batteries rechargeables au format 18650 alimentent la majorité des box et mods électroniques. Choisir le bon modèle garantit autonomie et sécurité.',
     sections: [
@@ -1396,7 +1396,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T12:45:00Z',
     readTime: '4 min',
     category: 'Réglementation',
-    image: 'https://images.unsplash.com/photo-1584467735871-8e85353a8413?w=800&q=80',
+    image: '/products/booster-pulp-20-mg_1.webp',
     summary: 'Après l’interdiction des puffs jetables, la France durcit sa réglementation sur les sachets de nicotine à sucer. Ce qu’il faut savoir.',
     intro: 'Publié en application du décret n° 2025-898, l’interdiction de la commercialisation des sachets de nicotine sans tabac (nicotine pouches) entre en vigueur le 1er avril 2026 en France.',
     sections: [
@@ -1425,7 +1425,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T13:00:00Z',
     readTime: '5 min',
     category: 'Conseils',
-    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&q=80',
+    image: '/products/alfaliquid-fraicheur-menthe-fraiche-10ml.webp',
     summary: 'Avec le paquet de cigarettes au-delà de 12.50 €, le passage à la vape permet d’économiser plus de 3000 € par an pour un fumeur un paquet/jour.',
     intro: 'Outre les bénéfices majeurs pour la santé, l’argument économique est l’un des moteurs principaux pour arrêter le tabac. Faisons le calcul réel des dépenses.',
     sections: [
@@ -1458,7 +1458,7 @@ export const BLOG_POSTS = [
     isoDate: '2026-07-30T13:15:00Z',
     readTime: '4 min',
     category: 'E-liquides',
-    image: 'https://images.unsplash.com/photo-1508253730651-e5ace80a7025?w=800&q=80',
+    image: '/products/coconut-puff_1.webp',
     summary: 'Vous regrettez le goût ultra-intense de votre ancienne puff jetable ? Voici la recette exacte pour obtenir le même rendu en flacon.',
     intro: 'Le succès gustatif des puffs reposait sur trois piliers : un arôme surdosé, un additif frais (agent glaçant) et des sels de nicotine. Voici comment reconstituer cette sensation parfaite.',
     sections: [
