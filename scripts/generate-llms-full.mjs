@@ -14,6 +14,11 @@ const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
 }))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
+const { STORE_PHONE } = await import(resolve(root, 'src/data/localBusiness.js'))
+
+// STORE_PHONE est volontairement vide (TODO dans src/data/localBusiness.js) :
+// on n'émet la ligne téléphone que si un vrai numéro est renseigné.
+const phoneLine = STORE_PHONE ? `- **Téléphone** : ${STORE_PHONE}\n` : ''
 
 const BASE_URL = 'https://www.theklope.com'
 const normalizedText = (value) => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -27,8 +32,7 @@ let md = `# THEKLOPE - Full Database & Specifications
 ## 1. Informations de l'Établissement & Contact
 - **Nom commercial** : THEKLOPE
 - **Adresse de la boutique physique** : 188 rue de Rome, 13006 Marseille, France
-- **Téléphone** : +33 4 91 55 55 55
-- **E-mail de support** : contact@theklope.com
+${phoneLine}- **E-mail de support** : contact@theklope.com
 - **Site officiel** : ${BASE_URL}
 - **RCS** : Marseille 815 155 973
 - **TVA** : FR58 815 155 973

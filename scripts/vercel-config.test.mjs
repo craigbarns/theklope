@@ -15,6 +15,8 @@ const expectedLegacyRedirects = {
   '/17-e-liquides-france': '/categorie/e-liquides',
   '/23-pyrex': '/categorie/accessoires',
   '/24-chargeurs': '/categorie/accessoires',
+  '/12-consommables': '/categorie/resistances',
+  '/26-diy': '/categorie/diy',
   '/content/5-:slug': '/livraison-retours',
   '/produit/classico-grege-50-ml-freaks': '/produit/grege-68',
   '/produit/e-liquide-cafe-10ml-liquidarom': '/produit/cafe-liquid-arom-209',
@@ -35,6 +37,24 @@ test('high-traffic legacy URLs redirect to a relevant live page', () => {
 
 test('no explicit redirect is added for the case-mistyped admin URL', () => {
   assert.equal(redirectsBySource.has('/ADMIN'), false)
+})
+
+test('a generic 301 catches legacy numeric PrestaShop category URLs', () => {
+  const generic = redirectsBySource.get('/:id(\\d+)-:slug')
+  assert.ok(generic, 'Missing generic redirect for /:id(\\d+)-:slug')
+  assert.equal(generic.destination, '/boutique')
+  assert.equal(generic.permanent, true)
+})
+
+test('specific legacy category redirects are evaluated before the generic numeric rule', () => {
+  const sources = config.redirects.map((redirect) => redirect.source)
+  const genericIndex = sources.indexOf('/:id(\\d+)-:slug')
+  assert.ok(genericIndex > -1, 'Generic numeric rule missing')
+  for (const source of Object.keys(expectedLegacyRedirects)) {
+    const index = sources.indexOf(source)
+    assert.ok(index > -1, `Missing redirect for ${source}`)
+    assert.ok(index < genericIndex, `${source} must be declared before the generic numeric rule`)
+  }
 })
 
 test('checkout cleanup is scheduled at most daily for Hobby compatibility', () => {

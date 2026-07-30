@@ -31,6 +31,7 @@ const {
   featuredProducts,
   getProductCategoryKey,
   productMatchesCategory,
+  productsByCategorySlugFrom,
   selectHomeHeroProduct,
 } = await import(resolve(root, 'src/data/catalog.js'))
 const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
@@ -143,9 +144,12 @@ let count = 0
 // ---- Produits ----
 for (const p of PRODUCTS) {
   const catKey = getProductCategoryKey(p)
-  const cat = CATEGORIES.find((c) => c.key === catKey)
+  // Cherche par clé ET par slug : `p.category` peut déjà être un slug ou une
+  // clé inconnue du catalogue distant. Sans correspondance, on évite à tout
+  // prix de construire /categorie/<clé brute> (404) : on pointe vers /boutique.
+  const cat = CATEGORIES.find((c) => c.key === catKey || c.slug === catKey || c.slug === p.category)
   const catLabel = cat ? cat.name : catKey
-  const catSlug = cat ? cat.slug : p.category
+  const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
   const title = `${p.name} — ${catLabel} | THEKLOPE`
   const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
   const path = `/produit/${p.id}`
@@ -194,14 +198,14 @@ for (const p of PRODUCTS) {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
           { '@type': 'ListItem', position: 2, name: 'Boutique', item: `${BASE_URL}/boutique` },
-          { '@type': 'ListItem', position: 3, name: catLabel, item: `${BASE_URL}/categorie/${catSlug}` },
+          { '@type': 'ListItem', position: 3, name: catLabel, item: abs(catPath) },
           { '@type': 'ListItem', position: 4, name: p.name, item: abs(path) },
         ],
       },
     ],
   }
   const content = `
-    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <span>${esc(catLabel)}</span></nav>
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <a href="${esc(catPath)}">${esc(catLabel)}</a></nav>
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
       <div><div class="card relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-2">
         <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(p.name)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
@@ -233,10 +237,21 @@ for (const p of PRODUCTS) {
   count++
 }
 
+// Bloc de crawlability : expose TOUS les liens produits en HTML crawlable,
+// au-delà de la sélection visible (limitée à 40) et sans dépendre du JS.
+const allProductsNav = (products, heading, ariaLabel) => {
+  if (!products.length) return ''
+  const items = products.map((p) => `<li><a href="/produit/${esc(p.id)}">${esc(p.name)}</a></li>`).join('')
+  return `<nav aria-label="${esc(ariaLabel)}" class="mt-12 text-sm text-muted"><h2>${esc(heading)}</h2><ul>${items}</ul></nav>`
+}
+
 // ---- Catégories ----
 for (const c of CATEGORIES) {
   const seo = CATEGORY_SEO[c.slug]
-  const inCat = PRODUCTS.filter((p) => productMatchesCategory(p, c.key)).slice(0, 40)
+  // Même logique que CategoryPage.jsx (gère aussi les catégories virtuelles
+  // nouveautes/meilleures-ventes) pour que le HTML crawlable reflète l'app.
+  const allInCat = productsByCategorySlugFrom(PRODUCTS, c.slug)
+  const inCat = allInCat.slice(0, 40)
   const title = `${seo?.seoTitle || c.name} | THEKLOPE`
   const description = (seo?.metaDescription || `${c.name} : ${c.tagline}. Sélection THEKLOPE, livraison France, paiement sécurisé. Vente réservée aux +18.`).slice(0, 160)
   const path = `/categorie/${c.slug}`
@@ -280,6 +295,7 @@ for (const c of CATEGORIES) {
     ${sections}
     <ul>${links}</ul>`
     + faq
+    + allProductsNav(allInCat, `Tout le catalogue ${c.name}`, 'Tous les produits de la catégorie')
   writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content, catalogBootstrap: inCat }))
   count++
 }
@@ -431,7 +447,11 @@ function buildStaticPageJsonLd(s) {
 }
 
 for (const s of STATIC_PAGES) {
-  const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>`
+  // /boutique : exposer tous les liens produits aux crawlers sans JS.
+  const shopNav = s.path === '/boutique'
+    ? allProductsNav(PRODUCTS, 'Tout le catalogue THEKLOPE', 'Tous les produits de la boutique')
+    : ''
+  const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
   const jsonLd = buildStaticPageJsonLd(s)
   writePage(s.path, buildPage({
     title: s.title,

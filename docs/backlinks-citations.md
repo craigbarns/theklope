@@ -43,7 +43,7 @@ Adresse      : 188 Rue de Rome
 Code postal  : 13006
 Ville        : Marseille
 Pays         : France
-Téléphone    : 04 91 55 55 55
+Téléphone    : [TODO — renseigner le vrai numéro avant toute inscription ; ne jamais utiliser de numéro fictif, voir STORE_PHONE dans src/data/localBusiness.js]
 Site web     : https://www.theklope.com
 Catégorie    : Boutique de cigarettes électroniques
 Horaires     : Lundi au vendredi 9h00–19h00 · Samedi et dimanche : fermé

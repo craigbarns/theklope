@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { categoryName, getProductCategoryKey } from '../data/catalog.js'
+import { CATEGORIES, categoryName, getProductCategoryKey } from '../data/catalog.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -237,7 +237,7 @@ export default function Product() {
         <Breadcrumbs
           items={[
             { label: 'Boutique', to: '/boutique' },
-            { label: categoryName(getProductCategoryKey(product)) },
+            { label: categoryName(getProductCategoryKey(product)), to: productCategoryPath },
             { label: product.name },
           ]}
         />
