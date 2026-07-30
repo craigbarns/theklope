@@ -43,7 +43,7 @@ test('PACK15 accepts the canonical resistance category', () => {
 test('regular promo codes keep working outside packs', () => {
   const totals = computeTotals({ lines: [device], promoCode: 'THEKLOPE10' })
   assert.equal(totals.discount, 4)
-  assert.equal(totals.total, 43.5)
+  assert.equal(totals.total, 36)
 })
 
 test('percentage promo codes round half cents deterministically', () => {

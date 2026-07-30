@@ -125,10 +125,10 @@ export default function Home() {
                 Voir les catégories
               </Link>
             </div>
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-muted">
-              <span className="flex items-center gap-2"><IconTruck width={18} height={18} className="text-neon" /> Livraison 24/48h</span>
-              <span className="flex items-center gap-2"><IconShield width={18} height={18} className="text-neon" /> Paiement sécurisé</span>
-              <span className="flex items-center gap-2"><IconCheck width={18} height={18} className="text-neon" /> +18 uniquement</span>
+            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted">
+              <span className="flex items-center gap-2"><IconTruck width={18} height={18} className="text-neon" /> Offerte dès 29 € (24/48h)</span>
+              <span className="flex items-center gap-2"><IconShield width={18} height={18} className="text-neon" /> Paiement 100% sécurisé</span>
+              <span className="flex items-center gap-2"><IconCheck width={18} height={18} className="text-neon" /> Boutique Physique 188 rue de Rome</span>
             </div>
           </div>
 

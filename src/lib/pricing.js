@@ -5,15 +5,15 @@
 // Ne jamais faire confiance à un montant envoyé par le navigateur.
 // =============================================================================
 
-export const FREE_SHIPPING_THRESHOLD = 49
+export const FREE_SHIPPING_THRESHOLD = 29
 export const DEFAULT_SHIPPING_COST = 7.5
 
 // Modes de livraison. Click & Collect (retrait boutique) = gratuit ; La Poste et
-// Coursier Marseille = 7,50 € (offerts dès 49 € via le seuil ci-dessus).
+// Coursier Marseille = 7,50 € (offerts dès 29 € via le seuil ci-dessus).
 export const SHIPPING_METHODS = [
-  { id: 'poste', label: 'La Poste', detail: 'Livraison à domicile, 2–4 j', price: 7.5 },
-  { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille', price: 7.5 },
-  { id: 'pickup', label: 'Click & Collect', detail: 'Retrait en boutique — 188 rue de Rome', price: 0 },
+  { id: 'poste', label: 'La Poste Colissimo', detail: 'Livraison 2–4 j (offerte dès 29 €)', price: 7.5 },
+  { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 29 €)', price: 7.5 },
+  { id: 'pickup', label: 'Click & Collect', detail: 'Retrait gratuit en boutique — 188 rue de Rome', price: 0 },
 ]
 
 export const PROMO_CODES = {

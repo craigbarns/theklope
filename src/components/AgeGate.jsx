@@ -64,68 +64,78 @@ export default function AgeGate() {
               Ce site est réservé aux personnes majeures.
             </h2>
             <p id="age-gate-description" className="mt-2 text-xs text-ash/70 leading-relaxed">
-              La vente de produits de vapotage est strictement interdite aux mineurs. Veuillez saisir votre date de naissance pour entrer.
+              La vente de produits de vapotage est strictement interdite aux mineurs (Code de la santé publique). Veuillez confirmer votre majorité pour entrer.
             </p>
 
-            <form onSubmit={handleSubmit} className="mt-6">
-              <div className="grid grid-cols-3 gap-3">
-                <label className="block text-left">
-                  <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Jour</span>
-                  <input
-                    ref={dayInputRef}
-                    type="number"
-                    min="1"
-                    max="31"
-                    placeholder="JJ"
-                    value={day}
-                    onChange={(e) => setDay(e.target.value)}
-                    required
-                    className="input text-center font-bold text-base"
-                  />
-                </label>
-                <label className="block text-left">
-                  <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Mois</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="12"
-                    placeholder="MM"
-                    value={month}
-                    onChange={(e) => setMonth(e.target.value)}
-                    required
-                    className="input text-center font-bold text-base"
-                  />
-                </label>
-                <label className="block text-left">
-                  <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Année</span>
-                  <input
-                    type="number"
-                    min="1900"
-                    max={new Date().getFullYear()}
-                    placeholder="AAAA"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    required
-                    className="input text-center font-bold text-base"
-                  />
-                </label>
-              </div>
+            <div className="mt-6 flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={() => setAgeVerified(true)}
+                className="btn-primary w-full py-3.5 text-base font-bold shadow-glow"
+              >
+                J'ai 18 ans ou plus — Entrer
+              </button>
+              <button
+                type="button"
+                onClick={() => setAgeVerified('no')}
+                className="btn-ghost w-full py-2.5 text-xs text-ash/80 hover:text-white"
+              >
+                Je suis mineur (Quitter)
+              </button>
+            </div>
 
-              {error && <p className="mt-3 text-xs text-rose-400 font-semibold" role="alert">{error}</p>}
+            <details className="mt-4 text-left group">
+              <summary className="cursor-pointer text-[11px] font-medium text-muted hover:text-neon transition text-center list-none">
+                Saisir ma date de naissance
+              </summary>
+              <form onSubmit={handleSubmit} className="mt-4 border-t border-white/10 pt-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <label className="block text-left">
+                    <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Jour</span>
+                    <input
+                      ref={dayInputRef}
+                      type="number"
+                      min="1"
+                      max="31"
+                      placeholder="JJ"
+                      value={day}
+                      onChange={(e) => setDay(e.target.value)}
+                      className="input text-center font-bold text-base"
+                    />
+                  </label>
+                  <label className="block text-left">
+                    <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Mois</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="12"
+                      placeholder="MM"
+                      value={month}
+                      onChange={(e) => setMonth(e.target.value)}
+                      className="input text-center font-bold text-base"
+                    />
+                  </label>
+                  <label className="block text-left">
+                    <span className="mb-1 block text-[10px] uppercase tracking-wider text-muted font-semibold">Année</span>
+                    <input
+                      type="number"
+                      min="1900"
+                      max={new Date().getFullYear()}
+                      placeholder="AAAA"
+                      value={year}
+                      onChange={(e) => setYear(e.target.value)}
+                      className="input text-center font-bold text-base"
+                    />
+                  </label>
+                </div>
 
-              <div className="mt-6 flex flex-col gap-3">
-                <button type="submit" className="btn-primary w-full py-3 font-semibold">
-                  Confirmer et entrer
+                {error && <p className="mt-3 text-xs text-rose-400 font-semibold" role="alert">{error}</p>}
+
+                <button type="submit" className="btn-ghost w-full mt-3 py-2 text-xs font-semibold border-white/20">
+                  Valider la date
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setAgeVerified('no')}
-                  className="text-xs text-faint hover:text-white transition"
-                >
-                  Quitter le site
-                </button>
-              </div>
-            </form>
+              </form>
+            </details>
 
             <p className="mt-6 text-[10px] leading-relaxed text-faint">
               Les produits contenant de la nicotine créent une forte dépendance. Leur utilisation est déconseillée aux non-fumeurs.
