@@ -390,10 +390,10 @@ export default function Product() {
 
             {/* Réassurance */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <Reassure icon={IconTruck} text="Offerte dès 29 € (24/48h)" />
               <Reassure icon={IconLock} text="Paiement 100% sécurisé" />
-              <Reassure icon={IconTruck} text="Livraison en 2–4 jours" />
-              <Reassure icon={IconShield} text="Retours sous 14 jours" />
-              <Reassure icon={IconShield} text="Vente réservée aux +18" />
+              <Reassure icon={IconShield} text="Boutique 188 Rue de Rome" />
+              <Reassure icon={IconCheck} text="Vente réservée aux +18" />
             </div>
 
             {hasNicotine && (
