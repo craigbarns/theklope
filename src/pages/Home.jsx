@@ -18,10 +18,10 @@ import {
 } from '../components/icons.jsx'
 
 const FEATURES = [
-  { icon: IconCheck, title: 'Informations produit', text: 'Caractéristiques et options sont indiquées sur chaque fiche.' },
-  { icon: IconTruck, title: 'Livraison en France', text: 'Délai indicatif de 2 à 4 jours selon le transporteur et la destination.' },
-  { icon: IconLock, title: 'Paiement par Mollie', text: 'La saisie du paiement s’effectue dans l’environnement Mollie.' },
-  { icon: IconHeadset, title: 'Service client', text: 'Les coordonnées de contact et l’adresse de la boutique sont disponibles sur le site.' },
+  { icon: IconTruck, title: 'Livraison Offerte dès 29 €', text: 'Expédition ultra-rapide 24/48h partout en France et coursier Marseille le jour même.' },
+  { icon: IconShield, title: 'Boutique Physique & Conseils', text: 'Une équipe d’experts passionnés à votre service au 188 rue de Rome, Marseille.' },
+  { icon: IconLock, title: 'Paiement 100% Sécurisé', text: 'Transaction chiffrée SSL & paiement sécurisé par Carte Bancaire et Mollie.' },
+  { icon: IconHeadset, title: 'Service Client Réactif', text: 'Accompagnement personnalisé pour vous guider dans le choix de votre matériel.' },
 ]
 
 const heroCats = [
