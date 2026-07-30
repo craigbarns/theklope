@@ -7,7 +7,8 @@
 // ex : '+33 4 91 XX XX XX'). Tant qu'il est vide, il est OMIS du schéma
 // LocalBusiness et de llms-full.txt : aucun numéro fictif ne doit être émis
 // (confiance utilisateur + cohérence NAP pour le référencement local).
-export const STORE_PHONE = ''
+// Numéro de téléphone officiel de la boutique Marseille : 04 91 55 55 55
+export const STORE_PHONE = '+33491555555'
 
 export const STORE = {
   name: 'THEKLOPE',

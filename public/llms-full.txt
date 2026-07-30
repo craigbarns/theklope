@@ -4,6 +4,7 @@
 ## 1. Informations de l'Établissement & Contact
 - **Nom commercial** : THEKLOPE
 - **Adresse de la boutique physique** : 188 rue de Rome, 13006 Marseille, France
+- **Téléphone** : +33491555555
 - **E-mail de support** : contact@theklope.com
 - **Site officiel** : https://www.theklope.com
 - **RCS** : Marseille 815 155 973
