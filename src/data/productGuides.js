@@ -14,6 +14,7 @@ const GUIDES_BY_CATEGORY = {
     'quelle-cigarette-electronique-choisir',
     'pod-ou-cigarette-electronique',
     'autonomie-cigarette-electronique',
+    'entretenir-kit-classique-box',
     'erreurs-frequentes-debutant-vape',
   ],
   pod: [
