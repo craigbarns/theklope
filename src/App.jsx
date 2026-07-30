@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { Link, Routes, Route, Navigate, useLocation, useParams } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import AgeGate from './components/AgeGate.jsx'
@@ -127,6 +128,7 @@ export default function App() {
       <CookieBanner />
       {!checkoutShell && <CoachVape />}
       <ConsentManager />
+      <Analytics />
     </div>
   )
 }
