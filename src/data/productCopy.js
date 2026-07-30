@@ -195,8 +195,8 @@ export function enrichProductCopy(product) {
   delete base.rating
   delete base.reviews
   base.specs = sanitizeProductSpecs(base.specs)
-  const short = compact(base.short)
-  const long = compact(base.long)
+  let short = compact(base.short).replace(/\bPLa marque\b/g, 'La marque')
+  let long = compact(base.long).replace(/\bPLa marque\b/g, 'La marque')
 
   return {
     ...base,
