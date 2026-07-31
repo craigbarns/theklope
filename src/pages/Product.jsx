@@ -223,11 +223,27 @@ export default function Product() {
     return true
   }
 
+  const seoTitle = useMemo(() => {
+    if (!product) return 'Produit | THEKLOPE'
+    const brandName = product.brand || ''
+    const hasBrandInName = brandName && product.name.toLowerCase().includes(brandName.toLowerCase())
+    const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
+    return `Acheter ${product.name}${brandSuffix} | THEKLOPE`
+  }, [product])
+
+  const seoDescription = useMemo(() => {
+    if (!product) return ''
+    const brandName = product.brand || ''
+    const brandMention = brandName ? ` par ${brandName}` : ''
+    const shortDesc = product.short ? ` ${product.short}` : ''
+    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`
+  }, [product])
+
   return (
     <>
       <Seo
-        title={`${product.name} — ${categoryName(getProductCategoryKey(product))} | THEKLOPE`}
-        description={product.short}
+        title={seoTitle}
+        description={seoDescription}
         image={product.image}
         imageAlt={`${product.name} — ${product.brand}`}
         type="product"

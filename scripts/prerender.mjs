@@ -150,8 +150,13 @@ for (const p of PRODUCTS) {
   const cat = CATEGORIES.find((c) => c.key === catKey || c.slug === catKey || c.slug === p.category)
   const catLabel = cat ? cat.name : catKey
   const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
-  const title = `${p.name} — ${catLabel} | THEKLOPE`
-  const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
+  const brandName = p.brand || ''
+  const hasBrandInName = brandName && p.name.toLowerCase().includes(brandName.toLowerCase())
+  const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
+  const title = `Acheter ${p.name}${brandSuffix} | THEKLOPE`
+  const brandMention = brandName ? ` par ${brandName}` : ''
+  const shortDesc = p.short ? ` ${p.short}` : ''
+  const description = `Acheter ${p.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`.slice(0, 160)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',

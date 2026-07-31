@@ -12,6 +12,7 @@ import { hasMollie, mollie } from './_lib/mollie.js'
 import {
   retryOrderConfirmationEmails,
   retryRefundConfirmationEmail,
+  sendRestockReminders,
   syncOrderFromMolliePayment,
 } from './_lib/orders.js'
 import { hasSupabaseAdmin, supabaseAdmin } from './_lib/supabaseAdmin.js'
@@ -274,6 +275,10 @@ export default async function handler(req, res) {
         })
       })
     }
+    const restockReminders = await sendRestockReminders(supabaseAdmin).catch((err) => {
+      console.error('Erreur relances réapprovisionnement:', err)
+      return { count: 0, sent: 0, error: err.message }
+    })
     return res.status(200).json({
       ok: true,
       scanned: candidates.length,
@@ -282,6 +287,7 @@ export default async function handler(req, res) {
       emailRetries,
       refundRetries,
       refundEmailRetries,
+      restockReminders,
     })
   } catch (error) {
     console.error('cleanup-checkouts error:', error)

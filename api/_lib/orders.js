@@ -726,3 +726,82 @@ export async function syncOrderFromMolliePayment(paymentId, {
 
   return { status: 'pending', orderId }
 }
+
+export function restockReminderEmailHtml(customerName) {
+  const title = 'Besoin de faire le plein de vos e-liquides ?'
+  const bodyHtml = `
+    <p style="font-size:15px;line-height:1.6;color:#e5e5e5;margin:0 0 16px">
+      Bonjour ${escapeHtml(customerName || 'vapoteur')},
+    </p>
+    <p style="font-size:14px;line-height:1.6;color:#ccc;margin:0 0 20px">
+      Cela fait environ 3 semaines depuis votre dernière commande chez THEKLOPE. Vos e-liquides et résistances touchent peut-être à leur fin !
+    </p>
+    <div style="background:#1a1a1a;border:1px solid #333;border-radius:12px;padding:20px;margin-bottom:24px">
+      <p style="margin:0 0 12px;font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">Vos avantages fidélité :</p>
+      <ul style="margin:0;padding-left:20px;font-size:14px;color:#e5e5e5;line-height:1.8">
+        <li>Livraison rapide sous 24/48h partout en France</li>
+        <li>Livraison offerte dès 49€ d'achat</li>
+        <li>Remises sur volumes 10ml, 50ml et packs sur mesure</li>
+      </ul>
+    </div>
+    <div style="text-align:center;margin:28px 0 12px">
+      <a href="https://www.theklope.com/boutique" style="display:inline-block;background:#35FF8A;color:#050505;font-weight:700;font-size:15px;padding:14px 28px;border-radius:10px;text-decoration:none">
+        Recharger mes e-liquides sur la boutique →
+      </a>
+    </div>`
+  return emailLayout({ title, bodyHtml })
+}
+
+export async function sendRestockReminders(client = supabaseAdmin) {
+  if (!client) return { count: 0, sent: 0 }
+
+  const now = new Date()
+  const maxDate = new Date(now.getTime() - 20 * 24 * 60 * 60 * 1000).toISOString()
+  const minDate = new Date(now.getTime() - 35 * 24 * 60 * 60 * 1000).toISOString()
+
+  const { data: orders, error } = await client
+    .from('orders')
+    .select('id, customer, customer_email, created_at, status, payment_status, restock_email_sent_at')
+    .eq('payment_status', 'paid')
+    .is('restock_email_sent_at', null)
+    .gte('created_at', minDate)
+    .lte('created_at', maxDate)
+    .limit(20)
+
+  if (error) {
+    console.error('Erreur récupération relances réapprovisionnement:', error)
+    return { count: 0, sent: 0, error: error.message }
+  }
+
+  if (!orders || orders.length === 0) {
+    return { count: 0, sent: 0 }
+  }
+
+  let sentCount = 0
+  for (const order of orders) {
+    const email = order.customer_email || order.customer?.email
+    if (!email) continue
+
+    try {
+      const html = restockReminderEmailHtml(order.customer?.name)
+      await sendEmail({
+        from: FROM_CHECKOUT,
+        to: email,
+        subject: 'Besoin de faire le plein de vos e-liquides ? — THEKLOPE',
+        html,
+        idempotencyKey: `restock-reminder-${order.id}`,
+      })
+
+      await client
+        .from('orders')
+        .update({ restock_email_sent_at: new Date().toISOString() })
+        .eq('id', order.id)
+
+      sentCount++
+    } catch (err) {
+      console.error(`Échec envoi e-mail relance pour la commande ${order.id}:`, err)
+    }
+  }
+
+  return { count: orders.length, sent: sentCount }
+}

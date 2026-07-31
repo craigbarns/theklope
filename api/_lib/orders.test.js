@@ -6,7 +6,9 @@ import {
   ensureFullOrderRefund,
   hasMollieChargeback,
   orderConfirmationFulfillmentHtml,
+  restockReminderEmailHtml,
   retryRefundConfirmationEmail,
+  sendRestockReminders,
   syncOrderFromMolliePayment,
   validateMolliePaymentForOrder,
 } from './orders.js'
@@ -388,4 +390,31 @@ test('a terminal Mollie refund from the same attempt is recovered without anothe
   assert.equal(createCalls, 0)
   assert.equal(calls.at(-1)[1].p_refund_id, failedRefund.id)
   assert.equal(calls.at(-1)[1].p_refund_status, 'failed')
+})
+
+test('restock reminder email template renders customer name and call-to-action', () => {
+  const html = restockReminderEmailHtml('Jean Dupont')
+  assert.match(html, /Bonjour Jean Dupont/)
+  assert.match(html, /Besoin de faire le plein de vos e-liquides \?/)
+  assert.match(html, /https:\/\/www\.theklope\.com\/boutique/)
+})
+
+test('sendRestockReminders handles empty client or zero eligible orders gracefully', async () => {
+  const resultNull = await sendRestockReminders(null)
+  assert.deepEqual(resultNull, { count: 0, sent: 0 })
+
+  const mockClient = {
+    from() {
+      return {
+        select() { return this },
+        eq() { return this },
+        is() { return this },
+        gte() { return this },
+        lte() { return this },
+        limit() { return Promise.resolve({ data: [], error: null }) },
+      }
+    },
+  }
+  const resultEmpty = await sendRestockReminders(mockClient)
+  assert.deepEqual(resultEmpty, { count: 0, sent: 0 })
 })
