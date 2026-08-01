@@ -106,7 +106,7 @@ export const CATEGORY_SEO = {
   'e-liquides-sels-de-nicotine': {
     seoTitle: 'E-liquides aux Sels de Nicotine',
     metaDescription:
-      'Retrouvez la sensation des puffs avec les e-liquides aux sels de nicotine. Douceur en gorge, assimilation rapide et sevrage efficace. Réservé aux adultes.',
+      'Retrouvez la sensation des puffs avec les e-liquides aux sels de nicotine. Douceur en gorge, assimilation rapide et dosages élevés. Réservé aux adultes.',
     h1: 'E-liquides aux Sels de Nicotine',
     intro:
       'Les e-liquides aux sels de nicotine sont la solution idéale pour les vapoteurs cherchant une assimilation rapide de la nicotine avec un passage en gorge (hit) très doux. Ils reproduisent exactement la sensation des puffs jetables.',
@@ -114,7 +114,7 @@ export const CATEGORY_SEO = {
       {
         title: 'Pourquoi choisir les sels de nicotine ?',
         text:
-          'Contrairement à la nicotine classique (freebase), le sel de nicotine permet de vapoter avec un taux élevé (10mg ou 20mg) sans irriter la gorge. C\'est le choix numéro un pour réussir son sevrage tabagique sans sensation de manque.',
+          'Contrairement à la nicotine classique (freebase), le sel de nicotine permet de vapoter avec un taux élevé (10mg ou 20mg) sans irriter la gorge. C\'est le choix numéro un pour les vapoteurs recherchant un dosage élevé sans sensation de brûlure.',
       },
       {
         title: 'Quel matériel utiliser avec des sels de nicotine ?',
