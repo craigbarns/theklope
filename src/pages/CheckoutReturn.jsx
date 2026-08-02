@@ -61,7 +61,11 @@ export default function CheckoutReturn() {
       return undefined
     }
 
-    if (orderId.startsWith('TK-DEMO-') || params.get('demo') === 'true') {
+    // Confirmation « démo » réservée au développement local : en production ce
+    // bloc est retiré du build, donc une URL ?demo=true forgée ne peut jamais
+    // afficher un faux « Merci pour votre commande » ni vider le panier sans
+    // paiement réellement confirmé par Mollie.
+    if (import.meta.env.DEV && (orderId.startsWith('TK-DEMO-') || params.get('demo') === 'true')) {
       setState(CHECKOUT_RETURN_STATE.paid)
       setOrder({
         id: orderId,

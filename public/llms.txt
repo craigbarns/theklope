@@ -24,5 +24,5 @@
 
 ## Fonctionnalités & Services
 - **Paiement sécurisé** : Intégration du checkout sécurisé Mollie.
-- **Livraison rapide** : Expédition sous 24/48h en France, gratuite dès 49€.
+- **Livraison rapide** : Expédition sous 24/48h en France, gratuite dès 29€.
 - **Avis réels** : Recueil d'avis clients réels authentifiés par Google.

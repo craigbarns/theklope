@@ -202,6 +202,12 @@ export default function Product() {
   if (pageState === PRODUCT_PAGE_STATE.notFound) return <NotFound />
 
   const fav = isFavorite(product.id)
+  // Fil d'Ariane : la route catégorie utilise le slug (/categorie/:slug), alors
+  // que getProductCategoryKey renvoie la clé interne. On convertit clé → slug via
+  // CATEGORIES, avec repli sur /boutique si la catégorie n'est pas répertoriée.
+  const productCategoryKey = getProductCategoryKey(product)
+  const productCategoryEntry = CATEGORIES.find((c) => c.key === productCategoryKey)
+  const productCategoryPath = productCategoryEntry ? `/categorie/${productCategoryEntry.slug}` : '/boutique'
   const quantityPricing = getQuantityPricingRule(product)
   const outOfStock = product.stock <= 0
   const stockLimitReached = !outOfStock && remainingStock === 0
@@ -256,7 +262,7 @@ export default function Product() {
     const brandName = product.brand || ''
     const brandMention = brandName ? ` par ${brandName}` : ''
     const shortDesc = product.short ? ` ${product.short}` : ''
-    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`
+    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`
   }, [product])
 
   return (
@@ -273,7 +279,7 @@ export default function Product() {
         <Breadcrumbs
           items={[
             { label: 'Boutique', to: '/boutique' },
-            { label: categoryName(getProductCategoryKey(product)), to: productCategoryPath },
+            { label: categoryName(productCategoryKey), to: productCategoryPath },
             { label: product.name },
           ]}
         />
