@@ -201,6 +201,17 @@ export default function Product() {
   if (pageState === PRODUCT_PAGE_STATE.error) return <CatalogUnavailable />
   if (pageState === PRODUCT_PAGE_STATE.notFound) return <NotFound />
 
+  // Ces calculs sont volontairement de simples valeurs dérivées. Des hooks
+  // placés après les retours ci-dessus changeraient l'ordre des hooks lorsque
+  // le catalogue passe de l'état « chargement » à l'état « prêt ».
+  const brandName = product.brand || ''
+  const hasBrandInName = brandName && product.name.toLowerCase().includes(brandName.toLowerCase())
+  const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
+  const brandMention = brandName ? ` par ${brandName}` : ''
+  const shortDesc = product.short ? ` ${product.short}` : ''
+  const seoTitle = `Acheter ${product.name}${brandSuffix} | THEKLOPE`
+  const seoDescription = `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`
+
   const fav = isFavorite(product.id)
   // Fil d'Ariane : la route catégorie utilise le slug (/categorie/:slug), alors
   // que getProductCategoryKey renvoie la clé interne. On convertit clé → slug via
@@ -248,22 +259,6 @@ export default function Product() {
     setTimeout(() => setAdded(false), 2000)
     return true
   }
-
-  const seoTitle = useMemo(() => {
-    if (!product) return 'Produit | THEKLOPE'
-    const brandName = product.brand || ''
-    const hasBrandInName = brandName && product.name.toLowerCase().includes(brandName.toLowerCase())
-    const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
-    return `Acheter ${product.name}${brandSuffix} | THEKLOPE`
-  }, [product])
-
-  const seoDescription = useMemo(() => {
-    if (!product) return ''
-    const brandName = product.brand || ''
-    const brandMention = brandName ? ` par ${brandName}` : ''
-    const shortDesc = product.short ? ` ${product.short}` : ''
-    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`
-  }, [product])
 
   return (
     <>
@@ -429,13 +424,6 @@ export default function Product() {
             </p>
 
             {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
-
-            {!outOfStock && (
-              <div className="mt-4 flex items-center gap-2.5 rounded-xl bg-neon/10 border border-neon/30 px-3.5 py-2.5 text-xs text-neon font-medium max-w-sm">
-                <IconTruck width={16} height={16} className="shrink-0" />
-                <span>{shippingCountdown}</span>
-              </div>
-            )}
 
             {/* Réassurance Premium */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
+import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import {
@@ -51,6 +52,11 @@ export default function CartDrawer() {
     onClose: close,
   })
 
+  const freeShippingThreshold = Math.max(0, Number(totals.freeShippingThreshold) || 0)
+  const remainingForFreeShipping = Math.max(0, freeShippingThreshold - totals.subtotal)
+  const freeShippingPct = freeShippingThreshold > 0
+    ? Math.min(100, Math.round((totals.subtotal / freeShippingThreshold) * 100))
+    : 100
   const itemsTotal = Math.max(0, totals.subtotal - totals.discount)
   const cartState = { cart, cartDetailed, catalogReady }
   const cartCatalogResolved = isCartCatalogResolved(cartState)
