@@ -7,16 +7,10 @@ import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
 import { isResistanceProduct } from '../data/catalog.js'
 import { getProductVariantChoices, resolveProductVariant } from '../lib/cart.js'
-
-const singleChoiceDefaults = (product) => Object.fromEntries(
-  getProductVariantChoices(product)
-    .filter(({ options }) => options.length === 1)
-    .map(({ key, options }) => [key, options[0]]),
-)
-
-const hasCompleteVariant = (product, variant) => getProductVariantChoices(product).every(
-  ({ key, options }) => options.some((option) => String(option) === String(variant?.[key])),
-)
+import {
+  getMissingConfiguratorVariantChoices,
+  getSingleChoiceDefaults,
+} from '../lib/configurator.js'
 
 export default function Configurateur() {
   const { products, addItemsToCart, applyPromo } = useStore()
@@ -76,10 +70,13 @@ export default function Configurateur() {
   const finalPrice = Math.round((subtotal - discount) * 100) / 100
 
   const configComplete = Boolean(selectedBox && selectedClearomizer && selectedEliquid)
-  const variantChoicesComplete = configComplete
-    && hasCompleteVariant(selectedBox, selectedBoxVariant)
-    && hasCompleteVariant(selectedClearomizer, selectedClearomizerVariant)
-    && hasCompleteVariant(selectedEliquid, selectedEliquidVariant)
+  const configuratorSelections = configComplete ? [
+    { section: 'Mod', product: selectedBox, variant: selectedBoxVariant },
+    { section: 'Résistance', product: selectedClearomizer, variant: selectedClearomizerVariant },
+    { section: 'Liquide', product: selectedEliquid, variant: selectedEliquidVariant },
+  ] : []
+  const missingVariantChoices = getMissingConfiguratorVariantChoices(configuratorSelections)
+  const variantChoicesComplete = configComplete && missingVariantChoices.length === 0
   // Empêche de valider « Étape suivante » sans avoir choisi le produit de l'étape.
   const nextDisabled =
     (step === 1 && !selectedBox) ||
@@ -88,21 +85,30 @@ export default function Configurateur() {
 
   const handleSelectBox = (box) => {
     setSelectedBox(box)
-    setSelectedBoxVariant(singleChoiceDefaults(box))
+    setSelectedBoxVariant(getSingleChoiceDefaults(box))
+    setSelectedClearomizer(null)
+    setSelectedClearomizerVariant({})
+    setSelectedEliquid(null)
+    setSelectedEliquidVariant({})
+    setAddError('')
     setSearchQuery('')
     setStep(2)
   }
 
   const handleSelectClearomizer = (clearomizer) => {
     setSelectedClearomizer(clearomizer)
-    setSelectedClearomizerVariant(singleChoiceDefaults(clearomizer))
+    setSelectedClearomizerVariant(getSingleChoiceDefaults(clearomizer))
+    setSelectedEliquid(null)
+    setSelectedEliquidVariant({})
+    setAddError('')
     setSearchQuery('')
     setStep(3)
   }
 
   const handleSelectEliquid = (eliquid) => {
     setSelectedEliquid(eliquid)
-    setSelectedEliquidVariant(singleChoiceDefaults(eliquid))
+    setSelectedEliquidVariant(getSingleChoiceDefaults(eliquid))
+    setAddError('')
     setSearchQuery('')
     setStep(4)
   }
@@ -110,7 +116,9 @@ export default function Configurateur() {
   const handleAddToCart = () => {
     if (!selectedBox || !selectedClearomizer || !selectedEliquid) return
     if (!variantChoicesComplete) {
-      setAddError('Choisissez chaque option du pack avant de l’ajouter au panier.')
+      setAddError(`Choisissez : ${missingVariantChoices.map(({ label, product }) => (
+        `${label} (${product.name})`
+      )).join(' · ')}.`)
       return
     }
 
@@ -340,14 +348,6 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 1 · Box/Batterie</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedBox.name}</h3>
                       <p className="text-xs text-faint">{selectedBox.brand}</p>
-                      <VariantChoices
-                        product={selectedBox}
-                        variant={selectedBoxVariant}
-                        onChange={(variant) => {
-                          setAddError('')
-                          setSelectedBoxVariant(variant)
-                        }}
-                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedBox.price)}</span>
                   </div>
@@ -363,14 +363,6 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 2 · Résistance/cartouche</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedClearomizer.name}</h3>
                       <p className="text-xs text-faint">{selectedClearomizer.brand}</p>
-                      <VariantChoices
-                        product={selectedClearomizer}
-                        variant={selectedClearomizerVariant}
-                        onChange={(variant) => {
-                          setAddError('')
-                          setSelectedClearomizerVariant(variant)
-                        }}
-                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedClearomizer.price)}</span>
                   </div>
@@ -382,14 +374,6 @@ export default function Configurateur() {
                       <p className="text-xs text-neon uppercase font-semibold">Étape 3 · E-liquide</p>
                       <h3 className="text-sm font-bold text-white mt-0.5">{selectedEliquid.name}</h3>
                       <p className="text-xs text-faint">{selectedEliquid.brand}</p>
-                      <VariantChoices
-                        product={selectedEliquid}
-                        variant={selectedEliquidVariant}
-                        onChange={(variant) => {
-                          setAddError('')
-                          setSelectedEliquidVariant(variant)
-                        }}
-                      />
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(selectedEliquid.price)}</span>
                   </div>
@@ -430,6 +414,46 @@ export default function Configurateur() {
               </div>
             </div>
 
+            {step === 4 && configComplete && (
+              <section className="mt-5 border-t border-white/8 pt-5" aria-labelledby="config-options-title">
+                <h3 id="config-options-title" className="text-xs font-bold uppercase tracking-wider text-white">
+                  Options du pack
+                </h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-muted">
+                  Choisissez ici les variantes avant d’ajouter la sélection au panier.
+                </p>
+                <div className="mt-3 space-y-3">
+                  <PackVariantChoices
+                    section="Mod"
+                    product={selectedBox}
+                    variant={selectedBoxVariant}
+                    onChange={(variant) => {
+                      setAddError('')
+                      setSelectedBoxVariant(variant)
+                    }}
+                  />
+                  <PackVariantChoices
+                    section="Résistance"
+                    product={selectedClearomizer}
+                    variant={selectedClearomizerVariant}
+                    onChange={(variant) => {
+                      setAddError('')
+                      setSelectedClearomizerVariant(variant)
+                    }}
+                  />
+                  <PackVariantChoices
+                    section="Liquide"
+                    product={selectedEliquid}
+                    variant={selectedEliquidVariant}
+                    onChange={(variant) => {
+                      setAddError('')
+                      setSelectedEliquidVariant(variant)
+                    }}
+                  />
+                </div>
+              </section>
+            )}
+
             <dl className="mt-6 space-y-2.5 border-t border-white/8 pt-5 text-sm">
               <div className="flex justify-between">
                 <dt className="text-muted">Sous-total</dt>
@@ -453,14 +477,19 @@ export default function Configurateur() {
                   </p>
                 )}
                 {!variantChoicesComplete && (
-                  <p className="mt-5 text-xs leading-relaxed text-amber-200/80">
-                    Choisissez toutes les options affichées (dont la résistance en ohms) pour continuer.
+                  <p id="config-variant-help" className="mt-5 text-xs leading-relaxed text-amber-200/80">
+                    Encore à choisir : {missingVariantChoices.map(({ label, product }) => (
+                      `${label} (${product.name})`
+                    )).join(' · ')}.
                   </p>
                 )}
                 <button
                   onClick={handleAddToCart}
-                  disabled={!variantChoicesComplete}
-                  className="btn-primary mt-6 w-full py-3 text-center text-xs disabled:cursor-not-allowed disabled:opacity-40"
+                  aria-disabled={!variantChoicesComplete}
+                  aria-describedby={!variantChoicesComplete ? 'config-variant-help' : undefined}
+                  className={`btn-primary mt-6 w-full py-3 text-center text-xs ${
+                    !variantChoicesComplete ? 'cursor-not-allowed opacity-40' : ''
+                  }`}
                 >
                   Ajouter la sélection au panier
                 </button>
@@ -490,38 +519,54 @@ export default function Configurateur() {
   )
 }
 
-function VariantChoices({ product, variant = {}, onChange }) {
-  const choices = getProductVariantChoices(product)
+function PackVariantChoices({ section, product, variant, onChange }) {
+  const choices = getProductVariantChoices(product).filter(({ options }) => options.length > 1)
+  if (!choices.length) return null
+
+  return (
+    <div className="rounded-xl border border-white/8 bg-white/[0.02] px-3 py-2.5">
+      <p className="text-[10px] font-semibold text-ash">
+        {section} · {product.name}
+      </p>
+      <VariantChoices product={product} variant={variant} onChange={onChange} choices={choices} />
+    </div>
+  )
+}
+
+function VariantChoices({ product, variant = {}, onChange, choices = getProductVariantChoices(product) }) {
   if (!choices.length) return null
 
   return (
     <div className="mt-2 space-y-2">
       {choices.map(({ key, label, options, suffix = '' }) => (
-        <div key={key} className="flex flex-wrap items-center gap-1.5">
-          <span className="text-[10px] text-muted">{label} :</span>
-          {options.length === 1 ? (
-            <span className="text-[10px] font-medium text-ash">{options[0]}{suffix}</span>
-          ) : (
-            options.map((option) => {
+        <fieldset key={key}>
+          <legend className="text-[10px] text-muted">{label} :</legend>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            {options.map((option) => {
               const selected = String(variant[key]) === String(option)
               return (
-                <button
+                <label
                   key={String(option)}
-                  type="button"
-                  onClick={() => onChange({ ...variant, [key]: option })}
-                  aria-pressed={selected}
-                  className={`rounded px-2 py-0.5 text-[10px] transition ${
+                  className={`cursor-pointer rounded px-2 py-0.5 text-[10px] transition focus-within:ring-2 focus-within:ring-neon/70 ${
                     selected
                       ? 'bg-neon font-bold text-noir'
                       : 'border border-white/8 bg-white/5 text-ash hover:border-white/20'
                   }`}
                 >
+                  <input
+                    type="radio"
+                    name={`config-${product.id}-${key}`}
+                    value={String(option)}
+                    checked={selected}
+                    onChange={() => onChange({ ...variant, [key]: option })}
+                    className="sr-only"
+                  />
                   {option}{suffix}
-                </button>
+                </label>
               )
-            })
-          )}
-        </div>
+            })}
+          </div>
+        </fieldset>
       ))}
     </div>
   )
