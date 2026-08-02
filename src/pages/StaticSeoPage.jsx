@@ -4,6 +4,7 @@ import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import { STATIC_SEO_PAGES } from '../data/staticSeoPages.js'
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import NotFound from './NotFound.jsx'
 
 export default function StaticSeoPage() {
@@ -69,6 +70,20 @@ export default function StaticSeoPage() {
         <p className="eyebrow mb-2">{page.eyebrow}</p>
         <h1 className="font-display text-3xl font-bold text-white sm:text-4xl">{page.h1}</h1>
         <p className="mt-3 max-w-3xl text-muted">{page.intro}</p>
+        {page.localBusiness && (
+          <p className="mt-3 text-sm text-ash/75">
+            {STORE_REVIEW_SUMMARY.sentence}{' '}
+            <a
+              href={STORE_REVIEW_SUMMARY.googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-neon"
+            >
+              Voir la fiche Google de la boutique
+            </a>
+            .
+          </p>
+        )}
         <div className="mt-6 flex flex-wrap gap-3">
           {page.links.map((link) => (
             <Link key={link.to} to={link.to} className="btn-ghost px-4 py-2.5 text-xs">

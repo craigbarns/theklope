@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getBlogPost } from '../data/blog.js'
+import { getBlogPost, getRelatedPosts } from '../data/blog.js'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
@@ -13,6 +13,7 @@ export default function BlogPost() {
   const [readingProgress, setReadingProgress] = useState(0)
 
   const post = useMemo(() => getBlogPost(slug), [slug])
+  const relatedPosts = useMemo(() => getRelatedPosts(slug), [slug])
 
   // Gérer la barre de progression de lecture
   useEffect(() => {
@@ -47,7 +48,7 @@ export default function BlogPost() {
       },
       headline: post.title,
       description: post.description,
-      image: `https://www.theklope.com${post.image}`,
+      image: post.image.startsWith('http') ? post.image : `https://www.theklope.com${post.image}`,
       datePublished: post.isoDate,
       dateModified: post.isoDate,
       author: {
@@ -115,7 +116,8 @@ export default function BlogPost() {
                 [&>blockquote]:border-l-4 [&>blockquote]:border-neon [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:my-6 [&>blockquote]:text-white
                 [&>ul]:list-disc [&>ul]:pl-5 [&>ul]:space-y-1.5 [&>ul]:mb-4 [&>ul]:text-muted
                 [&>ol]:list-decimal [&>ol]:pl-5 [&>ol]:space-y-1.5 [&>ol]:mb-4 [&>ol]:text-muted
-                [&>strong]:text-white [&>strong]:font-semibold"
+                [&>strong]:text-white [&>strong]:font-semibold
+                [&_a]:text-neon [&_a]:underline [&_a]:underline-offset-2 [&_a]:hover:text-white"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           </article>
@@ -173,6 +175,28 @@ export default function BlogPost() {
                         </button>
                       )}
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {relatedPosts.length > 0 && (
+              <div className="card p-6">
+                <h3 className="font-display text-sm font-bold text-white border-b border-white/8 pb-3 mb-4">
+                  Guides associés
+                </h3>
+                <div className="space-y-3">
+                  {relatedPosts.map((related) => (
+                    <Link
+                      key={related.slug}
+                      to={`/guides/${related.slug}`}
+                      className="block rounded-2xl border border-white/8 bg-noir/40 p-3 hover:border-neon/30 transition group"
+                    >
+                      <p className="text-xs font-bold text-white group-hover:text-neon">
+                        {related.title}
+                      </p>
+                      <p className="text-[10px] text-faint mt-1">{related.readTime}</p>
+                    </Link>
                   ))}
                 </div>
               </div>

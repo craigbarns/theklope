@@ -1,3 +1,5 @@
+import { CATEGORIES } from './catalog.js'
+
 export const CATEGORY_SEO = {
   'cigarettes-electroniques': {
     seoTitle: 'Cigarettes électroniques pour adultes',
@@ -98,6 +100,96 @@ export const CATEGORY_SEO = {
       {
         q: 'Peut-on acheter un e-liquide nicotiné en grand flacon ?',
         a: 'La réglementation encadre strictement les contenants nicotinés. Les grands formats sont généralement vendus sans nicotine, avec boosters séparés si autorisés.',
+      },
+    ],
+  },
+  'e-liquides-sels-de-nicotine': {
+    seoTitle: 'E-liquides aux Sels de Nicotine',
+    metaDescription:
+      'Retrouvez la sensation des puffs avec les e-liquides aux sels de nicotine. Douceur en gorge, assimilation rapide et sevrage efficace. Réservé aux adultes.',
+    h1: 'E-liquides aux Sels de Nicotine',
+    intro:
+      'Les e-liquides aux sels de nicotine sont la solution idéale pour les vapoteurs cherchant une assimilation rapide de la nicotine avec un passage en gorge (hit) très doux. Ils reproduisent exactement la sensation des puffs jetables.',
+    sections: [
+      {
+        title: 'Pourquoi choisir les sels de nicotine ?',
+        text:
+          'Contrairement à la nicotine classique (freebase), le sel de nicotine permet de vapoter avec un taux élevé (10mg ou 20mg) sans irriter la gorge. C\'est le choix numéro un pour réussir son sevrage tabagique sans sensation de manque.',
+      },
+      {
+        title: 'Quel matériel utiliser avec des sels de nicotine ?',
+        text:
+          'Les e-liquides aux sels de nicotine doivent être utilisés avec du matériel peu puissant : des pods compacts ou des résistances supérieures à 1.0 ohm. Une puissance trop forte délivrerait trop de nicotine d\'un coup.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Est-ce le même liquide que dans les puffs ?',
+        a: 'Absolument. Les puffs jetables utilisaient massivement des sels de nicotine à 20 mg/ml pour offrir une grande douceur. En passant au sel de nicotine en flacon, vous retrouverez exactement la même vape.',
+      },
+      {
+        q: 'Peut-on vapoter du sel de nicotine toute la journée ?',
+        a: 'Oui, mais comme l\'assimilation est très rapide, vos besoins sont vite comblés. Il est conseillé d\'espacer un peu plus ses bouffées qu\'avec un e-liquide classique.',
+      },
+    ],
+  },
+  'e-liquides-50ml': {
+    seoTitle: 'E-liquides 50 ml pas chers à booster',
+    metaDescription:
+      'E-liquides 50 ml en grand format économique (Mix & Vape). Ajoutez vos boosters pour choisir votre taux de nicotine. Vente réservée aux adultes.',
+    h1: 'E-liquides 50 ml : Les grands formats économiques',
+    intro:
+      'Les e-liquides 50 ml (ou "Mix & Vape" / "Shake & Vape") sont le format le plus économique pour les gros vapoteurs. La loi interdisant la vente de flacons de plus de 10 ml contenant de la nicotine, ces liquides sont vendus sans nicotine, surdosés en arômes, prêts à être boostés.',
+    sections: [
+      {
+        title: 'Comment booster un e-liquide 50 ml ?',
+        text:
+          'C\'est très simple : le e-liquide 50 ml est généralement conditionné dans un flacon de 60 ml ou 70 ml. Il vous suffit de retirer l\'embout, de verser un ou deux boosters de nicotine, de secouer, et votre liquide est prêt !',
+      },
+      {
+        title: 'Pourquoi choisir le format 50 ml ?',
+        text:
+          'Le format 50 ml offre un prix au millilitre nettement plus avantageux que les flacons de 10 ml prêts à vapoter, tout en permettant un réglage sur-mesure de votre taux de nicotine.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Combien de boosters faut-il pour faire du 3mg ou 6mg ?',
+        a: 'Pour 50 ml de e-liquide : ajoutez 1 booster (10 ml à 20 mg) pour obtenir 60 ml en 3 mg/ml. Ajoutez 2 boosters pour obtenir 70 ml en 6 mg/ml.',
+      },
+      {
+        q: 'Faut-il laisser reposer un e-liquide 50 ml après ajout du booster ?',
+        a: 'Un bon mélange de 30 secondes suffit généralement. Vous pouvez vapoter immédiatement votre liquide boosté.',
+      },
+    ],
+  },
+  'cartouches-xros': {
+    seoTitle: 'Cartouches Vaporesso XROS de remplacement',
+    metaDescription:
+      'Achetez vos cartouches XROS compatibles avec toute la gamme de pods Vaporesso XROS. Résistances Mesh 0.4 à 1.2 ohm pour MTL et RDL.',
+    h1: 'Cartouches Vaporesso XROS',
+    intro:
+      'Les cartouches XROS sont la référence des pods rechargeables Vaporesso. Grâce à la technologie Corex, elles offrent une excellente durée de vie et une restitution parfaite des saveurs, tout en évitant les fuites.',
+    sections: [
+      {
+        title: 'Quelle cartouche XROS choisir ?',
+        text:
+          'La valeur en ohm définit votre tirage. 1.2 ohm et 1.0 ohm : idéal pour un tirage serré (MTL) et les sels de nicotine. 0.8 ohm et 0.6 ohm : tirage polyvalent, plus de vapeur. 0.4 ohm : tirage aérien (RDL), uniquement compatible avec les modèles Pro et Max.',
+      },
+      {
+        title: 'Durée de vie et entretien des cartouches XROS',
+        text:
+          'Une cartouche XROS dure généralement entre 2 et 3 semaines selon votre rythme de vape et le type de liquide utilisé. Remplacez-la dès que le rendu des saveurs diminue.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les cartouches XROS sont-elles compatibles avec tous les pods XROS ?',
+        a: 'Oui, à l\'exception de la cartouche 0.4 ohm qui nécessite une batterie puissante (Xros Pro, Xros 4). Les cartouches 0.6, 0.8, 1.0 et 1.2 ohm sont universellement compatibles avec les Xros 3, Xros Mini, etc.',
+      },
+      {
+        q: 'Comment éviter les fuites avec une cartouche XROS ?',
+        a: 'Ne remplissez pas à ras bord et refermez bien le drip tip immédiatement après le remplissage pour préserver la pression interne.',
       },
     ],
   },
@@ -203,37 +295,33 @@ export const CATEGORY_SEO = {
       },
     ],
   },
-  'alternatives-puffs': {
-    seoTitle: 'Alternatives aux puffs jetables',
+  'puffs-rechargeables': {
+    seoTitle: 'Puffs rechargeables & alternatives légales',
     metaDescription:
-      'Alternatives aux puffs jetables pour adultes : pods rechargeables et kits compacts conformes. Sélection responsable THEKLOPE, livraison en France.',
-    h1: 'Alternatives aux puffs jetables',
+      'Puffs jetables interdites : découvrez nos puffs rechargeables et pods économiques 100% légaux en France. Vente réservée aux adultes.',
+    h1: 'Puffs rechargeables et alternatives légales',
     intro:
-      'THEKLOPE privilégie les solutions rechargeables et réutilisables pour les vapoteurs majeurs. Cette page présente des alternatives aux puffs jetables lorsque la réglementation applicable les autorise ou les encadre.',
+      'Suite à la loi du 24 février 2025, la vente de puffs jetables est interdite en France. THEKLOPE vous propose les meilleures alternatives légales : les puffs rechargeables et pods compacts, beaucoup plus économiques et respectueux de l’environnement.',
     sections: [
       {
-        title: 'Pourquoi choisir une alternative rechargeable ?',
+        title: 'Qu’est-ce qu’une puff rechargeable ?',
         text:
-          'Un pod rechargeable permet de remplacer la cartouche ou de remplir le réservoir, au lieu de jeter l’ensemble du dispositif. Il offre aussi plus de visibilité sur le e-liquide utilisé.',
+          'Une puff rechargeable (ou pod) conserve la simplicité d’une puff classique mais dispose d’une batterie rechargeable en USB-C et d’une cartouche remplissable. Vous ne jetez plus la batterie à chaque fois, ce qui divise votre budget vape par trois.',
       },
       {
-        title: 'Conformité et vente aux adultes',
+        title: 'Les puffs jetables sont-elles interdites ?',
         text:
-          'Les produits de vapotage sont réglementés. THEKLOPE ne cible pas les mineurs, ne fait pas de promesse médicale et met en avant les informations utiles pour un achat responsable.',
+          'Oui, la loi n° 2025-175 interdit la vente des dispositifs à usage unique. Les modèles présentés ici sont tous équipés d’un réservoir remplissable ou d’une cartouche remplaçable, en totale conformité avec la législation française actuelle.',
       },
     ],
     faq: [
       {
-        q: 'THEKLOPE vend-il des puffs jetables ?',
-        a: 'La disponibilité dépend de la réglementation en vigueur. THEKLOPE privilégie les alternatives rechargeables, conformes et réservées aux adultes.',
+        q: 'Quel modèle choisir pour remplacer ma puff jetable ?',
+        a: 'Les modèles avec tirage automatique (sans bouton) et cartouches intégrées comme les pods Vaporesso, Oxva ou les systèmes "Big Puff" rechargeables offrent exactement la même sensation.',
       },
       {
-        q: 'Quel produit choisir à la place d’une puff jetable ?',
-        a: 'Un pod rechargeable compact avec cartouches compatibles est souvent l’alternative la plus proche en simplicité, tout en réduisant le caractère jetable du produit.',
-      },
-      {
-        q: 'Une alternative rechargeable contient-elle forcément de la nicotine ?',
-        a: 'Non. Le taux dépend du e-liquide utilisé. Les produits nicotinés sont réservés aux adultes et créent une dépendance.',
+        q: 'Quel e-liquide utiliser pour retrouver le goût de ma puff ?',
+        a: 'Les puffs utilisent des "sels de nicotine". Pour retrouver cette douceur en gorge et ces saveurs intenses, orientez-vous vers notre catégorie E-liquides Sels de Nicotine.',
       },
     ],
   },
@@ -246,9 +334,9 @@ export const CATEGORY_SEO = {
       'Les packs débutants rassemblent du matériel et des consommables compatibles pour simplifier le choix des vapoteurs majeurs qui veulent un ensemble cohérent.',
     sections: [
       {
-        title: 'Un pack pour limiter les erreurs',
+        title: 'Vérifier chaque élément',
         text:
-          'Un pack évite de mélanger un e-liquide inadapté, une résistance non compatible ou un accessoire manquant. Les éléments sont choisis pour fonctionner ensemble.',
+          'Avant de commander, vérifiez la compatibilité de l’appareil, de la résistance ou cartouche et du e-liquide indiqués dans la composition.',
       },
       {
         title: 'Conseils avant achat',
@@ -259,7 +347,7 @@ export const CATEGORY_SEO = {
     faq: [
       {
         q: 'Que contient un pack débutant ?',
-        a: 'Selon l’offre, un pack peut contenir un kit ou pod, un ou plusieurs e-liquides et des consommables compatibles. Le détail est indiqué sur chaque fiche produit.',
+        a: 'Selon la composition, un pack peut contenir un kit ou pod, un ou plusieurs e-liquides et des consommables. Le détail est indiqué sur chaque fiche produit.',
       },
       {
         q: 'Un pack débutant est-il adapté à tout le monde ?',
@@ -274,7 +362,7 @@ export const CATEGORY_SEO = {
   nouveautes: {
     seoTitle: 'Nouveautés vape',
     metaDescription:
-      'Nouveautés vape THEKLOPE : derniers produits pour adultes, cigarettes électroniques, e-liquides, pods et accessoires. Livraison France.',
+      'Nouveautés vape THEKLOPE : derniers produits pour adultes, cigarettes électroniques, e-liquides, pods et accessoires. Livraison France, stock actualisé.',
     h1: 'Nouveautés vape',
     intro:
       'Suivez les dernières arrivées THEKLOPE : matériel, e-liquides, pods et accessoires sélectionnés pour les vapoteurs majeurs.',
@@ -302,33 +390,66 @@ export const CATEGORY_SEO = {
     ],
   },
   'meilleures-ventes': {
-    seoTitle: 'Meilleures ventes vape',
+    seoTitle: 'Sélection du catalogue vape',
     metaDescription:
-      'Meilleures ventes THEKLOPE : cigarettes électroniques, e-liquides, pods et accessoires appréciés par les clients adultes. Livraison France.',
-    h1: 'Meilleures ventes vape',
+      'Sélection du catalogue THEKLOPE : cigarettes électroniques, e-liquides, pods et accessoires disponibles pour adultes.',
+    h1: 'Sélection du catalogue vape',
     intro:
-      'Découvrez les produits les plus consultés et commandés sur THEKLOPE : matériel, e-liquides et accessoires pour vapoteurs majeurs.',
+      'Cette page regroupe une sélection éditoriale de matériel, e-liquides et accessoires disponibles pour adultes.',
     sections: [
       {
-        title: 'Des références populaires',
+        title: 'Une sélection éditoriale',
         text:
-          'Les meilleures ventes regroupent des produits appréciés pour leur disponibilité, leur simplicité d’usage ou leur compatibilité avec les besoins courants.',
+          'Les références sont présentées avec leur prix actuel, leur disponibilité et leurs caractéristiques techniques.',
       },
       {
-        title: 'Popularité ne remplace pas compatibilité',
+        title: 'Vérifier la compatibilité',
         text:
-          'Un produit populaire n’est pas forcément adapté à chaque utilisateur. Vérifiez toujours les caractéristiques, le taux de nicotine et les consommables nécessaires.',
+          'Vérifiez toujours les caractéristiques, le taux de nicotine et les consommables nécessaires avant de commander.',
       },
     ],
     faq: [
       {
-        q: 'Les meilleures ventes sont-elles les meilleurs produits pour moi ?',
-        a: 'Pas forcément. Elles donnent une indication de popularité, mais le choix doit rester basé sur votre matériel, votre usage et les informations fabricant.',
+        q: 'Comment choisir un produit dans cette sélection ?',
+        a: 'Basez votre choix sur votre matériel, votre usage et les informations du fabricant, notamment les compatibilités indiquées.',
       },
       {
         q: 'Les avis affichés sont-ils réels ?',
-        a: 'THEKLOPE utilise des signaux d’avis réels lorsque ceux-ci sont disponibles, notamment des avis boutique collectés sur Google.',
+        a: 'Cette sélection ne repose pas sur une note ou un volume d’avis produit. Consultez les caractéristiques de chaque référence avant de choisir.',
       },
     ],
   },
+}
+
+for (const cat of CATEGORIES) {
+  if (!CATEGORY_SEO[cat.slug]) {
+    const isBrand = cat.slug.startsWith('marque-')
+    const name = cat.name
+    CATEGORY_SEO[cat.slug] = {
+      seoTitle: isBrand ? `${name} : Matériel & E-liquides` : `${name} pour vape`,
+      metaDescription: `Retrouvez la sélection ${name} chez THEKLOPE. Produits garantis originaux, conseils d'experts et livraison 24/48h.`.slice(0, 155),
+      h1: isBrand ? `Boutique ${name}` : name,
+      intro: `Découvrez tous les produits ${name} disponibles chez THEKLOPE. Une sélection rigoureuse pour satisfaire les vapoteurs majeurs.`,
+      sections: [
+        {
+          title: `Pourquoi choisir ${name} ?`,
+          text: `La gamme ${name} se distingue par la qualité de sa fabrication, le respect des normes et une restitution optimale des saveurs.`,
+        },
+        {
+          title: `Conseils & Compatibilité ${name}`,
+          text: `Vérifiez toujours la compatibilité des consommables et du matériel ${name} avant votre achat. Notre équipe est disponible pour vous guider.`,
+        },
+      ],
+      faq: [
+        {
+          q: `Les références ${name} sont-elles d'origine ?`,
+          a: `Oui, l'ensemble des produits ${name} est issu des canaux de distribution officiels et certifiés.`,
+        },
+        {
+          q: `Quel est le délai d'expédition pour ${name} ?`,
+          a: `Toute commande validée avant 14h est expédiée le jour même depuis nos stocks en France.`,
+        },
+      ],
+    }
+  }
 }

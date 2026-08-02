@@ -53,6 +53,97 @@ const makePost = ({
 
 export const BLOG_POSTS = [
   makePost({
+    slug: 'stockage-eliquides-batterie-vape',
+    title: 'Comment bien conserver ses e-liquides et sa batterie ?',
+    description:
+      'Bonnes pratiques pour conserver ses e-liquides et sa batterie de cigarette électronique : chaleur, lumière et stockage en cas de pause.',
+    date: '25 Juillet 2026',
+    isoDate: '2026-07-25T08:00:00+02:00',
+    readTime: '4 min',
+    category: 'Entretien',
+    image: '/products/chargeur-mc1-xtar_1.jpg',
+    summary:
+      'La chaleur, la lumière directe et les variations de température abîment aussi bien les e-liquides que la batterie intégrée de votre matériel.',
+    intro:
+      'Bien conserver son matériel de vapotage évite les mauvaises surprises : altération du e-liquide, fuite ou batterie qui se décharge anormalement vite.',
+    sections: [
+      {
+        title: 'Protéger les e-liquides de la chaleur et de la lumière',
+        text:
+          'Conservez vos flacons de e-liquide à température ambiante, à l’abri du soleil direct et de sources de chaleur comme un radiateur ou une vitre de voiture en été. Une exposition prolongée à la chaleur ou à la lumière peut altérer la couleur, l’odeur et le goût du liquide. Refermez toujours bien le bouchon après usage.',
+      },
+      {
+        title: 'Bien s’occuper de la batterie intégrée',
+        text:
+          'La plupart des kits et box THEKLOPE intègrent une batterie rechargeable par câble USB-C. Évitez de la laisser en charge sans surveillance prolongée, de l’exposer à une chaleur excessive ou de la stocker totalement déchargée pendant plusieurs semaines. Utilisez de préférence le câble fourni ou un câble adapté à la puissance indiquée.',
+      },
+      {
+        title: 'Préparer une pause d’utilisation',
+        text:
+          'En cas de pause de plusieurs semaines, videz le réservoir ou la cartouche, rechargez partiellement la batterie et rangez le matériel dans un endroit sec, à température modérée. Vérifiez l’état des joints et des contacts avant de reprendre l’utilisation.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Peut-on conserver un e-liquide au réfrigérateur ?',
+        a: 'Ce n’est pas nécessaire dans des conditions normales. Un endroit sec, tempéré et à l’abri de la lumière suffit généralement à conserver un e-liquide.',
+      },
+      {
+        q: 'Faut-il retirer la batterie avant un rangement prolongé ?',
+        a: 'Sur les kits à batterie intégrée, il suffit généralement de la recharger partiellement avant une longue pause et d’éviter une chaleur excessive pendant le stockage.',
+      },
+    ],
+    relatedProductIds: ['cherry-frost-50ml-35', 'caffe-latte-50ml-0mg-210', 'doric-astra-2500mah-voopoo-271'],
+  }),
+  makePost({
+    slug: 'entretenir-kit-classique-box',
+    title: 'Entretenir un kit classique ou une box de cigarette électronique',
+    description:
+      'Entretien d’un kit classique ou d’une box : nettoyage du clearomiseur, joints, pas de vis 510 et stockage de la batterie.',
+    date: '23 Juillet 2026',
+    isoDate: '2026-07-23T08:00:00+02:00',
+    readTime: '5 min',
+    category: 'Entretien',
+    image: '/products/kit-aegis-solo-3-geekvape.jpg',
+    summary:
+      'Un kit classique ou une box comportent plusieurs pièces démontables : un entretien régulier du clearomiseur, des joints et des contacts limite les fuites et les pertes de goût.',
+    intro:
+      'Contrairement à un pod, un kit classique ou une box se démontent en plusieurs pièces : clearomiseur, joints, résistance et batterie. Quelques gestes réguliers suffisent à limiter les fuites et les problèmes de contact.',
+    sections: [
+      {
+        title: 'Nettoyer le clearomiseur et la vitre',
+        text:
+          'Démontez régulièrement le clearomiseur pour rincer le réservoir à l’eau tiède, sans savon, puis laissez sécher complètement avant de remonter et de remettre du e-liquide. La vitre se nettoie avec un chiffon doux pour retirer les traces de liquide séché.',
+      },
+      {
+        title: 'Vérifier les joints (o-rings)',
+        text:
+          'Les joints assurent l’étanchéité entre la vitre, le réservoir et la résistance. Un joint durci, fendu ou manquant est la cause la plus fréquente de fuite. Inspectez-les à chaque changement de résistance et remplacez ceux qui semblent usés.',
+      },
+      {
+        title: 'Entretenir le pas de vis et les contacts',
+        text:
+          'Le pas de vis 510, entre le clearomiseur et la box, accumule parfois des résidus de e-liquide qui gênent le contact électrique. Essuyez-le avec un chiffon sec et évitez de trop serrer le clearomiseur, au risque d’endommager le filetage.',
+      },
+      {
+        title: 'Stocker la box et la batterie',
+        text:
+          'Rangez le matériel à l’abri de la chaleur et du plein soleil, et évitez les poches serrées qui peuvent appuyer sur le bouton d’activation. Sur une box à batterie amovible, retirez la batterie en cas de rangement prolongé et gardez le matériel hors de portée des enfants.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Pourquoi mon kit classique fuit-il au niveau de la vitre ?',
+        a: 'C’est le plus souvent un joint usé, mal positionné ou un clearomiseur trop serré. Vérifiez l’état des joints et le remontage avant d’envisager un changement de résistance.',
+      },
+      {
+        q: 'Faut-il retirer la batterie d’une box quand on ne l’utilise pas longtemps ?',
+        a: 'Sur les box à batterie(s) amovible(s), il est préférable de la retirer en cas de rangement prolongé et de vérifier régulièrement son état.',
+      },
+    ],
+    relatedProductIds: ['aegis-solo-3-geekvape-265', 'gti-mesh-015020405-vaporesso-pack-de-5-300'],
+  }),
+  makePost({
     slug: 'comment-choisir-sa-resistance',
     title: 'Comment choisir sa résistance de cigarette électronique ?',
     description:
@@ -101,43 +192,76 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'quelle-cigarette-electronique-choisir',
-    title: 'Quelle cigarette électronique choisir en 2026 ? Guide responsable',
+    title: 'Quelle cigarette électronique choisir en 2026 ? Guide Ultime et Comparatif par Profil',
     description:
-      'Guide responsable pour choisir une cigarette électronique pour adulte : format, autonomie, tirage, compatibilité e-liquide et consommables.',
-    date: '9 Juillet 2026',
-    isoDate: '2026-07-09T08:00:00+02:00',
-    readTime: '6 min',
-    category: 'Guides responsables',
+      'Guide d’achat complet 2026 pour choisir sa cigarette électronique : comparatif des formats (pods, kits, box), profils de fumeur (petit, moyen, gros), autonomie mAh, tirage MTL/DL et conseils d’experts THEKLOPE Marseille.',
+    date: '29 Juillet 2026',
+    isoDate: '2026-07-29T08:00:00+02:00',
+    readTime: '12 min',
+    category: 'Guides d’achat',
     image: '/products/kit-xros-pro-2_1.jpg',
     summary:
-      'Pod, kit compact, box plus puissante : voici les critères utiles pour comparer les formats sans promesse médicale et avec les précautions nécessaires.',
+      'Comment bien choisir sa cigarette électronique en 2026 ? Retrouvez notre guide complet par profil de fumeur, comparatif technique (Pods vs Kits vs Boxs), autonomie en mAh, type de tirage et choix du e-liquide idéal.',
     intro:
-      'Choisir une cigarette électronique revient d’abord à choisir un format compatible avec son usage, son niveau d’expérience et les e-liquides envisagés.',
+      'Passer à la cigarette électronique en 2026 nécessite de se poser les bonnes questions : quel format adopter ? Quelle autonomie choisir en mAh ? Quel tirage (serré ou aérien) convient le mieux à vos habitudes ? L’équipe d’experts THEKLOPE (boutique vape à Marseille et en ligne) a rédigé ce guide d’achat complet pour vous accompagner pas à pas vers le matériel idéal selon votre profil de consommation.',
     sections: [
       {
-        title: 'Comparer les formats',
+        title: '1. Choisir selon son profil de fumeur : Quel vapoteur êtes-vous ?',
         text:
-          'Un pod rechargeable est compact et simple. Un kit tubulaire ou une box offre souvent plus d’autonomie, plus de puissance et davantage de réglages. Le bon choix dépend du confort recherché et de la compatibilité des consommables.',
+          'La réussite de votre passage à la vape dépend directement de l’adéquation entre votre consommation de tabac et la puissance de votre cigarette électronique :\n\n' +
+          '• **Profil Petit Fumeur (moins de 5 à 8 cigarettes/jour)** : Privilégiez un **Pod compact rechargeable** (ex: Vaporesso XROS, Voopoo Argus G2 Mini). Ces appareils discrets offrent une autonomie de 800 à 1200 mAh, idéale pour une journée d’utilisation modérée avec un e-liquide nicotiné en 6 mg/ml ou en sels de nicotine.\n\n' +
+          '• **Profil Moyen Fumeur (8 à 15 cigarettes/jour)** : Un **Kit tubulaire ou Pod avancé** (ex: Justfog Q16 Pro, Vaporesso Luxe XR Max, Voopoo Doric) disposant d’une batterie de 1500 à 2500 mAh apportera le compromis parfait entre compacité et autonomie, compatible avec des e-liquides en 9 à 12 mg/ml.\n\n' +
+          '• **Profil Gros Fumeur (plus de 15 à 20 cigarettes/jour)** : Optez pour un **Kit Box puissant avec accu interchangeable 18650/21700** (ex: GeekVape Aegis, Vaporesso Gen 80S). Une autonomie supérieure à 3000 mAh vous permettra de tenir toute la journée sans recharger, tout en profitant d’un réservoir généreux.',
       },
       {
-        title: 'Regarder l’autonomie et le tirage',
+        title: '2. Comparatif des formats : Pod, Kit Tube ou Box Électronique ?',
         text:
-          'L’autonomie s’exprime en mAh et doit être cohérente avec la fréquence d’utilisation. Le tirage serré consomme généralement moins qu’un tirage très aérien, qui demande plus de puissance et de liquide.',
+          'Chaque format de vapoteuse répond à des attentes spécifiques en termes de transportabilité, de réglages et d’entretien :\n\n' +
+          '• **Le Pod Rechargeable** : C’est le format le plus populaire en 2026. Équipé de cartouches amovibles ou rechargeables, il ne nécessite aucun réglage complexe. Idéal pour les débutants et les vapoteurs recherchant la discrétion.\n\n' +
+          '• **Le Kit Tube ou Stylopote** : De forme cylindrique, il combine une batterie intégrée et un clearomiseur classique vissé. Très ergonomique, il offre un excellent rendu des saveurs avec des résistances interchangeables.\n\n' +
+          '• **La Box Électronique (Mod)** : Équipée d’un écran OLED et de boutons de variation de puissance (Watts), la box permet de personnaliser au watt près la température et la densité de vapeur. Elle accepte de nombreux atomiseurs et clearomiseurs.',
       },
       {
-        title: 'Vérifier les consommables',
+        title: '3. Comprendre les types de tirage : MTL (Serré) vs DL (Aérien)',
         text:
-          'Avant d’acheter, vérifiez la disponibilité des résistances, cartouches, réservoirs et joints. Un matériel fiable est aussi un matériel dont les pièces restent faciles à trouver.',
+          'Le tirage détermine la manière dont vous aspirez la vapeur :\n\n' +
+          '• **Inhalation Indirecte (MTL — Mouth-To-Lung)** : Tirage serré similaire à une cigarette traditionnelle. La vapeur passe d’abord par la bouche avant d’atteindre les poumons. C’est le tirage conseillé pour les débutants car il procure le "hit" (sensation en gorge) nécessaire avec des e-liquides à taux de nicotine moyen à élevé (9 à 18 mg/ml).\n\n' +
+          '• **Inhalation Directe (DL — Direct-To-Lung)** : Tirage aérien produisant de gros nuages de vapeur. La vapeur va directement aux poumons comme avec une chicha. Ce tirage s’utilise avec des résistances basses (< 0.5 ohm) et des e-liquides faibles en nicotine (3 à 6 mg/ml) riches en Glycérine Végétale (VG).\n\n' +
+          '• **Inhalation Restreinte (RDL)** : Le compromis parfait entre vapeur généreuse et rendu des saveurs préservé.',
+      },
+      {
+        title: '4. Quelle autonomie en mAh et quelle puissance choisir ?',
+        text:
+          'L’autonomie d’une cigarette électronique s’exprime en Milliampères-heures (mAh) :\n' +
+          '• **Moins de 1000 mAh** : Pour un usage d’appoint ou petit fumeur.\n' +
+          '• **Entre 1000 et 2000 mAh** : Pour une journée d’utilisation classique en tirage MTL.\n' +
+          '• **Plus de 2500 mAh ou Accus séparés (18650)** : Pour les vapoteurs intensifs ou les matériels puissants DL.\n\n' +
+          'Conseil d’expert THEKLOPE : Si vous choisissez un modèle à batterie intégrée, veillez à ce qu’il dispose de la recharge rapide USB-C pour limiter le temps de charge.',
+      },
+      {
+        title: '5. Associer son matériel avec le bon E-Liquide et le bon Taux de Nicotine',
+        text:
+          'Un matériel performant associé à un e-liquide inadapté peut provoquer des fuites ou un goût de brûlé. Respectez la règle du ratio PG/VG :\n\n' +
+          '• **Résistances élevées (> 0.8 ohm — tirage MTL)** : Utilisez des e-liquides fluides au ratio **50/50 PG/VG** ou **70/30 PG/VG**. Ce ratio est idéal pour restituer les arômes et convient parfaitement aux e-liquides au sel de nicotine.\n' +
+          '• **Résistances basses (< 0.4 ohm — tirage DL)** : Utilisez des e-liquides plus épais avec un ratio **30/70 PG/VG** pour éviter les fuites et obtenir une vapeur dense.',
       },
     ],
     faq: [
       {
-        q: 'Quelle cigarette électronique choisir pour une première utilisation ?',
-        a: 'Un pod ou un kit simple, avec peu de réglages et des consommables faciles à identifier, est souvent plus accessible pour un adulte qui découvre la vape.',
+        q: 'Quelle cigarette électronique choisir pour débuter en 2026 ?',
+        a: 'Pour débuter facilement, un Pod rechargeable comme le Vaporesso XROS Pro ou un Kit compact comme le Justfog Q16 Pro est recommandé. Ils offrent une prise en main immédiate, un tirage serré proche de la cigarette et nécessitent très peu d’entretien.',
       },
       {
-        q: 'La cigarette électronique est-elle sans risque ?',
-        a: 'Non. Les produits de vapotage ne doivent pas être présentés comme totalement sans risque. Les produits nicotinés créent une dépendance et sont interdits aux mineurs.',
+        q: 'Combien coûte une bonne cigarette électronique ?',
+        a: 'Un kit ou pod débutant de qualité coûte entre 15 € et 35 €. Un matériel avancé ou une box double accu varie entre 40 € et 80 €. À terme, la vape coûte environ 4 à 5 fois moins cher que le tabac traditionnel.',
+      },
+      {
+        q: 'Quelle est la durée de vie d’une résistance ?',
+        a: 'Une résistance dure en moyenne 2 à 3 semaines selon votre rythme de consommation et la sucrosité de votre e-liquide. Elle se remplace dès que vous ressentez une baisse de vapeur ou un goût altéré.',
+      },
+      {
+        q: 'Où se faire conseiller en magasin à Marseille ?',
+        a: 'Retrouvez l’équipe THEKLOPE dans notre boutique physique située au 188 Rue de Rome, 13006 Marseille. Nos conseillers vous accompagnent pour tester les matériels et choisir le dosage idéal.',
       },
     ],
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'q16-pro-146', 'doric-astra-2500mah-voopoo-271'],
@@ -858,7 +982,7 @@ export const BLOG_POSTS = [
       {
         title: 'Communication responsable',
         text:
-          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit.',
+          'Le contenu doit éviter de présenter la vape comme sans risque ou comme une solution médicale. Les conseils restent informatifs et orientés compatibilité produit. Voir aussi les <a href="/conformite-vape">engagements de conformité THEKLOPE</a>.',
       },
     ],
     faq: [
@@ -959,6 +1083,417 @@ export const BLOG_POSTS = [
     ],
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'gti-mesh-015020405-vaporesso-pack-de-5-300'],
   }),
+  makePost({
+    slug: 'meilleure-cigarette-electronique',
+    title: 'Meilleure Cigarette Électronique : Quel Kit Acheter en 2026 ?',
+    description: 'Le comparatif ultime pour trouver la meilleure cigarette électronique adaptée à votre profil. Pods compacts, kits puissance ou tirage serré.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T10:00:00Z',
+    readTime: '6 min',
+    category: 'Matériel',
+    image: '/products/Kit Aegis Legend 5 et Z Subohm 5 - GeekVape.webp',
+    summary: 'Découvrez notre classement des meilleures e-cigarettes actuelles. Que vous soyez petit, moyen ou grand fumeur, trouvez le kit parfait pour vous.',
+    intro: 'Choisir sa première (ou sa nouvelle) cigarette électronique peut s’apparenter à un parcours du combattant face à la multitude de modèles. Pour vous simplifier la vie, nos experts ont sélectionné les meilleurs matériels actuels, reconnus pour leur fiabilité, leur rendu de saveur et leur simplicité d’utilisation.',
+    sections: [
+      {
+        title: 'Le Top pour débuter (Petit Fumeur)',
+        text: 'Pour les petits fumeurs (moins de 10 cigarettes/jour), les Pods sont aujourd’hui la norme. Ils sont compacts, ne fuient pas et ne demandent aucun réglage complexe. Le Vaporesso XROS 4 Mini et la série Pixo d’Aspire sont actuellement les stars incontestées de cette catégorie.',
+      },
+      {
+        title: 'Le meilleur compromis (Fumeur Moyen)',
+        text: 'Entre 10 et 15 cigarettes par jour, vous avez besoin de plus d’autonomie (batterie > 1000 mAh). Les kits intermédiaires comme le Luxe XR Max (Vaporesso) ou le Argus (Voopoo) offrent une excellente tenue de charge et un rendu de saveur exceptionnel.',
+      },
+      {
+        title: 'La machine à vapeur (Gros Fumeur & Cloud Chasing)',
+        text: 'Si vous fumez plus d’un paquet par jour ou que vous aimez les gros volumes de vapeur (tirage DL), orientez-vous vers des kits à double accu avec de gros clearomiseurs. Le Kit Gen Max de Vaporesso couplé au iTank est une référence absolue en la matière.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Combien coûte une bonne cigarette électronique ?',
+        a: 'Un excellent pod pour débuter coûte entre 15€ et 25€. Un kit intermédiaire autour de 35€-45€, et les modèles surpuissants vont de 50€ à 80€.',
+      },
+      {
+        q: 'Quel est le meilleur tirage pour arrêter de fumer ?',
+        a: 'Le tirage MTL (indirect, serré) est le plus recommandé car il reproduit fidèlement la sensation de tirage d’une cigarette traditionnelle.',
+      },
+    ],
+    relatedProductIds: ['pixo-aura-2-301', 'xros-4-mini-269', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
+  }),
+  makePost({
+    slug: 'top-10-meilleurs-eliquides',
+    title: 'Top des Meilleurs E-Liquides : Le Classement 2026',
+    description: 'Découvrez notre sélection des meilleurs e-liquides fruités, gourmands, frais et classic pour votre cigarette électronique.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T10:15:00Z',
+    readTime: '5 min',
+    category: 'E-liquides',
+    image: '/products/e-liquide-fruits-rouges-10ml-liquidarom.webp',
+    summary: 'Fruités rouges, menthe glaciale ou classic blond ? Retrouvez les références incontournables qui séduisent des milliers de vapoteurs.',
+    intro: 'Le choix du e-liquide est responsable à 80% de la réussite de votre sevrage. S’il est à votre goût et contient le bon taux de nicotine, vous ne retoucherez pas à la cigarette. Voici les grands favoris de la communauté THEKLOPE.',
+    sections: [
+      {
+        title: 'Les Meilleurs "Classics" (Goût Tabac)',
+        text: 'Pour retrouver la sensation brute sans les goudrons, les classics blonds secs comme le FR-M d’Alfaliquid ou le Classico Grège restent des piliers indétrônables pour débuter sereinement.',
+      },
+      {
+        title: 'Les Meilleurs Fruités',
+        text: 'Les fruits rouges dominent le marché. Le légendaire Fruits Rouges de Liquidarom ou les mélanges Pêche Abricot (Freaks) offrent des explosions de saveurs très fidèles qui ne lassent pas tout au long de la journée.',
+      },
+      {
+        title: 'Les Stars de la Menthe & du Frais',
+        text: 'Pour les amateurs de sensations fortes et de "hit" en gorge, les e-liquides Menthe Glaciale (Pulp, Alfaliquid) ou les Fruités Givrés (Freeze Dragon) apportent une fraîcheur intense particulièrement agréable.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Faut-il commencer par un goût Tabac ou Fruité ?',
+        a: 'Environ 70% des débutants commencent par un goût "Classic" (tabac) pour ne pas être dépaysés, puis migrent vers la menthe ou les fruits au bout de quelques semaines.',
+      },
+      {
+        q: 'Quelle marque choisir ?',
+        a: 'Toutes les marques françaises (Alfaliquid, Pulp, Liquidarom, Petit Nuage) répondent à des normes sanitaires extrêmement strictes et garantissent une qualité irréprochable.',
+      },
+    ],
+    relatedProductIds: ['fr-m-10ml-alfaliquid-76', 'fruits-rouges-liquid-arom-211', 'menthe-glaciale-10ml-alfaliquid-81', 'grege-68'],
+  }),
+  makePost({
+    slug: 'puffs-interdites-france-loi-alternatives',
+    title: 'Puffs Interdites en France en 2025-2026 : Tout sur la Loi et Vos Alternatives',
+    description: 'La vente de puffs jetables est définitivement interdite en France par la loi n° 2025-175. Découvrez ce qui change et les meilleures solutions légales.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T11:00:00Z',
+    readTime: '6 min',
+    category: 'Réglementation',
+    image: '/products/kit-xros-pro-2_3.webp',
+    summary: 'Promulguée le 24 février 2025, la loi interdisant les vapes jetables est pleinement en vigueur. Comment continuer à vapoter légalement et pour moins cher ?',
+    intro: 'La loi n° 2025-175 du 24 février 2025 a tranché : la fabrication, la mise en vente et la distribution à titre gratuit des dispositifs électroniques de vapotage à usage unique (les "puffs") sont désormais strictement interdites en France sous peine de lourdes sanctions.',
+    sections: [
+      {
+        title: 'Pourquoi les puffs jetables ont-elles été interdites ?',
+        text: 'Le législateur a motivé cette décision par deux enjeux majeurs : la santé publique (prévenir l’initiation nicotinique chez les adolescents) et l’écologie (combattre le gâchis massif de batteries au lithium non recyclées et de plastique à usage unique).',
+      },
+      {
+        title: 'Puffs rechargeables : l’alternative 100% légale',
+        text: 'Heureusement pour les anciens fumeurs, les vapes réutilisables (pods rechargeables en USB-C avec cartouches remplissables) restent totalement autorisées. Elles conservent la même compacité et le même tirage automatique sans bouton.',
+      },
+      {
+        title: 'Diviser son budget vape par 3',
+        text: 'Au-delà de la conformité, passer au pod rechargeable est extrêmement rentable. Une puff jetable coûte environ 9 € pour 600 bouffées (2 ml). Un flacon de 10 ml de e-liquide équivalent coûte environ 5,90 € et fournit 3000 bouffées !',
+      },
+    ],
+    faq: [
+      {
+        q: 'Est-il légal de vapoter une puff jetable qu’il me reste ?',
+        a: 'La loi vise la mise en vente et la distribution. Les particuliers détenant d’anciennes puffs ne sont pas verbalisés, mais les boutiques ont l’interdiction stricte d’en vendre.',
+      },
+      {
+        q: 'Quel pod choisir pour retrouver la sensation puff ?',
+        a: 'Les pods Vaporesso XROS, Oxva Xlim et Geekvape Wenax associés à un e-liquide aux sels de nicotine offrent exactement le même rendu et la même restitution des arômes.',
+      },
+    ],
+    relatedProductIds: ['xros-4-mini-269', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
+  }),
+  makePost({
+    slug: 'sels-de-nicotine-guide-complet',
+    title: 'Sels de Nicotine : Le Guide Complet pour un Sevrage Réussi',
+    description: 'Tout savoir sur le sel de nicotine : différence avec la nicotine classique, dosage, matériel compatible et avantages pour arrêter de fumer.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T11:15:00Z',
+    readTime: '5 min',
+    category: 'E-liquides',
+    image: '/products/e-liquide-selad-bubble-gum-10ml_1.webp',
+    summary: 'Moins d’irritation en gorge, absorption rapide et sensation proche de la cigarette classique : découvrez le secret des e-liquides aux sels de nicotine.',
+    intro: 'Apparus massivement dans l’univers de la vape grâce aux puffs, les e-liquides aux sels de nicotine ont révolutionné le sevrage tabagique en permettant de consommer des taux élevés sans sensation de brûlure en gorge.',
+    sections: [
+      {
+        title: 'Qu’est-ce que le sel de nicotine ?',
+        text: 'Il s’agit de la forme la plus proche de la nicotine présente à l’état naturel dans la feuille de tabac. Grâce à un pH plus acide, le sel de nicotine est absorbé par le cerveau en 15 secondes seulement, contre 10 minutes pour la nicotine "freebase" traditionnelle.',
+      },
+      {
+        title: 'Pour qui sont faits les sels de nicotine ?',
+        text: 'Ils sont parfaits pour les gros fumeurs (plus d’un paquet par jour), les vapoteurs qui toussent avec la nicotine classique à 12mg ou 18mg, et les utilisateurs cherchant à remplacer leur puff.',
+      },
+      {
+        title: 'Quel matériel utiliser ?',
+        text: 'Attention : le sel de nicotine ne doit PAS être vapoté à forte puissance ou en inhalation directe (DL). Privilégiez des pods ou clearomiseurs peu puissants avec des résistances supérieures à 0.8 ohm (10W à 18W).',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel dosage de sel de nicotine choisir ?',
+        a: 'Le 20 mg/ml est recommandé pour les gros fumeurs ou le sevrage immédiat. Le 10 mg/ml convient aux fumeurs modérés (5 à 10 cigarettes par jour).',
+      },
+    ],
+    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+  }),
+  makePost({
+    slug: 'comment-faire-son-eliquide-diy',
+    title: 'Comment Faire Son E-Liquide DIY (Guide Pratique 2026)',
+    description: 'Apprenez à fabriquer votre propre e-liquide facilement. Dosage base, arômes, boosters de nicotine et temps de steep expliqués simplement.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T11:30:00Z',
+    readTime: '7 min',
+    category: 'DIY',
+    image: '/products/booster-20-mg-clark-s_1.webp',
+    summary: 'Le Do It Yourself (DIY) permet de personnaliser ses saveurs et de diviser par quatre le coût de sa vape. Suivez le guide pas à pas.',
+    intro: 'Fabriquer son propre e-liquide est extrêmement simple et accessible à tous. En mélangeant une base neutre, des arômes concentrés et des boosters de nicotine, vous maîtrisez totalement la composition de votre vape.',
+    sections: [
+      {
+        title: 'Les 3 ingrédients indispensables',
+        text: '1. La base neutre (PG/VG) : constitue 80% du liquide. 2. L’arôme concentré : apporte le goût (généralement dosé à 10-15%). 3. Le booster de nicotine : flacon de 10ml à 20mg pour ajouter la nicotine souhaitée.',
+      },
+      {
+        title: 'Calculer ses dosages avec notre Calculette DIY',
+        text: 'Pas besoin d’être fort en maths ! Utilisez notre outil gratuit en ligne /calculette-diy pour obtenir au millilitre près les quantités exactes à verser dans votre flacon gradué.',
+      },
+      {
+        title: 'L’étape clé : Le Steep (maturation)',
+        text: 'Après le mélange, secouez vigoureusement. Laissez reposer votre flacon à l’abri de la lumière : 48h pour les menthes et fruités simples, 2 à 3 semaines pour les gourmands et tabacs.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Peut-on vapoter un DIY immédiatement après le mélange ?',
+        a: 'Oui, mais les saveurs ne seront pas encore parfaitement diffusées. Le goût sera bien plus riche après quelques jours de repos (steep).',
+      },
+    ],
+    relatedProductIds: ['fr-m-10ml-alfaliquid-76'],
+  }),
+  makePost({
+    slug: 'test-vaporesso-xros-6-mini',
+    title: 'Test & Avis Vaporesso XROS 6 Mini : Le Meilleur Pod Compact ?',
+    description: 'Notre avis d’expert sur le pod Vaporesso XROS 6 Mini. Autonomie, rendu des saveurs, compatibilité cartouches et bilan complet.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T11:45:00Z',
+    readTime: '4 min',
+    category: 'Matériel',
+    image: '/products/kit-xros-pro-2_2.webp',
+    summary: 'Vaporesso affine sa formule gagnante avec le XROS 6 Mini. Test complet d’un pod qui s’impose comme le compagnon idéal du quotidien.',
+    intro: 'La série XROS de Vaporesso domine le marché du pod MTL depuis plusieurs années. Nous avons testé en profondeur le dernier-né de la gamme : le XROS 6 Mini.',
+    sections: [
+      {
+        title: 'Prise en main et Ergonomie',
+        text: 'Fini en alliage d’aluminium brossé ultra-léger, le XROS 6 Mini tient parfaitement en paume. Aucun bouton : le tirage est 100% automatique et réagit instantanément dès la première aspiration.',
+      },
+      {
+        title: 'Batterie et Autonomie',
+        text: 'Malgré son format compact, Vaporesso intègre une batterie haute densité de 1000 mAh offrant une journée complète de vape intensive sans recharger.',
+      },
+      {
+        title: 'Restitution des Saveurs Corex',
+        text: 'Les nouvelles cartouches Mesh fournissent un rendu aromatique d’une précision chirurgicale, particulièrement saisissant sur les e-liquides fruités et au sel de nicotine.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Est-il compatible avec les anciennes cartouches XROS ?',
+        a: 'Oui ! La force de la gamme XROS est la rétrocompatibilité totale avec l’ensemble des cartouches XROS (0.6, 0.8, 1.0 et 1.2 ohm).',
+      },
+    ],
+    relatedProductIds: ['xros-4-mini-269'],
+  }),
+  makePost({
+    slug: 'xros-5-vs-xros-pro-comparatif',
+    title: 'XROS 5, XROS 5 Mini ou XROS Pro : Lequel Choisir en 2026 ?',
+    description: 'Comparatif complet des pods Vaporesso XROS 5, Mini et Pro. Écran, batterie, puissance et réglages : trouvez le pod fait pour vous.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T12:00:00Z',
+    readTime: '5 min',
+    category: 'Matériel',
+    image: '/products/kit-xros-pro-2_1.webp',
+    summary: 'Vous hésitez entre les différents déclinaisons de la famille XROS ? Nous comparons l’autonomie, les fonctionnalités et les prix.',
+    intro: 'La gamme XROS de Vaporesso offre plusieurs modèles pour répondre à tous les profils d’utilisateurs. Du modèle le plus simple au modèle le plus poussé, voici le guide pour faire le bon choix.',
+    sections: [
+      {
+        title: 'XROS 5 Mini : La simplicité absolue',
+        text: 'Pas de réglage, pas d’écran. C’est le choix ultime pour ceux qui veulent une vape sans prise de tête ou pour remplacer une puff jetable.',
+      },
+      {
+        title: 'XROS 5 Standard : L’airflow ajustable',
+        text: 'Ajoute un réglage d’arrivée d’air (airflow slider) au dos pour passer d’un tirage serré (MTL) à un tirage plus ouvert (RDL).',
+      },
+      {
+        title: 'XROS Pro : La puissance sur-mesure',
+        text: 'Équipé d’un écran OLED, d’un bouton de verrouillage physique et d’une batterie de 1200 mAh, le Pro permet de régler sa puissance au watt près et accepte la cartouche 0.4 ohm.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Lequel offre la meilleure autonomie ?',
+        a: 'Le XROS Pro possède la plus grande batterie (1200 mAh), suivi de près par les XROS 5 (1000 mAh).',
+      },
+    ],
+    relatedProductIds: ['xros-4-mini-269', 'pixo-aura-2-301'],
+  }),
+  makePost({
+    slug: 'lost-mary-elf-bar-remplacants-legaux',
+    title: 'Lost Mary, Elf Bar... Que sont devenues vos Puffs Préférées ?',
+    description: 'Interdiction des puffs : découvrez les nouvelles versions légales rechargeables de vos marques favorites comme Lost Mary et Elf Bar.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T12:15:00Z',
+    readTime: '5 min',
+    category: 'Actualités',
+    image: '/products/kit-apex-vaporesso.webp',
+    summary: 'Les puffs jetables BM600 ou Elfbar 600 ont disparu des linéaires. Mais les fabricants ont réagi en proposant des versions à cartouches rechargeables conformes.',
+    intro: 'Suite à l’application de la loi n° 2025-175, les modèles jetables Lost Mary BM600 et Elf Bar 600 ne sont plus commercialisés en France. Cependant, les marques ont adapté leur catalogue.',
+    sections: [
+      {
+        title: 'Les nouveaux kits à cartouches fermées ou rechargeables',
+        text: 'Les fabricants proposent désormais des batteries rechargeables en USB-C associées à des cartouches ou flacons de e-liquides interchangeables. Le matériel devient permanent, seule la recharge se remplace.',
+      },
+      {
+        title: 'Retrouver les recettes originales en e-liquides',
+        text: 'Toutes les recettes mythiques (Watermelon Ice, Blue Razz Lemonade, Triple Mango) sont désormais conditionnées en flacons de e-liquides 10ml aux sels de nicotine sous les gammes Elfliq ou Maryliq.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Ces nouveaux systèmes sont-ils légaux en France ?',
+        a: 'Oui, car le dispositif principal n’est plus à usage unique et la batterie se recharge indéfiniment.',
+      },
+    ],
+    relatedProductIds: ['xros-4-mini-269'],
+  }),
+  makePost({
+    slug: 'quel-accu-18650-choisir-box',
+    title: 'Quel Accu 18650 Choisir pour sa Box Electronique ? Guide Sécurité',
+    description: 'Sélection des meilleurs accus 18650 (Sony VTC6, Samsung 30Q, LG HG2, Ucell). Autonomie, courant de décharge (CDM) et consignes de sécurité.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T12:30:00Z',
+    readTime: '6 min',
+    category: 'Accessoires',
+    image: '/products/chargeur-mc1-xtar_2.webp',
+    summary: 'L’accu est le cœur énergétique de votre cigarette électronique. Choisir un accu adapté et respecter la sécurité est capital.',
+    intro: 'Les batteries rechargeables au format 18650 alimentent la majorité des box et mods électroniques. Choisir le bon modèle garantit autonomie et sécurité.',
+    sections: [
+      {
+        title: 'Les deux critères essentiels : mAh et CDM (Ampères)',
+        text: 'La capacité en mAh indique l’autonomie (ex: 3000 mAh). Le Courant de Décharge Maximal (CDM en Ampères) indique la puissance maximale que l’accu peut fournir sans surchauffer. Pour une vape puissante (Subohm), privilégiez un CDM élevé (25A+).',
+      },
+      {
+        title: 'Notre sélection des meilleurs accus 18650',
+        text: '1. Ucell 18650 3000 mAh : parfait compromis autonomie/stabilité pour vape quotidienne. 2. Sony / Murata VTC6 : une référence pour l’autonomie. 3. Samsung 25R : idéal pour les fortes puissances.',
+      },
+      {
+        title: 'Règles de sécurité indispensables',
+        text: 'Ne transportez JAMAIS un accu nu dans une poche ou un sac (risque de court-circuit au contact de clés ou pièces) : utilisez toujours une boîte en plastique. Remplacez le gaine plastique (wrap) si elle est abîmée.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Peut-on recharger ses accus directement dans la box via USB ?',
+        a: 'Le rechargement USB dépanne, mais il est vivement recommandé d’utiliser un chargeur d’accus externe dédié pour préserver leur durée de vie et équilibrer la charge.',
+      },
+    ],
+    relatedProductIds: ['gen-max-220w-avec-itank-t-vaporesso-noir-274'],
+  }),
+  makePost({
+    slug: 'sachets-nicotine-interdits-2026',
+    title: 'Sachets de Nicotine (Nicotine Pouches) Interdits au 1er Avril 2026',
+    description: 'Le décret n° 2025-898 interdit la vente des sachets de nicotine en France dès le 1er avril 2026. Analyse de la loi et alternatives pour le sevrage.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T12:45:00Z',
+    readTime: '4 min',
+    category: 'Réglementation',
+    image: '/products/booster-pulp-20-mg_1.webp',
+    summary: 'Après l’interdiction des puffs jetables, la France durcit sa réglementation sur les sachets de nicotine à sucer. Ce qu’il faut savoir.',
+    intro: 'Publié en application du décret n° 2025-898, l’interdiction de la commercialisation des sachets de nicotine sans tabac (nicotine pouches) entre en vigueur le 1er avril 2026 en France.',
+    sections: [
+      {
+        title: 'Motivations du décret n° 2025-898',
+        text: 'Les autorités de santé ont pointé du doigt les risques d’intoxication nicotinique aiguë chez les jeunes et l’absence de recul sanitaire sur ces produits consommables par voie orale.',
+      },
+      {
+        title: 'Se tourner vers la vape aux sels de nicotine',
+        text: 'Pour les utilisateurs de nicotine pouches cherchant une alternative orale ou discrète sans combustion, la cigarette électronique à inhalation indirecte (MTL) associée aux sels de nicotine demeure le levier le plus efficace et encadré.',
+      },
+    ],
+    faq: [
+      {
+        q: 'La cigarette électronique est-elle concernée par cette interdiction ?',
+        a: 'Non. L’interdiction du 1er avril 2026 concerne exclusivement les sachets de nicotine à usage oral et les produits assimilés sans tabac.',
+      },
+    ],
+    relatedProductIds: ['fr-m-10ml-alfaliquid-76'],
+  }),
+  makePost({
+    slug: 'vapoter-moins-cher-que-fumer-cout',
+    title: 'Vapoter Coûte-t-il Moins Cher que Fumer ? (Chiffres et Calculs 2026)',
+    description: 'Comparatif chiffré du budget tabac vs vape en 2026. Découvrez combien vous économisez chaque mois en passant à la cigarette électronique.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T13:00:00Z',
+    readTime: '5 min',
+    category: 'Conseils',
+    image: '/products/alfaliquid-fraicheur-menthe-fraiche-10ml.webp',
+    summary: 'Avec le paquet de cigarettes au-delà de 12.50 €, le passage à la vape permet d’économiser plus de 3000 € par an pour un fumeur un paquet/jour.',
+    intro: 'Outre les bénéfices majeurs pour la santé, l’argument économique est l’un des moteurs principaux pour arrêter le tabac. Faisons le calcul réel des dépenses.',
+    sections: [
+      {
+        title: 'Le budget d’un fumeur en 2026',
+        text: 'Un fumeur d’un paquet par jour dépense environ 12.50 € x 365 jours = 4 562 € par an !',
+      },
+      {
+        title: 'Le budget d’un vapoteur sur une année',
+        text: '1. Matériel initial (pod + résistances) : ~35 €. 2. Consommables (résistances de rechange) : ~10 € par mois. 3. E-liquides (4 flacons par mois ou format 50ml) : ~30 € par mois. Total annuel vape : environ 500 € à 650 € !',
+      },
+      {
+        title: 'Plus de 3 900 € d’économie nette',
+        text: 'En passant à la cigarette électronique, vous économisez en moyenne 325 € chaque mois dès le premier mois d’utilisation.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel est l’investissement de départ pour commencer la vape ?',
+        a: 'Un kit débutant complet avec e-liquides coûte entre 25 € et 40 € tout compris.',
+      },
+    ],
+    relatedProductIds: ['xros-4-mini-269', 'fr-m-10ml-alfaliquid-76'],
+  }),
+  makePost({
+    slug: 'trouver-gout-puff-en-eliquide',
+    title: 'Comment Retrouver le Goût Exact de Votre Puff en E-Liquide ?',
+    description: 'Guide des équivalences de saveurs e-liquides pour remplacer vos puffs jetables préférées. Pastèque glacée, myrtille, fruits rouges et cola.',
+    date: '30 Juil 2026',
+    isoDate: '2026-07-30T13:15:00Z',
+    readTime: '4 min',
+    category: 'E-liquides',
+    image: '/products/coconut-puff_1.webp',
+    summary: 'Vous regrettez le goût ultra-intense de votre ancienne puff jetable ? Voici la recette exacte pour obtenir le même rendu en flacon.',
+    intro: 'Le succès gustatif des puffs reposait sur trois piliers : un arôme surdosé, un additif frais (agent glaçant) et des sels de nicotine. Voici comment reconstituer cette sensation parfaite.',
+    sections: [
+      {
+        title: 'Règle n°1 : Choisir des e-liquides aux Sels de Nicotine',
+        text: 'Le sel de nicotine neutralise l’acidité en gorge et permet aux arômes fruités de s’exprimer pleinement sans être masqués par le "hit".',
+      },
+      {
+        title: 'Règle n°2 : Choisir des gammes au profil "Puff"',
+        text: 'Des marques comme Liquideo (gamme Wpuff Flavors), JNR, Fruizee ou Freaks proposent des liquides formulés spécifiquement avec ce côté ultra-fruité et très frais.',
+      },
+      {
+        title: 'Équivalences des saveurs cultes',
+        text: '• Puff Pastèque Glacée → E-liquide Watermelon Ice ou Freeze Mangue / Pastèque. • Puff Myrtille Sûre → E-liquide Fruits Rouges Givrés. • Puff Peachy Mango → E-liquide Pêche Abricot Freaks.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Pourquoi les e-liquides classiques semblent-ils parfois moins sucrés ?',
+        a: 'Les e-liquides traditionnels sont conçus pour ne pas encrasser les résistances et éviter l’écœurement. Pour retrouver un goût très sucré, choisissez la gamme Sels de Nicotine.',
+      },
+    ],
+    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+  }),
 ]
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
+
+// Maillage interne : suggère d'autres guides de la même catégorie pour
+// garder le lecteur sur le site et renforcer le contexte thématique.
+export const getRelatedPosts = (slug, limit = 3) => {
+  const current = getBlogPost(slug)
+  if (!current) return []
+  return BLOG_POSTS.filter((p) => p.slug !== slug && p.category === current.category).slice(
+    0,
+    limit,
+  )
+}

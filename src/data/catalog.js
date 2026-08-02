@@ -10,13 +10,47 @@ export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
   { slug: 'e-liquides', key: 'eliquide', name: 'E-liquides', tagline: 'Saveurs sélectionnées, dosage maîtrisé' },
+  { slug: 'e-liquides-sels-de-nicotine', key: 'sels-nicotine', name: 'E-liquides Sels de nicotine', tagline: 'Douceur en gorge et sevrage efficace' },
+  { slug: 'e-liquides-50ml', key: 'eliquide-50ml', name: 'E-liquides 50 ml', tagline: 'Grands formats économiques à booster' },
+  { slug: 'e-liquides-100ml', key: 'eliquide-100ml', name: 'E-liquides 100 ml', tagline: 'Très grands formats XL' },
+  { slug: 'e-liquides-tabac', key: 'eliquide-tabac', name: 'E-liquides Tabac & Classic', tagline: 'Saveurs blondes et riches' },
+  { slug: 'e-liquides-fruites', key: 'eliquide-fruite', name: 'E-liquides Fruités', tagline: 'Fruits rouges, mangue, fraise' },
+  { slug: 'e-liquides-menthe', key: 'eliquide-menthe', name: 'E-liquides Menthe & Frais', tagline: 'Sensations intenses et fraîches' },
+  { slug: 'e-liquides-gourmands', key: 'eliquide-gourmand', name: 'E-liquides Gourmands', tagline: 'Vanille, caramel, dessert' },
   { slug: 'diy', key: 'diy', name: 'DIY', tagline: 'Bases, boosters, arômes & flacons' },
+  { slug: 'diy-bases', key: 'diy-bases', name: 'Bases e-liquide DIY', tagline: 'Bases neutres 50/50 et PG/VG' },
+  { slug: 'diy-aromes', key: 'diy-aromes', name: 'Arômes Concentrés DIY', tagline: 'Concentrés de saveurs à diluer' },
+  { slug: 'diy-boosters', key: 'diy-boosters', name: 'Boosters de Nicotine', tagline: 'Boosters 20mg et sel de nicotine' },
   { slug: 'resistances', key: 'resistance', name: 'Résistances', tagline: 'Consommables compatibles pour entretenir votre matériel' },
+  { slug: 'cartouches-xros', key: 'cartouches-xros', name: 'Cartouches XROS', tagline: 'Toute la gamme pour pods Vaporesso XROS' },
+  { slug: 'resistances-geekvape-z', key: 'resistances-geekvape-z', name: 'Résistances Z Coil Geekvape', tagline: 'Résistances pour clearomiseurs Z Subohm' },
+  { slug: 'resistances-pnp-voopoo', key: 'resistances-pnp-voopoo', name: 'Résistances PnP Voopoo', tagline: 'Résistances PnP et PnP-X pour Drag et Argus' },
+  { slug: 'resistances-zenith-innokin', key: 'resistances-zenith-innokin', name: 'Résistances Zenith Innokin', tagline: 'Résistances Z-Coil pour Zenith et Zlide' },
   { slug: 'accessoires', key: 'accessoire', name: 'Accessoires', tagline: 'Résistances, batteries, chargeurs & étuis' },
-  { slug: 'alternatives-puffs', key: 'alternative-puff', name: 'Alternatives aux puffs jetables', tagline: 'Pods et modèles rechargeables conformes pour adultes' },
+  { slug: 'puffs-rechargeables', key: 'alternative-puff', name: 'Puffs rechargeables & alternatives', tagline: 'Systèmes légaux, économiques et écologiques' },
   { slug: 'packs-debutants', key: 'pack', name: 'Packs débutants', tagline: 'Tout pour bien démarrer' },
+  
+  // Pages Marques
+  { slug: 'marque-vaporesso', key: 'brand-vaporesso', name: 'Vaporesso', tagline: 'Kits, pods XROS et résistances Vaporesso' },
+  { slug: 'marque-geekvape', key: 'brand-geekvape', name: 'Geekvape', tagline: 'Box Aegis, pods Wenax et résistances Z-Coil' },
+  { slug: 'marque-voopoo', key: 'brand-voopoo', name: 'Voopoo', tagline: 'Pods Drag, Argus et résistances PnP' },
+  { slug: 'marque-oxva', key: 'brand-oxva', name: 'OXVA', tagline: 'Pods Xlim et cartouches de précision' },
+  { slug: 'marque-aspire', key: 'brand-aspire', name: 'Aspire', tagline: 'Clearomiseurs Nautilus et kits légendaires' },
+  { slug: 'marque-innokin', key: 'brand-innokin', name: 'Innokin', tagline: 'Kits Zenith, Zlide et consommables d’excellence' },
+  { slug: 'marque-justfog', key: 'brand-justfog', name: 'Justfog', tagline: 'Kits Q16 et consommables compacts' },
+  { slug: 'marque-liquideo', key: 'brand-liquideo', name: 'Liquideo', tagline: 'E-liquides Freeze, Wpuff et séries cultes' },
+  { slug: 'marque-freaks', key: 'brand-freaks', name: 'Freaks', tagline: 'E-liquides originaux et recettes intenses' },
+  { slug: 'marque-liquidarom', key: 'brand-liquidarom', name: 'Liquidarom', tagline: 'Saveurs françaises et classiques incontournables' },
+  { slug: 'marque-alfaliquid', key: 'brand-alfaliquid', name: 'Alfaliquid', tagline: 'Le leader français des e-liquides (FR-M, FR-4)' },
+  { slug: 'marque-tjuice', key: 'brand-tjuice', name: 'T-Juice', tagline: 'Red Astaire et recettes mythiques britanniques' },
+  { slug: 'marque-vampire-vape', key: 'brand-vampirevape', name: 'Vampire Vape', tagline: 'Heisenberg, Pinkman et concentrés iconiques' },
+  { slug: 'marque-pulp', key: 'brand-pulp', name: 'Pulp', tagline: 'E-liquides authentiques et réalistes' },
+  { slug: 'marque-petit-nuage', key: 'brand-petitnuage', name: 'Petit Nuage', tagline: 'Saveurs douces et gourmandes en 60ml' },
+  { slug: 'marque-fruizee', key: 'brand-fruizee', name: 'Fruizee', tagline: 'E-liquides ultra-frais et fruités de Eliquid France' },
+  { slug: 'marque-jnr', key: 'brand-jnr', name: 'JNR Vape', tagline: 'E-liquides et rechargeables au goût de puff' },
+
   { slug: 'nouveautes', key: 'new', name: 'Nouveautés', tagline: 'Les dernières arrivées' },
-  { slug: 'meilleures-ventes', key: 'best', name: 'Meilleures ventes', tagline: 'Les préférés de la communauté' },
+  { slug: 'meilleures-ventes', key: 'best', name: 'Sélection du catalogue', tagline: 'Références disponibles sélectionnées par la boutique' },
 ]
 
 export const BADGES = {
@@ -45,7 +79,7 @@ export const isResistanceProduct = (p = {}) => {
 
 export const isAlternativePuffProduct = (p = {}) => {
   if (!['pod', 'ecig', 'pack'].includes(p.category)) return false
-  return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target)\b/i.test(normalizedProductText(p))
+  return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target|dojo|jnr|tornado)\b/i.test(normalizedProductText(p))
 }
 
 export const isDiyProduct = (p = {}) => {
@@ -55,11 +89,90 @@ export const isDiyProduct = (p = {}) => {
   return /\b(diy|boosters?|bases?\s+(?:neutres?|pg|vg|\d+\s*\/\s*\d+)|bouteilles?\s+vides?|flacons?\s+vides?|fioles?\s+gradu[eé]es?|ar[oô]mes?\s+concentr[eé]s?)\b/i.test(text)
 }
 
+export const isPackProduct = (p = {}) => {
+  if (p.category === 'pack') return true
+  if (p.category === 'ecig' || p.category === 'pod') return true
+  return false
+}
+
+export const isSelsNicotine = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  return /\b(sel|sels)\s+de\s+nicotine\b/i.test(normalizedProductText(p)) || p.nicotine?.includes(20)
+}
+
+export const isEliquide50ml = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  return /\b50\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 50
+}
+
+export const isEliquide100ml = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  return /\b100\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 100
+}
+
+export const isEliquideTabac = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  const text = normalizedProductText(p)
+  return /\b(tabac|classic|blond|brun|virginia)\b/i.test(text)
+}
+
+export const isEliquideFruite = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  const text = normalizedProductText(p)
+  return /\b(fruit[eé]s?|fraise|framboise|mangue|p[eê]che|abricot|pomme|melon|pasteque|fruits?\s+rouges?|citron|cassis|fruits?\s+des\s+bois)\b/i.test(text)
+}
+
+export const isEliquideMenthe = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  const text = normalizedProductText(p)
+  return /\b(menthe|frais|glaciale|eucalyptus|freeze|ice)\b/i.test(text)
+}
+
+export const isEliquideGourmand = (p = {}) => {
+  if (p.category !== 'eliquide') return false
+  const text = normalizedProductText(p)
+  return /\b(gourmands?|vanille|caramel|caf[eé]|biscuit|tarte|noisette|chocolat|pop-corn)\b/i.test(text)
+}
+
+export const isDiyBases = (p = {}) => isDiyProduct(p) && /\b(base|neutre|1l|1000ml|liter)\b/i.test(normalizedProductText(p))
+export const isDiyAromes = (p = {}) => isDiyProduct(p) && /\b(ar[oô]me|concentr[eé])\b/i.test(normalizedProductText(p))
+export const isDiyBoosters = (p = {}) => isDiyProduct(p) && /\b(booster|nicotine)\b/i.test(normalizedProductText(p))
+
+export const isGeekvapeZCoil = (p = {}) => (p.category === 'resistance' || p.category === 'accessoire') && /\b(z\s*coils?|z\s*subohm|geekvape\s+z)\b/i.test(normalizedProductText(p))
+export const isVoopooPnP = (p = {}) => (p.category === 'resistance' || p.category === 'accessoire') && /\b(pnp|pnp-x|voopoo)\b/i.test(normalizedProductText(p))
+export const isInnokinZenith = (p = {}) => (p.category === 'resistance' || p.category === 'accessoire') && /\b(zenith|zlide|z-coil)\b/i.test(normalizedProductText(p))
+
+export const isCartouchesXros = (p = {}) => {
+  if (p.category !== 'resistance' && p.category !== 'accessoire') return false
+  return /\b(cartouches?)\s+(xros)\b/i.test(normalizedProductText(p))
+}
+
 export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
 
 export const productMatchesCategory = (product, categoryKey) => {
+  if (categoryKey.startsWith('brand-')) {
+    const brandName = categoryKey.replace('brand-', '').toLowerCase()
+    const pBrand = (product.brand || '').toLowerCase()
+    const pText = normalizedProductText(product)
+    return pBrand.includes(brandName) || pText.includes(brandName)
+  }
   if (categoryKey === 'resistance') return isResistanceProduct(product)
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
+  if (categoryKey === 'pack') return isPackProduct(product)
+  if (categoryKey === 'sels-nicotine') return isSelsNicotine(product)
+  if (categoryKey === 'eliquide-50ml') return isEliquide50ml(product)
+  if (categoryKey === 'eliquide-100ml') return isEliquide100ml(product)
+  if (categoryKey === 'eliquide-tabac') return isEliquideTabac(product)
+  if (categoryKey === 'eliquide-fruite') return isEliquideFruite(product)
+  if (categoryKey === 'eliquide-menthe') return isEliquideMenthe(product)
+  if (categoryKey === 'eliquide-gourmand') return isEliquideGourmand(product)
+  if (categoryKey === 'diy-bases') return isDiyBases(product)
+  if (categoryKey === 'diy-aromes') return isDiyAromes(product)
+  if (categoryKey === 'diy-boosters') return isDiyBoosters(product)
+  if (categoryKey === 'cartouches-xros') return isCartouchesXros(product)
+  if (categoryKey === 'resistances-geekvape-z') return isGeekvapeZCoil(product)
+  if (categoryKey === 'resistances-pnp-voopoo') return isVoopooPnP(product)
+  if (categoryKey === 'resistances-zenith-innokin') return isInnokinZenith(product)
   return getProductCategoryKey(product) === categoryKey
 }
 

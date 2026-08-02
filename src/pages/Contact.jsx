@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
-import { IconMail, IconPhone, IconHeadset, IconCheck, IconPin } from '../components/icons.jsx'
+import { IconMail, IconPhone, IconHeadset, IconCheck, IconPin, IconStar } from '../components/icons.jsx'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 
 const MINI_FAQ = [
   { q: 'Quels sont les délais de livraison ?', a: 'Expédition sous 24/48h, réception sous 2 à 4 jours ouvrés en France.' },
@@ -105,6 +106,16 @@ export default function Contact() {
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconPhone width={17} height={17} /></span>
               04 91 55 55 55
             </a>
+            <a
+              href={STORE_REVIEW_SUMMARY.googleUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mb-3 flex items-center gap-3 text-sm text-ash/75 hover:text-neon"
+            >
+              <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconStar width={17} height={17} /></span>
+              {STORE_REVIEW_SUMMARY.compactLabel} — voir la fiche
+            </a>
+
             <div className="flex items-center gap-3 text-sm text-ash/75">
               <span className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-neon"><IconHeadset width={17} height={17} /></span>
               Lundi – Vendredi · 9h00 – 19h00

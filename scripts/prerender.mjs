@@ -31,6 +31,7 @@ const {
   featuredProducts,
   getProductCategoryKey,
   productMatchesCategory,
+  productsByCategorySlugFrom,
   selectHomeHeroProduct,
 } = await import(resolve(root, 'src/data/catalog.js'))
 const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
@@ -142,9 +143,20 @@ let count = 0
 
 // ---- Produits ----
 for (const p of PRODUCTS) {
-  const catLabel = categoryName(getProductCategoryKey(p))
-  const title = `${p.name} — ${catLabel} | THEKLOPE`
-  const description = (p.short || p.long || `${p.name} disponible chez THEKLOPE.`).slice(0, 160)
+  const catKey = getProductCategoryKey(p)
+  // Cherche par clé ET par slug : `p.category` peut déjà être un slug ou une
+  // clé inconnue du catalogue distant. Sans correspondance, on évite à tout
+  // prix de construire /categorie/<clé brute> (404) : on pointe vers /boutique.
+  const cat = CATEGORIES.find((c) => c.key === catKey || c.slug === catKey || c.slug === p.category)
+  const catLabel = cat ? cat.name : catKey
+  const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
+  const brandName = p.brand || ''
+  const hasBrandInName = brandName && p.name.toLowerCase().includes(brandName.toLowerCase())
+  const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
+  const title = `Acheter ${p.name}${brandSuffix} | THEKLOPE`
+  const brandMention = brandName ? ` par ${brandName}` : ''
+  const shortDesc = p.short ? ` ${p.short}` : ''
+  const description = `Acheter ${p.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`.slice(0, 160)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -189,15 +201,16 @@ for (const p of PRODUCTS) {
       {
         '@type': 'BreadcrumbList',
         itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Accueil', item: abs('/') },
-          { '@type': 'ListItem', position: 2, name: catLabel, item: abs(`/categorie/${getProductCategoryKey(p)}`) },
-          { '@type': 'ListItem', position: 3, name: p.name, item: abs(path) },
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Boutique', item: `${BASE_URL}/boutique` },
+          { '@type': 'ListItem', position: 3, name: catLabel, item: abs(catPath) },
+          { '@type': 'ListItem', position: 4, name: p.name, item: abs(path) },
         ],
       },
     ],
   }
   const content = `
-    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <span>${esc(catLabel)}</span></nav>
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <a href="${esc(catPath)}">${esc(catLabel)}</a></nav>
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
       <div><div class="card relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-2">
         <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(p.name)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
@@ -229,10 +242,21 @@ for (const p of PRODUCTS) {
   count++
 }
 
+// Bloc de crawlability : expose TOUS les liens produits en HTML crawlable,
+// au-delà de la sélection visible (limitée à 40) et sans dépendre du JS.
+const allProductsNav = (products, heading, ariaLabel) => {
+  if (!products.length) return ''
+  const items = products.map((p) => `<li><a href="/produit/${esc(p.id)}">${esc(p.name)}</a></li>`).join('')
+  return `<nav aria-label="${esc(ariaLabel)}" class="mt-12 text-sm text-muted"><h2>${esc(heading)}</h2><ul>${items}</ul></nav>`
+}
+
 // ---- Catégories ----
 for (const c of CATEGORIES) {
   const seo = CATEGORY_SEO[c.slug]
-  const inCat = PRODUCTS.filter((p) => productMatchesCategory(p, c.key)).slice(0, 40)
+  // Même logique que CategoryPage.jsx (gère aussi les catégories virtuelles
+  // nouveautes/meilleures-ventes) pour que le HTML crawlable reflète l'app.
+  const allInCat = productsByCategorySlugFrom(PRODUCTS, c.slug)
+  const inCat = allInCat.slice(0, 40)
   const title = `${seo?.seoTitle || c.name} | THEKLOPE`
   const description = (seo?.metaDescription || `${c.name} : ${c.tagline}. Sélection THEKLOPE, livraison France, paiement sécurisé. Vente réservée aux +18.`).slice(0, 160)
   const path = `/categorie/${c.slug}`
@@ -248,6 +272,14 @@ for (const c of CATEGORIES) {
         url: abs(path),
         name: seo?.h1 || c.name,
         description,
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Catégories', item: `${BASE_URL}/categories` },
+          { '@type': 'ListItem', position: 3, name: seo?.h1 || c.name, item: abs(path) },
+        ],
       },
       ...(seo?.faq?.length
         ? [{
@@ -268,6 +300,7 @@ for (const c of CATEGORIES) {
     ${sections}
     <ul>${links}</ul>`
     + faq
+    + allProductsNav(allInCat, `Tout le catalogue ${c.name}`, 'Tous les produits de la catégorie')
   writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content, catalogBootstrap: inCat }))
   count++
 }
@@ -279,15 +312,27 @@ for (const b of BLOG_POSTS) {
   const path = `/guides/${b.slug}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: b.title,
-    description: b.description || b.title,
-    image: absImg(b.image),
-    datePublished: b.isoDate,
-    dateModified: b.isoDate,
-    author: { '@type': 'Organization', name: 'THEKLOPE' },
-    publisher: { '@type': 'Organization', name: 'THEKLOPE' },
-    mainEntityOfPage: abs(path),
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: b.title,
+        description: b.description || b.title,
+        image: absImg(b.image),
+        datePublished: b.isoDate,
+        dateModified: b.isoDate,
+        author: { '@type': 'Organization', name: 'THEKLOPE' },
+        publisher: { '@type': 'Organization', name: 'THEKLOPE' },
+        mainEntityOfPage: abs(path),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Guides', item: `${BASE_URL}/guides` },
+          { '@type': 'ListItem', position: 3, name: b.title, item: abs(path) },
+        ],
+      },
+    ],
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/guides">Guides</a> › <span>${esc(b.title)}</span></nav>
@@ -316,12 +361,108 @@ const STATIC_PAGES = [
   { path: '/checkout', title: 'Paiement sécurisé | THEKLOPE', description: 'Finalisez votre commande THEKLOPE avec le paiement sécurisé Mollie.', noindex: true, catalogBootstrap: PRODUCTS },
   { path: '/checkout/retour', title: 'Confirmation de commande | THEKLOPE', description: 'Confirmation de votre commande THEKLOPE.', noindex: true },
 ]
+function buildStaticPageJsonLd(s) {
+  const path = s.path
+  const name = s.title.split(' | ')[0].split(' — ')[0]
+  const graph = [
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+        { '@type': 'ListItem', position: 2, name, item: abs(path) },
+      ],
+    },
+  ]
+
+  if (path === '/faq') {
+    graph.unshift({
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'Quels sont les délais de livraison THEKLOPE ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Les commandes sont préparées selon le stock disponible et expédiées sous 24/48h en France.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Les produits THEKLOPE sont-ils vendus aux mineurs ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Non. La vente de produits de vapotage est strictement réservée aux personnes majeures de 18 ans et plus.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Où se trouve la boutique physique THEKLOPE ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Notre boutique physique est située au 188 rue de Rome, 13006 Marseille.' },
+        },
+        {
+          '@type': 'Question',
+          name: 'Puis-je retirer ma commande gratuitement en boutique ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'Oui, le retrait en boutique Click & Collect au 188 rue de Rome à Marseille est 100% gratuit.' },
+        },
+      ],
+    })
+  } else if (path === '/calculette-diy') {
+    graph.unshift({
+      '@type': 'WebApplication',
+      name: 'Calculette DIY e-liquide THEKLOPE',
+      applicationCategory: 'UtilityApplication',
+      operatingSystem: 'All',
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (path === '/configurateur') {
+    graph.unshift({
+      '@type': 'WebApplication',
+      name: 'Configurateur de pack cigarette électronique THEKLOPE',
+      applicationCategory: 'ShoppingApplication',
+      operatingSystem: 'All',
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (path === '/contact') {
+    graph.unshift({
+      '@type': 'ContactPage',
+      name: 'Contact THEKLOPE',
+      url: abs(path),
+      description: s.description,
+    }, buildLocalBusinessSchema())
+  } else if (path === '/a-propos') {
+    graph.unshift({
+      '@type': 'AboutPage',
+      name: 'À propos de THEKLOPE',
+      url: abs(path),
+      description: s.description,
+    }, buildLocalBusinessSchema())
+  } else if (['/boutique', '/categories', '/guides'].includes(path)) {
+    graph.unshift({
+      '@type': 'CollectionPage',
+      name,
+      url: abs(path),
+      description: s.description,
+    })
+  } else if (!s.noindex) {
+    graph.unshift({
+      '@type': 'WebPage',
+      name,
+      url: abs(path),
+      description: s.description,
+    })
+  }
+
+  return { '@context': 'https://schema.org', '@graph': graph }
+}
+
 for (const s of STATIC_PAGES) {
-  const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>`
+  // /boutique : exposer tous les liens produits aux crawlers sans JS.
+  const shopNav = s.path === '/boutique'
+    ? allProductsNav(PRODUCTS, 'Tout le catalogue THEKLOPE', 'Tous les produits de la boutique')
+    : ''
+  const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
+  const jsonLd = buildStaticPageJsonLd(s)
   writePage(s.path, buildPage({
     title: s.title,
     description: s.description,
     canonicalPath: s.path,
+    jsonLd,
     content,
     noindex: s.noindex,
     catalogBootstrap: s.catalogBootstrap,
@@ -348,6 +489,13 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
         description,
       },
       {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: page.h1, item: abs(path) },
+        ],
+      },
+      {
         '@type': 'FAQPage',
         mainEntity: page.faq.map((item) => ({
           '@type': 'Question',
@@ -370,8 +518,8 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 }
 
 // ---- Page d'accueil (/) ----
-const homeTitle = 'THEKLOPE — Boutique vape en ligne'
-const homeDescription = 'THEKLOPE — boutique vape en ligne : cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France, paiement Mollie sécurisé.'
+const homeTitle = 'Vape Shop Marseille & Boutique Vape en Ligne | THEKLOPE'
+const homeDescription = "Boutique de vape et e-liquides à Marseille et en ligne. Découvrez nos kits, pods, e-liquides et produits DIY. Livraison rapide 24/48h et conseils d'experts."
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -411,7 +559,7 @@ const homeContent = `
     <div class="relative grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
       <div>
         <span class="chip mb-6 border-neon/30 text-neon">Boutique vape française · +18</span>
-        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE<br>Boutique vape en ligne</h1>
+        <h1 class="font-display text-4xl font-bold leading-tight text-white sm:text-5xl lg:text-6xl">THEKLOPE — Boutique vape en ligne</h1>
         <p class="mt-6 max-w-lg text-base leading-relaxed sm:text-lg">Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour adultes.</p>
         <p class="mt-8"><a href="/boutique">Découvrir la boutique</a></p>
       </div>

@@ -125,11 +125,11 @@ const SECTIONS = [
     ],
   },
   {
-    title: 'Confiance et avis',
+    title: 'Confiance et contact',
     items: [
       {
-        q: 'Les avis affichés par THEKLOPE sont-ils réels ?',
-        a: 'THEKLOPE met en avant des avis boutique réels lorsqu’ils sont disponibles, notamment des avis Google, sans inventer d’avis produit.',
+        q: 'Où vérifier les informations sur THEKLOPE ?',
+        a: 'Les coordonnées de la boutique et de la société sont disponibles dans le footer, la page Contact et les mentions légales.',
       },
       {
         q: 'Comment contacter le service client ?',

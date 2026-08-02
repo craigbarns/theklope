@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { categoryName, getProductCategoryKey } from '../data/catalog.js'
-import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+import { CATEGORIES, categoryName, getProductCategoryKey } from '../data/catalog.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
-import Stars from '../components/Stars.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import NotFound from './NotFound.jsx'
@@ -17,6 +15,7 @@ import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import { relatedGuidesForProduct } from '../data/productGuides.js'
 import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
+import { getQuantityPricingRule } from '../lib/pricing.js'
 import {
   IconHeart,
   IconCart,
@@ -31,11 +30,13 @@ import {
 
 export default function Product() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const {
     products,
     cart,
     getProduct,
     addToCart,
+    setCartOpen,
     toggleFavorite,
     isFavorite,
     cookiesChoice,
@@ -182,21 +183,6 @@ export default function Product() {
     }
   }, [cookiesChoice, product])
 
-  // Compte à rebours d'expédition (limite 14h00)
-  const shippingCountdown = useMemo(() => {
-    const now = new Date()
-    const hours = now.getHours()
-    const day = now.getDay()
-    const isWeekend = day === 0 || day === 6
-
-    if (hours < 14 && !isWeekend) {
-      const remainingHours = 14 - hours - 1
-      const remainingMinutes = 60 - now.getMinutes()
-      return `Expédition aujourd'hui ! Commandez dans les ${remainingHours}h ${remainingMinutes}min.`
-    }
-    return `Commandez maintenant pour une expédition dès demain (ou lundi) !`
-  }, [])
-
   const cartProductQty = product
     ? cart.reduce(
       (sum, item) => sum + (item.productId === product.id ? Number(item.qty) || 0 : 0),
@@ -216,6 +202,7 @@ export default function Product() {
   if (pageState === PRODUCT_PAGE_STATE.notFound) return <NotFound />
 
   const fav = isFavorite(product.id)
+  const quantityPricing = getQuantityPricingRule(product)
   const outOfStock = product.stock <= 0
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
@@ -227,6 +214,13 @@ export default function Product() {
     ...(ohm != null ? { ohm } : {}),
   }
   const variantResolution = resolveProductVariant(product, selectedVariant)
+
+  const handleBuyNow = () => {
+    if (handleAdd()) {
+      setCartOpen(false)
+      navigate('/checkout')
+    }
+  }
 
   const handleAdd = (requestedQty = qty) => {
     if (outOfStock || stockLimitReached) {
@@ -249,11 +243,27 @@ export default function Product() {
     return true
   }
 
+  const seoTitle = useMemo(() => {
+    if (!product) return 'Produit | THEKLOPE'
+    const brandName = product.brand || ''
+    const hasBrandInName = brandName && product.name.toLowerCase().includes(brandName.toLowerCase())
+    const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
+    return `Acheter ${product.name}${brandSuffix} | THEKLOPE`
+  }, [product])
+
+  const seoDescription = useMemo(() => {
+    if (!product) return ''
+    const brandName = product.brand || ''
+    const brandMention = brandName ? ` par ${brandName}` : ''
+    const shortDesc = product.short ? ` ${product.short}` : ''
+    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`
+  }, [product])
+
   return (
     <>
       <Seo
-        title={`${product.name} — ${categoryName(getProductCategoryKey(product))} | THEKLOPE`}
-        description={product.short}
+        title={seoTitle}
+        description={seoDescription}
         image={product.image}
         imageAlt={`${product.name} — ${product.brand}`}
         type="product"
@@ -263,7 +273,7 @@ export default function Product() {
         <Breadcrumbs
           items={[
             { label: 'Boutique', to: '/boutique' },
-            { label: categoryName(getProductCategoryKey(product)) },
+            { label: categoryName(getProductCategoryKey(product)), to: productCategoryPath },
             { label: product.name },
           ]}
         />
@@ -274,7 +284,6 @@ export default function Product() {
             <div className="card relative overflow-hidden rounded-3xl p-2 aspect-square flex items-center justify-center">
               <div className="absolute left-4 top-4 z-10 flex gap-2">
                 {product.badge && <Badge type={product.badge} />}
-                {product.oldPrice && !product.badge && <Badge type="promo" />}
               </div>
               <ProductImage
                 src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
@@ -311,22 +320,26 @@ export default function Product() {
           <div>
             <p className="text-xs uppercase tracking-wider text-faint">{product.brand} · {product.type}</p>
             <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{product.name}</h1>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
-              <span className="text-xs text-muted">Note de la boutique sur Google, pas du produit.</span>
-            </div>
 
             <div className="mt-5 flex items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
-              {product.oldPrice && (
-                <span className="text-lg text-faint line-through">{formatPrice(product.oldPrice)}</span>
-              )}
-              {product.oldPrice && (
-                <span className="rounded-full bg-rose-500/15 px-2.5 py-1 text-xs font-semibold text-rose-400">
-                  -{Math.round((1 - product.price / product.oldPrice) * 100)}%
-                </span>
-              )}
             </div>
+
+            {quantityPricing && (
+              <details className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
+                <summary className="cursor-pointer font-medium text-ash/80">
+                  Tarifs TTC selon la quantité
+                </summary>
+                <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-muted">
+                  <p>{quantityPricing.conditionLabel}.</p>
+                  <p>
+                    Exemple avec des références au prix affiché&nbsp;: {quantityPricing.minQty} flacons =
+                    {' '}{formatPrice(quantityPricing.exampleTotal)} TTC.
+                  </p>
+                  <p>Le total exact est recalculé automatiquement dans le panier selon les références éligibles.</p>
+                </div>
+              </details>
+            )}
 
             <p className="mt-5 text-ash/70">{product.short}</p>
 
@@ -359,44 +372,54 @@ export default function Product() {
             </div>
 
             {/* Quantité + CTA */}
-            <div className="mt-7 flex flex-wrap items-center gap-4">
-              <div className="flex items-center rounded-full border border-white/15">
-                <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
-                  <IconMinus width={16} height={16} />
+            <div className="mt-7 flex flex-col gap-3">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center rounded-full border border-white/15">
+                  <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
+                    <IconMinus width={16} height={16} />
+                  </button>
+                  <span className="w-10 text-center font-semibold text-white">{qty}</span>
+                  <button onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white disabled:opacity-30" aria-label="Augmenter">
+                    <IconPlus width={16} height={16} />
+                  </button>
+                </div>
+                <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:px-8">
+                  {outOfStock
+                    ? 'Rupture de stock'
+                    : stockLimitReached
+                      ? 'Stock maximum au panier'
+                      : added
+                        ? <><IconCheck width={18} height={18} /> Ajouté !</>
+                        : <><IconCart width={18} height={18} /> Ajouter au panier</>}
                 </button>
-                <span className="w-10 text-center font-semibold text-white">{qty}</span>
-                <button onClick={() => setQty((q) => Math.min(maxQty, q + 1))} disabled={qty >= maxQty} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white disabled:opacity-30" aria-label="Augmenter">
-                  <IconPlus width={16} height={16} />
+                <button
+                  onClick={() => toggleFavorite(product.id)}
+                  aria-label="Favori"
+                  className={`grid h-12 w-12 place-items-center rounded-full border transition ${
+                    fav ? 'border-neon/40 bg-neon/15 text-neon' : 'border-white/15 text-ash/70 hover:text-white'
+                  }`}
+                >
+                  <IconHeart filled={fav} />
                 </button>
               </div>
-              <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary flex-1 disabled:cursor-not-allowed disabled:opacity-50 sm:flex-none sm:px-10">
-                {outOfStock
-                  ? 'Rupture de stock'
-                  : stockLimitReached
-                    ? 'Stock maximum au panier'
-                    : added
-                      ? <><IconCheck width={18} height={18} /> Ajouté !</>
-                      : <><IconCart width={18} height={18} /> Ajouter au panier</>}
-              </button>
-              <button
-                onClick={() => toggleFavorite(product.id)}
-                aria-label="Favori"
-                className={`grid h-12 w-12 place-items-center rounded-full border transition ${
-                  fav ? 'border-neon/40 bg-neon/15 text-neon' : 'border-white/15 text-ash/70 hover:text-white'
-                }`}
-              >
-                <IconHeart filled={fav} />
-              </button>
+
+              {!outOfStock && !stockLimitReached && (
+                <button
+                  type="button"
+                  onClick={() => handleBuyNow()}
+                  className="btn-ghost w-full border-neon/40 text-neon hover:bg-neon hover:text-noir transition font-bold py-3 text-sm flex items-center justify-center gap-2"
+                >
+                  Commander
+                </button>
+              )}
             </div>
 
             <p className={`mt-3 text-sm ${outOfStock ? 'text-rose-400' : 'text-muted'}`}>
               {outOfStock
-                ? 'Rupture de stock — bientôt de retour'
+                ? 'Rupture de stock'
                 : stockLimitReached
                   ? 'Tout le stock disponible est déjà dans votre panier'
-                : remainingStock > 10
-                  ? 'En stock — expédition sous 24/48 h'
-                  : `Plus que ${remainingStock} disponible${remainingStock > 1 ? 's' : ''} à ajouter`}
+                  : `${remainingStock} exemplaire${remainingStock > 1 ? 's' : ''} disponible${remainingStock > 1 ? 's' : ''}`}
             </p>
 
             {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
@@ -412,8 +435,8 @@ export default function Product() {
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Reassure icon={IconTruck} title="Expédition 24h" text="Commandé avant 14h, expédié le jour même" />
               <Reassure icon={IconLock} title="Paiement Sécurisé" text="Cryptage bancaire SSL / Mollie" />
-              <Reassure icon={IconShield} title="Garantie & TPD" text="Produits 100% authentiques" />
-              <Reassure icon={IconCheck} title="Retrait Marseille" text="Retrait gratuit en boutique" />
+              <Reassure icon={IconShield} title="Boutique 188 Rue de Rome" text="Conseil & retrait Marseille" />
+              <Reassure icon={IconCheck} title="Garantie & TPD" text="Vente réservée aux +18 ans" />
             </div>
 
             {hasNicotine && (
@@ -459,20 +482,6 @@ export default function Product() {
                 </div>
               ))}
             </dl>
-          </div>
-        </div>
-
-        {/* Avis */}
-        <div className="mt-14">
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-            <h2 className="font-display text-2xl font-bold text-white">Avis clients Google</h2>
-            <Stars rating={STORE_REVIEW_SUMMARY.rating} reviews={STORE_REVIEW_SUMMARY.count} size={16} />
-            <p className="text-sm text-muted">Avis boutique THEKLOPE réels, collectés sur Google.</p>
-          </div>
-          <div className="card p-5 text-sm leading-relaxed text-ash/70">
-            Cette note concerne l’expérience globale en boutique, et non ce produit en particulier.
-            Les avis Google complets sont affichés sur la page d’accueil après votre accord pour le service d’avis externe.
-            <a href="/#avis-clients" className="ml-1 font-semibold text-neon hover:underline">Voir les avis clients</a>
           </div>
         </div>
 

@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom'
 import Logo from './Logo.jsx'
-import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import { useStore } from '../context/StoreContext.jsx'
 
 const COLUMNS = [
@@ -11,11 +10,14 @@ const COLUMNS = [
       { to: '/categorie/cigarettes-electroniques', label: 'Cigarettes électroniques' },
       { to: '/categorie/pods', label: 'Pods' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
+      { to: '/categorie/e-liquides-sels-de-nicotine', label: 'E-liquides Sels de Nicotine' },
+      { to: '/categorie/e-liquides-50ml', label: 'E-liquides 50 ml' },
       { to: '/categorie/diy', label: 'Produits DIY' },
       { to: '/categorie/resistances', label: 'Résistances' },
-      { to: '/categorie/alternatives-puffs', label: 'Alternatives aux puffs' },
-      { to: '/categorie/accessoires', label: 'Accessoires' },
+      { to: '/categorie/cartouches-xros', label: 'Cartouches XROS' },
+      { to: '/categorie/puffs-rechargeables', label: 'Puffs rechargeables' },
       { to: '/categorie/packs-debutants', label: 'Packs débutants' },
+      { to: '/categorie/accessoires', label: 'Accessoires' },
     ],
   },
   {
@@ -23,7 +25,7 @@ const COLUMNS = [
     links: [
       { to: '/faq', label: 'FAQ' },
       { to: '/contact', label: 'Contact' },
-      { to: '/configurateur', label: 'Configurateur de Pack' },
+      { to: '/configurateur', label: 'Configurateur' },
       { to: '/calculette-diy', label: 'Calculette DIY & Booster' },
       { to: '/livraison-retours', label: 'Livraison & retours' },
     ],
@@ -37,7 +39,7 @@ const COLUMNS = [
       { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique Marseille' },
       { to: '/conformite-vape', label: 'Conformité vape' },
       { to: '/categorie/nouveautes', label: 'Nouveautés' },
-      { to: '/categorie/meilleures-ventes', label: 'Meilleures ventes' },
+      { to: '/categorie/meilleures-ventes', label: 'Sélection du catalogue' },
     ],
   },
   {
@@ -71,7 +73,6 @@ export default function Footer() {
             </address>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">Boutique à Marseille</span>
-              <span className="chip">{STORE_REVIEW_SUMMARY.compactLabel}</span>
               <span className="chip">Paiement sécurisé</span>
               <span className="chip">+18 uniquement</span>
             </div>

@@ -78,6 +78,34 @@ const safeUrl = (value, base) => {
   }
 }
 
+export function buildAnalyticsPageContext({ href, referrer } = {}) {
+  const currentHref = href ?? (
+    typeof window === 'undefined' ? '' : window.location.href
+  )
+  const currentUrl = safeUrl(currentHref)
+  const pageLocation = currentUrl
+    ? (() => {
+        currentUrl.search = ''
+        currentUrl.hash = ''
+        return currentUrl.toString()
+      })()
+    : '/'
+
+  const currentReferrer = referrer ?? (
+    typeof document === 'undefined' ? '' : document.referrer
+  )
+  const referrerUrl = safeUrl(currentReferrer, currentUrl?.origin)
+  if (referrerUrl) {
+    referrerUrl.search = ''
+    referrerUrl.hash = ''
+  }
+
+  return {
+    page_location: pageLocation,
+    ...(referrerUrl ? { page_referrer: referrerUrl.toString() } : {}),
+  }
+}
+
 const isPaymentReferrer = (hostname) => (
   hostname === 'mollie.com'
   || hostname.endsWith('.mollie.com')
@@ -245,10 +273,19 @@ export function loadGoogleAnalytics() {
   window[`ga-disable-${GA_MEASUREMENT_ID}`] = false
   ensureGtagQueue()
   window.gtag('js', new Date())
+  // Réapplique explicitement l'accord après un cycle accepter → refuser →
+  // accepter. Le refus précédent a pu laisser Consent Mode en état `denied`.
+  window.gtag('consent', 'update', {
+    analytics_storage: 'granted',
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+  })
   window.gtag('config', GA_MEASUREMENT_ID, {
     send_page_view: false,
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
+    ...buildAnalyticsPageContext(),
   })
 
   googleAnalyticsPromise = new Promise((resolve) => {
@@ -346,7 +383,12 @@ export function trackEvent(name, params = {}) {
   if (typeof window === 'undefined' || !hasAnalyticsConsent()) return false
   if (typeof window.gtag !== 'function') loadGoogleAnalytics()
   if (typeof window.gtag !== 'function') return false
-  window.gtag('event', name, params)
+  window.gtag('event', name, {
+    ...params,
+    // Défense en profondeur : GA4 reçoit toujours une URL et un référent sans
+    // paramètres libres, y compris pour les événements e-commerce automatiques.
+    ...buildAnalyticsPageContext(),
+  })
   return true
 }
 
@@ -354,18 +396,29 @@ export async function trackEventWhenReady(name, params = {}) {
   if (typeof window === 'undefined' || !hasAnalyticsConsent()) return false
   const loaded = await loadGoogleAnalytics()
   if (!loaded || typeof window.gtag !== 'function') return false
-  window.gtag('event', name, params)
+  window.gtag('event', name, {
+    ...params,
+    ...buildAnalyticsPageContext(),
+  })
   return true
 }
 
+const pagePathWithoutQuery = (value) => {
+  if (!value) return ''
+  const path = String(value || '').split(/[?#]/, 1)[0]
+  return path.startsWith('/') ? path : `/${path}`
+}
+
 export function trackPageView(path) {
-  if (!path || path === lastPageView || !hasAnalyticsConsent()) return false
+  const pagePath = pagePathWithoutQuery(path)
+  if (!pagePath || pagePath === lastPageView || !hasAnalyticsConsent()) return false
   const tracked = trackEvent('page_view', {
-    page_location: window.location.href,
-    page_path: path,
+    // Les paramètres libres (`q`, identifiants de retour paiement, etc.) ne
+    // quittent jamais le navigateur dans un événement de page.
+    page_path: pagePath,
     page_title: document.title,
   })
-  if (tracked) lastPageView = path
+  if (tracked) lastPageView = pagePath
   return tracked
 }
 
@@ -378,3 +431,164 @@ export const toAnalyticsItem = (product, quantity = 1, variant = {}) => ({
   quantity: Number(quantity) || 1,
   item_variant: Object.values(variant || {}).filter((value) => value != null && value !== '').join(', '),
 })
+
+const cleanEventText = (value, max = 100) => {
+  const cleaned = String(value ?? '')
+    .trim()
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .replace(/\s+/g, ' ')
+  return cleaned ? cleaned.slice(0, max) : undefined
+}
+
+const isAnalyticsItem = (item) => (
+  item
+  && typeof item === 'object'
+  && (cleanEventText(item.item_id) || cleanEventText(item.item_name))
+)
+
+const normalizeAnalyticsItems = (items) => (
+  Array.isArray(items) ? items.filter(isAnalyticsItem) : []
+)
+
+const analyticsItemsValue = (items) => (
+  items.reduce((total, item) => {
+    const price = Number(item.price)
+    const quantity = Number(item.quantity)
+    if (!Number.isFinite(price) || price < 0) return total
+    return total + (price * (Number.isFinite(quantity) && quantity > 0 ? quantity : 1))
+  }, 0)
+)
+
+const ecommerceParams = ({
+  items,
+  value,
+  currency = 'EUR',
+  coupon,
+  ...params
+} = {}) => {
+  const normalizedItems = normalizeAnalyticsItems(items)
+  if (normalizedItems.length === 0) return null
+
+  const numericValue = value == null ? analyticsItemsValue(normalizedItems) : Number(value)
+  return {
+    currency: cleanEventText(currency, 3)?.toUpperCase() || 'EUR',
+    value: Number.isFinite(numericValue) && numericValue >= 0
+      ? Math.round(numericValue * 100) / 100
+      : analyticsItemsValue(normalizedItems),
+    ...(cleanEventText(coupon) ? { coupon: cleanEventText(coupon) } : {}),
+    ...params,
+    items: normalizedItems,
+  }
+}
+
+// GA4 recommandé : interaction avec un produit depuis une liste ou des
+// résultats de recherche. `item` accepte déjà un objet issu de toAnalyticsItem ;
+// `product` est le raccourci destiné aux composants de cartes produit.
+export function trackSelectItem({
+  product,
+  item,
+  quantity = 1,
+  variant = {},
+  itemListId,
+  itemListName,
+  index,
+} = {}) {
+  const analyticsItem = item || (product ? toAnalyticsItem(product, quantity, variant) : null)
+  if (!isAnalyticsItem(analyticsItem)) return false
+
+  const numericIndex = Number(index)
+  return trackEvent('select_item', {
+    ...(cleanEventText(itemListId) ? { item_list_id: cleanEventText(itemListId) } : {}),
+    ...(cleanEventText(itemListName) ? { item_list_name: cleanEventText(itemListName) } : {}),
+    items: [{
+      ...analyticsItem,
+      ...(Number.isInteger(numericIndex) && numericIndex >= 0 ? { index: numericIndex } : {}),
+    }],
+  })
+}
+
+// `zero_results` est un événement personnalisé complémentaire au `search`
+// recommandé par GA4. Le texte libre n'est jamais envoyé à Google : un client
+// peut saisir par erreur un e-mail, un téléphone ou un identifiant de commande.
+export function trackSearch({ searchTerm, resultCount } = {}) {
+  const normalizedTerm = cleanEventText(searchTerm)
+  if (!normalizedTerm) return false
+
+  const numericResultCount = Number(resultCount)
+  const params = {
+    search_term: 'catalogue_query',
+    query_length: normalizedTerm.length,
+    query_token_count: normalizedTerm.split(/\s+/).filter(Boolean).length,
+    ...(Number.isFinite(numericResultCount) && numericResultCount >= 0
+      ? { result_count: Math.floor(numericResultCount) }
+      : {}),
+  }
+  const searchTracked = trackEvent('search', params)
+  if (params.result_count !== 0) return searchTracked
+  return trackEvent('zero_results', params) && searchTracked
+}
+
+export function trackViewCart({ items, value, currency = 'EUR', coupon } = {}) {
+  const params = ecommerceParams({ items, value, currency, coupon })
+  return params ? trackEvent('view_cart', params) : false
+}
+
+export function trackRemoveFromCart({
+  product,
+  item,
+  quantity = 1,
+  variant = {},
+  value,
+  currency = 'EUR',
+  coupon,
+} = {}) {
+  const analyticsItem = item || (product ? toAnalyticsItem(product, quantity, variant) : null)
+  const params = ecommerceParams({
+    items: analyticsItem ? [analyticsItem] : [],
+    value,
+    currency,
+    coupon,
+  })
+  return params ? trackEvent('remove_from_cart', params) : false
+}
+
+export function trackAddPaymentInfo({
+  items,
+  value,
+  currency = 'EUR',
+  coupon,
+  paymentType,
+} = {}) {
+  const params = ecommerceParams({
+    items,
+    value,
+    currency,
+    coupon,
+    ...(cleanEventText(paymentType) ? { payment_type: cleanEventText(paymentType) } : {}),
+  })
+  return params ? trackEvent('add_payment_info', params) : false
+}
+
+const trackSafeError = (name, {
+  errorCode = 'unknown',
+  checkoutStep,
+  paymentProvider,
+  paymentType,
+  retryable,
+} = {}) => {
+  const numericStep = Number(checkoutStep)
+  const normalizedStep = Number.isInteger(numericStep) && numericStep > 0
+    ? numericStep
+    : cleanEventText(checkoutStep)
+  return trackEvent(name, {
+    error_code: cleanEventText(errorCode) || 'unknown',
+    ...(normalizedStep ? { checkout_step: normalizedStep } : {}),
+    ...(cleanEventText(paymentProvider) ? { payment_provider: cleanEventText(paymentProvider) } : {}),
+    ...(cleanEventText(paymentType) ? { payment_type: cleanEventText(paymentType) } : {}),
+    ...(typeof retryable === 'boolean' ? { retryable } : {}),
+  })
+}
+
+export const trackCheckoutError = (params = {}) => trackSafeError('checkout_error', params)
+
+export const trackPaymentError = (params = {}) => trackSafeError('payment_error', params)

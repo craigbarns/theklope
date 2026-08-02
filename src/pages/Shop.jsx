@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { CATEGORIES, productMatchesCategory, sortProductsByMerchandising } from '../data/catalog.js'
-import { IconFilter, IconClose, IconChevronDown } from '../components/icons.jsx'
-import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
+import { IconFilter, IconClose, IconChevronDown, IconSearch } from '../components/icons.jsx'
+import { toAnalyticsItem, trackEvent, trackSearch } from '../lib/analytics.js'
+import { normalizeSearchText, rankProductsBySearch } from '../lib/productSearch.js'
+import { createShopSearchState, getShopSearchQuery } from '../lib/searchNavigation.js'
 
 const SORTS = [
   { value: 'selection', label: 'Sélection THEKLOPE' },
@@ -19,12 +21,13 @@ const PRODUCT_CATEGORIES = CATEGORIES.filter((c) => !['nouveautes', 'meilleures-
 const PAGE_SIZE = 24
 
 export default function Shop() {
-  const { products, catalogMeta, cookiesChoice } = useStore()
-  const [params] = useSearchParams()
-  const initialQ = params.get('q') || ''
+  const { products, catalogMeta, catalogSearchReady, cookiesChoice } = useStore()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const queryFromNavigation = getShopSearchQuery(location.state)
   const maxAvailablePrice = catalogMeta.maxPrice
 
-  const [search, setSearch] = useState(initialQ)
+  const [search, setSearch] = useState(queryFromNavigation)
   const [cats, setCats] = useState([])
   const [brands, setBrands] = useState([])
   const [types, setTypes] = useState([])
@@ -34,17 +37,54 @@ export default function Shop() {
   const [sort, setSort] = useState('selection')
   const [mobileFilters, setMobileFilters] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const trackedListRef = useRef('')
+  const trackedListRef = useRef({ context: '', count: 0 })
+  const trackedSearchRef = useRef('')
+
+  const updateSearchState = useCallback((value) => {
+    navigate('/boutique', {
+      replace: true,
+      state: createShopSearchState(location.state, value),
+    })
+  }, [location.state, navigate])
 
   useEffect(() => {
     setMaxPrice((value) => Math.min(value || maxAvailablePrice, maxAvailablePrice))
   }, [maxAvailablePrice])
 
+  useEffect(() => {
+    setSearch(queryFromNavigation)
+  }, [queryFromNavigation])
+
+  useEffect(() => {
+    if (normalizeSearchText(search) === normalizeSearchText(queryFromNavigation)) return undefined
+    const timer = window.setTimeout(() => updateSearchState(search), 250)
+    return () => window.clearTimeout(timer)
+  }, [queryFromNavigation, search, updateSearchState])
+
+  useEffect(() => {
+    const normalizedQuery = normalizeSearchText(queryFromNavigation)
+    if (!normalizedQuery) {
+      trackedSearchRef.current = ''
+      return
+    }
+    if (!catalogSearchReady) return
+    const resultCount = rankProductsBySearch(products, queryFromNavigation).length
+    const signature = `${normalizedQuery}:${resultCount}`
+    if (trackedSearchRef.current === signature) return
+    if (trackSearch({ searchTerm: queryFromNavigation, resultCount })) {
+      trackedSearchRef.current = signature
+    }
+  }, [catalogSearchReady, cookiesChoice, products, queryFromNavigation])
+
   const toggle = (setter, value) =>
     setter((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
 
-  const reset = () => {
+  const clearSearch = () => {
     setSearch('')
+    updateSearchState('')
+  }
+
+  const resetFilters = () => {
     setCats([])
     setBrands([])
     setTypes([])
@@ -53,24 +93,26 @@ export default function Shop() {
     setMaxPrice(maxAvailablePrice)
   }
 
+  const reset = () => {
+    clearSearch()
+    resetFilters()
+  }
+
+  const hasSearch = Boolean(normalizeSearchText(queryFromNavigation))
+  const searchLoading = hasSearch && !catalogSearchReady
+  const searchResults = useMemo(
+    () => (hasSearch ? rankProductsBySearch(products, queryFromNavigation) : products),
+    [hasSearch, products, queryFromNavigation],
+  )
+
   const filtered = useMemo(() => {
-    let list = products.filter((p) => {
-      if (search) {
-        const t = search.toLowerCase()
-        if (
-          !p.name.toLowerCase().includes(t) &&
-          !p.short.toLowerCase().includes(t) &&
-          !p.brand.toLowerCase().includes(t) &&
-          !p.type.toLowerCase().includes(t)
-        )
-          return false
-      }
+    let list = searchResults.filter((p) => {
       if (cats.length && !cats.some((cat) => productMatchesCategory(p, cat))) return false
       if (brands.length && !brands.includes(p.brand)) return false
       if (types.length && !types.includes(p.type)) return false
       if (p.price > maxPrice) return false
-      if (nicotine.length && !p.nicotine.some((n) => nicotine.includes(n))) return false
-      if (flavors.length && !p.flavors.some((f) => flavors.includes(f))) return false
+      if (nicotine.length && !(p.nicotine || []).some((n) => nicotine.includes(n))) return false
+      if (flavors.length && !(p.flavors || []).some((f) => flavors.includes(f))) return false
       return true
     })
 
@@ -85,42 +127,72 @@ export default function Shop() {
         list = [...list].sort((a, b) => (b.badge === 'nouveau' ? 1 : 0) - (a.badge === 'nouveau' ? 1 : 0))
         break
       default:
-        list = sortProductsByMerchandising(list)
+        if (!hasSearch) list = sortProductsByMerchandising(list)
     }
     return list
-  }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort, products])
+  }, [searchResults, cats, brands, types, nicotine, flavors, maxPrice, sort, hasSearch])
 
   const visibleProducts = useMemo(() => filtered.slice(0, visibleCount), [filtered, visibleCount])
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE)
-  }, [search, cats, brands, types, nicotine, flavors, maxPrice, sort])
+  }, [queryFromNavigation, cats, brands, types, nicotine, flavors, maxPrice, sort])
 
   useEffect(() => {
-    const signature = visibleProducts.slice(0, PAGE_SIZE).map((product) => product.id).join('|')
-    if (!signature || trackedListRef.current === signature) return
+    if (searchLoading || visibleProducts.length === 0) return
+    const itemListId = hasSearch ? 'search_results' : 'boutique'
+    const itemListName = hasSearch ? 'Résultats de recherche' : 'Boutique'
+    const context = [
+      itemListId,
+      normalizeSearchText(queryFromNavigation),
+      sort,
+      cats.join(','),
+      brands.join(','),
+      types.join(','),
+      nicotine.join(','),
+      flavors.join(','),
+      maxPrice,
+    ].join('|')
+    const startIndex = trackedListRef.current.context === context
+      ? trackedListRef.current.count
+      : 0
+    const newlyVisibleProducts = visibleProducts.slice(startIndex)
+    if (newlyVisibleProducts.length === 0) return
     if (trackEvent('view_item_list', {
-      item_list_id: 'boutique',
-      item_list_name: 'Boutique',
-      items: visibleProducts.slice(0, PAGE_SIZE).map((product, index) => ({
+      item_list_id: itemListId,
+      item_list_name: itemListName,
+      items: newlyVisibleProducts.map((product, index) => ({
         ...toAnalyticsItem(product),
-        index,
+        index: startIndex + index,
       })),
     })) {
-      trackedListRef.current = signature
+      trackedListRef.current = { context, count: visibleProducts.length }
     }
-  }, [cookiesChoice, visibleProducts])
+  }, [
+    brands,
+    cats,
+    cookiesChoice,
+    flavors,
+    hasSearch,
+    maxPrice,
+    nicotine,
+    queryFromNavigation,
+    searchLoading,
+    sort,
+    types,
+    visibleProducts,
+  ])
 
   const activeCount = cats.length + brands.length + types.length + nicotine.length + flavors.length + (maxPrice < maxAvailablePrice ? 1 : 0)
 
   const activeChips = useMemo(() => {
     const chips = []
     
-    if (search) {
+    if (hasSearch) {
       chips.push({
         id: 'search',
-        label: `Recherche: "${search}"`,
-        onRemove: () => setSearch(''),
+        label: `Recherche: "${queryFromNavigation}"`,
+        onRemove: clearSearch,
       })
     }
     
@@ -174,7 +246,7 @@ export default function Shop() {
     })
 
     return chips
-  }, [search, cats, maxPrice, maxAvailablePrice, brands, types, nicotine, flavors])
+  }, [hasSearch, queryFromNavigation, cats, maxPrice, maxAvailablePrice, brands, types, nicotine, flavors])
 
   const filtersPanel = (
     <div className="space-y-6">
@@ -226,14 +298,16 @@ export default function Shop() {
         </div>
       </FilterGroup>
 
-      <FilterGroup title="Saveur">
-        {catalogMeta.flavors.map((f) => (
-          <CheckRow key={f} checked={flavors.includes(f)} onChange={() => toggle(setFlavors, f)} label={f} />
-        ))}
+      <FilterGroup title={`Saveur (${catalogMeta.flavors.length})`}>
+        <FlavorFilter
+          values={catalogMeta.flavors}
+          selected={flavors}
+          onToggle={(flavor) => toggle(setFlavors, flavor)}
+        />
       </FilterGroup>
 
       {activeCount > 0 && (
-        <button onClick={reset} className="text-sm text-neon hover:underline">
+        <button onClick={resetFilters} className="text-sm text-neon hover:underline">
           Réinitialiser les filtres
         </button>
       )}
@@ -248,7 +322,11 @@ export default function Shop() {
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="font-display text-3xl font-bold text-white">Boutique</h1>
-            <p className="mt-1 text-sm text-muted">{filtered.length} produit{filtered.length > 1 ? 's' : ''}</p>
+            <p className="mt-1 text-sm text-muted">
+              {searchLoading
+                ? 'Chargement du catalogue…'
+                : `${filtered.length} produit${filtered.length > 1 ? 's' : ''}`}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -264,13 +342,49 @@ export default function Shop() {
                 className="appearance-none rounded-full border border-white/10 bg-carbon py-2.5 pl-4 pr-10 text-sm text-white outline-none focus:border-neon/50"
               >
                 {SORTS.map((s) => (
-                  <option key={s.value} value={s.value}>Trier : {s.label}</option>
+                  <option key={s.value} value={s.value}>
+                    Trier : {s.value === 'selection' && hasSearch ? 'Pertinence' : s.label}
+                  </option>
                 ))}
               </select>
               <IconChevronDown width={16} height={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-faint" />
             </div>
           </div>
         </div>
+
+        <form
+          className="relative mt-6 max-w-2xl"
+          role="search"
+          onSubmit={(event) => {
+            event.preventDefault()
+            updateSearchState(search)
+          }}
+        >
+          <IconSearch
+            width={19}
+            height={19}
+            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-muted"
+          />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Produit, marque, saveur, modèle compatible…"
+            aria-label="Rechercher dans la boutique"
+            maxLength={120}
+            className="w-full rounded-xl border border-white/10 bg-carbon py-3.5 pl-12 pr-12 text-sm text-white outline-none placeholder:text-faint focus:border-neon/50"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={clearSearch}
+              aria-label="Effacer la recherche"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted transition hover:text-white"
+            >
+              <IconClose width={17} height={17} />
+            </button>
+          )}
+        </form>
 
         {/* CONTENEUR DES CHIPS ACTIFS */}
         {activeChips.length > 0 && (
@@ -305,16 +419,46 @@ export default function Shop() {
           </aside>
 
           <div>
-            {filtered.length === 0 ? (
-              <div className="card grid place-items-center p-16 text-center">
-                <p className="text-muted">Aucun produit ne correspond à votre recherche.</p>
-                <button onClick={reset} className="btn-ghost mt-4">Réinitialiser</button>
+            {searchLoading ? (
+              <div className="card grid place-items-center px-6 py-14 text-center sm:p-16" role="status">
+                <p className="text-sm text-muted">Recherche dans le catalogue complet…</p>
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="card grid place-items-center px-6 py-14 text-center sm:p-16">
+                <h2 className="font-display text-xl font-semibold text-white">
+                  {hasSearch ? `Aucun résultat pour « ${queryFromNavigation} »` : 'Aucun produit avec ces filtres'}
+                </h2>
+                <p className="mt-2 max-w-md text-sm text-muted">
+                  {hasSearch && searchResults.length > 0
+                    ? `${searchResults.length} produit${searchResults.length > 1 ? 's correspondent' : ' correspond'} à la recherche, mais pas aux filtres actifs.`
+                    : hasSearch
+                      ? 'Essayez une marque, une saveur ou une référence plus courte, puis vérifiez les filtres actifs.'
+                      : 'Retirez un ou plusieurs filtres pour élargir la sélection.'}
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-3">
+                  {hasSearch && searchResults.length > 0 ? (
+                    <button onClick={resetFilters} className="btn-ghost">Retirer les filtres</button>
+                  ) : (
+                    <button onClick={reset} className="btn-ghost">Voir tous les produits</button>
+                  )}
+                  {hasSearch && (
+                    <button onClick={clearSearch} className="text-sm font-medium text-neon hover:underline">
+                      Effacer la recherche
+                    </button>
+                  )}
+                </div>
               </div>
             ) : (
               <>
                 <div id="catalogue-products" className="grid grid-cols-2 gap-4 sm:gap-5 xl:grid-cols-3">
-                  {visibleProducts.map((p) => (
-                    <ProductCard key={p.id} product={p} />
+                  {visibleProducts.map((p, index) => (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      itemListId={hasSearch ? 'search_results' : 'boutique'}
+                      itemListName={hasSearch ? 'Résultats de recherche' : 'Boutique'}
+                      index={index}
+                    />
                   ))}
                 </div>
                 <div className="mt-8 flex flex-col items-center gap-3">
@@ -386,5 +530,98 @@ function CheckRow({ checked, onChange, label }) {
       <input type="checkbox" checked={checked} onChange={onChange} className="sr-only" />
       {label}
     </label>
+  )
+}
+
+function FlavorFilter({ values, selected, onToggle }) {
+  const [query, setQuery] = useState('')
+  const [expanded, setExpanded] = useState(false)
+  const normalizedQuery = normalizeSearchText(query)
+
+  const matches = useMemo(() => {
+    const filteredValues = normalizedQuery
+      ? values.filter((value) => normalizeSearchText(value).includes(normalizedQuery))
+      : values
+    const selectedSet = new Set(selected)
+
+    return [
+      ...filteredValues.filter((value) => selectedSet.has(value)),
+      ...filteredValues.filter((value) => !selectedSet.has(value)),
+    ]
+  }, [normalizedQuery, selected, values])
+
+  const collapsedLimit = normalizedQuery ? 20 : 12
+  const visibleValues = expanded ? matches : matches.slice(0, collapsedLimit)
+  const remaining = matches.length - visibleValues.length
+
+  return (
+    <div className="space-y-2">
+      {values.length > 12 && (
+        <div className="relative">
+          <IconSearch
+            width={15}
+            height={15}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint"
+          />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => {
+              setQuery(event.target.value)
+              setExpanded(false)
+            }}
+            placeholder="Filtrer les saveurs…"
+            aria-label="Filtrer la liste des saveurs"
+            className="w-full rounded-lg border border-white/10 bg-noir/20 py-2 pl-9 pr-8 text-xs text-white outline-none placeholder:text-faint focus:border-neon/40"
+          />
+          {query && (
+            <button
+              type="button"
+              onClick={() => {
+                setQuery('')
+                setExpanded(false)
+              }}
+              aria-label="Effacer le filtre des saveurs"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-faint hover:text-white"
+            >
+              <IconClose width={13} height={13} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {visibleValues.map((flavor) => (
+        <CheckRow
+          key={flavor}
+          checked={selected.includes(flavor)}
+          onChange={() => onToggle(flavor)}
+          label={flavor}
+        />
+      ))}
+
+      {matches.length === 0 && (
+        <p className="py-2 text-xs text-muted">Aucune saveur ne correspond à « {query.trim()} ».</p>
+      )}
+
+      {remaining > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="pt-1 text-xs font-medium text-neon hover:underline"
+        >
+          Afficher {remaining} autre{remaining > 1 ? 's' : ''} saveur{remaining > 1 ? 's' : ''}
+        </button>
+      )}
+
+      {expanded && matches.length > collapsedLimit && (
+        <button
+          type="button"
+          onClick={() => setExpanded(false)}
+          className="pt-1 text-xs text-muted hover:text-white"
+        >
+          Réduire la liste
+        </button>
+      )}
+    </div>
   )
 }

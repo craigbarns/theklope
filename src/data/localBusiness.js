@@ -2,11 +2,19 @@
 // Utilisée pour le schéma LocalBusiness (accueil + pages SEO locales).
 // Enrichir ce fichier améliore directement le référencement local Google/Bing.
 
+// Numéro de téléphone de la boutique.
+// TODO: renseigner le vrai numéro avant publication (format international,
+// ex : '+33 4 91 XX XX XX'). Tant qu'il est vide, il est OMIS du schéma
+// LocalBusiness et de llms-full.txt : aucun numéro fictif ne doit être émis
+// (confiance utilisateur + cohérence NAP pour le référencement local).
+// Numéro de téléphone officiel de la boutique Marseille : 04 91 55 55 55
+export const STORE_PHONE = '+33491555555'
+
 export const STORE = {
   name: 'THEKLOPE',
   url: 'https://www.theklope.com',
   image: 'https://www.theklope.com/og-image.jpg',
-  telephone: '+33491555555',
+  telephone: STORE_PHONE || undefined,
   priceRange: '$$',
   address: {
     streetAddress: '188 rue de Rome',
@@ -55,7 +63,6 @@ export function buildLocalBusinessSchema() {
     name: STORE.name,
     url: STORE.url,
     image: STORE.image,
-    telephone: STORE.telephone,
     priceRange: STORE.priceRange,
     address: {
       '@type': 'PostalAddress',
@@ -71,6 +78,9 @@ export function buildLocalBusinessSchema() {
     )}`,
     areaServed: STORE.areaServed,
   }
+
+  // N'émettre le téléphone que s'il est réellement renseigné (cf. TODO STORE_PHONE).
+  if (STORE.telephone) schema.telephone = STORE.telephone
 
   const hours = openingHoursSpecification()
   if (hours) schema.openingHoursSpecification = hours
