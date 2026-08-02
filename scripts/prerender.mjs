@@ -148,41 +148,53 @@ for (const p of PRODUCTS) {
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: p.name,
-    image: [absImg(p.image)],
-    description: p.long || p.short || p.name,
-    sku: p.id,
-    brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
-    offers: {
-      '@type': 'Offer',
-      url: abs(path),
-      priceCurrency: 'EUR',
-      price: (Number(p.price) || 0).toFixed(2),
-      validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
-      priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
-      itemCondition: 'https://schema.org/NewCondition',
-      availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-      seller: { '@type': 'Organization', name: 'THEKLOPE' },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
-        shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
-          transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+    '@graph': [
+      {
+        '@type': 'Product',
+        name: p.name,
+        image: [absImg(p.image)],
+        description: p.long || p.short || p.name,
+        sku: p.id,
+        brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
+        offers: {
+          '@type': 'Offer',
+          url: abs(path),
+          priceCurrency: 'EUR',
+          price: (Number(p.price) || 0).toFixed(2),
+          validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
+          priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+          itemCondition: 'https://schema.org/NewCondition',
+          availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          seller: { '@type': 'Organization', name: 'THEKLOPE' },
+          shippingDetails: {
+            '@type': 'OfferShippingDetails',
+            shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
+            shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
+            deliveryTime: {
+              '@type': 'ShippingDeliveryTime',
+              handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+              transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+            },
+          },
+          hasMerchantReturnPolicy: {
+            '@type': 'MerchantReturnPolicy',
+            applicableCountry: 'FR',
+            returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+            merchantReturnDays: 14,
+            returnMethod: 'https://schema.org/ReturnByMail',
+            returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+          },
         },
       },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'FR',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 14,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: abs('/') },
+          { '@type': 'ListItem', position: 2, name: catLabel, item: abs(`/categorie/${getProductCategoryKey(p)}`) },
+          { '@type': 'ListItem', position: 3, name: p.name, item: abs(path) },
+        ],
       },
-    },
+    ],
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <span>${esc(catLabel)}</span></nav>

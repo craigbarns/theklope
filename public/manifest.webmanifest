@@ -1,0 +1,24 @@
+{
+  "name": "THEKLOPE — Boutique Vape Premium",
+  "short_name": "THEKLOPE",
+  "description": "Boutique en ligne spécialisée en cigarettes électroniques, pods, e-liquides et accessoires de vape premium.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["shopping", "lifestyle"]
+}

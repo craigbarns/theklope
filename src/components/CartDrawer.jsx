@@ -148,21 +148,31 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            <div className="border-b border-white/10 px-5 py-3">
+            <div className="border-b border-white/10 px-5 py-3.5 bg-carbon/40">
               {remainingForFreeShipping > 0 ? (
-                <p className="flex items-center gap-2 text-xs text-ash/80">
-                  <IconTruck width={16} height={16} className="text-neon shrink-0" />
-                  Plus que <strong className="text-neon">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte
-                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <p className="flex items-center gap-2 text-ash/90">
+                    <IconTruck width={16} height={16} className="text-neon shrink-0 animate-pulse" />
+                    Plus que <strong className="text-neon font-bold">{formatPrice(remainingForFreeShipping)}</strong> pour la livraison offerte
+                  </p>
+                  <span className="text-[10px] text-faint font-semibold">{freeShippingPct}%</span>
+                </div>
               ) : (
-                <p className="flex items-center gap-2 text-xs text-neon">
-                  <IconTruck width={16} height={16} className="shrink-0" /> Livraison offerte débloquée&nbsp;!
+                <p className="flex items-center gap-2 text-xs text-neon font-semibold">
+                  <IconTruck width={16} height={16} className="shrink-0" /> 🎉 Livraison offerte débloquée !
                 </p>
               )}
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-neon transition-all duration-500" style={{ width: `${freeShippingPct}%` }} />
+              <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-white/10 p-0.5">
+                <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-neon transition-all duration-500 shadow-glow" style={{ width: `${freeShippingPct}%` }} />
               </div>
-              <p className="mt-2 text-[11px] text-faint">Retrait gratuit en boutique à Marseille, au choix lors du paiement.</p>
+              <p className="mt-2 text-[11px] text-faint flex justify-between items-center">
+                <span>Retrait boutique gratuit à Marseille (13006)</span>
+                {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && (
+                  <span className="text-[10px] font-bold text-neon bg-neon/10 px-2 py-0.5 rounded-full border border-neon/20">
+                    Presque atteint !
+                  </span>
+                )}
+              </p>
               {totals.bundleProgress?.length > 0 && (
                 <div className="mt-3">
                   <BundleProgress hints={totals.bundleProgress} compact />

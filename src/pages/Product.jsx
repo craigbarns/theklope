@@ -69,73 +69,93 @@ export default function Product() {
 
   const productSchema = useMemo(() => {
     if (!product) return null
-    // priceValidUntil : Google recommande une date de validité du prix (≈ fin de l'année suivante).
     const priceValidUntil = `${new Date().getFullYear() + 1}-12-31`
-    // priceValidFrom : début de validité du prix (date de mise en ligne du produit si connue).
-    const priceValidFrom = (product.created_at ? new Date(product.created_at) : new Date())
-      .toISOString().split('T')[0]
+    let priceValidFrom = new Date().toISOString().split('T')[0]
+    if (product.created_at) {
+      try {
+        const parsedDate = new Date(product.created_at)
+        if (!isNaN(parsedDate.getTime())) {
+          priceValidFrom = parsedDate.toISOString().split('T')[0]
+        }
+      } catch {
+        // Fallback to today
+      }
+    }
+    const rawImg = typeof product.image === 'string' && product.image ? product.image : '/products/product-placeholder.svg'
+    const fullImgUrl = rawImg.startsWith('http') ? rawImg : `https://www.theklope.com${rawImg.startsWith('/') ? '' : '/'}${rawImg}`
+
     const schema = {
       "@context": "https://schema.org",
-      "@type": "Product",
-      "name": product.name,
-      "image": [
-        product.image.startsWith('http') ? product.image : `https://www.theklope.com${product.image}`
-      ],
-      "description": product.long || product.short,
-      "sku": product.id,
-      "brand": {
-        "@type": "Brand",
-        "name": product.brand
-      },
-      "offers": {
-        "@type": "Offer",
-        "url": `https://www.theklope.com/produit/${product.id}`,
-        "priceCurrency": "EUR",
-        "price": (Number(product.price) || 0).toFixed(2),
-        "validFrom": priceValidFrom,
-        "priceValidUntil": priceValidUntil,
-        "itemCondition": "https://schema.org/NewCondition",
-        "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-        "seller": {
-          "@type": "Organization",
-          "name": "THEKLOPE"
-        },
-        "shippingDetails": {
-          "@type": "OfferShippingDetails",
-          "shippingDestination": {
-            "@type": "DefinedRegion",
-            "addressCountry": "FR"
+      "@graph": [
+        {
+          "@type": "Product",
+          "name": product.name || '',
+          "image": [fullImgUrl],
+          "description": product.long || product.short || product.name || '',
+          "sku": product.id,
+          "brand": {
+            "@type": "Brand",
+            "name": product.brand || 'THEKLOPE'
           },
-          "shippingRate": {
-            "@type": "MonetaryAmount",
-            "value": "7.50",
-            "currency": "EUR"
-          },
-          "deliveryTime": {
-            "@type": "ShippingDeliveryTime",
-            "handlingTime": {
-              "@type": "QuantitativeValue",
-              "minValue": 1,
-              "maxValue": 2,
-              "unitCode": "DAY"
+          "offers": {
+            "@type": "Offer",
+            "url": `https://www.theklope.com/produit/${product.id}`,
+            "priceCurrency": "EUR",
+            "price": (Number(product.price) || 0).toFixed(2),
+            "validFrom": priceValidFrom,
+            "priceValidUntil": priceValidUntil,
+            "itemCondition": "https://schema.org/NewCondition",
+            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "seller": {
+              "@type": "Organization",
+              "name": "THEKLOPE"
             },
-            "transitTime": {
-              "@type": "QuantitativeValue",
-              "minValue": 2,
-              "maxValue": 4,
-              "unitCode": "DAY"
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": "FR"
+              },
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": "7.50",
+                "currency": "EUR"
+              },
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 1,
+                  "maxValue": 2,
+                  "unitCode": "DAY"
+                },
+                "transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": 2,
+                  "maxValue": 4,
+                  "unitCode": "DAY"
+                }
+              }
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": "FR",
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": 14,
+              "returnMethod": "https://schema.org/ReturnByMail",
+              "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
             }
           }
         },
-        "hasMerchantReturnPolicy": {
-          "@type": "MerchantReturnPolicy",
-          "applicableCountry": "FR",
-          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
-          "merchantReturnDays": 14,
-          "returnMethod": "https://schema.org/ReturnByMail",
-          "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.theklope.com/" },
+            { "@type": "ListItem", "position": 2, "name": categoryName(product.category), "item": `https://www.theklope.com/categorie/${getProductCategoryKey(product)}` },
+            { "@type": "ListItem", "position": 3, "name": product.name || '', "item": `https://www.theklope.com/produit/${product.id}` }
+          ]
         }
-      }
+      ]
     }
     return schema
   }, [product])
@@ -388,12 +408,12 @@ export default function Product() {
               </div>
             )}
 
-            {/* Réassurance */}
+            {/* Réassurance Premium */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <Reassure icon={IconLock} text="Paiement 100% sécurisé" />
-              <Reassure icon={IconTruck} text="Livraison en 2–4 jours" />
-              <Reassure icon={IconShield} text="Retours sous 14 jours" />
-              <Reassure icon={IconShield} text="Vente réservée aux +18" />
+              <Reassure icon={IconTruck} title="Expédition 24h" text="Commandé avant 14h, expédié le jour même" />
+              <Reassure icon={IconLock} title="Paiement Sécurisé" text="Cryptage bancaire SSL / Mollie" />
+              <Reassure icon={IconShield} title="Garantie & TPD" text="Produits 100% authentiques" />
+              <Reassure icon={IconCheck} title="Retrait Marseille" text="Retrait gratuit en boutique" />
             </div>
 
             {hasNicotine && (
@@ -612,11 +632,14 @@ function VariantPicker({ label, options, value, onChange, render = (x) => x }) {
   )
 }
 
-function Reassure({ icon: Icon, text }) {
+function Reassure({ icon: Icon, title, text }) {
   return (
-    <div className="flex items-center gap-2.5 rounded-xl border border-white/8 bg-white/5 px-3 py-3 text-xs text-ash/70">
-      <Icon width={18} height={18} className="shrink-0 text-neon" />
-      {text}
+    <div className="flex flex-col gap-1 rounded-2xl border border-white/10 bg-carbon/60 p-3.5 backdrop-blur-sm hover:border-neon/30 transition">
+      <div className="flex items-center gap-2">
+        <Icon width={17} height={17} className="shrink-0 text-neon" />
+        <span className="text-xs font-semibold text-white">{title}</span>
+      </div>
+      <p className="text-[11px] text-faint leading-tight mt-0.5">{text}</p>
     </div>
   )
 }

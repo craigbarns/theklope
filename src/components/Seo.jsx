@@ -38,11 +38,18 @@ export default function Seo({
     // 3. URL canonique (par défaut : origine + chemin, sans query/hash)
     const canonicalUrl = canonical || `${window.location.origin}${window.location.pathname}`
     updateLink('canonical', canonicalUrl)
-    const schemaType = schema?.['@type']
+    const schemaType = schema?.['@type'] || (Array.isArray(schema?.['@graph']) ? schema['@graph'].find(item => item['@type'] === 'Product' || item['@type'] === 'BlogPosting')?.['@type'] : undefined)
     const inferredType = schemaType === 'Product' ? 'product' : schemaType === 'BlogPosting' ? 'article' : 'website'
-    const schemaImage = Array.isArray(schema?.image) ? schema.image[0] : schema?.image
-    const socialImage = new URL(image || schemaImage || DEFAULT_SOCIAL_IMAGE, window.location.origin).href
+    const mainSchemaObj = schema?.['@type'] ? schema : (Array.isArray(schema?.['@graph']) ? schema['@graph'].find(item => item['@type'] === 'Product' || item['@type'] === 'BlogPosting') : null)
+    const schemaImage = Array.isArray(mainSchemaObj?.image) ? mainSchemaObj.image[0] : mainSchemaObj?.image
     const defaultSocialImage = new URL(DEFAULT_SOCIAL_IMAGE, window.location.origin).href
+    let socialImage = defaultSocialImage
+    try {
+      const candidate = image || schemaImage || DEFAULT_SOCIAL_IMAGE
+      socialImage = new URL(candidate, window.location.origin).href
+    } catch {
+      socialImage = defaultSocialImage
+    }
     updateMeta('og:type', type || inferredType)
     updateMeta('og:url', canonicalUrl)
     updateMeta('og:image', socialImage)
