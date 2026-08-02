@@ -236,7 +236,7 @@ export default function Product() {
     const brandName = product.brand || ''
     const brandMention = brandName ? ` par ${brandName}` : ''
     const shortDesc = product.short ? ` ${product.short}` : ''
-    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`
+    return `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`
   }, [product])
 
   return (

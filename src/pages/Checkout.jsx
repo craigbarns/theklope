@@ -256,9 +256,13 @@ export default function Checkout() {
       const data = await response.json().catch(() => ({}))
       if (!response.ok || data.error || !data.checkoutUrl) {
         const errorMsg = data.error || 'Impossible de créer le paiement.'
-        
-        // Mode démonstration / test si l'API Mollie n'est pas encore configurée
-        if (errorMsg.includes('MOLLIE_API_KEY') || response.status === 404) {
+
+        // Mode démonstration : UNIQUEMENT en développement local (serveur Vite),
+        // pour prévisualiser la page de confirmation sans clé Mollie. En
+        // production, ce raccourci est retiré du build : jamais de fausse
+        // confirmation « payée » côté client — l'erreur réelle est affichée pour
+        // qu'aucune commande fantôme non payée ne soit présentée au client.
+        if (import.meta.env.DEV && (errorMsg.includes('MOLLIE_API_KEY') || response.status === 404)) {
           const demoOrderId = `TK-DEMO-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
           paymentAttemptRef.current = { fingerprint, key: paymentAttemptRef.current.key, orderId: demoOrderId }
           persistPaymentAttempt(paymentAttemptRef.current)

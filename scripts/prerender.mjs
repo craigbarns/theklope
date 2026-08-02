@@ -156,7 +156,7 @@ for (const p of PRODUCTS) {
   const title = `Acheter ${p.name}${brandSuffix} | THEKLOPE`
   const brandMention = brandName ? ` par ${brandName}` : ''
   const shortDesc = p.short ? ` ${p.short}` : ''
-  const description = `Acheter ${p.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 49€.`.slice(0, 160)
+  const description = `Acheter ${p.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -575,7 +575,7 @@ const homeContent = `
   <h2>Nos Engagements & Services</h2>
   <ul>
     <li><strong>Produits testés et sélectionnés :</strong> Chaque référence est choisie pour sa fiabilité et sa qualité.</li>
-    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 49€.</li>
+    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 29€.</li>
     <li><strong>Paiement 100% sécurisé :</strong> Transactions chiffrées avec Mollie, vos données sont protégées.</li>
     <li><strong>Service client réactif :</strong> Une équipe disponible pour vous accompagner.</li>
   </ul>

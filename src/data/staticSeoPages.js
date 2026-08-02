@@ -27,7 +27,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Livraison partout en France',
         text:
-          'Vous n’êtes pas sur Marseille ? Les commandes sont expédiées dans toute la France, livraison offerte dès 49€. Le paiement est traité via un checkout sécurisé Mollie.',
+          'Vous n’êtes pas sur Marseille ? Les commandes sont expédiées dans toute la France, livraison offerte dès 29€. Le paiement est traité via un checkout sécurisé Mollie.',
       },
     ],
     links: [
@@ -85,7 +85,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Livraison en France si vous n’êtes pas sur place',
         text:
-          'Hors de Marseille, votre commande est expédiée partout en France, livraison offerte dès 49€, avec paiement sécurisé Mollie.',
+          'Hors de Marseille, votre commande est expédiée partout en France, livraison offerte dès 29€, avec paiement sécurisé Mollie.',
       },
     ],
     links: [
