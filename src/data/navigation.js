@@ -60,6 +60,5 @@ export const MAIN_NAV = [
   { to: '/categorie/accessoires', label: 'Accessoires' },
   { to: '/guides', label: 'Guides' },
   { to: '/boutique-vape-marseille', label: 'Marseille' },
-  { to: '/admin?tab=emailing', label: '📧 Emailing' },
 ]
 

@@ -49,7 +49,6 @@ const COLUMNS = [
       { to: '/legal/cgv', label: 'CGV' },
       { to: '/legal/confidentialite', label: 'Confidentialité' },
       { to: '/legal/retour', label: 'Politique de retour' },
-      { to: '/admin?tab=emailing', label: 'Administration (Emailing)' },
     ],
   },
 ]
