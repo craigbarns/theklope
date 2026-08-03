@@ -17,6 +17,34 @@ const SORTS = [
 ]
 const PAGE_SIZE = 24
 
+const SUB_CATEGORIES_MAP = {
+  'e-liquides': [
+    { slug: 'e-liquides-50ml', name: '50 ml' },
+    { slug: 'e-liquides-100ml', name: '100 ml' },
+    { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
+    { slug: 'e-liquides-fruites', name: 'Fruités' },
+    { slug: 'e-liquides-gourmands', name: 'Gourmands' },
+    { slug: 'e-liquides-menthe', name: 'Menthe & Frais' },
+    { slug: 'e-liquides-tabac', name: 'Tabac & Classic' },
+  ],
+  'cigarettes-electroniques': [
+    { slug: 'pods', name: 'Pods' },
+    { slug: 'packs-debutants', name: 'Packs débutants' },
+    { slug: 'puffs-rechargeables', name: 'Puffs rechargeables' },
+  ],
+  diy: [
+    { slug: 'diy-bases', name: 'Bases DIY' },
+    { slug: 'diy-aromes', name: 'Arômes Concentrés' },
+    { slug: 'diy-boosters', name: 'Boosters' },
+  ],
+  resistances: [
+    { slug: 'cartouches-xros', name: 'Cartouches XROS' },
+    { slug: 'resistances-geekvape-z', name: 'Geekvape Z' },
+    { slug: 'resistances-pnp-voopoo', name: 'PnP Voopoo' },
+    { slug: 'resistances-zenith-innokin', name: 'Zenith Innokin' },
+  ],
+}
+
 export default function CategoryPage() {
   const { slug } = useParams()
   const { products: allProducts, cookiesChoice } = useStore()
@@ -133,6 +161,21 @@ export default function CategoryPage() {
           </Link>
         )}
       </div>
+
+      {SUB_CATEGORIES_MAP[slug]?.length > 0 && (
+        <div className="mt-6 flex flex-wrap items-center gap-2 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-neon mr-1">Sous-catégories :</span>
+          {SUB_CATEGORIES_MAP[slug].map((sub) => (
+            <Link
+              key={sub.slug}
+              to={`/categorie/${sub.slug}`}
+              className="rounded-full bg-white/[0.04] border border-white/10 hover:border-neon/40 hover:bg-neon/10 px-3.5 py-1.5 text-xs font-medium text-ash hover:text-neon transition"
+            >
+              {sub.name}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {seo?.sections?.length > 0 && (
         <section className="mt-8 grid gap-4 md:grid-cols-2">

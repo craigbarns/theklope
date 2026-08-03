@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useStore } from '../context/StoreContext.jsx'
 import Logo from './Logo.jsx'
-import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser } from './icons.jsx'
+import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser, IconChevronDown } from './icons.jsx'
 import { CATEGORIES } from '../data/catalog.js'
 import { MAIN_NAV } from '../data/navigation.js'
 
@@ -84,19 +84,57 @@ export default function Header() {
           </div>
 
           <nav className="hidden items-center gap-0.5 xl:flex">
-            {MAIN_NAV.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `rounded-full px-2.5 py-2 text-xs font-medium transition 2xl:px-3.5 2xl:text-sm ${
-                    isActive ? 'text-neon' : 'text-ash/75 hover:text-white'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            {MAIN_NAV.map((item) => {
+              if (item.children?.length) {
+                return (
+                  <div key={item.to} className="group relative">
+                    <NavLink
+                      to={item.to}
+                      className={({ isActive }) =>
+                        `flex items-center gap-1 rounded-full px-2.5 py-2 text-xs font-medium transition 2xl:px-3.5 2xl:text-sm ${
+                          isActive ? 'text-neon' : 'text-ash/75 hover:text-white'
+                        }`
+                      }
+                    >
+                      <span>{item.label}</span>
+                      <IconChevronDown width={12} height={12} className="opacity-60 transition-transform group-hover:rotate-180" />
+                    </NavLink>
+
+                    <div className="invisible absolute left-0 top-full pt-2 opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 z-50">
+                      <div className="min-w-[220px] rounded-2xl border border-white/10 bg-carbon/95 p-2 shadow-2xl backdrop-blur-xl">
+                        {item.children.map((sub) => (
+                          <NavLink
+                            key={sub.to}
+                            to={sub.to}
+                            className={({ isActive }) =>
+                              `block rounded-xl px-3 py-2 text-xs font-medium transition ${
+                                isActive ? 'bg-neon/10 text-neon' : 'text-ash/80 hover:bg-white/5 hover:text-white'
+                              }`
+                            }
+                          >
+                            {sub.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `rounded-full px-2.5 py-2 text-xs font-medium transition 2xl:px-3.5 2xl:text-sm ${
+                      isActive ? 'text-neon' : 'text-ash/75 hover:text-white'
+                    }`
+                  }
+                >
+                  {item.label}
+                </NavLink>
+              )
+            })}
           </nav>
 
           <div className="flex items-center gap-1">
@@ -157,20 +195,38 @@ export default function Header() {
           <nav className="container-page flex flex-col space-y-1 pb-6 pt-2">
             <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Navigation</p>
             {MAIN_NAV.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `rounded-2xl px-4 py-3 text-base font-semibold transition-all ${
-                    isActive ? 'bg-neon/10 text-neon' : 'text-ash hover:bg-white/5'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
+              <div key={item.to} className="space-y-1">
+                <NavLink
+                  to={item.to}
+                  className={({ isActive }) =>
+                    `flex items-center justify-between rounded-2xl px-4 py-3 text-base font-semibold transition-all ${
+                      isActive ? 'bg-neon/10 text-neon' : 'text-ash hover:bg-white/5'
+                    }`
+                  }
+                >
+                  <span>{item.label}</span>
+                </NavLink>
+                {item.children?.length > 0 && (
+                  <div className="ml-4 grid grid-cols-1 gap-1 border-l border-white/10 pl-3 py-1">
+                    {item.children.map((sub) => (
+                      <NavLink
+                        key={sub.to}
+                        to={sub.to}
+                        className={({ isActive }) =>
+                          `rounded-xl px-3 py-2 text-sm font-medium transition ${
+                            isActive ? 'text-neon font-bold' : 'text-ash/70 hover:text-white'
+                          }`
+                        }
+                      >
+                        {sub.label}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
             ))}
             <div className="my-4 h-px bg-white/10" />
-            <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Catégories</p>
+            <p className="px-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-neon">Toutes les catégories</p>
             <div className="grid grid-cols-2 gap-2 px-2">
               {CATEGORIES.map((c) => (
                 <Link

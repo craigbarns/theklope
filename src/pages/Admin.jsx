@@ -31,6 +31,7 @@ const TABS = [
   { id: 'overview', label: 'Vue d’ensemble' },
   { id: 'products', label: 'Produits' },
   { id: 'orders', label: 'Commandes' },
+  { id: 'emailing', label: 'Campagnes E-mailing' },
   { id: 'settings', label: 'Pilotage' },
 ]
 
@@ -259,6 +260,7 @@ export default function Admin() {
           } : null}
         />
       )}
+      {tab === 'emailing' && <EmailingPanel />}
       {tab === 'settings' && (
         <SettingsPanel
           products={products}
@@ -1336,3 +1338,209 @@ function lastSevenDays(orders) {
     }
   })
 }
+
+const EMAIL_TEMPLATE_PREVIEW = `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><title>THEKLOPE Nouveau Site</title></head>
+<body style="margin:0;padding:0;background:#0a0a0a;font-family:sans-serif;color:#e5e5e5;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background:#0a0a0a;padding:30px 10px;">
+    <tr><td align="center">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width:600px;background:#121212;border:1px solid #262626;border-radius:20px;padding:28px;text-align:center;">
+        <tr><td>
+          <h1 style="color:#fff;font-size:24px;margin:0 0 10px 0;">THE<span style="color:#35FF8A;">KLOPE</span></h1>
+          <span style="background:rgba(53,255,138,0.15);border:1px solid #35FF8A;color:#35FF8A;font-size:11px;padding:4px 12px;border-radius:20px;font-weight:700;">🚀 NOUVEAU SITE EN LIGNE</span>
+          <h2 style="color:#fff;font-size:20px;margin-top:24px;">Coucou ! Bienvenue sur notre tout nouveau site 🎉</h2>
+          <p style="color:#b0b0b0;font-size:14px;line-height:1.6;">Retrouvez toute l'expérience THEKLOPE, une navigation ultra-rapide et vos produits préférés !</p>
+
+          <div style="background:rgba(53,255,138,0.08);border:1px solid rgba(53,255,138,0.3);border-radius:12px;padding:14px;margin:20px 0;">
+            <p style="color:#35FF8A;margin:0;font-size:12px;font-weight:bold;text-transform:uppercase;">Code Promo de Bienvenue</p>
+            <p style="color:#fff;margin:6px 0 0;font-size:17px;font-weight:bold;">-15% avec le code : <span style="color:#35FF8A;border:1px dashed #35FF8A;padding:2px 8px;border-radius:6px;">BIENVENUE</span></p>
+          </div>
+
+          <div style="background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:16px;margin-bottom:12px;text-align:left;">
+            <p style="color:#35FF8A;margin:0;font-size:11px;font-weight:bold;">FORMAT 10 ML</p>
+            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 10 ml dès <span style="color:#35FF8A;">2.95 €*</span></p>
+            <p style="color:#888;margin:4px 0 0;font-size:11px;">* Dès 20 e-liquides achetés (Liquidarom ou Freaks).</p>
+          </div>
+
+          <div style="background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left;">
+            <p style="color:#35FF8A;margin:0;font-size:11px;font-weight:bold;">GRAND FORMAT 50 ML</p>
+            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 50 ml dès <span style="color:#35FF8A;">14.92 €*</span></p>
+            <p style="color:#888;margin:4px 0 0;font-size:11px;">* Dès 4 e-liquides 50 ml achetés (toutes marques confondues).</p>
+          </div>
+
+          <a href="https://www.theklope.com/boutique" target="_blank" style="display:inline-block;background:#35FF8A;color:#0a0a0a;font-weight:bold;padding:14px 28px;border-radius:10px;text-decoration:none;">VOIR LA BOUTIQUE EN LIGNE →</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+function EmailingPanel() {
+  const [subject, setSubject] = useState('🎉 Bienvenue sur le nouveau site THEKLOPE ! -15% & Offres e-liquides')
+  const [testEmail, setTestEmail] = useState('')
+  const [sendingTest, setSendingTest] = useState(false)
+  const [testResult, setTestResult] = useState(null)
+  const [testError, setTestError] = useState(null)
+
+  const totalClients = 2527
+
+  const handleSendTest = async (e) => {
+    e.preventDefault()
+    if (!testEmail || !testEmail.includes('@')) {
+      setTestError('Veuillez entrer une adresse e-mail de test valide.')
+      return
+    }
+    setSendingTest(true)
+    setTestResult(null)
+    setTestError(null)
+
+    try {
+      const res = await fetch('/api/send-campaign', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'send-test',
+          to: testEmail,
+          subject,
+          html: EMAIL_TEMPLATE_PREVIEW,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setTestResult(`✅ E-mail de test envoyé avec succès à ${testEmail} !`)
+      } else {
+        setTestError(data.error || "Erreur lors de l'envoi du test.")
+      }
+    } catch (err) {
+      setTestError(err.message || "Erreur lors de l'envoi de test.")
+    } finally {
+      setSendingTest(false)
+    }
+  }
+
+  return (
+    <div className="space-y-8 animate-fade-in">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-white">Gestion de l'Emailing Clients</h2>
+          <p className="mt-1 text-sm text-muted">
+            Campagne de lancement Nouveau Site — {totalClients} clients inscrits
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="/clients_theklope_clean.csv"
+            download="clients_theklope_clean.csv"
+            className="btn-ghost text-xs"
+          >
+            📥 Télécharger CSV ({totalClients} clients)
+          </a>
+          <a
+            href="/scripts/email-campaign-nouveau-site.html"
+            download="email-campaign-nouveau-site.html"
+            className="btn-ghost text-xs"
+          >
+            📄 Télécharger HTML du mail
+          </a>
+        </div>
+      </div>
+
+      {/* Cartes de synthèse */}
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="card p-5">
+          <p className="eyebrow">Destinataires qualifiés</p>
+          <p className="mt-2 text-3xl font-extrabold text-white">{totalClients.toLocaleString('fr-FR')}</p>
+          <p className="mt-1 text-xs text-muted">Base clients nettoyée & d'actualité</p>
+        </div>
+        <div className="card p-5">
+          <p className="eyebrow">Service d'envoi</p>
+          <p className="mt-2 text-xl font-bold text-neon">API Resend</p>
+          <p className="mt-1 text-xs text-muted">contact@theklope.com</p>
+        </div>
+        <div className="card p-5">
+          <p className="eyebrow">Offres incluses</p>
+          <p className="mt-2 text-sm font-bold text-white">10ml dès 2.95€ · 50ml dès 14.92€</p>
+          <p className="mt-1 text-xs text-electric">Code BIENVENUE (-15%)</p>
+        </div>
+      </div>
+
+      {/* Section Envoi de Test */}
+      <div className="card p-6">
+        <h3 className="font-display text-lg font-bold text-white">1. Envoyer un e-mail de TEST</h3>
+        <p className="mt-1 text-xs text-muted">Envoyez d'abord un e-mail de test sur votre propre boîte de réception pour valider le visuel.</p>
+
+        <form onSubmit={handleSendTest} className="mt-4 flex flex-col gap-3 sm:flex-row">
+          <input
+            type="email"
+            value={testEmail}
+            onChange={(e) => setTestEmail(e.target.value)}
+            placeholder="votre-email@exemple.com"
+            className="flex-1 rounded-xl border border-white/10 bg-carbon px-4 py-2.5 text-sm text-white outline-none focus:border-neon"
+            required
+          />
+          <button type="submit" disabled={sendingTest} className="btn-primary shrink-0 py-2.5">
+            {sendingTest ? 'Envoi en cours...' : 'Envoyer e-mail de test'}
+          </button>
+        </form>
+
+        {testResult && (
+          <div className="mt-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-300">
+            {testResult}
+          </div>
+        )}
+        {testError && (
+          <div className="mt-3 rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-300">
+            {testError}
+          </div>
+        )}
+      </div>
+
+      {/* Section Aperçu HTML & Objet */}
+      <div className="card p-6">
+        <h3 className="font-display text-lg font-bold text-white">2. Paramètres & Aperçu du mail client</h3>
+        <div className="mt-4 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-ash">Objet de l'e-mail (Sujet)</label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              className="mt-1 w-full rounded-xl border border-white/10 bg-carbon px-4 py-2.5 text-sm text-white outline-none focus:border-neon"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-ash mb-2">Aperçu visuel en temps réel :</label>
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-black p-2">
+              <iframe
+                srcDoc={EMAIL_TEMPLATE_PREVIEW}
+                title="Aperçu e-mail client"
+                className="h-[480px] w-full rounded-xl border-0 bg-black"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Section Lancement Global */}
+      <div className="card p-6 border-neon/30 bg-neon/5">
+        <h3 className="font-display text-lg font-bold text-white">3. Lancement de la campagne à tous les clients ({totalClients})</h3>
+        <p className="mt-1 text-xs text-muted">
+          Vous pouvez aussi exécuter la commande de diffusion sécurisée par lots dans le terminal avec votre clé Resend :
+        </p>
+
+        <div className="mt-4">
+          <div className="rounded-xl border border-white/10 bg-carbon p-4 text-xs text-ash space-y-2">
+            <p className="font-semibold text-white">Commande d'envoi batch sécurisé Resend :</p>
+            <code className="block rounded-lg bg-black/60 p-3 text-neon font-mono select-all overflow-x-auto">
+              RESEND_API_KEY="re_votre_cle_resend" node scripts/send-campaign-resend.mjs --send-all
+            </code>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+

@@ -5,7 +5,7 @@ import { MAIN_NAV } from './navigation.js'
 
 test('main navigation links directly to DIY products and accessories', () => {
   assert.deepEqual(
-    MAIN_NAV.filter(({ label }) => ['DIY', 'Accessoires'].includes(label)),
+    MAIN_NAV.filter(({ label }) => ['DIY', 'Accessoires'].includes(label)).map(({ to, label }) => ({ to, label })),
     [
       { to: '/categorie/diy', label: 'DIY' },
       { to: '/categorie/accessoires', label: 'Accessoires' },
