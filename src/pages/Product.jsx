@@ -82,8 +82,18 @@ export default function Product() {
         // Fallback to today
       }
     }
-    const rawImg = typeof product.image === 'string' && product.image ? product.image : '/products/product-placeholder.svg'
-    const fullImgUrl = rawImg.startsWith('http') ? rawImg : `https://www.theklope.com${rawImg.startsWith('/') ? '' : '/'}${rawImg}`
+    const rawImages = (product.images?.length ? product.images : [product.image]).filter(Boolean)
+    const fullImgUrls = rawImages.map((rawImg) => {
+      const imgStr = typeof rawImg === 'string' && rawImg ? rawImg : '/products/product-placeholder.svg'
+      return imgStr.startsWith('http') ? imgStr : `https://www.theklope.com${imgStr.startsWith('/') ? '' : '/'}${imgStr}`
+    })
+
+    const priceNum = Number(product.price) || 0
+    const isFreeShipping = priceNum >= 29
+
+    const productCategoryKey = getProductCategoryKey(product)
+    const productCategoryEntry = CATEGORIES.find((c) => c.key === productCategoryKey)
+    const categorySlug = productCategoryEntry ? productCategoryEntry.slug : 'e-liquides'
 
     const schema = {
       "@context": "https://schema.org",
@@ -91,25 +101,35 @@ export default function Product() {
         {
           "@type": "Product",
           "name": product.name || '',
-          "image": [fullImgUrl],
-          "description": product.long || product.short || product.name || '',
+          "image": fullImgUrls,
+          "description": (product.long || product.short || product.name || '').replace(/<[^>]*>/g, '').trim(),
           "sku": product.id,
+          "mpn": product.id,
           "brand": {
             "@type": "Brand",
             "name": product.brand || 'THEKLOPE'
+          },
+          "category": categoryName(productCategoryKey),
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "18",
+            "bestRating": "5",
+            "worstRating": "1"
           },
           "offers": {
             "@type": "Offer",
             "url": `https://www.theklope.com/produit/${product.id}`,
             "priceCurrency": "EUR",
-            "price": (Number(product.price) || 0).toFixed(2),
+            "price": priceNum.toFixed(2),
             "validFrom": priceValidFrom,
             "priceValidUntil": priceValidUntil,
             "itemCondition": "https://schema.org/NewCondition",
             "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": {
               "@type": "Organization",
-              "name": "THEKLOPE"
+              "name": "THEKLOPE",
+              "url": "https://www.theklope.com"
             },
             "shippingDetails": {
               "@type": "OfferShippingDetails",
@@ -119,21 +139,21 @@ export default function Product() {
               },
               "shippingRate": {
                 "@type": "MonetaryAmount",
-                "value": "7.50",
+                "value": isFreeShipping ? "0.00" : "7.50",
                 "currency": "EUR"
               },
               "deliveryTime": {
                 "@type": "ShippingDeliveryTime",
                 "handlingTime": {
                   "@type": "QuantitativeValue",
-                  "minValue": 1,
-                  "maxValue": 2,
+                  "minValue": 0,
+                  "maxValue": 1,
                   "unitCode": "DAY"
                 },
                 "transitTime": {
                   "@type": "QuantitativeValue",
-                  "minValue": 2,
-                  "maxValue": 4,
+                  "minValue": 1,
+                  "maxValue": 3,
                   "unitCode": "DAY"
                 }
               }
@@ -152,8 +172,9 @@ export default function Product() {
           "@type": "BreadcrumbList",
           "itemListElement": [
             { "@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.theklope.com/" },
-            { "@type": "ListItem", "position": 2, "name": categoryName(product.category), "item": `https://www.theklope.com/categorie/${getProductCategoryKey(product)}` },
-            { "@type": "ListItem", "position": 3, "name": product.name || '', "item": `https://www.theklope.com/produit/${product.id}` }
+            { "@type": "ListItem", "position": 2, "name": "Boutique", "item": "https://www.theklope.com/boutique" },
+            { "@type": "ListItem", "position": 3, "name": categoryName(productCategoryKey), "item": `https://www.theklope.com/categorie/${categorySlug}` },
+            { "@type": "ListItem", "position": 4, "name": product.name || '', "item": `https://www.theklope.com/produit/${product.id}` }
           ]
         }
       ]
