@@ -110,11 +110,17 @@ export function getQuantityPricingRule(product = {}) {
     : BUNDLE_VOLUME_TIERS.find((candidate) => candidate.volumes.includes(volume))
   if (!tier) return null
 
-  const regularTotalCents = toCents(product.price) * tier.minQty
+  const unitCents = toCents(product.price)
+  const discountedUnitCents = unitCents - Math.round(unitCents * tier.rate)
+  const regularTotalCents = unitCents * tier.minQty
   const adjustedTotalCents = regularTotalCents - Math.round(regularTotalCents * tier.rate)
   return {
     key: tier.key,
     minQty: tier.minQty,
+    rate: tier.rate,
+    discountPercent: Math.round(tier.rate * 100),
+    unitPrice: product.price,
+    discountedUnitPrice: fromCents(discountedUnitCents),
     conditionLabel: tier.conditionLabel,
     exampleTotal: fromCents(adjustedTotalCents),
   }

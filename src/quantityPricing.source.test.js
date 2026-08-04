@@ -11,7 +11,7 @@ test('quantity terms stay factual and limited to product and transaction surface
   const category = await readSource('./pages/CategoryPage.jsx')
 
   assert.match(product, /Tarifs TTC selon la quantité/)
-  assert.match(product, /Le total exact est recalculé automatiquement dans le panier/)
+  assert.match(product, /calculée automatiquement dans votre panier/)
   assert.doesNotMatch(product, /prix barré|économisez|plus que|compte à rebours/i)
   assert.doesNotMatch(productCard, /getQuantityPricingRule|Tarif quantité/)
   assert.doesNotMatch(home, /getQuantityPricingRule|Tarif quantité/)

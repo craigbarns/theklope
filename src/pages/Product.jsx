@@ -327,19 +327,53 @@ export default function Product() {
             </div>
 
             {quantityPricing && (
-              <details className="mt-4 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
-                <summary className="cursor-pointer font-medium text-ash/80">
-                  Tarifs TTC selon la quantité
-                </summary>
-                <div className="mt-3 space-y-1.5 text-xs leading-relaxed text-muted">
-                  <p>{quantityPricing.conditionLabel}.</p>
-                  <p>
-                    Exemple avec des références au prix affiché&nbsp;: {quantityPricing.minQty} flacons =
-                    {' '}{formatPrice(quantityPricing.exampleTotal)} TTC.
-                  </p>
-                  <p>Le total exact est recalculé automatiquement dans le panier selon les références éligibles.</p>
+              <div className="mt-5 rounded-2xl border border-neon/30 bg-gradient-to-br from-carbon via-noir to-anthracite p-5 shadow-lg">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-neon flex items-center gap-1.5">
+                    <span>🔥</span> Tarifs TTC selon la quantité (Dégressifs)
+                  </span>
+                  <span className="rounded-full bg-neon/15 border border-neon/40 px-2.5 py-0.5 text-xs font-bold text-neon">
+                    -{quantityPricing.discountPercent}% dès {quantityPricing.minQty} unités
+                  </span>
                 </div>
-              </details>
+
+                <div className="mt-3 overflow-hidden rounded-xl border border-white/10 bg-noir/60">
+                  <table className="w-full text-left text-xs">
+                    <thead className="border-b border-white/10 bg-white/[0.03] text-faint uppercase font-bold">
+                      <tr>
+                        <th className="py-2.5 px-3">Quantité</th>
+                        <th className="py-2.5 px-3">Prix unitaire TTC</th>
+                        <th className="py-2.5 px-3 text-right">Remise</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      <tr>
+                        <td className="py-2.5 px-3 text-ash/80">1 à {quantityPricing.minQty - 1} flacons</td>
+                        <td className="py-2.5 px-3 font-semibold text-white">{formatPrice(product.price)} / flacon</td>
+                        <td className="py-2.5 px-3 text-right text-muted">-</td>
+                      </tr>
+                      <tr className="bg-neon/10 font-bold">
+                        <td className="py-2.5 px-3 text-white">
+                          {quantityPricing.minQty} flacons et +
+                          <span className="ml-2 inline-block rounded bg-neon px-1.5 py-0.5 text-[10px] text-noir uppercase font-extrabold">
+                            Meilleur prix
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-3 text-neon font-extrabold text-sm">
+                          {formatPrice(quantityPricing.discountedUnitPrice)} / flacon
+                        </td>
+                        <td className="py-2.5 px-3 text-right text-neon font-extrabold">
+                          -{quantityPricing.discountPercent}%
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <p className="mt-3 text-[11px] leading-relaxed text-muted">
+                  💡 {quantityPricing.conditionLabel}. La remise est calculée automatiquement dans votre panier !
+                </p>
+              </div>
             )}
 
             <p className="mt-5 text-ash/70">{product.short}</p>

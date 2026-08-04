@@ -210,6 +210,10 @@ test('product quantity information uses resolved volume and exact cart arithmeti
   }), {
     key: '10ml-alfaliquid-pulp',
     minQty: 20,
+    rate: 0.25,
+    discountPercent: 25,
+    unitPrice: 5.9,
+    discountedUnitPrice: 4.42,
     conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Alfaliquid et Pulp',
     exampleTotal: 88.5,
   })
@@ -222,6 +226,10 @@ test('product quantity information uses resolved volume and exact cart arithmeti
   }), {
     key: '50-100ml',
     minQty: 4,
+    rate: 0.25,
+    discountPercent: 25,
+    unitPrice: 19.9,
+    discountedUnitPrice: 14.92,
     conditionLabel: 'À partir de 4 flacons 50ml ou 100ml combinables, toutes marques',
     exampleTotal: 59.7,
   })
