@@ -22,7 +22,7 @@ export const CATEGORIES = [
   { slug: 'diy-aromes', key: 'diy-aromes', name: 'Arômes Concentrés DIY', tagline: 'Concentrés de saveurs à diluer' },
   { slug: 'diy-boosters', key: 'diy-boosters', name: 'Boosters de Nicotine', tagline: 'Boosters 20mg et sel de nicotine' },
   { slug: 'resistances', key: 'resistance', name: 'Résistances', tagline: 'Consommables compatibles pour entretenir votre matériel' },
-  { slug: 'cartouches-xros', key: 'cartouches-xros', name: 'Cartouches XROS', tagline: 'Toute la gamme pour pods Vaporesso XROS' },
+  { slug: 'cartouches-xros', key: 'cartouches-xros', name: 'Cartouches', tagline: 'Cartouches et réservoirs pour pods' },
   { slug: 'resistances-geekvape-z', key: 'resistances-geekvape-z', name: 'Résistances Z Coil Geekvape', tagline: 'Résistances pour clearomiseurs Z Subohm' },
   { slug: 'resistances-pnp-voopoo', key: 'resistances-pnp-voopoo', name: 'Résistances PnP Voopoo', tagline: 'Résistances PnP et PnP-X pour Drag et Argus' },
   { slug: 'resistances-zenith-innokin', key: 'resistances-zenith-innokin', name: 'Résistances Zenith Innokin', tagline: 'Résistances Z-Coil pour Zenith et Zlide' },

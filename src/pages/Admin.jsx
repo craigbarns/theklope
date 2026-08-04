@@ -506,7 +506,40 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-muted">{product.type}</td>
+                  <td className="px-4 py-4 text-muted">
+                    <div>
+                      <span>{product.type}</span>
+                      {(['resistance', 'cartouches-xros'].includes(product.category) ||
+                        /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(product.name || '')) && (
+                        <div className="mt-1 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => onSave({ ...toFormProduct(product), category: 'resistance', type: 'Résistance' })}
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
+                              product.category === 'resistance'
+                                ? 'bg-neon text-noir shadow-sm'
+                                : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
+                            }`}
+                            title="Classer en Résistance"
+                          >
+                            ⚡ Résistance
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onSave({ ...toFormProduct(product), category: 'cartouches-xros', type: 'Cartouche' })}
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
+                              product.category === 'cartouches-xros'
+                                ? 'bg-neon text-noir shadow-sm'
+                                : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
+                            }`}
+                            title="Classer en Cartouche"
+                          >
+                            🧪 Cartouche
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-4 font-semibold text-white">{formatPrice(product.price)}</td>
                   <td className="px-4 py-4">
                     <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${product.stock <= 10 ? 'bg-amber-400 text-noir' : 'bg-white/10 text-white'}`}>
@@ -637,6 +670,41 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
               ))}
             </select>
           </label>
+
+          {(['resistance', 'cartouches-xros'].includes(form.category) ||
+            /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(form.name || '')) && (
+            <div className="rounded-2xl border border-neon/30 bg-neon/5 p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-neon">Classement Consommable</span>
+                <span className="text-[10px] text-muted font-mono">{form.category}</span>
+              </div>
+              <p className="text-xs text-ash/80">Classer ce produit comme Résistance ou Cartouche :</p>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, category: 'resistance', type: 'Résistance' }))}
+                  className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                    form.category === 'resistance'
+                      ? 'border-neon bg-neon text-noir font-extrabold shadow-glow'
+                      : 'border-white/10 bg-white/5 text-ash hover:border-white/20 hover:text-white'
+                  }`}
+                >
+                  ⚡ Résistance
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForm((prev) => ({ ...prev, category: 'cartouches-xros', type: 'Cartouche' }))}
+                  className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition flex items-center justify-center gap-1.5 ${
+                    form.category === 'cartouches-xros'
+                      ? 'border-neon bg-neon text-noir font-extrabold shadow-glow'
+                      : 'border-white/10 bg-white/5 text-ash hover:border-white/20 hover:text-white'
+                  }`}
+                >
+                  🧪 Cartouche
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="grid grid-cols-3 gap-3">
             <Field label="Prix" type="number" step="0.01" min="0" value={form.price} onChange={update('price')} required />
