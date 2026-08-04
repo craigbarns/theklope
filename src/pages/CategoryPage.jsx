@@ -30,7 +30,7 @@ const SUB_CATEGORIES_MAP = {
   ],
   resistances: [
     { slug: 'resistances', name: 'Résistances' },
-    { slug: 'cartouches-xros', name: 'Cartouches' },
+    { slug: 'cartouches', name: 'Cartouches' },
   ],
   diy: [
     { slug: 'diy-bases', name: 'Bases neutres DIY' },

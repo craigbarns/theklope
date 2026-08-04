@@ -14,7 +14,7 @@ const COLUMNS = [
       { to: '/categorie/e-liquides-50ml', label: 'E-liquides 50 ml' },
       { to: '/categorie/diy', label: 'Produits DIY' },
       { to: '/categorie/resistances', label: 'Résistances' },
-      { to: '/categorie/cartouches-xros', label: 'Cartouches XROS' },
+      { to: '/categorie/cartouches', label: 'Cartouches' },
       { to: '/categorie/puffs-rechargeables', label: 'Puffs rechargeables' },
       { to: '/categorie/packs-debutants', label: 'Packs débutants' },
       { to: '/categorie/accessoires', label: 'Accessoires' },

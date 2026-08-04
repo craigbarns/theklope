@@ -163,6 +163,36 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  cartouches: {
+    seoTitle: 'Cartouches et pods rechargeables de remplacement',
+    metaDescription:
+      'Achetez vos cartouches rechargeables pour pods toutes marques : Vaporesso XROS, Geekvape, Voopoo, Innokin. Réservoirs et résistances intégrées.',
+    h1: 'Cartouches pour Pods',
+    intro:
+      'Retrouvez toute la gamme de cartouches de remplacement pour vos pods rechargeables. Compatibles Vaporesso, Geekvape, Voopoo, Innokin et plus encore, pour une vape simple et sans fuite.',
+    sections: [
+      {
+        title: 'Quelle cartouche pod choisir ?',
+        text:
+          'Choisissez la cartouche adaptée à votre modèle de pod (Vaporesso XROS, Geekvape Wenax, Voopoo Argus, etc.). Les valeurs élevées (0.8 à 1.2 ohm) sont idéales pour un tirage serré MTL et les sels de nicotine.',
+      },
+      {
+        title: 'Quand remplacer sa cartouche ?',
+        text:
+          'Une cartouche avec résistance intégrée se remplace dès que les saveurs s’altèrent ou qu’un goût de brûlé apparaît (généralement après 2 à 3 semaines d’utilisation).',
+      },
+    ],
+    faq: [
+      {
+        q: 'Comment remplir sa cartouche de pod ?',
+        a: 'Déclipsez l’embout buccal ou soulevez le bouchon en silicone étanche pour accéder au réservoir, puis remplissez avec votre e-liquide préféré.',
+      },
+      {
+        q: 'Quelle est la durée de vie d’une cartouche pod ?',
+        a: 'Une cartouche dure en moyenne entre 2 et 3 semaines selon votre fréquence d’utilisation et la sucrosité de votre e-liquide.',
+      },
+    ],
+  },
   'cartouches-xros': {
     seoTitle: 'Cartouches Vaporesso XROS de remplacement',
     metaDescription:

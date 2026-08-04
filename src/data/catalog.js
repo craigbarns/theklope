@@ -22,7 +22,7 @@ export const CATEGORIES = [
   { slug: 'diy-aromes', key: 'diy-aromes', name: 'Arômes Concentrés DIY', tagline: 'Concentrés de saveurs à diluer' },
   { slug: 'diy-boosters', key: 'diy-boosters', name: 'Boosters de Nicotine', tagline: 'Boosters 20mg et sel de nicotine' },
   { slug: 'resistances', key: 'resistance', name: 'Résistances', tagline: 'Consommables compatibles pour entretenir votre matériel' },
-  { slug: 'cartouches-xros', key: 'cartouches-xros', name: 'Cartouches', tagline: 'Cartouches et réservoirs pour pods' },
+  { slug: 'cartouches', key: 'cartouches', name: 'Cartouches', tagline: 'Cartouches et réservoirs pods (toutes marques)' },
   { slug: 'resistances-geekvape-z', key: 'resistances-geekvape-z', name: 'Résistances Z Coil Geekvape', tagline: 'Résistances pour clearomiseurs Z Subohm' },
   { slug: 'resistances-pnp-voopoo', key: 'resistances-pnp-voopoo', name: 'Résistances PnP Voopoo', tagline: 'Résistances PnP et PnP-X pour Drag et Argus' },
   { slug: 'resistances-zenith-innokin', key: 'resistances-zenith-innokin', name: 'Résistances Zenith Innokin', tagline: 'Résistances Z-Coil pour Zenith et Zlide' },
@@ -76,17 +76,18 @@ const normalizedProductText = (p = {}) =>
 
 export const isResistanceProduct = (p = {}) => {
   if (p.category === 'resistance' || p.type === 'Résistance') return true
-  if (p.category === 'cartouches-xros' || p.type === 'Cartouche') return false
+  if (['cartouches', 'cartouches-xros'].includes(p.category) || p.type === 'Cartouche') return false
   if (p.category !== 'accessoire') return false
   const resistanceText = [normalizedProductText(p), p.image, ...(p.images || [])].filter(Boolean).join(' ')
   return /\b(r[eé]sistances?|cartouches?|mesh|coils?|bvc|nautilus|ito|gti|pnp|tpp|gt\s*core)\b/i.test(resistanceText)
 }
 
-export const isCartouchesXros = (p = {}) => {
-  if (p.category === 'cartouches-xros' || p.type === 'Cartouche') return true
+export const isCartoucheProduct = (p = {}) => {
+  if (['cartouches', 'cartouches-xros'].includes(p.category) || p.type === 'Cartouche') return true
   const text = normalizedProductText(p)
   return /\b(cartouches?)\b/i.test(text)
 }
+export const isCartouchesXros = isCartoucheProduct
 
 export const isAccusProduct = (p = {}) => p.category === 'accessoires-accus' || p.type === 'Accu' || ((p.category === 'accessoire' || p.type === 'Accu') && /\b(accus?|18650|21700|20700|battery|batterie|pile)\b/i.test(normalizedProductText(p)))
 export const isChargeursProduct = (p = {}) => p.category === 'accessoires-chargeurs' || p.type === 'Chargeur' || ((p.category === 'accessoire' || p.type === 'Chargeur') && /\b(chargeurs?|c[aâ]ble|secteur|usb|usb-c|fast\s+charge)\b/i.test(normalizedProductText(p)))
@@ -181,7 +182,7 @@ export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'diy-bases') return isDiyBases(product)
   if (categoryKey === 'diy-aromes') return isDiyAromes(product)
   if (categoryKey === 'diy-boosters') return isDiyBoosters(product)
-  if (categoryKey === 'cartouches-xros') return isCartouchesXros(product)
+  if (['cartouches', 'cartouches-xros'].includes(categoryKey)) return isCartoucheProduct(product)
   if (categoryKey === 'resistances-geekvape-z') return isGeekvapeZCoil(product)
   if (categoryKey === 'resistances-pnp-voopoo') return isVoopooPnP(product)
   if (categoryKey === 'resistances-zenith-innokin') return isInnokinZenith(product)

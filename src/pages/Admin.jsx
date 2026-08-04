@@ -509,7 +509,7 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                   <td className="px-4 py-4 text-muted">
                     <div>
                       <span>{product.type}</span>
-                      {(['resistance', 'cartouches-xros'].includes(product.category) ||
+                      {(['resistance', 'cartouches', 'cartouches-xros'].includes(product.category) ||
                         /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(product.name || '')) && (
                         <div className="mt-1 flex items-center gap-1">
                           <button
@@ -526,9 +526,9 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                           </button>
                           <button
                             type="button"
-                            onClick={() => onSave({ ...toFormProduct(product), category: 'cartouches-xros', type: 'Cartouche' })}
+                            onClick={() => onSave({ ...toFormProduct(product), category: 'cartouches', type: 'Cartouche' })}
                             className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
-                              product.category === 'cartouches-xros'
+                              ['cartouches', 'cartouches-xros'].includes(product.category)
                                 ? 'bg-neon text-noir shadow-sm'
                                 : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
                             }`}
@@ -671,7 +671,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
             </select>
           </label>
 
-          {(['resistance', 'cartouches-xros'].includes(form.category) ||
+          {(['resistance', 'cartouches', 'cartouches-xros'].includes(form.category) ||
             /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(form.name || '')) && (
             <div className="rounded-2xl border border-neon/30 bg-neon/5 p-4 space-y-2">
               <div className="flex items-center justify-between">
@@ -693,9 +693,9 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm((prev) => ({ ...prev, category: 'cartouches-xros', type: 'Cartouche' }))}
+                  onClick={() => setForm((prev) => ({ ...prev, category: 'cartouches', type: 'Cartouche' }))}
                   className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                    form.category === 'cartouches-xros'
+                    ['cartouches', 'cartouches-xros'].includes(form.category)
                       ? 'border-neon bg-neon text-noir font-extrabold shadow-glow'
                       : 'border-white/10 bg-white/5 text-ash hover:border-white/20 hover:text-white'
                   }`}

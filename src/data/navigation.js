@@ -24,7 +24,7 @@ export const MAIN_NAV = [
     label: 'Résistances',
     children: [
       { to: '/categorie/resistances', label: 'Résistances' },
-      { to: '/categorie/cartouches-xros', label: 'Cartouches' },
+      { to: '/categorie/cartouches', label: 'Cartouches' },
     ],
   },
   {
