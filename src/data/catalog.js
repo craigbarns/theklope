@@ -75,11 +75,23 @@ const normalizedProductText = (p = {}) =>
   [p.name, p.brand, p.type, p.description, ...(p.flavors || [])].filter(Boolean).join(' ').toLowerCase()
 
 export const isResistanceProduct = (p = {}) => {
-  if (p.category === 'resistance') return true
+  if (p.category === 'resistance' || p.type === 'Résistance') return true
+  if (p.category === 'cartouches-xros' || p.type === 'Cartouche') return false
   if (p.category !== 'accessoire') return false
   const resistanceText = [normalizedProductText(p), p.image, ...(p.images || [])].filter(Boolean).join(' ')
   return /\b(r[eé]sistances?|cartouches?|mesh|coils?|bvc|nautilus|ito|gti|pnp|tpp|gt\s*core)\b/i.test(resistanceText)
 }
+
+export const isCartouchesXros = (p = {}) => {
+  if (p.category === 'cartouches-xros' || p.type === 'Cartouche') return true
+  const text = normalizedProductText(p)
+  return /\b(cartouches?)\b/i.test(text)
+}
+
+export const isAccusProduct = (p = {}) => p.category === 'accessoires-accus' || p.type === 'Accu' || ((p.category === 'accessoire' || p.type === 'Accu') && /\b(accus?|18650|21700|20700|battery|batterie|pile)\b/i.test(normalizedProductText(p)))
+export const isChargeursProduct = (p = {}) => p.category === 'accessoires-chargeurs' || p.type === 'Chargeur' || ((p.category === 'accessoire' || p.type === 'Chargeur') && /\b(chargeurs?|c[aâ]ble|secteur|usb|usb-c|fast\s+charge)\b/i.test(normalizedProductText(p)))
+export const isClearoTanksProduct = (p = {}) => p.category === 'accessoires-clearo-tanks' || p.type === 'Clearomiseur' || ((p.category === 'accessoire' || p.category === 'resistance' || p.type === 'Clearomiseur') && /\b(clearomiseurs?|tanks?|atomiseurs?|drip|reconstructible)\b/i.test(normalizedProductText(p)))
+export const isPyrexProduct = (p = {}) => p.category === 'accessoires-pyrex' || p.type === 'Pyrex' || ((p.category === 'accessoire' || p.type === 'Pyrex') && /\b(pyrex|verre|tube|bulb|remplacement)\b/i.test(normalizedProductText(p)))
 
 export const isAlternativePuffProduct = (p = {}) => {
   if (!['pod', 'ecig', 'pack'].includes(p.category)) return false
@@ -146,15 +158,6 @@ export const isGeekvapeZCoil = (p = {}) => (p.category === 'resistance' || p.cat
 export const isVoopooPnP = (p = {}) => (p.category === 'resistance' || p.category === 'accessoire') && /\b(pnp|pnp-x|voopoo)\b/i.test(normalizedProductText(p))
 export const isInnokinZenith = (p = {}) => (p.category === 'resistance' || p.category === 'accessoire') && /\b(zenith|zlide|z-coil)\b/i.test(normalizedProductText(p))
 
-export const isCartouchesXros = (p = {}) => {
-  if (p.category !== 'resistance' && p.category !== 'accessoire') return false
-  return /\b(cartouches?)\s+(xros)\b/i.test(normalizedProductText(p))
-}
-
-export const isAccusProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Accu') && /\b(accus?|18650|21700|20700|battery|batterie|pile)\b/i.test(normalizedProductText(p))
-export const isChargeursProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Chargeur') && /\b(chargeurs?|c[aâ]ble|secteur|usb|usb-c|fast\s+charge)\b/i.test(normalizedProductText(p))
-export const isClearoTanksProduct = (p = {}) => (p.category === 'accessoire' || p.category === 'resistance' || p.type === 'Clearomiseur') && /\b(clearomiseurs?|tanks?|atomiseurs?|drip|reconstructible)\b/i.test(normalizedProductText(p))
-export const isPyrexProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Pyrex') && /\b(pyrex|verre|tube|bulb|remplacement)\b/i.test(normalizedProductText(p))
 
 export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
 
