@@ -27,6 +27,10 @@ export const CATEGORIES = [
   { slug: 'resistances-pnp-voopoo', key: 'resistances-pnp-voopoo', name: 'Résistances PnP Voopoo', tagline: 'Résistances PnP et PnP-X pour Drag et Argus' },
   { slug: 'resistances-zenith-innokin', key: 'resistances-zenith-innokin', name: 'Résistances Zenith Innokin', tagline: 'Résistances Z-Coil pour Zenith et Zlide' },
   { slug: 'accessoires', key: 'accessoire', name: 'Accessoires', tagline: 'Résistances, batteries, chargeurs & étuis' },
+  { slug: 'accessoires-accus', key: 'accessoires-accus', name: 'Accus', tagline: 'Batteries et accus 18650, 21700' },
+  { slug: 'accessoires-chargeurs', key: 'accessoires-chargeurs', name: 'Chargeurs', tagline: 'Chargeurs d’accus et câbles USB-C' },
+  { slug: 'accessoires-clearo-tanks', key: 'accessoires-clearo-tanks', name: 'Clearo / Tanks', tagline: 'Clearomiseurs et réservoirs vape' },
+  { slug: 'accessoires-pyrex', key: 'accessoires-pyrex', name: 'Pyrex', tagline: 'Tubes en verre Pyrex de remplacement' },
   { slug: 'puffs-rechargeables', key: 'alternative-puff', name: 'Puffs rechargeables & alternatives', tagline: 'Systèmes légaux, économiques et écologiques' },
   { slug: 'packs-debutants', key: 'pack', name: 'Packs débutants', tagline: 'Tout pour bien démarrer' },
   
@@ -147,6 +151,11 @@ export const isCartouchesXros = (p = {}) => {
   return /\b(cartouches?)\s+(xros)\b/i.test(normalizedProductText(p))
 }
 
+export const isAccusProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Accu') && /\b(accus?|18650|21700|20700|battery|batterie|pile)\b/i.test(normalizedProductText(p))
+export const isChargeursProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Chargeur') && /\b(chargeurs?|c[aâ]ble|secteur|usb|usb-c|fast\s+charge)\b/i.test(normalizedProductText(p))
+export const isClearoTanksProduct = (p = {}) => (p.category === 'accessoire' || p.category === 'resistance' || p.type === 'Clearomiseur') && /\b(clearomiseurs?|tanks?|atomiseurs?|drip|reconstructible)\b/i.test(normalizedProductText(p))
+export const isPyrexProduct = (p = {}) => (p.category === 'accessoire' || p.type === 'Pyrex') && /\b(pyrex|verre|tube|bulb|remplacement)\b/i.test(normalizedProductText(p))
+
 export const getProductCategoryKey = (product = {}) => (isDiyProduct(product) ? 'diy' : product.category)
 
 export const productMatchesCategory = (product, categoryKey) => {
@@ -173,6 +182,10 @@ export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'resistances-geekvape-z') return isGeekvapeZCoil(product)
   if (categoryKey === 'resistances-pnp-voopoo') return isVoopooPnP(product)
   if (categoryKey === 'resistances-zenith-innokin') return isInnokinZenith(product)
+  if (categoryKey === 'accessoires-accus') return isAccusProduct(product)
+  if (categoryKey === 'accessoires-chargeurs') return isChargeursProduct(product)
+  if (categoryKey === 'accessoires-clearo-tanks') return isClearoTanksProduct(product)
+  if (categoryKey === 'accessoires-pyrex') return isPyrexProduct(product)
   return getProductCategoryKey(product) === categoryKey
 }
 

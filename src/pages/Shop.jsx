@@ -17,6 +17,17 @@ const SORTS = [
   { value: 'nouveautes', label: 'Nouveautés' },
 ]
 
+const MAIN_SHOP_CATEGORIES = [
+  { key: 'eliquide', name: 'E-liquides' },
+  { key: 'ecig', name: 'Cigarettes électroniques' },
+  { key: 'pod', name: 'Pods' },
+  { key: 'resistance', name: 'Résistances & Cartouches' },
+  { key: 'diy', name: 'DIY' },
+  { key: 'accessoire', name: 'Accessoires' },
+  { key: 'pack', name: 'Packs débutants' },
+  { key: 'alternative-puff', name: 'Puffs rechargeables' },
+]
+
 const PRODUCT_CATEGORIES = CATEGORIES.filter((c) => !['nouveautes', 'meilleures-ventes'].includes(c.slug))
 const PAGE_SIZE = 24
 
@@ -34,6 +45,7 @@ export default function Shop() {
   const [nicotine, setNicotine] = useState([])
   const [flavors, setFlavors] = useState([])
   const [maxPrice, setMaxPrice] = useState(maxAvailablePrice)
+  const [userTouchedPrice, setUserTouchedPrice] = useState(false)
   const [sort, setSort] = useState('selection')
   const [mobileFilters, setMobileFilters] = useState(false)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -48,8 +60,12 @@ export default function Shop() {
   }, [location.state, navigate])
 
   useEffect(() => {
-    setMaxPrice((value) => Math.min(value || maxAvailablePrice, maxAvailablePrice))
-  }, [maxAvailablePrice])
+    if (!userTouchedPrice) {
+      setMaxPrice(maxAvailablePrice)
+    } else if (maxPrice > maxAvailablePrice) {
+      setMaxPrice(maxAvailablePrice)
+    }
+  }, [maxAvailablePrice, maxPrice, userTouchedPrice])
 
   useEffect(() => {
     setSearch(queryFromNavigation)
@@ -90,6 +106,7 @@ export default function Shop() {
     setTypes([])
     setNicotine([])
     setFlavors([])
+    setUserTouchedPrice(false)
     setMaxPrice(maxAvailablePrice)
   }
 
@@ -249,38 +266,37 @@ export default function Shop() {
   }, [hasSearch, queryFromNavigation, cats, maxPrice, maxAvailablePrice, brands, types, nicotine, flavors])
 
   const filtersPanel = (
-    <div className="space-y-6">
-      <FilterGroup title="Catégorie">
-        {PRODUCT_CATEGORIES.map((c) => (
+    <div className="space-y-4">
+      <FilterGroup title="Catégorie" defaultOpen={true} activeCount={cats.length}>
+        {MAIN_SHOP_CATEGORIES.map((c) => (
           <CheckRow key={c.key} checked={cats.includes(c.key)} onChange={() => toggle(setCats, c.key)} label={c.name} />
         ))}
       </FilterGroup>
 
-      <FilterGroup title="Prix">
+      <FilterGroup title="Prix" defaultOpen={true} activeCount={maxPrice < maxAvailablePrice ? 1 : 0}>
         <input
           type="range"
           min={1}
           max={maxAvailablePrice}
           value={maxPrice}
-          onChange={(e) => setMaxPrice(Number(e.target.value))}
+          onChange={(e) => {
+            setMaxPrice(Number(e.target.value))
+            setUserTouchedPrice(true)
+          }}
           className="w-full accent-neon"
         />
         <p className="mt-1 text-xs text-muted">Jusqu'à {maxPrice} €</p>
       </FilterGroup>
 
-      <FilterGroup title="Marque">
-        {catalogMeta.brands.map((b) => (
-          <CheckRow key={b} checked={brands.includes(b)} onChange={() => toggle(setBrands, b)} label={b} />
-        ))}
+      <FilterGroup title="Marque" defaultOpen={false} activeCount={brands.length}>
+        <BrandFilter
+          values={catalogMeta.brands}
+          selected={brands}
+          onToggle={(brand) => toggle(setBrands, brand)}
+        />
       </FilterGroup>
 
-      <FilterGroup title="Type de produit">
-        {catalogMeta.types.map((t) => (
-          <CheckRow key={t} checked={types.includes(t)} onChange={() => toggle(setTypes, t)} label={t} />
-        ))}
-      </FilterGroup>
-
-      <FilterGroup title="Taux de nicotine">
+      <FilterGroup title="Taux de nicotine" defaultOpen={true} activeCount={nicotine.length}>
         <div className="flex flex-wrap gap-2">
           {catalogMeta.nicotineLevels.map((n) => (
             <button
@@ -288,7 +304,7 @@ export default function Shop() {
               onClick={() => toggle(setNicotine, n)}
               className={`rounded-full border px-3 py-1.5 text-xs transition ${
                 nicotine.includes(n)
-                  ? 'border-neon bg-neon/15 text-neon'
+                  ? 'border-neon bg-neon/15 text-neon font-semibold'
                   : 'border-white/10 text-ash/70 hover:border-white/30'
               }`}
             >
@@ -298,7 +314,7 @@ export default function Shop() {
         </div>
       </FilterGroup>
 
-      <FilterGroup title={`Saveur (${catalogMeta.flavors.length})`}>
+      <FilterGroup title={`Saveurs (${catalogMeta.flavors.length})`} defaultOpen={false} activeCount={flavors.length}>
         <FlavorFilter
           values={catalogMeta.flavors}
           selected={flavors}
@@ -307,8 +323,8 @@ export default function Shop() {
       </FilterGroup>
 
       {activeCount > 0 && (
-        <button onClick={resetFilters} className="text-sm text-neon hover:underline">
-          Réinitialiser les filtres
+        <button onClick={resetFilters} className="w-full rounded-xl border border-neon/30 bg-neon/10 py-2.5 text-xs font-semibold text-neon hover:bg-neon/20 transition">
+          Réinitialiser les filtres ({activeCount})
         </button>
       )}
     </div>
@@ -504,11 +520,87 @@ export default function Shop() {
   )
 }
 
-function FilterGroup({ title, children }) {
+function FilterGroup({ title, children, defaultOpen = true, activeCount = 0 }) {
+  const [open, setOpen] = useState(defaultOpen)
   return (
-    <div>
-      <h3 className="mb-3 text-sm font-semibold text-white">{title}</h3>
-      <div className="space-y-2">{children}</div>
+    <div className="border-b border-white/10 pb-4 last:border-0 last:pb-0">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="flex w-full items-center justify-between py-1 text-left text-sm font-semibold text-white transition hover:text-neon"
+      >
+        <span className="flex items-center gap-2">
+          <span>{title}</span>
+          {activeCount > 0 && (
+            <span className="rounded-full bg-neon px-1.5 py-0.5 text-[10px] font-bold text-noir">
+              {activeCount}
+            </span>
+          )}
+        </span>
+        <IconChevronDown
+          width={16}
+          height={16}
+          className={`text-muted transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      {open && <div className="mt-3 space-y-2 animate-fade-in">{children}</div>}
+    </div>
+  )
+}
+
+function BrandFilter({ values, selected, onToggle }) {
+  const [query, setQuery] = useState('')
+  const [expanded, setExpanded] = useState(false)
+  const normalizedQuery = normalizeSearchText(query)
+
+  const matches = useMemo(() => {
+    const filteredValues = normalizedQuery
+      ? values.filter((value) => normalizeSearchText(value).includes(normalizedQuery))
+      : values
+    const selectedSet = new Set(selected)
+
+    return [
+      ...filteredValues.filter((value) => selectedSet.has(value)),
+      ...filteredValues.filter((value) => !selectedSet.has(value)),
+    ]
+  }, [normalizedQuery, selected, values])
+
+  const collapsedLimit = 8
+  const visibleValues = expanded ? matches : matches.slice(0, collapsedLimit)
+  const remaining = matches.length - visibleValues.length
+
+  return (
+    <div className="space-y-2">
+      {values.length > 8 && (
+        <div className="relative mb-2">
+          <IconSearch width={14} height={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-faint" />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); setExpanded(false) }}
+            placeholder="Filtrer les marques…"
+            className="w-full rounded-lg border border-white/10 bg-noir/20 py-1.5 pl-8 pr-7 text-xs text-white outline-none placeholder:text-faint focus:border-neon/40"
+          />
+          {query && (
+            <button type="button" onClick={() => setQuery('')} className="absolute right-2 top-1/2 -translate-y-1/2 text-faint hover:text-white">
+              <IconClose width={12} height={12} />
+            </button>
+          )}
+        </div>
+      )}
+      {visibleValues.map((brand) => (
+        <CheckRow key={brand} checked={selected.includes(brand)} onChange={() => onToggle(brand)} label={brand} />
+      ))}
+      {remaining > 0 && !expanded && (
+        <button type="button" onClick={() => setExpanded(true)} className="mt-1 text-xs font-medium text-neon hover:underline">
+          + Voir {remaining} marques de plus
+        </button>
+      )}
+      {expanded && values.length > collapsedLimit && !query && (
+        <button type="button" onClick={() => setExpanded(false)} className="mt-1 text-xs font-medium text-muted hover:text-white">
+          Réduire la liste
+        </button>
+      )}
     </div>
   )
 }

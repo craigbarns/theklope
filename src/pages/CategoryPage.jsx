@@ -19,29 +19,29 @@ const PAGE_SIZE = 24
 
 const SUB_CATEGORIES_MAP = {
   'e-liquides': [
+    { slug: 'e-liquides', name: '10 ml' },
     { slug: 'e-liquides-50ml', name: '50 ml' },
     { slug: 'e-liquides-100ml', name: '100 ml' },
-    { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
-    { slug: 'e-liquides-fruites', name: 'Fruités' },
-    { slug: 'e-liquides-gourmands', name: 'Gourmands' },
-    { slug: 'e-liquides-menthe', name: 'Menthe & Frais' },
-    { slug: 'e-liquides-tabac', name: 'Tabac & Classic' },
   ],
   'cigarettes-electroniques': [
-    { slug: 'pods', name: 'Pods' },
-    { slug: 'packs-debutants', name: 'Packs débutants' },
-    { slug: 'puffs-rechargeables', name: 'Puffs rechargeables' },
-  ],
-  diy: [
-    { slug: 'diy-bases', name: 'Bases DIY' },
-    { slug: 'diy-aromes', name: 'Arômes Concentrés' },
-    { slug: 'diy-boosters', name: 'Boosters' },
+    { slug: 'cigarettes-electroniques', name: 'Kits Cigarettes Electroniques' },
+    { slug: 'pods', name: 'Pod' },
+    { slug: 'puffs-rechargeables', name: 'Puffs Rechargeable' },
   ],
   resistances: [
-    { slug: 'cartouches-xros', name: 'Cartouches XROS' },
-    { slug: 'resistances-geekvape-z', name: 'Geekvape Z' },
-    { slug: 'resistances-pnp-voopoo', name: 'PnP Voopoo' },
-    { slug: 'resistances-zenith-innokin', name: 'Zenith Innokin' },
+    { slug: 'resistances', name: 'Résistances' },
+    { slug: 'cartouches-xros', name: 'Cartouches' },
+  ],
+  diy: [
+    { slug: 'diy-bases', name: 'Bases neutres DIY' },
+    { slug: 'diy-aromes', name: 'Arômes concentrés' },
+    { slug: 'diy-boosters', name: 'Boosters de nicotine' },
+  ],
+  accessoires: [
+    { slug: 'accessoires-accus', name: 'Accus' },
+    { slug: 'accessoires-chargeurs', name: 'Chargeurs' },
+    { slug: 'accessoires-clearo-tanks', name: 'Clearo / Tanks' },
+    { slug: 'accessoires-pyrex', name: 'Pyrex' },
   ],
 }
 
