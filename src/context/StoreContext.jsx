@@ -964,5 +964,8 @@ export function useStore() {
   return ctx
 }
 
-export const formatPrice = (n) =>
-  new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(n)
+export const formatPrice = (n) => {
+  const val = Number(n)
+  const safe = Number.isFinite(val) ? val : 0
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(safe)
+}

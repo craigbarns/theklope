@@ -326,7 +326,7 @@ export default function Product() {
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
             </div>
 
-            {quantityPricing && (
+            {Boolean(quantityPricing && quantityPricing.minQty > 0) && (
               <div className="mt-5 rounded-2xl border border-neon/30 bg-gradient-to-br from-carbon via-noir to-anthracite p-5 shadow-lg">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-bold uppercase tracking-wider text-neon flex items-center gap-1.5">
