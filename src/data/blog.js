@@ -192,9 +192,9 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'quelle-cigarette-electronique-choisir',
-    title: 'Quelle cigarette électronique choisir en 2026 ? Guide Ultime et Comparatif par Profil',
+    title: 'Quelle cigarette électronique choisir ? Guide 2026',
     description:
-      'Guide d’achat complet 2026 pour choisir sa cigarette électronique : comparatif des formats (pods, kits, box), profils de fumeur (petit, moyen, gros), autonomie mAh, tirage MTL/DL et conseils d’experts THEKLOPE Marseille.',
+      'Guide THEKLOPE pour choisir sa cigarette électronique en 2026 : comparatif pods, kits et box par profil de fumeur, autonomie, tirage et e-liquide adapté.',
     date: '29 Juillet 2026',
     isoDate: '2026-07-29T08:00:00+02:00',
     readTime: '12 min',
