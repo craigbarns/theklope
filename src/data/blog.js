@@ -1483,6 +1483,53 @@ export const BLOG_POSTS = [
     ],
     relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
   }),
+  makePost({
+    slug: 'voyager-avion-cigarette-electronique',
+    title: 'Voyager en avion avec sa cigarette électronique : les règles à connaître',
+    description:
+      'Bagage cabine ou soute, batteries, e-liquide et réglementation selon la destination : les règles pratiques pour voyager en avion avec sa cigarette électronique.',
+    date: '5 Août 2026',
+    isoDate: '2026-08-05T08:00:00+02:00',
+    readTime: '4 min',
+    category: 'Réglementation',
+    image: '/products/kit-pod-argus-g2-mini-1500mah-voopoo-offre-groupee-1-1.webp',
+    summary:
+      'Cigarette électronique, batteries et e-liquide obéissent à des règles précises en avion : rangement en cabine, contenants liquides et réglementation du pays de destination.',
+    intro:
+      'Voyager en avion avec sa cigarette électronique implique de respecter les règles de sécurité aérienne sur les batteries et les liquides, ainsi que la réglementation du pays visité. Quelques vérifications avant le départ évitent les mauvaises surprises à l’aéroport.',
+    sections: [
+      {
+        title: 'Cigarette électronique et batteries : uniquement en cabine',
+        text:
+          'Comme pour tout appareil à batterie lithium, les compagnies aériennes imposent de transporter sa cigarette électronique et ses batteries de rechange en bagage cabine, jamais en soute, en raison du risque d’incident électrique en zone non surveillée. Protégez les batteries de rechange dans un étui ou avec un capuchon isolant pour éviter tout contact avec des objets métalliques.',
+      },
+      {
+        title: 'Le e-liquide soumis à la règle des liquides en cabine',
+        text:
+          'Les flacons de e-liquide emportés en cabine suivent la règle générale des liquides : contenants de 100 ml maximum, regroupés dans un sac plastique transparent refermable. Avant le vol, il est recommandé de vider ou de remplir complètement le réservoir de son matériel pour limiter les fuites dues aux variations de pression en cabine.',
+      },
+      {
+        title: 'Vérifier la réglementation du pays de destination',
+        text:
+          'La réglementation sur la vape varie fortement d’un pays à l’autre : certains pays encadrent strictement la possession ou la vente de cigarettes électroniques, voire les interdisent. Avant le départ, vérifiez les règles en vigueur à destination auprès d’une source officielle (ambassade, autorités aériennes ou douanières du pays visité).',
+      },
+    ],
+    faq: [
+      {
+        q: 'Peut-on vapoter à bord d’un avion ?',
+        a: 'Non. L’usage d’une cigarette électronique est interdit à bord des vols commerciaux, au même titre que le tabac.',
+      },
+      {
+        q: 'Les batteries de rechange peuvent-elles voyager en soute ?',
+        a: 'Non, elles doivent rester en bagage cabine, protégées dans un étui pour éviter tout court-circuit.',
+      },
+      {
+        q: 'Faut-il vider le réservoir avant de prendre l’avion ?',
+        a: 'C’est une précaution recommandée : les écarts de pression en cabine peuvent provoquer une fuite si le réservoir est partiellement rempli.',
+      },
+    ],
+    relatedProductIds: ['argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279', 'q16-pro-146'],
+  }),
 ]
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
