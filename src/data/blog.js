@@ -1118,7 +1118,7 @@ export const BLOG_POSTS = [
         a: 'Le tirage MTL (indirect, serré) est le plus recommandé car il reproduit fidèlement la sensation de tirage d’une cigarette traditionnelle.',
       },
     ],
-    relatedProductIds: ['pixo-aura-2-301', 'xros-4-mini-269', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
+    relatedProductIds: ['pocke-x-144', 'q16-pro-146', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
   }),
   makePost({
     slug: 'top-10-meilleurs-eliquides',
@@ -1192,7 +1192,7 @@ export const BLOG_POSTS = [
         a: 'Les pods Vaporesso XROS, Oxva Xlim et Geekvape Wenax associés à un e-liquide aux sels de nicotine offrent exactement le même rendu et la même restitution des arômes.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
+    relatedProductIds: ['q16-pro-146', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
   }),
   makePost({
     slug: 'sels-de-nicotine-guide-complet',
@@ -1225,7 +1225,7 @@ export const BLOG_POSTS = [
         a: 'Le 20 mg/ml est recommandé pour les gros fumeurs ou le sevrage immédiat. Le 10 mg/ml convient aux fumeurs modérés (5 à 10 cigarettes par jour).',
       },
     ],
-    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'q16-pro-146'],
   }),
   makePost({
     slug: 'comment-faire-son-eliquide-diy',
@@ -1291,7 +1291,7 @@ export const BLOG_POSTS = [
         a: 'Oui ! La force de la gamme XROS est la rétrocompatibilité totale avec l’ensemble des cartouches XROS (0.6, 0.8, 1.0 et 1.2 ohm).',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269'],
+    relatedProductIds: ['q16-pro-146'],
   }),
   makePost({
     slug: 'xros-5-vs-xros-pro-comparatif',
@@ -1324,7 +1324,7 @@ export const BLOG_POSTS = [
         a: 'Le XROS Pro possède la plus grande batterie (1200 mAh), suivi de près par les XROS 5 (1000 mAh).',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'pixo-aura-2-301'],
+    relatedProductIds: ['q16-pro-146', 'pocke-x-144'],
   }),
   makePost({
     slug: 'lost-mary-elf-bar-remplacants-legaux',
@@ -1353,7 +1353,7 @@ export const BLOG_POSTS = [
         a: 'Oui, car le dispositif principal n’est plus à usage unique et la batterie se recharge indéfiniment.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269'],
+    relatedProductIds: ['q16-pro-146'],
   }),
   makePost({
     slug: 'quel-accu-18650-choisir-box',
@@ -1448,7 +1448,7 @@ export const BLOG_POSTS = [
         a: 'Un kit débutant complet avec e-liquides coûte entre 25 € et 40 € tout compris.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'fr-m-10ml-alfaliquid-76'],
+    relatedProductIds: ['q16-pro-146', 'fr-m-10ml-alfaliquid-76'],
   }),
   makePost({
     slug: 'trouver-gout-puff-en-eliquide',
@@ -1481,7 +1481,7 @@ export const BLOG_POSTS = [
         a: 'Les e-liquides traditionnels sont conçus pour ne pas encrasser les résistances et éviter l’écœurement. Pour retrouver un goût très sucré, choisissez la gamme Sels de Nicotine.',
       },
     ],
-    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'q16-pro-146'],
   }),
 ]
 
