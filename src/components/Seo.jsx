@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { markPageSeoReady } from '../lib/pageReadiness.js'
 
-const DEFAULT_SOCIAL_IMAGE = '/og-image.jpg'
+const DEFAULT_SOCIAL_IMAGE = '/og-image-v2.jpg'
 
 // Met à jour le titre, les balises OpenGraph et injecte le JSON-LD structuré pour le SEO/GEO.
 export default function Seo({
