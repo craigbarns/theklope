@@ -13,7 +13,7 @@ export const STORE_PHONE = '+33491555555'
 export const STORE = {
   name: 'THEKLOPE',
   url: 'https://www.theklope.com',
-  image: 'https://www.theklope.com/og-image.jpg',
+  image: 'https://www.theklope.com/og-image-v2.jpg',
   telephone: STORE_PHONE || undefined,
   priceRange: '$$',
   address: {

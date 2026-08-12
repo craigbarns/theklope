@@ -22,7 +22,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
 const dist = resolve(root, 'dist')
 const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').replace(/\/$/, '')
-const DEFAULT_OG = `${BASE_URL}/og-image.jpg`
+const DEFAULT_OG = `${BASE_URL}/og-image-v2.jpg`
 
 const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
 const {

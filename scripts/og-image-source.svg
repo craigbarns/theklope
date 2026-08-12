@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">THEKLOPE — Vape shop Marseille et boutique en ligne</title>
+  <desc id="desc">Visuel social officiel THEKLOPE avec le logo éclair vert et noir.</desc>
+
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="24%" r="62%">
+      <stop offset="0" stop-color="#35FF8A" stop-opacity=".16"/>
+      <stop offset=".5" stop-color="#123E27" stop-opacity=".1"/>
+      <stop offset="1" stop-color="#050505" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="rule" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#35FF8A" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#35FF8A" stop-opacity=".6"/>
+      <stop offset="1" stop-color="#35FF8A" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="#050505"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <circle cx="600" cy="128" r="235" fill="#062216" opacity=".62"/>
+
+  <!-- Logo officiel utilisé dans l’en-tête du site. -->
+  <g transform="translate(301 105)">
+    <rect width="122" height="122" rx="30.5" fill="#35FF8A"/>
+    <path d="M68.6 15.3 30.5 66.7h23.6l-5.5 40.1 42.9-54.2H67.1l1.5-37.3Z" fill="#050505"/>
+    <text x="158" y="88" fill="#F7F7F7" font-family="Helvetica, Arial, sans-serif" font-size="82" font-weight="700">THE</text>
+    <text x="323" y="88" fill="#35FF8A" font-family="Helvetica, Arial, sans-serif" font-size="82" font-weight="700">KLOPE</text>
+  </g>
+
+  <text x="600" y="322" fill="#F3F3F3" font-family="Helvetica, Arial, sans-serif" font-size="45" font-weight="400" text-anchor="middle">La vape nouvelle génération</text>
+  <rect x="245" y="367" width="710" height="2" rx="1" fill="url(#rule)"/>
+  <text x="600" y="430" fill="#35FF8A" font-family="Helvetica, Arial, sans-serif" font-size="28" text-anchor="middle">Cigarettes électroniques · E-liquides · Accessoires</text>
+  <text x="600" y="512" fill="#A6A6A6" font-family="Helvetica, Arial, sans-serif" font-size="24" text-anchor="middle">Livraison 24/48h · Paiement sécurisé · Réservé aux +18 ans</text>
+
+  <text x="600" y="581" fill="#DADADA" font-family="Helvetica, Arial, sans-serif" font-size="20" font-weight="700" letter-spacing="3" text-anchor="middle">THEKLOPE.COM</text>
+</svg>
