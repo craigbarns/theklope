@@ -29,7 +29,7 @@ const heroCats = [
   { slug: 'e-liquides', name: 'E-liquides', key: 'eliquide' },
   { slug: 'resistances', name: 'Résistances', key: 'resistance' },
   { slug: 'accessoires', name: 'Accessoires', key: 'accessoire' },
-  { slug: 'alternatives-puffs', name: 'Alternatives puffs', key: 'alternative-puff' },
+  { slug: 'puffs-rechargeables', name: 'Alternatives puffs', key: 'alternative-puff' },
 ]
 
 const GUIDE_LINKS = [

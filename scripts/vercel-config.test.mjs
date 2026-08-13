@@ -17,6 +17,7 @@ const expectedLegacyRedirects = {
   '/24-chargeurs': '/categorie/accessoires',
   '/12-consommables': '/categorie/resistances',
   '/26-diy': '/categorie/diy',
+  '/categorie/alternatives-puffs': '/categorie/puffs-rechargeables',
   '/content/5-:slug': '/livraison-retours',
   '/produit/classico-grege-50-ml-freaks': '/produit/grege-68',
   '/produit/e-liquide-cafe-10ml-liquidarom': '/produit/cafe-liquid-arom-209',
