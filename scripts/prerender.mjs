@@ -43,6 +43,7 @@ const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
 const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
+const { buildMerchantSku } = await import(resolve(root, 'src/lib/merchantSku.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -166,7 +167,7 @@ for (const p of PRODUCTS) {
         name: p.name,
         image: [absImg(p.image)],
         description: p.long || p.short || p.name,
-        sku: p.id,
+        sku: buildMerchantSku(p.id),
         brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
         offers: {
           '@type': 'Offer',

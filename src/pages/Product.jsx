@@ -16,6 +16,7 @@ import { relatedGuidesForProduct } from '../data/productGuides.js'
 import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
 import { getQuantityPricingRule } from '../lib/pricing.js'
+import { buildMerchantSku } from '../lib/merchantSku.js'
 import {
   IconHeart,
   IconCart,
@@ -103,20 +104,12 @@ export default function Product() {
           "name": product.name || '',
           "image": fullImgUrls,
           "description": (product.long || product.short || product.name || '').replace(/<[^>]*>/g, '').trim(),
-          "sku": product.id,
-          "mpn": product.id,
+          "sku": buildMerchantSku(product.id),
           "brand": {
             "@type": "Brand",
             "name": product.brand || 'THEKLOPE'
           },
           "category": categoryName(productCategoryKey),
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "4.8",
-            "reviewCount": "18",
-            "bestRating": "5",
-            "worstRating": "1"
-          },
           "offers": {
             "@type": "Offer",
             "url": `https://www.theklope.com/produit/${product.id}`,

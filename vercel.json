@@ -23,6 +23,7 @@
     { "source": "/cart", "destination": "/panier", "permanent": true },
     { "source": "/search", "destination": "/boutique", "permanent": true },
     { "source": "/diy", "destination": "/categorie/diy", "permanent": true },
+    { "source": "/categorie/alternatives-puffs", "destination": "/categorie/puffs-rechargeables", "permanent": true },
     { "source": "/categorie/cartouches-xros", "destination": "/categorie/cartouches", "permanent": true },
 
     { "source": "/content/1-:slug", "destination": "/livraison-retours", "permanent": true },
