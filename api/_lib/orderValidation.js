@@ -1,5 +1,6 @@
 import { SHIPPING_METHODS } from '../../src/lib/pricing.js'
 import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
+import { categoryMatches } from '../../src/lib/productCategory.js'
 
 export const MAX_CART_LINES = 100
 export const MAX_LINE_QUANTITY = 100
@@ -76,7 +77,7 @@ export function normalizeVariant(product, input = {}) {
 
   const variant = {}
   for (const [key, productField, label, categories] of VARIANT_FIELDS) {
-    const fieldApplies = !categories || categories.includes(product?.category)
+    const fieldApplies = !categories || categories.some((category) => categoryMatches(product?.category, category))
     const allowed = fieldApplies && Array.isArray(product?.[productField])
       ? product[productField].filter((value) => value !== '' && value != null)
       : []

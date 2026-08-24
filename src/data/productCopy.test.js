@@ -47,6 +47,21 @@ test('DIY fallback copy describes preparation without presenting a concentrate a
   assert.doesNotMatch(`${short} ${long}`, /prêt à vapoter/i)
 })
 
+test('editorial e-liquid subcategories keep liquid-specific fallback copy', () => {
+  const product = {
+    name: 'Pêche 10 ml',
+    brand: 'Liquidarom',
+    category: 'eliquide-fruite',
+    type: 'E-liquide',
+    flavors: ['Pêche'],
+    nicotine: [0, 3],
+    specs: { Contenance: '10 ml', Ratio: '70 PG / 30 VG' },
+  }
+
+  assert.match(buildProductShort(product), /saveur Pêche/i)
+  assert.match(buildProductLong(product), /Taux disponibles : 0 mg et 3 mg/i)
+})
+
 test('legacy synthetic product ratings are stripped from every enriched product', () => {
   const product = enrichProductCopy({
     name: 'Produit test',
