@@ -15,7 +15,6 @@ const GUIDES_BY_CATEGORY = {
     'pod-ou-cigarette-electronique',
     'autonomie-cigarette-electronique',
     'entretenir-kit-classique-box',
-    'erreurs-frequentes-debutant-vape',
   ],
   pod: [
     'pod-ou-cigarette-electronique',
