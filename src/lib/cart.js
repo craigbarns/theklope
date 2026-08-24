@@ -1,3 +1,5 @@
+import { categoryMatches } from './productCategory.js'
+
 export const CART_VARIANT_FIELDS = Object.freeze([
   { key: 'color', productField: 'colors', label: 'Couleur' },
   { key: 'flavor', productField: 'flavors', label: 'Saveur', categories: ['eliquide', 'diy'] },
@@ -15,7 +17,7 @@ const variantKey = (variant = {}) => JSON.stringify(
 export function getProductVariantOptions(product = {}, key) {
   const definition = CART_VARIANT_FIELDS.find((entry) => entry.key === key)
   if (!definition) return []
-  if (definition.categories && !definition.categories.includes(product?.category)) return []
+  if (definition.categories && !definition.categories.some((category) => categoryMatches(product?.category, category))) return []
   const source = Array.isArray(product?.[definition.productField]) ? product[definition.productField] : []
   return source.filter(hasValue)
 }

@@ -24,6 +24,22 @@ test('variant values are canonicalized against catalog options', () => {
   assert.deepEqual(result, { ok: true, variant: { color: 'Rouge', nicotine: 3, ohm: '0.8' } })
 })
 
+test('server validation accepts variants from editorial e-liquid subcategories', () => {
+  const subcategoryProduct = {
+    ...product,
+    category: 'eliquide-fruite',
+    colors: [],
+    flavors: ['Pêche'],
+    nicotine: [0, 3],
+    ohmOptions: [],
+  }
+
+  assert.deepEqual(normalizeVariant(subcategoryProduct, { flavor: 'pêche', nicotine: '3' }), {
+    ok: true,
+    variant: { flavor: 'Pêche', nicotine: 3 },
+  })
+})
+
 test('missing ambiguous variants are rejected and a sole option stays implicit', () => {
   const result = normalizeVariant(product, {})
   assert.equal(result.ok, false)

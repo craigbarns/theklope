@@ -7,6 +7,7 @@ import ProductImage from '../components/ProductImage.jsx'
 import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '../data/catalog.js'
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
+import { isEliquidProduct } from '../lib/productCategory.js'
 import {
   IconArrowRight,
   IconShield,
@@ -397,7 +398,7 @@ function ProductRow({ eyebrow, title, link, products, itemListId }) {
 function catThumb(key, products = []) {
   const map = {
     ecig: products.find((p) => p.category === 'ecig'),
-    eliquide: products.find((p) => p.category === 'eliquide'),
+    eliquide: products.find((p) => isEliquidProduct(p)),
     resistance: products.find(isResistanceProduct),
     accessoire: products.find((p) => p.category === 'accessoire'),
     'alternative-puff': products.find((p) => p.category === 'pod') || products.find((p) => p.category === 'ecig'),

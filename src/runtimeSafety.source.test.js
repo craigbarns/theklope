@@ -38,3 +38,13 @@ test('product page does not render an undeclared urgency countdown', async () =>
 
   assert.doesNotMatch(source, /\bshippingCountdown\b/)
 })
+
+test('mobile purchase controls do not cover the primary product or cart actions', async () => {
+  const product = await readSource('./pages/Product.jsx')
+  const coach = await readSource('./components/CoachVape.jsx')
+
+  assert.match(product, /entry\.boundingClientRect\.bottom < 0/)
+  assert.match(product, /showMobilePurchaseBar &&/)
+  assert.match(coach, /const isCart = location\.pathname === '\/panier'/)
+  assert.match(coach, /isCheckout \|\| isCart/)
+})

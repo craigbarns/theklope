@@ -6,6 +6,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
 import { isResistanceProduct } from '../data/catalog.js'
+import { isEliquidProduct } from '../lib/productCategory.js'
 import { getProductVariantChoices, resolveProductVariant } from '../lib/cart.js'
 import {
   getMissingConfiguratorVariantChoices,
@@ -41,7 +42,7 @@ export default function Configurateur() {
 
   // 3. Filtrer les e-liquides
   const eliquids = useMemo(() => {
-    return products.filter((p) => p.category === 'eliquide' && p.stock > 0)
+    return products.filter((p) => isEliquidProduct(p) && p.stock > 0)
   }, [products])
 
   // Filtrage par recherche

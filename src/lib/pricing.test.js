@@ -40,6 +40,34 @@ test('PACK15 accepts the canonical resistance category', () => {
   assert.equal(totals.total, 68)
 })
 
+test('editorial e-liquid subcategories remain eligible for PACK15', () => {
+  const featuredLiquid = { ...liquid, category: 'eliquide-fruite' }
+  const lines = [device, accessory, featuredLiquid]
+
+  assert.equal(isCompletePack(lines), true)
+  assert.equal(getCompletePackSubtotal(lines), 70)
+  const totals = computeTotals({ lines, shippingMethodId: 'pickup', promoCode: 'PACK15' })
+  assert.equal(totals.promo.code, 'PACK15')
+  assert.equal(totals.discount, 10.5)
+})
+
+test('editorial e-liquid subcategories receive the advertised quantity price', () => {
+  const product = {
+    category: 'eliquide-fruite',
+    brand: 'Liquidarom',
+    volume: '10ml',
+    price: 5.9,
+  }
+  const rule = getQuantityPricingRule(product)
+  assert.equal(rule.minQty, 20)
+  assert.equal(rule.discountPercent, 50)
+  assert.equal(rule.discountedUnitPrice, 2.95)
+
+  const totals = computeTotals({ lines: [{ ...product, qty: 20 }], shippingMethodId: 'pickup' })
+  assert.equal(totals.discount, 59)
+  assert.equal(totals.total, 59)
+})
+
 test('regular promo codes keep working outside packs', () => {
   const totals = computeTotals({ lines: [device], promoCode: 'THEKLOPE10' })
   assert.equal(totals.discount, 4)

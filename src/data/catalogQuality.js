@@ -1,3 +1,5 @@
+import { isEliquidProduct } from '../lib/productCategory.js'
+
 const HARDWARE_IN_LIQUID_PATTERN = /\b(?:r[eé]sistances?|coils?|cartouches?|chargeurs?|batteries?|accus?|clearomiseurs?|tanks?|kits?|pods?|box|mods?|aegis|xros|gtx|pnp|tpp|nautilus|zenith)\b/i
 
 const normalizeName = (value) => String(value || '')
@@ -63,7 +65,7 @@ export function findCatalogIssues(products = []) {
       })
     }
 
-    if (isActive(product) && product?.category === 'eliquide' && HARDWARE_IN_LIQUID_PATTERN.test(normalizeName(`${product?.name || ''} ${product?.type || ''}`))) {
+    if (isActive(product) && isEliquidProduct(product) && HARDWARE_IN_LIQUID_PATTERN.test(normalizeName(`${product?.name || ''} ${product?.type || ''}`))) {
       issues.push({
         code: 'hardware_as_liquid',
         productIds: id ? [id] : [],

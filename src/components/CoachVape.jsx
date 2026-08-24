@@ -4,6 +4,7 @@ import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { productRequiresVariantSelection } from '../lib/cart.js'
 import { useDialogFocus } from '../lib/useDialogFocus.js'
 import { sortProductsByMerchandising } from '../data/catalog.js'
+import { isEliquidProduct } from '../lib/productCategory.js'
 
 export default function CoachVape() {
   const { products, addToCart, ageVerified, cookiesChoice, reviewsChoice } = useStore()
@@ -227,7 +228,7 @@ export default function CoachVape() {
         (p) => p.category === 'ecig' && !p.type.toLowerCase().includes('pod')
       )
     } else if (currentAnswers.type === 'type_eliquide') {
-      matchedProducts = products.filter((p) => p.category === 'eliquide')
+      matchedProducts = products.filter((p) => isEliquidProduct(p))
     }
 
     // Filtrer par saveur pour les eliquides
@@ -358,8 +359,9 @@ export default function CoachVape() {
 
   const isProductPage = location.pathname.startsWith('/produit/')
   const isCheckout = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/')
+  const isCart = location.pathname === '/panier'
 
-  if (ageVerified !== true || !cookiesChoice || !reviewsChoice || isCheckout) return null
+  if (ageVerified !== true || !cookiesChoice || !reviewsChoice || isCheckout || isCart) return null
 
   return (
     <>

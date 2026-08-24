@@ -1,3 +1,5 @@
+import { isEliquidProduct } from '../lib/productCategory.js'
+
 const GENERIC_MARKERS = [
   'un produit de qualite selectionne par theklope',
   'produit selectionne par theklope pour une experience fiable',
@@ -56,7 +58,7 @@ export function isGenericProductCopy(value) {
 }
 
 function nicotinePhrase(product) {
-  if (product.category !== 'eliquide') return ''
+  if (!isEliquidProduct(product)) return ''
   const levels = unique(product.nicotine || []).map((n) => `${Number(n)} mg`)
   return levels.length ? `Taux disponibles : ${list(levels)}.` : ''
 }
@@ -87,7 +89,7 @@ export function buildProductShort(product) {
   const category = CATEGORY_LABELS[product.category] || compact(product.type) || 'produit vape'
   const specs = product.specs || {}
 
-  if (product.category === 'eliquide') {
+  if (isEliquidProduct(product)) {
     const format = compact(specs.Contenance) || 'format 10 ml'
     const ratio = compact(specs.Ratio)
     const flavors = unique(product.flavors || [])
@@ -134,7 +136,7 @@ export function buildProductLong(product) {
   const specs = specsText(product.specs)
   const details = []
 
-  if (product.category === 'eliquide') {
+  if (isEliquidProduct(product)) {
     const flavStr = (product.flavors || []).join(' et ').toLowerCase()
     const flavorIntro = flavStr ? `aux notes de ${flavStr}` : `incontournable`
     details.push(`Découvrez le ${name}${brandSuffix}, un e-liquide ${flavorIntro} pour votre e-cigarette.`)
