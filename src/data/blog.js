@@ -261,7 +261,7 @@ export const BLOG_POSTS = [
       },
       {
         q: 'Où se faire conseiller en magasin à Marseille ?',
-        a: 'Retrouvez l’équipe THEKLOPE dans notre boutique physique située au 188 Rue de Rome, 13006 Marseille. Nos conseillers vous accompagnent pour tester les matériels et choisir le dosage idéal.',
+        a: 'Retrouvez l’équipe THEKLOPE dans notre <a href="/cigarette-electronique-marseille">boutique physique à Marseille</a>, 188 Rue de Rome, 13006. Nos conseillers vous accompagnent pour tester les matériels et choisir le dosage idéal.',
       },
     ],
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'q16-pro-146', 'doric-astra-2500mah-voopoo-271'],
@@ -949,7 +949,7 @@ export const BLOG_POSTS = [
       },
       {
         q: 'Peut-on retourner un e-liquide ouvert ?',
-        a: 'Non, les e-liquides ouverts ne sont généralement pas repris pour des raisons d’hygiène et de sécurité.',
+        a: 'Non, les e-liquides ouverts ne sont généralement pas repris pour des raisons d’hygiène et de sécurité. Le détail des conditions figure sur la page <a href="/livraison-retours">livraison et retours</a>.',
       },
     ],
     relatedProductIds: ['bvc-ce5-27', 'bvc-nautilus-28'],
@@ -1068,7 +1068,7 @@ export const BLOG_POSTS = [
       {
         title: 'Utiliser les fiches produits',
         text:
-          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, demandez conseil avant commande.',
+          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, demandez conseil avant commande, en ligne ou directement à la <a href="/boutique-vape-marseille">boutique THEKLOPE à Marseille</a>.',
       },
     ],
     faq: [
