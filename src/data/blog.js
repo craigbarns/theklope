@@ -63,6 +63,92 @@ const makePost = ({
 
 export const BLOG_POSTS = [
   makePost({
+    slug: 'avis-test-vaporesso-xros-pro',
+    title: 'Avis Vaporesso XROS Pro : Le Test Complet du Pod de 2026',
+    description: 'Notre avis complet et test du pod Vaporesso XROS Pro. Découvrez ses performances, son autonomie, et pourquoi c\'est l\'un des meilleurs pods pour remplacer la puff.',
+    date: '25 Aout 2026',
+    isoDate: '2026-08-25T10:00:00+02:00',
+    readTime: '6 min',
+    category: 'Test & Avis',
+    image: '/products/kit-xros-pro-2_1.jpg',
+    summary: 'Avec son format compact, sa grande autonomie et son rendu des saveurs exceptionnel, le XROS Pro de Vaporesso s\'impose comme la référence absolue des pods rechargeables.',
+    intro: 'Vaporesso frappe très fort cette année avec le XROS Pro, un pod compact qui promet des performances dignes d\'une grosse cigarette électronique. Nous l\'avons testé sous toutes les coutures pendant plusieurs semaines. Voici notre avis définitif sur ce best-seller.',
+    sections: [
+      {
+        title: 'Design et Ergonomie : Le sans-faute',
+        text: 'Dès la première prise en main, le XROS Pro respire la solidité. Son alliage métallique lui confère un poids rassurant sans être lourd. Mais la véritable innovation réside dans son petit écran caché sous la coque avant, qui indique discrètement le niveau de batterie et la puissance.',
+      },
+      {
+        title: 'Performances : Un tirage MTL exceptionnel',
+        text: 'C\'est sur le rendu des saveurs que le XROS Pro se distingue de ses concurrents. Les cartouches XROS Series (dotées de la technologie COREX) offrent une durée de vie incroyable. Que vous vapotiez des fruités frais ou des sels de nicotine, le "hit" est parfait et la vapeur très dense pour un pod de cette taille.',
+      },
+      {
+        title: 'Autonomie et recharge ultra-rapide',
+        text: 'Avec sa batterie intégrée de 1200 mAh, ce pod tient facilement toute la journée, même pour un fumeur moyen. Et si vous tombez à court, sa recharge rapide en USB-C (2A) permet de récupérer 100% de batterie en seulement 35 minutes.',
+      },
+      {
+        title: 'Notre Avis Final',
+        text: 'Le Vaporesso XROS Pro est sans conteste l\'un des meilleurs investissements pour arrêter de fumer ou pour remplacer une puff jetable. Il est intuitif, endurant et terriblement efficace.',
+      }
+    ],
+    faq: [
+      {
+        q: 'Quel e-liquide utiliser avec le Vaporesso XROS Pro ?',
+        a: 'Il excelle avec des e-liquides fluides, idéalement en 50/50 PG/VG, ou avec des sels de nicotine.',
+      },
+      {
+        q: 'Combien de temps dure une cartouche XROS ?',
+        a: 'En moyenne, une cartouche XROS vous durera entre 2 et 3 semaines avant de ressentir une baisse de saveur.',
+      }
+    ],
+    cta: {
+      title: 'Envie d\'essayer le XROS Pro ?',
+      text: 'Découvrez-le dans notre configurateur de pack. Associez-le avec vos e-liquides favoris et obtenez -15% sur le total !',
+      link: '/configurateur',
+      button: 'Créer mon Pack XROS Pro (-15%)',
+    },
+    relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50'],
+  }),
+  makePost({
+    slug: 'quelle-resistance-pour-eliquide-50-50',
+    title: 'Quelle résistance choisir pour un e-liquide 50/50 PG/VG ?',
+    description: 'Guide SEO : Comment choisir la bonne résistance pour vapoter un e-liquide en 50/50 PG/VG. Évitez les fuites et le goût de brûlé.',
+    date: '24 Aout 2026',
+    isoDate: '2026-08-24T10:00:00+02:00',
+    readTime: '4 min',
+    category: 'Entretien',
+    image: '/products/resistances-gti-mesh-015020405-vaporesso-pack-de-5.jpg',
+    summary: 'Le ratio 50/50 est le plus populaire de la vape, mais il exige une résistance adaptée pour fonctionner correctement sans fuite ni goût de brûlé.',
+    intro: 'Vous venez d\'acheter un e-liquide équilibré à 50% de Propylène Glycol (PG) et 50% de Glycérine Végétale (VG), mais vous ne savez pas quelle résistance installer sur votre cigarette électronique ? Suivez le guide pour un tirage parfait.',
+    sections: [
+      {
+        title: 'Comprendre le e-liquide 50/50',
+        text: 'Le ratio 50/50 est considéré comme le compromis idéal. Il est assez fluide pour bien imbiber le coton, mais assez visqueux pour produire une belle quantité de vapeur sans fuir. C\'est le ratio "passe-partout" par excellence.',
+      },
+      {
+        title: 'La résistance idéale : entre 0.6 et 1.2 ohm',
+        text: 'Pour vapoter du 50/50 dans les meilleures conditions, privilégiez des résistances dont la valeur se situe entre 0.6 ohm et 1.2 ohm. Ces résistances ont des arrivées de liquide de taille moyenne, parfaitement calibrées pour ce niveau de fluidité.',
+      },
+      {
+        title: 'Ce qu\'il faut éviter avec du 50/50',
+        text: 'Évitez absolument les très grosses résistances sub-ohm (comme celles à 0.15 ou 0.20 ohm prévues pour faire d\'énormes nuages). Ces résistances nécessitent des e-liquides beaucoup plus épais (70% de VG ou plus). Si vous mettez du 50/50 dedans, le liquide va couler à travers et votre clearomiseur va fuir à grandes eaux.',
+      }
+    ],
+    faq: [
+      {
+        q: 'Puis-je vapoter des sels de nicotine en 50/50 ?',
+        a: 'Oui, la plupart des e-liquides aux sels de nicotine sont d\'ailleurs conçus en 50/50. Assurez-vous d\'utiliser une résistance de 1.0 ohm ou plus.',
+      }
+    ],
+    cta: {
+      title: 'Trouvez la résistance compatible avec votre matériel',
+      text: 'Nous proposons l\'intégralité des résistances des plus grandes marques (Geekvape, Vaporesso, Voopoo).',
+      link: '/categorie/resistances',
+      button: 'Voir toutes les résistances',
+    },
+    relatedProductIds: ['gti-mesh-015020405-vaporesso-pack-de-5-300'],
+  }),
+  makePost({
     slug: 'stockage-eliquides-batterie-vape',
     title: 'Comment bien conserver ses e-liquides et sa batterie ?',
     description:
