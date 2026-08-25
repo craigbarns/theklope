@@ -2,133 +2,1251 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "buildCommand": "npm run build",
   "crons": [
-    { "path": "/api/cleanup-checkouts", "schedule": "20 3 * * *" }
+    {
+      "path": "/api/cleanup-checkouts",
+      "schedule": "20 3 * * *"
+    }
   ],
   "trailingSlash": false,
   "redirects": [
     {
       "source": "/:path*",
-      "has": [{ "type": "host", "value": "theklope.vercel.app" }],
+      "has": [
+        {
+          "type": "host",
+          "value": "theklope.vercel.app"
+        }
+      ],
       "destination": "https://www.theklope.com/:path*",
       "permanent": true
     },
-    { "source": "/blog", "destination": "/guides", "permanent": true },
-    { "source": "/blog/:slug", "destination": "/guides/:slug", "permanent": true },
-
-    { "source": "/fr", "destination": "/", "permanent": true },
-    { "source": "/fr/:path*", "destination": "/:path*", "permanent": true },
-    { "source": "/contact-us", "destination": "/contact", "permanent": true },
-    { "source": "/contactez-nous", "destination": "/contact", "permanent": true },
-    { "source": "/magasins", "destination": "/boutique-vape-marseille", "permanent": true },
-    { "source": "/cart", "destination": "/panier", "permanent": true },
-    { "source": "/search", "destination": "/boutique", "permanent": true },
-    { "source": "/diy", "destination": "/categorie/diy", "permanent": true },
-    { "source": "/categorie/alternatives-puffs", "destination": "/categorie/puffs-rechargeables", "permanent": true },
-    { "source": "/categorie/cartouches-xros", "destination": "/categorie/cartouches", "permanent": true },
-
-    { "source": "/content/1-:slug", "destination": "/livraison-retours", "permanent": true },
-    { "source": "/content/2-:slug", "destination": "/legal/mentions-legales", "permanent": true },
-    { "source": "/content/3-:slug", "destination": "/legal/cgv", "permanent": true },
-    { "source": "/content/5-:slug", "destination": "/livraison-retours", "permanent": true },
-    { "source": "/content/8-:slug", "destination": "/legal/confidentialite", "permanent": true },
-
-    { "source": "/2-accueil", "destination": "/boutique", "permanent": true },
-    { "source": "/3-e-cigarettes", "destination": "/categorie/cigarettes-electroniques", "permanent": true },
-    { "source": "/4-e-liquides", "destination": "/categorie/e-liquides", "permanent": true },
-    { "source": "/15-kits-complets", "destination": "/categorie/cigarettes-electroniques", "permanent": true },
-    { "source": "/17-e-liquides-france", "destination": "/categorie/e-liquides", "permanent": true },
-    { "source": "/23-pyrex", "destination": "/categorie/accessoires", "permanent": true },
-    { "source": "/24-chargeurs", "destination": "/categorie/accessoires", "permanent": true },
-    { "source": "/23-resistances", "destination": "/categorie/resistances", "permanent": true },
-    { "source": "/44-reservoirs", "destination": "/categorie/accessoires", "permanent": true },
-    { "source": "/e-liquides-france", "destination": "/categorie/e-liquides", "permanent": true },
-    { "source": "/kits-complets", "destination": "/categorie/cigarettes-electroniques", "permanent": true },
-    { "source": "/resistances", "destination": "/categorie/resistances", "permanent": true },
-    { "source": "/accus", "destination": "/categorie/accessoires", "permanent": true },
-    { "source": "/brand/9-innokin", "destination": "/boutique?q=Innokin", "permanent": true },
-    { "source": "/brand/8-smok", "destination": "/boutique?q=Smok", "permanent": true },
-
-    { "source": "/produit/classico-grege-50-ml-freaks", "destination": "/produit/grege-68", "permanent": true },
-    { "source": "/produit/e-liquide-cafe-10ml-liquidarom", "destination": "/produit/cafe-liquid-arom-209", "permanent": true },
-
-    { "source": "/e-liquides-france/306-peche-abricot-50-ml-freaks.html", "destination": "/produit/peche-abricot-50ml-0mg-zhc-297", "permanent": true },
-    { "source": "/e-liquides-france/139-melon-50-ml-freaks.html", "destination": "/produit/melon-de-cavaillon-50ml-0mg-293", "permanent": true },
-    { "source": "/e-liquides-france/335-freeze-dragon-50-ml-liquideo.html", "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253", "permanent": true },
-    { "source": "/e-liquides-france/443-la-petite-limo-60-ml-petit-nuage.html", "destination": "/produit/la-petite-limo-60ml-petit-nuage-286", "permanent": true },
-    { "source": "/e-liquides-france/445-reve-bleu-60-ml-petit-nuage.html", "destination": "/produit/reve-bleu-60ml-petit-nuage-303", "permanent": true },
-    { "source": "/e-liquides-france/266-fruits-rouges-givres-10-ml-liquidarom.html", "destination": "/produit/fruits-rouges-givres-10ml-liquidarom-227", "permanent": true },
-    { "source": "/kits-complets/416-drag-s2-voopoo.html", "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280", "permanent": true },
-    { "source": "/kits-complets/388-608-gen-max-vaporesso.html", "destination": "/produit/gen-max-220w-avec-itank-t-vaporesso-noir-274", "permanent": true },
-    { "source": "/kits-complets/409-geekvape-digi-max.html", "destination": "/produit/kit-digi-max-geekvape-89", "permanent": true },
-    { "source": "/kits-complets/74-pocke-x-aspire.html", "destination": "/produit/pocke-x-144", "permanent": true },
-    { "source": "/e-liquides-france/209-citron-fizz-10-ml-pulp.html", "destination": "/produit/citron-fizz-38", "permanent": true },
-    { "source": "/e-liquides-france/215-menthe-fraiche-10-ml-alfaliquid.html", "destination": "/produit/fraicheur-menthe-fraiche-10ml-202", "permanent": true },
-    { "source": "/e-liquides-france/190-boston-menthol-10-ml-pulp.html", "destination": "/produit/boston-menthol-23", "permanent": true },
-    { "source": "/e-liquides-france/276-m-blend-10-ml-liquidarom.html", "destination": "/produit/m-blend-liquidarom-231", "permanent": true },
-    { "source": "/clearomiseurs-reservoirs/385-cartouche-luxe-q-vaporesso.html", "destination": "/produit/luxe-q2-3ml-4pcs-vaporesso-214", "permanent": true },
-    { "source": "/clearomiseurs-reservoirs/418-555-cartouche-apex-vaporesso.html", "destination": "/produit/apex-5ml-par-2-vaporesso-212", "permanent": true },
-    { "source": "/e-liquides-france/271-silver-blend-10-ml-liquidarom.html", "destination": "/produit/silver-blend-10ml-liquidarom-240", "permanent": true },
-    { "source": "/e-liquides-france/257-110-pomme-10-ml-liquidarom.html", "destination": "/produit/pomme-10ml-pg-70-vg-30-288", "permanent": true },
-    { "source": "/e-liquides-france/273-phm-blend-10-ml-liquidarom.html", "destination": "/produit/phm-blend-10ml-liquidarom-238", "permanent": true },
-    { "source": "/e-liquides-france/267-menthe-hollywood-10-ml-liquidarom.html", "destination": "/produit/menthe-hollywood-10ml-liquidarom-233", "permanent": true },
-    { "source": "/kits-complets/420-soul-geekvape.html", "destination": "/produit/soul-par-2-geekvape-215", "permanent": true },
-    { "source": "/kits-complets/72-q16-pro-justfog.html", "destination": "/produit/q16-pro-146", "permanent": true },
-    { "source": "/e-liquides-france/219-fr-k-10-ml-alfaliquid.html", "destination": "/produit/fr-k-10ml-195", "permanent": true },
-    { "source": "/e-liquides-france/275-gold-blend-10-ml-liquidarom.html", "destination": "/produit/gold-blend-10ml-liquidarom-228", "permanent": true },
-    { "source": "/e-liquides-france/133-barbapapa-50-ml-freaks.html", "destination": "/produit/barbapapa-13", "permanent": true },
-    { "source": "/e-liquides-france/149-berry-fresh-50-ml-freaks.html", "destination": "/produit/berry-fresh-15", "permanent": true },
-    { "source": "/e-liquides-france/312-valkyrie-50-ml-al.html", "destination": "/produit/valkyrie-182", "permanent": true },
-    { "source": "/index.php", "destination": "/", "permanent": true },
-    { "source": "/12-consommables", "destination": "/categorie/resistances", "permanent": true },
-    { "source": "/26-diy", "destination": "/categorie/diy", "permanent": true },
-    { "source": "/:id(\\d+)-:slug", "destination": "/boutique", "permanent": true },
-    { "source": "/:path*.html", "destination": "/boutique", "permanent": true },
-    { "source": "/brand/:path*", "destination": "/boutique", "permanent": true }
+    {
+      "source": "/blog",
+      "destination": "/guides",
+      "permanent": true
+    },
+    {
+      "source": "/blog/:slug",
+      "destination": "/guides/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/fr",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/fr/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/contact-us",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/contactez-nous",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/magasins",
+      "destination": "/boutique-vape-marseille",
+      "permanent": true
+    },
+    {
+      "source": "/cart",
+      "destination": "/panier",
+      "permanent": true
+    },
+    {
+      "source": "/search",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/diy",
+      "destination": "/categorie/diy",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/alternatives-puffs",
+      "destination": "/categorie/puffs-rechargeables",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/cartouches-xros",
+      "destination": "/categorie/cartouches",
+      "permanent": true
+    },
+    {
+      "source": "/content/1-:slug",
+      "destination": "/livraison-retours",
+      "permanent": true
+    },
+    {
+      "source": "/content/2-:slug",
+      "destination": "/legal/mentions-legales",
+      "permanent": true
+    },
+    {
+      "source": "/content/3-:slug",
+      "destination": "/legal/cgv",
+      "permanent": true
+    },
+    {
+      "source": "/content/5-:slug",
+      "destination": "/livraison-retours",
+      "permanent": true
+    },
+    {
+      "source": "/content/8-:slug",
+      "destination": "/legal/confidentialite",
+      "permanent": true
+    },
+    {
+      "source": "/2-accueil",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/3-e-cigarettes",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/4-e-liquides",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/15-kits-complets",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/17-e-liquides-france",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/23-pyrex",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/24-chargeurs",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/23-resistances",
+      "destination": "/categorie/resistances",
+      "permanent": true
+    },
+    {
+      "source": "/44-reservoirs",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/resistances",
+      "destination": "/categorie/resistances",
+      "permanent": true
+    },
+    {
+      "source": "/accus",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/brand/9-innokin",
+      "destination": "/boutique?q=Innokin",
+      "permanent": true
+    },
+    {
+      "source": "/brand/8-smok",
+      "destination": "/boutique?q=Smok",
+      "permanent": true
+    },
+    {
+      "source": "/produit/classico-grege-50-ml-freaks",
+      "destination": "/produit/grege-68",
+      "permanent": true
+    },
+    {
+      "source": "/produit/e-liquide-cafe-10ml-liquidarom",
+      "destination": "/produit/cafe-liquid-arom-209",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/306-peche-abricot-50-ml-freaks.html",
+      "destination": "/produit/peche-abricot-50ml-0mg-zhc-297",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/139-melon-50-ml-freaks.html",
+      "destination": "/produit/melon-de-cavaillon-50ml-0mg-293",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/335-freeze-dragon-50-ml-liquideo.html",
+      "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/443-la-petite-limo-60-ml-petit-nuage.html",
+      "destination": "/produit/la-petite-limo-60ml-petit-nuage-286",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/445-reve-bleu-60-ml-petit-nuage.html",
+      "destination": "/produit/reve-bleu-60ml-petit-nuage-303",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/266-fruits-rouges-givres-10-ml-liquidarom.html",
+      "destination": "/produit/fruits-rouges-givres-10ml-liquidarom-227",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/416-drag-s2-voopoo.html",
+      "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/388-608-gen-max-vaporesso.html",
+      "destination": "/produit/gen-max-220w-avec-itank-t-vaporesso-noir-274",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/409-geekvape-digi-max.html",
+      "destination": "/produit/kit-digi-max-geekvape-89",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/74-pocke-x-aspire.html",
+      "destination": "/produit/pocke-x-144",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/209-citron-fizz-10-ml-pulp.html",
+      "destination": "/produit/citron-fizz-38",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/215-menthe-fraiche-10-ml-alfaliquid.html",
+      "destination": "/produit/fraicheur-menthe-fraiche-10ml-202",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/190-boston-menthol-10-ml-pulp.html",
+      "destination": "/produit/boston-menthol-23",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/276-m-blend-10-ml-liquidarom.html",
+      "destination": "/produit/m-blend-liquidarom-231",
+      "permanent": true
+    },
+    {
+      "source": "/clearomiseurs-reservoirs/385-cartouche-luxe-q-vaporesso.html",
+      "destination": "/produit/luxe-q2-3ml-4pcs-vaporesso-214",
+      "permanent": true
+    },
+    {
+      "source": "/clearomiseurs-reservoirs/418-555-cartouche-apex-vaporesso.html",
+      "destination": "/produit/apex-5ml-par-2-vaporesso-212",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/271-silver-blend-10-ml-liquidarom.html",
+      "destination": "/produit/silver-blend-10ml-liquidarom-240",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/257-110-pomme-10-ml-liquidarom.html",
+      "destination": "/produit/pomme-10ml-pg-70-vg-30-288",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/273-phm-blend-10-ml-liquidarom.html",
+      "destination": "/produit/phm-blend-10ml-liquidarom-238",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/267-menthe-hollywood-10-ml-liquidarom.html",
+      "destination": "/produit/menthe-hollywood-10ml-liquidarom-233",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/420-soul-geekvape.html",
+      "destination": "/produit/soul-par-2-geekvape-215",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/72-q16-pro-justfog.html",
+      "destination": "/produit/q16-pro-146",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/219-fr-k-10-ml-alfaliquid.html",
+      "destination": "/produit/fr-k-10ml-195",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/275-gold-blend-10-ml-liquidarom.html",
+      "destination": "/produit/gold-blend-10ml-liquidarom-228",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/133-barbapapa-50-ml-freaks.html",
+      "destination": "/produit/barbapapa-13",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/149-berry-fresh-50-ml-freaks.html",
+      "destination": "/produit/berry-fresh-15",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/312-valkyrie-50-ml-al.html",
+      "destination": "/produit/valkyrie-182",
+      "permanent": true
+    },
+    {
+      "source": "/index.php",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/12-consommables",
+      "destination": "/categorie/resistances",
+      "permanent": true
+    },
+    {
+      "source": "/26-diy",
+      "destination": "/categorie/diy",
+      "permanent": true
+    },
+    {
+      "source": "/:id(\\d+)-:slug",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/121-menthe-fraiche-50-ml-freaks.html",
+      "destination": "/produit/menthe-fraiche-1-120",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/317-resistances-euc-vaporesso.html",
+      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/108-349-sofa-loser-50-ml-fat-juice-factory-by-pulp.html",
+      "destination": "/produit/the-pink-fat-gum-172",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/422-astra-voopoo.html",
+      "destination": "/produit/doric-astra-2500mah-voopoo-271",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/244-malaisian-bomb-10-ml-freaks.html",
+      "destination": "/produit/malaisian-bomb-1-113",
+      "permanent": true
+    },
+    {
+      "source": "/diy/15-concentre-menthe-fraiche-30-ml-freaks.html",
+      "destination": "/produit/menthe-fraiche-1-120",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/363-neutre-50-ml-freaks.html",
+      "destination": "/produit/le-neutre-99",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/396-resistance-ub-max-lost-vape.html",
+      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/64-resistances-zenith-pro-r-10-ohm-innokin.html",
+      "destination": "/produit/kit-coolfire-z80-zenith-ii-innokin-88",
+      "permanent": true
+    },
+    {
+      "source": "/clearomiseurs-reservoirs/68-clearomiseur-melo-4-d25-eleaf.html",
+      "destination": "/produit/granite-melon-66",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/223-239-senois-10-ml-freaks.html",
+      "destination": "/produit/senois-1-156",
+      "permanent": true
+    },
+    {
+      "source": "/diy/27-concentre-coco-miam-30-ml-freaks.html",
+      "destination": "/produit/coco-miam-42",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/372-ushiro-100-ml-fighter-fuel.html",
+      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/129-coco-miam-50-ml-freaks.html",
+      "destination": "/produit/coco-miam-42",
+      "permanent": true
+    },
+    {
+      "source": "/diy/8-concentre-tropical-tempest-30-ml-freaks.html",
+      "destination": "/produit/tropical-tempest-1-177",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/384-luxe-q-vaporesso.html",
+      "destination": "/produit/luxe-q2-3ml-4pcs-vaporesso-214",
+      "permanent": true
+    },
+    {
+      "source": "/packs-e-liquide/297-pack-20-red-astaire-10-ml-t-juice.html",
+      "destination": "/produit/red-astaire-50-ml-149",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/386-resistance-gti-vaporesso.html",
+      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/242-melon-10-ml-freaks.html",
+      "destination": "/produit/granite-melon-66",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/99-the-pink-fat-gum-50-ml-pulp-kitchen.html",
+      "destination": "/produit/the-pink-fat-gum-172",
+      "permanent": true
+    },
+    {
+      "source": "/accus/4-accu-18650-vtc-6-3000-mah-30-a-sony.html",
+      "destination": "/produit/doric-astra-2500mah-voopoo-271",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/195-320-la-menthe-frappee-10-ml-pulp.html",
+      "destination": "/produit/le-the-a-la-menthe-100",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/188-mozambique-10-ml-pulp.html",
+      "destination": "/produit/mozambique-126",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/158-orange-citron-mandarine-50-ml-fruizee.html",
+      "destination": "/produit/citron-orange-mandarine-39",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/80-resistances-gt-core-vaporesso.html",
+      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/194-menthe-polaire-10-ml-pulp.html",
+      "destination": "/produit/menthe-polaire-124",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/208-la-fraise-sauvage-10-ml-pulp.html",
+      "destination": "/produit/fraise-sauvage-62",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/204-peau-de-peche-10-ml-pulp.html",
+      "destination": "/produit/peau-de-peche-138",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/272-robusto-blend-10-ml-liquidarom.html",
+      "destination": "/produit/robusto-blend-10ml-liquidarom-239",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/203-pomme-chicha-10-ml-pulp.html",
+      "destination": "/produit/pomme-10ml-pg-70-vg-30-288",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/113-la-chose-50-ml-le-french-liquid.html",
+      "destination": "/produit/la-chose-50ml-5050-le-french-liquide-285",
+      "permanent": true
+    },
+    {
+      "source": "/diy/33-concentre-berry-fresh-30-ml-freaks.html",
+      "destination": "/produit/berry-fresh-1-14",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/205-myrtille-givree-10-ml-pulp.html",
+      "destination": "/produit/myrtille-givre-127",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/227-menthe-hollywood-10-ml-freaks.html",
+      "destination": "/produit/menthe-hollywood-122",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/299-pack-20-heisenberg-10-ml-vampire-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/358-canaille-50-ml-liquideo.html",
+      "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/71-ego-aio-eco-friendly-joyetech.html",
+      "destination": "/produit/aio-7",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/399-resistance-pnp-x-voopoo.html",
+      "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/423-aegis-solo-3-geekvape.html",
+      "destination": "/produit/aegis-solo-3-geekvape-265",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/214-menthe-glaciale-10-ml-alfaliquid.html",
+      "destination": "/produit/fraicheur-menthe-glaciale-10ml-203",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/247-fraise-10-ml-freaks.html",
+      "destination": "/produit/fraise-sauvage-62",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/148-blue-cloud-50-ml-freaks.html",
+      "destination": "/produit/blue-cloud-1-20",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/246-fruits-rouges-10-ml-freaks.html",
+      "destination": "/produit/fruits-rouges-a-la-reglisse-64",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/248-citron-vert-10-ml-freaks.html",
+      "destination": "/produit/citron-cassis-37",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/202-cafe-du-saint-amour-10-ml-pulp.html",
+      "destination": "/produit/eclair-au-cafe-57",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/315-mangue-abricot-10-ml-freaks.html",
+      "destination": "/produit/mangue-abricot-115",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/126-macada-miam-50-ml-freaks.html",
+      "destination": "/produit/macada-miam-109",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/339-japura-50-ml-amazone.html",
+      "destination": "/produit/japura-77",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/185-358-verveine-pamplemousse-rose-10-ml-pulp.html",
+      "destination": "/produit/verveine-pamplemousse-rose-185",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/281-red-astaire-50-ml-t-juice.html",
+      "destination": "/produit/red-astaire-50-ml-149",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/60-583-clone-50-ml-swoke.html",
+      "destination": "/produit/clone-41",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/394-xr-max-vaporesso.html",
+      "destination": "/produit/armour-max-220w-avec-itank-2-8ml-vaporesso-noir-267",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/432-631-argus-g2-mini-voopoo.html",
+      "destination": "/produit/argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/388-gen-max-vaporesso.html",
+      "destination": "/produit/gen-max-220w-avec-itank-t-vaporesso-noir-274",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/107-445-vanilla-slurp-50-ml-fat-juice-factory-by-pulp.html",
+      "destination": "/produit/the-pink-fat-gum-172",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/245-lava-red-10-ml-freaks.html",
+      "destination": "/produit/lava-red-97",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/333-crapule-50-ml-liquideo.html",
+      "destination": "/produit/crapule-47",
+      "permanent": true
+    },
+    {
+      "source": "/packs-e-liquide/429-pack-3-freaks-ou-liquidarom.html",
+      "destination": "/produit/cola-liquidarom-44",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/160-bloody-summer-50-ml-fruizee.html",
+      "destination": "/produit/bloody-summer-19",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/226-menthe-fraiche-10-ml-freaks.html",
+      "destination": "/produit/menthe-fraiche-1-120",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/183-pinkman-10-ml-vampire-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/diy/48-concentre-ultimate-ragnarok-30-ml-al.html",
+      "destination": "/produit/ragnarok-148",
+      "permanent": true
+    },
+    {
+      "source": "/diy/19-concentre-macada-miam-30-ml-freaks.html",
+      "destination": "/produit/macada-miam-109",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/140-mangue-50-ml-freaks.html",
+      "destination": "/produit/cassis-mangue-32",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/134-anis-50-ml-freaks.html",
+      "destination": "/produit/anis-51-10ml-204",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/359-dragigus-10-ml-freaks.html",
+      "destination": "/produit/dragigus-10ml-x10-223",
+      "permanent": true
+    },
+    {
+      "source": "/diy/43-concentre-red-astaire-30-ml-t-juice.html",
+      "destination": "/produit/red-astaire-50-ml-149",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/280-461-resistances-gtx-vaporesso.html",
+      "destination": "/produit/kit-gtx-one-pro-vaporesso-90",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/371-uraken-100-ml-fighter-fuel.html",
+      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/350-spartacus-50-ml-al.html",
+      "destination": "/produit/spartacus-161",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/144-framboise-50-ml-freaks.html",
+      "destination": "/produit/framboise-63",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/327-shinigami-50-ml-al.html",
+      "destination": "/produit/shinigami-160",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/166-subzero-10-ml-halo.html",
+      "destination": "/produit/subzero-1-165",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/124-noisette-50-ml-freaks.html",
+      "destination": "/produit/noisette-131",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/357-kit-zelos-3-aspire.html",
+      "destination": "/produit/kit-zelos-81",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/380-coolfire-z60-innokin.html",
+      "destination": "/produit/kit-coolfire-z60-avec-zlide-top-innokin-87",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/57-resistances-serie-z-zeus-subohm-geek-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/pyrex/179-pyrex-melo-4-d25.html",
+      "destination": "/produit/granite-melon-66",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/338-tireboulette-50-ml-liquideo.html",
+      "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/314-peche-abricot-10-ml-freaks.html",
+      "destination": "/produit/peche-abricot-139",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/152-relax-50-ml-eliquid-france.html",
+      "destination": "/produit/relax-151",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/279-mistyk-50-ml-liquideo-juice-heroes.html",
+      "destination": "/produit/mistyk-128",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/146-citron-vert-50-ml-freaks.html",
+      "destination": "/produit/citron-cassis-37",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/310-oni-50-ml-al.html",
+      "destination": "/produit/oni-132",
+      "permanent": true
+    },
+    {
+      "source": "/diy/35-concentre-anis-30-ml-freaks.html",
+      "destination": "/produit/anis-51-10ml-204",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/157-crazy-mango-50-ml-fruizee.html",
+      "destination": "/produit/crazy-mango-48",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/250-blue-cloud-10-ml-freaks.html",
+      "destination": "/produit/blue-cloud-1-20",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/127-la-derniere-seance-50-ml-freaks.html",
+      "destination": "/produit/la-derniere-seance-1-93",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/328-cerise-fruit-du-dragon-50-ml-freaks.html",
+      "destination": "/produit/cerise-fruits-du-dragon-33",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/191-blond-torrefie-10-ml-pulp.html",
+      "destination": "/produit/blond-torrefie-17",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/398-drag-x2-voopoo.html",
+      "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280",
+      "permanent": true
+    },
+    {
+      "source": "/diy/45-concentre-ultimate-valkyrie-30-ml-al.html",
+      "destination": "/produit/valkyrie-182",
+      "permanent": true
+    },
+    {
+      "source": "/diy/46-concentre-ultimate-oni-30-ml-al.html",
+      "destination": "/produit/oni-132",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/182-red-astaire-10-ml-t-juice.html",
+      "destination": "/produit/red-astaire-50-ml-149",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/337-sacripant-50-ml-liquideo.html",
+      "destination": "/produit/sacripant-154",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/391-legend-3-geek-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/263-mojito-fraise-10-ml-liquidarom.html",
+      "destination": "/produit/liquidarom-mojito-fraise-104",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/308-resistances-pnp-voopoo.html",
+      "destination": "/produit/drag-s2-avec-pnp-x-voopoo-new-colors-280",
+      "permanent": true
+    },
+    {
+      "source": "/diy/14-concentre-menthe-hollywood-30-ml-freaks.html",
+      "destination": "/produit/menthe-hollywood-122",
+      "permanent": true
+    },
+    {
+      "source": "/accus/5-accu-18650-3500-mah-20-a-mxjo.html",
+      "destination": "/produit/doric-astra-2500mah-voopoo-271",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/225-232-alezan-10-ml-freaks.html",
+      "destination": "/produit/alezan-1-9",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/349-cassis-fruit-du-dragon-50-ml-freaks.html",
+      "destination": "/produit/cerise-fruits-du-dragon-33",
+      "permanent": true
+    },
+    {
+      "source": "/diy/9-concentre-stop-it-30-ml-freaks.html",
+      "destination": "/produit/stop-it-1-163",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/151-supreme-50-ml-eliquid-france.html",
+      "destination": "/produit/supreme-170",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/368-kuroko-100-ml-fighter-fuel.html",
+      "destination": "/produit/kuroko-82",
+      "permanent": true
+    },
+    {
+      "source": "/diy/53-concentre-ultimate-phoenix-30-ml-al.html",
+      "destination": "/produit/phoenix-141",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/132-breakfast-50-ml-freaks.html",
+      "destination": "/produit/breakfast-1-24",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/369-hogano-100-ml-fighter-fuel.html",
+      "destination": "/produit/hogano-74",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/216-malawia-10-ml-alfaliquid.html",
+      "destination": "/produit/malawia-10ml-200",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/199-308-vanille-extreme-10-ml-pulp.html",
+      "destination": "/produit/vanille-custard-183",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/311-phoenix-50-ml-al.html",
+      "destination": "/produit/phoenix-141",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/165-571-tribeca-10-ml-halo.html",
+      "destination": "/produit/tribeca-1-175",
+      "permanent": true
+    },
+    {
+      "source": "/accueil/459-aegis-mini-5-geekvape.html",
+      "destination": "/produit/aegis-mini-5-5",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/387-gen-se-vaporesso.html",
+      "destination": "/produit/gen-max-220w-avec-itank-t-vaporesso-noir-274",
+      "permanent": true
+    },
+    {
+      "source": "/resistances/62-resistances-aegis-boost-geek-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/161-cinema-act-3-100-ml-cloud-of-icarus.html",
+      "destination": "/produit/act-1-0",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/309-ragnarok-50-ml-al.html",
+      "destination": "/produit/ragnarok-148",
+      "permanent": true
+    },
+    {
+      "source": "/diy/34-concentre-barbapapa-30-ml-freaks.html",
+      "destination": "/produit/barbapapa-1-12",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/262-mojito-10-ml-liquidarom.html",
+      "destination": "/produit/liquidarom-mojito-fraise-104",
+      "permanent": true
+    },
+    {
+      "source": "/diy/51-concentre-ultimate-shinigami-zero-30-ml-al.html",
+      "destination": "/produit/shinigami-160",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-monde/184-heisenberg-10-ml-vampire-vape.html",
+      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/370-minasawa-100-ml-fighter-fuel.html",
+      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/213-305-usa-mix-10-ml-alfaliquid.html",
+      "destination": "/produit/usa-mix-10ml-201",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/237-199-barbapapa-10-ml-freaks.html",
+      "destination": "/produit/barbapapa-1-12",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/307-mangue-abricot-50-ml-freaks.html",
+      "destination": "/produit/mangue-abricot-115",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/141-malaisian-bomb-50-ml-freaks.html",
+      "destination": "/produit/malaisian-bomb-1-113",
+      "permanent": true
+    },
+    {
+      "source": "/diy/30-concentre-caramel-30-ml-freaks.html",
+      "destination": "/produit/caramel-toffee-10ml-211",
+      "permanent": true
+    },
+    {
+      "source": "/diy/7-concentre-vanille-custard-30-ml-freaks.html",
+      "destination": "/produit/vanille-custard-183",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/111-chubby-berries-50-ml-fat-juice-factory-by-pulp.html",
+      "destination": "/produit/chubby-berries-36",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/192-345-blond-miel-noir-10-ml-pulp.html",
+      "destination": "/produit/blond-miel-noir-16",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/417-apex-vaporesso.html",
+      "destination": "/produit/apex-5ml-par-2-vaporesso-212",
+      "permanent": true
+    },
+    {
+      "source": "/pyrex/318-pyrex-q16-pro-complet-justfog.html",
+      "destination": "/produit/kit-q16-pro-plus-justfog-91",
+      "permanent": true
+    },
+    {
+      "source": "/clearomiseurs-reservoirs/67-clearomiseur-zenith-d22-innokin.html",
+      "destination": "/produit/kit-coolfire-z80-zenith-ii-innokin-88",
+      "permanent": true
+    },
+    {
+      "source": "/diy/10-concentre-pomme-verte-30-ml-freaks.html",
+      "destination": "/produit/pomme-10ml-pg-70-vg-30-288",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/412-armour-g-vaporesso.html",
+      "destination": "/produit/kit-armour-g-mtl-vaporesso-85",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/259-fruits-rouges-10-ml-liquidarom.html",
+      "destination": "/produit/fruits-rouges-10ml-liquidarom-226",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/353-cerise-fruit-du-dragon-10-ml-freaks.html",
+      "destination": "/produit/cerise-fruits-du-dragon-33",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/431-628-fraise-pasteque-kiwi-10-ml-liquidarom.html",
+      "destination": "/produit/liquidarom-fraise-kiwi-paste-que-00-mg-ml-10-ml-107",
+      "permanent": true
+    },
+    {
+      "source": "/diy/22-concentre-fruits-rouges-30-ml-freaks.html",
+      "destination": "/produit/fruits-rouges-a-la-reglisse-64",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/123-stop-it-50-ml-freaks.html",
+      "destination": "/produit/stop-it-1-163",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/332-la-galette-des-rois-50-ml-la-fabrique-francaise.html",
+      "destination": "/produit/galette-des-rois-65",
+      "permanent": true
+    },
+    {
+      "source": "/kits-complets/381-coolfire-z80-innokin.html",
+      "destination": "/produit/kit-coolfire-z80-zenith-ii-innokin-88",
+      "permanent": true
+    },
+    {
+      "source": "/bases/38-pack-base-boosters-200-ml.html",
+      "destination": "/produit/malawia-10ml-200",
+      "permanent": true
+    },
+    {
+      "source": "/diy/12-concentre-pasteque-30-ml-freaks.html",
+      "destination": "/produit/citron-pasteque-50ml-ice-cool-by-liquidarom-221",
+      "permanent": true
+    },
+    {
+      "source": "/diy/31-concentre-breakfast-30-ml-freaks.html",
+      "destination": "/produit/breakfast-1-24",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/153-famous-50-ml-france-eliquid.html",
+      "destination": "/produit/famous-58",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/228-vanille-custard-10-ml-freaks.html",
+      "destination": "/produit/vanille-custard-183",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/448-663-jolie-blonde-50-ml-liquideo.html",
+      "destination": "/produit/jolie-blonde-50ml-liquideo-261",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/241-pasteque-10-ml-freaks.html",
+      "destination": "/produit/citron-pasteque-50ml-ice-cool-by-liquidarom-221",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/210-366-cassis-exquis-10-ml-pulp.html",
+      "destination": "/produit/cassis-exquis-31",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/136-pomme-verte-50-ml-freaks.html",
+      "destination": "/produit/pomme-10ml-pg-70-vg-30-288",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/402-24-fraise-framboise-basilic-50-ml-ice-cool.html",
+      "destination": "/produit/fraise-framboise-basilic-50ml-ice-cool-by-liquidarom-246",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/450-665-freeze-dragon-serpent-50-ml-liquideo.html",
+      "destination": "/produit/freeze-dragon-serpent-50ml-liquideo-253",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/255-cafe-10-ml-liquidarom.html",
+      "destination": "/produit/cola-liquidarom-44",
+      "permanent": true
+    },
+    {
+      "source": "/diy/28-concentre-citron-vert-30-ml-freaks.html",
+      "destination": "/produit/citron-cassis-37",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/145-fraise-50-ml-freaks.html",
+      "destination": "/produit/fraise-sauvage-62",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/249-cerise-10-ml-freaks.html",
+      "destination": "/produit/cerise-fruits-du-dragon-33",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides-france/201-corne-de-gazelle-10-ml-pulp.html",
+      "destination": "/produit/corne-de-gazelle-46",
+      "permanent": true
+    },
+    {
+      "source": "/:path*.html",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/brand/:path*",
+      "destination": "/boutique",
+      "permanent": true
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
-        { "key": "Content-Security-Policy", "value": "base-uri 'self'; frame-ancestors 'none'; object-src 'none'" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "base-uri 'self'; frame-ancestors 'none'; object-src 'none'"
+        }
       ]
     },
     {
       "source": "/service-worker.js",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
       ]
     },
     {
       "source": "/sw.js",
       "headers": [
-        { "key": "Cache-Control", "value": "no-store, max-age=0" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
       ]
     },
     {
       "source": "/404.html",
       "headers": [
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/sitemap"
+    },
     {
       "source": "/produit/:id",
-      "has": [{ "type": "query", "key": "catalogue_live", "value": "1" }],
+      "has": [
+        {
+          "type": "query",
+          "key": "catalogue_live",
+          "value": "1"
+        }
+      ],
       "destination": "/index.html"
     },
-    { "source": "/produit/:id", "destination": "/api/product-route?id=:id" },
-    { "source": "/panier", "destination": "/index.html" },
-    { "source": "/checkout", "destination": "/index.html" },
-    { "source": "/checkout/retour", "destination": "/index.html" },
-    { "source": "/favoris", "destination": "/index.html" },
-    { "source": "/admin", "destination": "/index.html" }
+    {
+      "source": "/produit/:id",
+      "destination": "/api/product-route?id=:id"
+    },
+    {
+      "source": "/panier",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/checkout",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/checkout/retour",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/favoris",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
+      "destination": "/index.html"
+    }
   ]
 }

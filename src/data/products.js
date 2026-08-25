@@ -3106,32 +3106,24 @@ export const PRODUCTS = [
   {
     "id": "kit-digi-max-geekvape-89",
     "name": "Kit Digi Max GeekVape",
-    "category": "eliquide",
+    "category": "ecig",
     "brand": "Geekvape",
-    "type": "E-liquide",
-    "price": 5.9,
-    "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 175,
+    "type": "Kit complet",
+    "price": 54.90,
+    "oldPrice": 64.90,
+    "rating": 4.8,
+    "reviews": 12,
     "stock": 44,
-    "badge": null,
-    "nicotine": [
-      0,
-      3,
-      6,
-      12,
-      16
-    ],
-    "flavors": [
-      "Kit Digi Max GeekVape"
-    ],
-    "colors": [],
-    "short": "Un produit de qualité sélectionné par THEKLOPE pour sa fiabilité et ses saveurs.",
-    "long": "Découvrez Kit Digi Max GeekVape, un produit de référence rigoureusement testé par notre équipe. Parfaitement adapté à un usage quotidien, il garantit durabilité et performance constante.",
+    "badge": "nouveau",
+    "colors": ["Noir", "Argent", "Bleu", "Gunmetal"],
+    "short": "Le kit ultime de Geekvape avec écran tactile HD et 80W de puissance.",
+    "long": "Le Kit Digi Max de GeekVape est la toute dernière innovation en matière de cigarette électronique. Équipé d'un écran tactile massif et du célèbre clearomiseur Z Subohm, il délivre jusqu'à 80W de puissance pour une vape aérienne parfaite. L'alliance ultime entre technologie et rendu des saveurs.",
     "specs": {
-      "Contenance": "10 ml",
-      "Origine": "Fabriqué en France",
-      "Ratio": "50 PG / 50 VG"
+      "Autonomie": "3000 mAh (Intégrée)",
+      "Puissance Max": "80 Watts",
+      "Tirage": "Aérien (DL)",
+      "Contenance": "5 ml",
+      "Écran": "Tactile Couleur HD"
     },
     "images": [
       "/products/Kit Digi Max - GeekVape.jpg"
@@ -10732,8 +10724,7 @@ const STATIC_CATALOG_CORRECTIONS = {
   },
   // Ces anciennes références n'existent plus dans le catalogue live. Elles
   // restent consultables en local mais ne peuvent plus être ajoutées au panier.
-  'gtx-70': { stock: 0, badge: null },
-  'kit-digi-max-geekvape-89': { stock: 0, badge: null },
+  'gtx-70': { stock: 0, badge: null }
 };
 
 PRODUCTS.forEach((product) => {

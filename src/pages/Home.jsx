@@ -95,8 +95,8 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="Vape Shop Marseille & Boutique Vape en Ligne | THEKLOPE"
-        description="Boutique de vape et e-liquides à Marseille et en ligne. Découvrez nos kits, pods, e-liquides et produits DIY. Livraison rapide 24/48h et conseils d'experts."
+        title="Boutique Cigarette Électronique, E-liquides & Puffs à Marseille | THEKLOPE"
+        description="Boutique de cigarette électronique et vape à Marseille (et en ligne). Large choix de kits, pods, puffs et e-liquides au meilleur prix. Expédition 24/48h."
         schema={homeSchema}
       />
 
