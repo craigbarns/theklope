@@ -69,9 +69,53 @@ export function searchRelatedProducts({ products = [], query = '', currentProduc
 export function resolveRelatedProducts(product, products = []) {
   if (!product) return []
   const productsById = new Map(products.map((item) => [item.id, item]))
-  return normalizeRelatedProductIds(product.relatedProductIds, product.id)
+  const manualRelated = normalizeRelatedProductIds(product.relatedProductIds, product.id)
     .map((id) => productsById.get(id))
     .filter(Boolean)
+
+  if (manualRelated.length >= 4) return manualRelated.slice(0, 4)
+
+  // -- SEO & Conversion : Génération automatique de Cross-Sell si vide ou incomplet --
+  const autoRelated = new Set(manualRelated.map((p) => p.id))
+  const suggestions = [...manualRelated]
+
+  const addSuggestion = (p) => {
+    if (suggestions.length >= 4 || autoRelated.has(p.id) || p.id === product.id) return
+    autoRelated.add(p.id)
+    suggestions.push(p)
+  }
+
+  // Helper pour trouver des produits selon des critères
+  const findProducts = (condition, limit = 4) => {
+    for (const p of products) {
+      if (suggestions.length >= 4) break
+      if (condition(p) && p.stock > 0) addSuggestion(p)
+    }
+  }
+
+  const pCat = product.category || ''
+  const pBrand = product.brand || ''
+
+  if (['ecig', 'pod', 'pack'].includes(pCat)) {
+    // 1. Matériel : Recommander en priorité les résistances ou cartouches de la MÊME MARQUE
+    findProducts((p) => ['resistance', 'cartouches', 'accessoire'].includes(p.category) && p.brand === pBrand)
+    // 2. Compléter avec des E-liquides adaptés (Sels de nicotine pour les pods)
+    findProducts((p) => p.category === 'eliquide' && (pCat === 'pod' ? p.name.toLowerCase().includes('sel') : true))
+  } else if (pCat === 'eliquide' || pCat.startsWith('eliquide-')) {
+    // 1. E-liquide : Recommander d'autres e-liquides de la même marque
+    findProducts((p) => p.category === 'eliquide' && p.brand === pBrand)
+    // 2. Compléter avec les best-sellers e-liquides
+    findProducts((p) => p.category === 'eliquide' && p.badge === 'best-seller')
+  } else if (pCat.startsWith('diy-')) {
+    // 1. DIY : Recommander les boosters et bases
+    findProducts((p) => ['diy-bases', 'diy-boosters', 'diy-aromes'].includes(p.category))
+  } else {
+    // Fallback : produits de la même marque ou même catégorie
+    findProducts((p) => p.brand === pBrand && p.category === pCat)
+    findProducts((p) => p.category === pCat)
+  }
+
+  return suggestions.slice(0, 4)
 }
 
 export function resolveCartRelatedProducts(cartDetailed = [], products = []) {

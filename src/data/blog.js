@@ -1,6 +1,14 @@
-function buildContent({ intro, sections, faq = [] }) {
+function buildContent({ intro, sections, faq = [], cta = null }) {
+  const ctaHtml = cta ? `
+    <div class="my-10 rounded-3xl border border-neon/40 bg-neon/5 p-8 text-center shadow-[0_0_30px_rgba(20,255,0,0.1)]">
+      <h3 class="font-display text-2xl font-bold text-white">${cta.title}</h3>
+      <p class="mt-3 text-ash">${cta.text}</p>
+      <a href="${cta.link}" class="btn-primary mt-6 inline-flex">${cta.button}</a>
+    </div>
+  ` : ''
+
   return `
-    <p>${intro}</p>
+    <p class="text-lg text-ash leading-relaxed">${intro}</p>
     ${sections
       .map(
         (section) => `
@@ -9,6 +17,7 @@ function buildContent({ intro, sections, faq = [] }) {
         `,
       )
       .join('')}
+    ${ctaHtml}
     <h2>Questions fréquentes</h2>
     ${faq
       .map(
@@ -35,6 +44,7 @@ const makePost = ({
   intro,
   sections,
   faq,
+  cta = null,
   relatedProductIds = [],
 }) => ({
   slug,
@@ -47,7 +57,7 @@ const makePost = ({
   category,
   image,
   summary,
-  content: buildContent({ intro, sections, faq }),
+  content: buildContent({ intro, sections, faq, cta }),
   relatedProductIds,
 })
 
@@ -264,6 +274,12 @@ export const BLOG_POSTS = [
         a: 'Retrouvez l’équipe THEKLOPE dans notre boutique physique située au 188 Rue de Rome, 13006 Marseille. Nos conseillers vous accompagnent pour tester les matériels et choisir le dosage idéal.',
       },
     ],
+    cta: {
+      title: 'Besoin d\'aide pour créer votre pack sur-mesure ?',
+      text: 'Utilisez notre Configurateur Intelligent. Composez votre pack (Cigarette + E-liquide + Accessoires) et profitez d\'une remise immédiate de 15%.',
+      link: '/configurateur',
+      button: 'Lancer le Configurateur THEKLOPE (-15%)',
+    },
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'q16-pro-146', 'doric-astra-2500mah-voopoo-271'],
   }),
   makePost({
@@ -1258,6 +1274,12 @@ export const BLOG_POSTS = [
         a: 'Oui, mais les saveurs ne seront pas encore parfaitement diffusées. Le goût sera bien plus riche après quelques jours de repos (steep).',
       },
     ],
+    cta: {
+      title: 'Ne vous trompez plus dans vos dosages !',
+      text: 'Combien de boosters de nicotine faut-il ? Combien de ml d\'arôme concentré ? Laissez notre calculette gratuite faire le travail pour vous.',
+      link: '/calculette-diy',
+      button: 'Ouvrir la Calculette DIY',
+    },
     relatedProductIds: ['fr-m-10ml-alfaliquid-76'],
   }),
   makePost({

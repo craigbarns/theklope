@@ -36,36 +36,32 @@ export const CATEGORY_SEO = {
     ],
   },
   pods: {
-    seoTitle: 'Pods rechargeables et cigarettes électroniques compactes',
-    metaDescription:
-      'Pods rechargeables pour adultes : formats compacts, cartouches compatibles, tirage serré ou polyvalent. Sélection THEKLOPE, livraison en France.',
-    h1: 'Pods rechargeables pour adultes',
-    intro:
-      'Les pods rechargeables sont des cigarettes électroniques compactes pensées pour une utilisation simple. Ils conviennent aux vapoteurs majeurs qui recherchent un format discret, facile à transporter et à entretenir.',
+    seoTitle: 'Pods Rechargeables : La Petite Cigarette Électronique | THEKLOPE',
+    metaDescription: 'Découvrez notre sélection de pods rechargeables. Le format de cigarette électronique compact, discret et idéal pour débuter. Expédition 24h/48h.',
+    h1: 'Pods Rechargeables & Cigarettes Électroniques Compactes',
+    intro: 'Les pods rechargeables sont des cigarettes électroniques compactes, simples et parfaites pour débuter ou comme matériel d\'appoint. Discrets et faciles à transporter, ils sont idéaux pour les e-liquides aux sels de nicotine ou avec un taux de propylène glycol (PG) élevé.',
     sections: [
       {
-        title: 'Pod rechargeable ou kit classique ?',
-        text:
-          'Le pod mise sur la simplicité : batterie intégrée, cartouche remplaçable ou rechargeable, réglages limités. Un kit classique offre souvent plus d’autonomie et de personnalisation.',
+        title: 'Pourquoi choisir un pod rechargeable ?',
+        text: 'Le pod se démarque par sa grande simplicité d’utilisation. Sans réglages complexes, il suffit souvent de clipser une cartouche aimantée et d’aspirer. C’est la meilleure transition vers la vape pour un fumeur adulte cherchant une expérience au tirage serré (MTL) proche d’une cigarette classique.',
       },
       {
-        title: 'Vérifier les cartouches compatibles',
-        text:
-          'Avant d’acheter, contrôlez la compatibilité des cartouches, des résistances et du ratio PG/VG recommandé. Une mauvaise association peut provoquer fuites, goût de brûlé ou usure prématurée.',
+        title: 'Pod rechargeable vs Puff : Le choix écologique et économique',
+        text: 'Contrairement aux puffs jetables bientôt interdites, le pod rechargeable vous permet de conserver la batterie et de ne changer que la résistance ou la cartouche, tout en remplissant vous-même votre e-liquide. Un choix beaucoup plus économique sur le long terme.',
       },
     ],
     faq: [
       {
-        q: 'Un pod rechargeable remplace-t-il une puff jetable ?',
-        a: 'Un pod rechargeable peut être une alternative plus durable à une puff jetable lorsqu’il est utilisé par un adulte et avec des consommables compatibles.',
+        q: 'Quel e-liquide choisir pour un pod ?',
+        a: 'Un pod fonctionne avec des résistances de faible puissance. Privilégiez des e-liquides contenant au moins 50% de propylène glycol (PG), comme le 50/50, 70/30 ou les e-liquides aux sels de nicotine.',
       },
       {
-        q: 'Quel e-liquide utiliser dans un pod ?',
-        a: 'La plupart des pods fonctionnent avec des e-liquides fluides, souvent en 50/50 PG/VG. Il faut toujours vérifier la notice du fabricant.',
+        q: 'Quand faut-il changer la cartouche de son pod ?',
+        a: 'La durée de vie d\'une cartouche ou d\'une résistance de pod est généralement d\'une à deux semaines, selon votre consommation. Un goût de brûlé ou une baisse de vapeur sont les signes qu\'il faut la remplacer.',
       },
       {
-        q: 'Quand changer une cartouche de pod ?',
-        a: 'Il faut la remplacer en cas de goût altéré, fuite persistante, baisse de rendu ou résistance usée.',
+        q: 'Un pod est-il suffisant pour arrêter de fumer ?',
+        a: 'Associé au bon taux de nicotine (ou aux sels de nicotine), un pod rechargeable est souvent le matériel le plus efficace pour réussir son sevrage tabagique grâce à son tirage adapté.',
       },
     ],
   },
@@ -104,32 +100,32 @@ export const CATEGORY_SEO = {
     ],
   },
   'e-liquides-sels-de-nicotine': {
-    seoTitle: 'E-liquides aux Sels de Nicotine',
-    metaDescription:
-      'Retrouvez la sensation des puffs avec les e-liquides aux sels de nicotine. Douceur en gorge, assimilation rapide et sevrage efficace. Réservé aux adultes.',
+    seoTitle: 'E-liquides Sels de Nicotine : Retrouvez le Goût de la Puff | THEKLOPE',
+    metaDescription: 'Découvrez notre gamme e-liquides aux sels de nicotine. Retrouvez la saveur intense de la puff, une douceur en gorge et un apport rapide en nicotine. Livraison 24h.',
     h1: 'E-liquides aux Sels de Nicotine',
-    intro:
-      'Les e-liquides aux sels de nicotine sont la solution idéale pour les vapoteurs cherchant une assimilation rapide de la nicotine avec un passage en gorge (hit) très doux. Ils reproduisent exactement la sensation des puffs jetables.',
+    intro: 'Les e-liquides aux sels de nicotine ont révolutionné la vape. Ils permettent de vapoter avec un taux de nicotine élevé (jusqu\'à 20mg) sans aucune irritation en gorge. C\'est exactement la même technologie que l\'on retrouve dans les puffs jetables, mais en format flacon 10ml, beaucoup plus économique et écologique.',
     sections: [
       {
-        title: 'Pourquoi choisir les sels de nicotine ?',
-        text:
-          'Contrairement à la nicotine classique (freebase), le sel de nicotine permet de vapoter avec un taux élevé (10mg ou 20mg) sans irriter la gorge. C\'est le choix numéro un pour réussir son sevrage tabagique sans sensation de manque.',
+        title: 'Le meilleur choix pour remplacer votre puff',
+        text: 'Avec l\'interdiction des puffs jetables, l\'association d\'un e-liquide aux sels de nicotine avec un petit Pod rechargeable est la seule alternative légale pour retrouver exactement la même sensation, le même goût sucré et frais, et le même niveau de satisfaction.',
       },
       {
-        title: 'Quel matériel utiliser avec des sels de nicotine ?',
-        text:
-          'Les e-liquides aux sels de nicotine doivent être utilisés avec du matériel peu puissant : des pods compacts ou des résistances supérieures à 1.0 ohm. Une puissance trop forte délivrerait trop de nicotine d\'un coup.',
+        title: 'Matériel compatible : Attention aux réglages !',
+        text: 'Les e-liquides aux sels de nicotine sont conçus pour être vaporisés à faible puissance (généralement entre 10 et 15 watts) avec des résistances supérieures ou égales à 1.0 ohm. L\'utilisation sur un matériel sub-ohm puissant est fortement déconseillée.',
       },
     ],
     faq: [
       {
-        q: 'Est-ce le même liquide que dans les puffs ?',
-        a: 'Absolument. Les puffs jetables utilisaient massivement des sels de nicotine à 20 mg/ml pour offrir une grande douceur. En passant au sel de nicotine en flacon, vous retrouverez exactement la même vape.',
+        q: 'Quelle est la différence entre sel de nicotine et nicotine classique ?',
+        a: 'La nicotine classique (nicotine base) procure un "hit" (sensation en gorge) fort, qui peut faire tousser à des taux élevés. Le sel de nicotine a un pH plus neutre, offrant un passage en gorge très doux même à 20 mg/ml, avec une absorption par le corps beaucoup plus rapide.',
       },
       {
-        q: 'Peut-on vapoter du sel de nicotine toute la journée ?',
-        a: 'Oui, mais comme l\'assimilation est très rapide, vos besoins sont vite comblés. Il est conseillé d\'espacer un peu plus ses bouffées qu\'avec un e-liquide classique.',
+        q: 'Quel taux de sel de nicotine choisir ?',
+        a: 'Les sels de nicotine sont généralement proposés en 10 mg/ml (pour les fumeurs moyens ou vapoteurs réguliers) et en 20 mg/ml (pour les gros fumeurs en phase de sevrage ou les utilisateurs de puffs).',
+      },
+      {
+        q: 'Puis-je utiliser du sel de nicotine sur une grosse cigarette électronique ?',
+        a: 'Non. Il faut impérativement utiliser un petit matériel (type Pod) ou un clearomiseur avec un tirage serré (MTL) et une résistance d\'au moins 1.0 ohm. Une puissance trop élevée vaporiserait trop de nicotine d\'un coup.',
       },
     ],
   },
@@ -456,28 +452,28 @@ for (const cat of CATEGORIES) {
     const isBrand = cat.slug.startsWith('marque-')
     const name = cat.name
     CATEGORY_SEO[cat.slug] = {
-      seoTitle: isBrand ? `${name} : Matériel & E-liquides` : `${name} pour vape`,
-      metaDescription: `Retrouvez la sélection ${name} chez THEKLOPE. Produits garantis originaux, conseils d'experts et livraison 24/48h.`.slice(0, 155),
-      h1: isBrand ? `Boutique ${name}` : name,
-      intro: `Découvrez tous les produits ${name} disponibles chez THEKLOPE. Une sélection rigoureuse pour satisfaire les vapoteurs majeurs.`,
+      seoTitle: isBrand ? `Acheter ${name} : Cigarette Électronique & E-liquide | THEKLOPE` : `${name} pour vape`,
+      metaDescription: `Retrouvez toute la gamme ${name} chez THEKLOPE : kits, pods, résistances et e-liquides. Produits 100% originaux. Expédition 24/48h.`.slice(0, 155),
+      h1: isBrand ? `Cigarette électronique, pods et e-liquides ${name}` : name,
+      intro: `Explorez notre catalogue complet de produits **${name}**. Reconnue dans le monde de la vape pour la fiabilité de ses modèles et la qualité de ses saveurs, la marque ${name} propose du matériel et des e-liquides adaptés aux vapoteurs débutants comme expérimentés.`,
       sections: [
         {
-          title: `Pourquoi choisir ${name} ?`,
-          text: `La gamme ${name} se distingue par la qualité de sa fabrication, le respect des normes et une restitution optimale des saveurs.`,
+          title: `L'expertise ${name} dans la vape`,
+          text: `La gamme de cigarettes électroniques et de e-liquides ${name} est pensée pour offrir une restitution parfaite des saveurs et une excellente durée de vie. Le fabricant s'impose des normes strictes pour garantir une vape sécurisée et agréable aux adultes.`,
         },
         {
-          title: `Conseils & Compatibilité ${name}`,
-          text: `Vérifiez toujours la compatibilité des consommables et du matériel ${name} avant votre achat. Notre équipe est disponible pour vous guider.`,
+          title: `Comment bien choisir son produit ${name} ?`,
+          text: `Pour le matériel ${name}, vérifiez la compatibilité des résistances ou cartouches. Un pod compact sera parfait avec des e-liquides en 50/50 ou sels de nicotine, tandis qu'un kit puissant nécessitera un e-liquide avec un taux de Glycérine Végétale (VG) plus élevé. En cas de doute, notre service client THEKLOPE est là pour vous conseiller.`,
         },
       ],
       faq: [
         {
-          q: `Les références ${name} sont-elles d'origine ?`,
-          a: `Oui, l'ensemble des produits ${name} est issu des canaux de distribution officiels et certifiés.`,
+          q: `Les produits ${name} vendus sur THEKLOPE sont-ils authentiques ?`,
+          a: `Oui, absolument. Nous travaillons en direct avec les distributeurs officiels. L'ensemble du matériel et des e-liquides ${name} est certifié 100% d'origine.`,
         },
         {
-          q: `Quel est le délai d'expédition pour ${name} ?`,
-          a: `Toute commande validée avant 14h est expédiée le jour même depuis nos stocks en France.`,
+          q: `Quel est le délai de livraison pour une commande de la marque ${name} ?`,
+          a: `Si le produit est affiché en stock, toute commande validée avant 14h est expédiée le jour même (jours ouvrés). La livraison prend généralement 24 à 48 heures en France métropolitaine.`,
         },
       ],
     }

@@ -145,19 +145,15 @@ let count = 0
 // ---- Produits ----
 for (const p of PRODUCTS) {
   const catKey = getProductCategoryKey(p)
-  // Cherche par clé ET par slug : `p.category` peut déjà être un slug ou une
-  // clé inconnue du catalogue distant. Sans correspondance, on évite à tout
-  // prix de construire /categorie/<clé brute> (404) : on pointe vers /boutique.
   const cat = CATEGORIES.find((c) => c.key === catKey || c.slug === catKey || c.slug === p.category)
-  const catLabel = cat ? cat.name : catKey
+  const catLabel = cat ? cat.name : (p.type || catKey)
   const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
-  const brandName = p.brand || ''
-  const hasBrandInName = brandName && p.name.toLowerCase().includes(brandName.toLowerCase())
-  const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
-  const title = `Acheter ${p.name}${brandSuffix} | THEKLOPE`
-  const brandMention = brandName ? ` par ${brandName}` : ''
+  const brandName = p.brand || 'THEKLOPE'
+  
+  // SEO Optimization : Title plus sémantique
+  const title = `${p.name} - ${brandName} | ${catLabel} | THEKLOPE`
   const shortDesc = p.short ? ` ${p.short}` : ''
-  const description = `Acheter ${p.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
+  const description = `Achetez la ${catLabel.toLowerCase()} ${p.name} par ${brandName} au meilleur prix. ${shortDesc} Expédition 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -214,7 +210,7 @@ for (const p of PRODUCTS) {
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <a href="${esc(catPath)}">${esc(catLabel)}</a></nav>
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
       <div><div class="card relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-2">
-        <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(p.name)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
+        <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(catLabel)} ${esc(p.name)} par ${esc(brandName)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
       </div></div>
       <div>
         <p class="text-xs uppercase tracking-wider text-faint">${esc(p.brand || 'THEKLOPE')} · ${esc(p.type || catLabel)}</p>
