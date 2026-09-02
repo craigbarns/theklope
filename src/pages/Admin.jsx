@@ -86,8 +86,8 @@ const checkoutReviewReasonLabel = {
   refund_intent_exceeds_remaining: 'solde de remboursement modifié',
   legacy_paid_cancelled_unreconciled: 'ancienne annulation payée à réconcilier',
 }
-// L'expédition ou la mise à disposition passe par /api/mark-shipped, la remise
-// par /api/mark-delivered et l'annulation par /api/cancel-order. Le select ne
+// L'expédition, la mise à disposition et la remise passent par
+// /api/mark-shipped ; l'annulation passe par /api/cancel-order. Le select ne
 // sert qu'à confirmer que le transporteur ou la boutique a remis la commande.
 const MANUAL_FULFILLMENT_STATUSES = new Set(['shipped', 'ready_for_pickup'])
 
@@ -131,7 +131,7 @@ export default function Admin() {
     const loadStatus = async () => {
       try {
         setMondialRelayStatusError('')
-        const response = await fetch('/api/mondial-relay/status', {
+        const response = await fetch('/api/mondial-relay?action=status', {
           headers: { Authorization: `Bearer ${token}` },
           signal: controller.signal,
         })
@@ -1109,7 +1109,7 @@ function MondialRelayControl({ order, adminSession, refreshRemoteData, status })
     setSearching(true)
     setFeedback(null)
     try {
-      const payload = await apiCall('/api/mondial-relay/relay-points', {
+      const payload = await apiCall('/api/mondial-relay?action=relay-points', {
         postcode: order.address?.zip,
         weightGrams,
       })
@@ -1135,7 +1135,7 @@ function MondialRelayControl({ order, adminSession, refreshRemoteData, status })
     setCreating(true)
     setFeedback(null)
     try {
-      const payload = await apiCall('/api/mondial-relay/create-label', {
+      const payload = await apiCall('/api/mondial-relay?action=create-label', {
         orderId: order.id,
         weightGrams,
         deliveryMode,
@@ -1167,7 +1167,7 @@ function MondialRelayControl({ order, adminSession, refreshRemoteData, status })
     setTrackingLoading(true)
     setFeedback(null)
     try {
-      const payload = await apiCall('/api/mondial-relay/tracking', { shipmentNumber })
+      const payload = await apiCall('/api/mondial-relay?action=tracking', { shipmentNumber })
       setTrackingData(payload)
       setFeedback({ ok: true, message: payload.summary || 'Suivi Mondial Relay actualisé.' })
     } catch (error) {
@@ -1442,7 +1442,7 @@ function SettingsPanel({
     setTestingMondialRelay(true)
     setMondialRelayTest(null)
     try {
-      const response = await fetch('/api/mondial-relay/relay-points', {
+      const response = await fetch('/api/mondial-relay?action=relay-points', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
