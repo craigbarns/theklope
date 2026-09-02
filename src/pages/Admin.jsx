@@ -117,6 +117,38 @@ export default function Admin() {
   const [editing, setEditing] = useState(null)
   const [query, setQuery] = useState('')
   const [actionError, setActionError] = useState('')
+  const [mondialRelayStatus, setMondialRelayStatus] = useState(null)
+  const [mondialRelayStatusError, setMondialRelayStatusError] = useState('')
+
+  useEffect(() => {
+    const token = adminSession?.access_token
+    if (!token) {
+      setMondialRelayStatus(null)
+      setMondialRelayStatusError('')
+      return undefined
+    }
+    const controller = new AbortController()
+    const loadStatus = async () => {
+      try {
+        setMondialRelayStatusError('')
+        const response = await fetch('/api/mondial-relay/status', {
+          headers: { Authorization: `Bearer ${token}` },
+          signal: controller.signal,
+        })
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok || payload.error) {
+          throw new Error(payload.error || 'Configuration Mondial Relay indisponible.')
+        }
+        setMondialRelayStatus(payload)
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          setMondialRelayStatusError(error.message || 'Configuration Mondial Relay indisponible.')
+        }
+      }
+    }
+    loadStatus()
+    return () => controller.abort()
+  }, [adminSession?.access_token])
 
   const filteredProducts = useMemo(() => {
     const term = query.trim().toLowerCase()
@@ -242,6 +274,9 @@ export default function Admin() {
             }
           }}
           markShipped={markShipped}
+          adminSession={adminSession}
+          refreshRemoteData={refreshRemoteData}
+          mondialRelayStatus={mondialRelayStatus}
           cancelOrder={adminSession ? async (orderId, reason) => {
             const response = await fetch('/api/cancel-order', {
               method: 'POST',
@@ -283,6 +318,9 @@ export default function Admin() {
           }}
           setTab={setTab}
           supabaseEnabled={supabaseEnabled}
+          adminSession={adminSession}
+          mondialRelayStatus={mondialRelayStatus}
+          mondialRelayStatusError={mondialRelayStatusError}
         />
       )}
     </div>
@@ -776,7 +814,15 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   )
 }
 
-function OrdersPanel({ orders, updateOrderStatus, markShipped, cancelOrder }) {
+function OrdersPanel({
+  orders,
+  updateOrderStatus,
+  markShipped,
+  cancelOrder,
+  adminSession,
+  refreshRemoteData,
+  mondialRelayStatus,
+}) {
   const reviewRequiredCount = orders.filter((order) => order.checkoutReviewRequiredAt).length
   return (
     <section className="card mt-8 p-5 sm:p-6">
@@ -886,6 +932,19 @@ function OrdersPanel({ orders, updateOrderStatus, markShipped, cancelOrder }) {
                 <MiniTotal label="Livraison" value={order.shippingCost === 0 ? 'Offerte' : formatPrice(order.shippingCost)} />
                 <MiniTotal label="Paiement" value={order.paymentStatus === 'paid' ? 'Payé' : order.paymentStatus} />
               </dl>
+
+              {adminSession
+                && order.paymentStatus === 'paid'
+                && order.shipping?.id !== 'pickup'
+                && !order.checkoutReviewRequiredAt
+                && ['processing', 'shipped'].includes(order.status) && (
+                <MondialRelayControl
+                  order={order}
+                  adminSession={adminSession}
+                  refreshRemoteData={refreshRemoteData}
+                  status={mondialRelayStatus}
+                />
+              )}
 
               {order.paymentStatus === 'paid'
                 && !order.checkoutReviewRequiredAt
@@ -1002,6 +1061,282 @@ function CancelOrderControl({ order, cancelOrder }) {
   )
 }
 
+function MondialRelayControl({ order, adminSession, refreshRemoteData, status }) {
+  const saved = order.shipping?.mondialRelay || {}
+  const [weightGrams, setWeightGrams] = useState(saved.weightGrams || 1000)
+  const [deliveryMode, setDeliveryMode] = useState(saved.deliveryMode || '24R')
+  const [relayId, setRelayId] = useState(saved.relayId || '')
+  const [points, setPoints] = useState([])
+  const [searching, setSearching] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [trackingLoading, setTrackingLoading] = useState(false)
+  const [createdLabel, setCreatedLabel] = useState(null)
+  const [trackingData, setTrackingData] = useState(null)
+  const [feedback, setFeedback] = useState(null)
+
+  useEffect(() => {
+    setWeightGrams(saved.weightGrams || 1000)
+    setDeliveryMode(saved.deliveryMode || '24R')
+    setRelayId(saved.relayId || '')
+  }, [saved.deliveryMode, saved.relayId, saved.weightGrams])
+
+  const labelUrl = createdLabel?.labelUrl || saved.labelUrl || ''
+  const shipmentNumber = createdLabel?.shipmentNumber || saved.shipmentNumber || order.shipping?.tracking || ''
+  const api1Configured = Boolean(status?.api1?.configured)
+  const api2Configured = Boolean(status?.api2?.configured)
+  const canCreate = order.status === 'processing' && !labelUrl
+
+  const apiCall = async (path, body) => {
+    const response = await fetch(path, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminSession.access_token}`,
+      },
+      body: JSON.stringify(body),
+    })
+    const payload = await response.json().catch(() => ({}))
+    if (!response.ok || payload.error) {
+      const error = new Error(payload.error || 'Action Mondial Relay impossible.')
+      error.payload = payload
+      throw error
+    }
+    return payload
+  }
+
+  const searchPoints = async () => {
+    if (searching) return
+    setSearching(true)
+    setFeedback(null)
+    try {
+      const payload = await apiCall('/api/mondial-relay/relay-points', {
+        postcode: order.address?.zip,
+        weightGrams,
+      })
+      setPoints(payload.points || [])
+      setFeedback({
+        ok: true,
+        message: payload.points?.length
+          ? `${payload.points.length} Point${payload.points.length > 1 ? 's' : ''} Relais ou Locker trouvé${payload.points.length > 1 ? 's' : ''}.`
+          : 'Aucun Point Relais disponible autour de cette adresse.',
+      })
+    } catch (error) {
+      setFeedback({ ok: false, message: error.message })
+    } finally {
+      setSearching(false)
+    }
+  }
+
+  const createLabel = async () => {
+    if (creating) return
+    if (!window.confirm(
+      'Créer cette expédition réelle dans Mondial Relay ? Vérifiez le poids, le mode de livraison et le Point Relais avant de continuer.',
+    )) return
+    setCreating(true)
+    setFeedback(null)
+    try {
+      const payload = await apiCall('/api/mondial-relay/create-label', {
+        orderId: order.id,
+        weightGrams,
+        deliveryMode,
+        relayId,
+      })
+      setCreatedLabel({ labelUrl: payload.labelUrl, shipmentNumber: payload.shipmentNumber })
+      setFeedback({
+        ok: true,
+        message: payload.reused
+          ? 'L’étiquette existante a été récupérée sans créer de doublon.'
+          : 'Expédition créée. Le numéro de suivi est prêt et le PDF peut être imprimé.',
+      })
+      await refreshRemoteData()
+    } catch (error) {
+      if (error.payload?.recoveryRequired && error.payload?.labelUrl) {
+        setCreatedLabel({
+          labelUrl: error.payload.labelUrl,
+          shipmentNumber: error.payload.shipmentNumber,
+        })
+      }
+      setFeedback({ ok: false, message: error.message })
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const loadTracking = async () => {
+    if (trackingLoading || !shipmentNumber) return
+    setTrackingLoading(true)
+    setFeedback(null)
+    try {
+      const payload = await apiCall('/api/mondial-relay/tracking', { shipmentNumber })
+      setTrackingData(payload)
+      setFeedback({ ok: true, message: payload.summary || 'Suivi Mondial Relay actualisé.' })
+    } catch (error) {
+      setFeedback({ ok: false, message: error.message })
+    } finally {
+      setTrackingLoading(false)
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-fuchsia-400/25 bg-fuchsia-500/5 p-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-white">Mondial Relay</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted">
+            Recherche Point Relais via API 1 · création et PDF 10 × 15 via API 2.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-wide">
+          <span className={`rounded-full border px-2.5 py-1 ${api1Configured ? 'border-neon/30 text-neon' : 'border-amber-300/30 text-amber-200'}`}>
+            API 1 {api1Configured ? 'connectée' : 'à configurer'}
+          </span>
+          <span className={`rounded-full border px-2.5 py-1 ${api2Configured ? 'border-neon/30 text-neon' : 'border-amber-300/30 text-amber-200'}`}>
+            API 2 {api2Configured ? status?.api2?.environment : 'à configurer'}
+          </span>
+        </div>
+      </div>
+
+      {labelUrl ? (
+        <div className="mt-4 flex flex-col gap-3 rounded-xl border border-neon/20 bg-neon/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold text-white">Expédition {shipmentNumber}</p>
+            <p className="mt-1 text-xs text-muted">
+              {saved.deliveryMode === '24R' && saved.relayId ? `Point Relais ${saved.relayId} · ` : ''}
+              {saved.weightGrams ? `${saved.weightGrams} g` : 'Poids enregistré'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <a href={labelUrl} target="_blank" rel="noreferrer" className="btn-primary shrink-0">
+              Télécharger le PDF
+            </a>
+            <button type="button" onClick={loadTracking} disabled={trackingLoading || !api1Configured} className="btn-ghost shrink-0 disabled:opacity-50">
+              {trackingLoading ? 'Actualisation…' : 'Actualiser le suivi'}
+            </button>
+          </div>
+        </div>
+      ) : canCreate ? (
+        <>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted">Poids du colis (g)</span>
+              <input
+                type="number"
+                min="10"
+                max="30000"
+                step="10"
+                value={weightGrams}
+                onChange={(event) => setWeightGrams(event.target.value)}
+                className="input"
+              />
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-muted">Mode Mondial Relay</span>
+              <select
+                value={deliveryMode}
+                onChange={(event) => {
+                  setDeliveryMode(event.target.value)
+                  setFeedback(null)
+                }}
+                className="input"
+              >
+                <option value="24R">Point Relais / Locker</option>
+                <option value="HOM">Domicile (si prévu au contrat)</option>
+              </select>
+            </label>
+            {deliveryMode === '24R' && (
+              <label className="block">
+                <span className="mb-1.5 block text-xs font-medium text-muted">Code Point Relais</span>
+                <input
+                  value={relayId}
+                  onChange={(event) => setRelayId(event.target.value.toUpperCase())}
+                  placeholder="FR-12345"
+                  className="input"
+                />
+              </label>
+            )}
+          </div>
+
+          {deliveryMode === '24R' && (
+            <div className="mt-3">
+              <button type="button" onClick={searchPoints} disabled={searching || !api1Configured} className="btn-ghost disabled:opacity-50">
+                {searching ? 'Recherche…' : `Rechercher autour de ${order.address?.zip || 'l’adresse'}`}
+              </button>
+              {!api1Configured && (
+                <p className="mt-2 text-xs text-amber-200">Configure l’API 1 ou saisis manuellement le code du Point Relais choisi avec le client.</p>
+              )}
+              {points.length > 0 && (
+                <div className="mt-3 grid gap-2 lg:grid-cols-2">
+                  {points.map((point) => (
+                    <label
+                      key={point.id}
+                      className={`flex cursor-pointer gap-3 rounded-xl border p-3 transition ${relayId === point.id ? 'border-neon/50 bg-neon/10' : 'border-white/10 bg-white/[0.02] hover:border-white/25'}`}
+                    >
+                      <input
+                        type="radio"
+                        name={`mondial-relay-${order.id}`}
+                        value={point.id}
+                        checked={relayId === point.id}
+                        onChange={() => setRelayId(point.id)}
+                        className="mt-1 accent-emerald-400"
+                      />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-white">{point.name || point.id}</span>
+                        <span className="mt-0.5 block text-xs text-muted">
+                          {[point.address, point.postcode, point.city].filter(Boolean).join(' · ')}
+                          {point.distanceMeters ? ` · ${point.distanceMeters < 1000 ? `${point.distanceMeters} m` : `${(point.distanceMeters / 1000).toFixed(1)} km`}` : ''}
+                        </span>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+              <p className="mt-3 text-xs leading-relaxed text-amber-100/80">
+                Le checkout actuel n’enregistre pas encore le choix du client : confirme le Point Relais avec lui avant de créer l’expédition.
+              </p>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={createLabel}
+            disabled={creating || !api2Configured || (deliveryMode === '24R' && !relayId)}
+            className="btn-primary mt-4 disabled:opacity-50"
+          >
+            {creating ? 'Création en cours…' : 'Créer l’expédition & le PDF'}
+          </button>
+          {!api2Configured && (
+            <p className="mt-2 text-xs text-amber-200">Les identifiants API 2 sont requis pour activer ce bouton.</p>
+          )}
+        </>
+      ) : (
+        <p className="mt-4 text-xs text-muted">La commande est déjà expédiée sans étiquette Mondial Relay enregistrée.</p>
+      )}
+
+      {trackingData?.events?.length > 0 && (
+        <div className="mt-4 rounded-xl border border-white/10 bg-noir/30 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-fuchsia-200">Derniers événements</p>
+          <ol className="mt-3 space-y-2">
+            {trackingData.events.slice(0, 5).map((event, index) => (
+              <li key={`${event.date}-${event.time}-${index}`} className="text-xs text-muted">
+                <strong className="text-white">{event.label || 'Mise à jour'}</strong>
+                {[event.date, event.time, event.location].filter(Boolean).length > 0
+                  ? ` · ${[event.date, event.time, event.location].filter(Boolean).join(' · ')}`
+                  : ''}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {feedback && (
+        <p role="status" className={`mt-3 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-300'}`}>
+          {feedback.message}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // Expédition avec suivi, ou notification distincte de mise à disposition pour
 // le retrait boutique. Le statut retourné par le serveur reste la source de vérité.
 function ShipControl({ order, markShipped }) {
@@ -1010,6 +1345,11 @@ function ShipControl({ order, markShipped }) {
   const [carrier, setCarrier] = useState(order.shipping?.carrier || '')
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState(null)
+
+  useEffect(() => {
+    setTracking(order.shipping?.tracking || '')
+    setCarrier(order.shipping?.carrier || '')
+  }, [order.shipping?.carrier, order.shipping?.tracking])
 
   const notified = isPickup
     ? ['ready_for_pickup', 'delivered'].includes(order.status)
@@ -1082,8 +1422,46 @@ function ShipControl({ order, markShipped }) {
   )
 }
 
-function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setTab, supabaseEnabled }) {
+function SettingsPanel({
+  products,
+  orders,
+  resetProducts,
+  clearAllProducts,
+  setTab,
+  supabaseEnabled,
+  adminSession,
+  mondialRelayStatus,
+  mondialRelayStatusError,
+}) {
   const catalogIssues = useMemo(() => findCatalogIssues(products), [products])
+  const [testingMondialRelay, setTestingMondialRelay] = useState(false)
+  const [mondialRelayTest, setMondialRelayTest] = useState(null)
+
+  const testMondialRelayApi1 = async () => {
+    if (!adminSession?.access_token || testingMondialRelay) return
+    setTestingMondialRelay(true)
+    setMondialRelayTest(null)
+    try {
+      const response = await fetch('/api/mondial-relay/relay-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminSession.access_token}`,
+        },
+        body: JSON.stringify({ postcode: '13006', weightGrams: 1000 }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok || payload.error) throw new Error(payload.error || 'Test API 1 impossible.')
+      setMondialRelayTest({
+        ok: true,
+        message: `Connexion confirmée : ${payload.points?.length || 0} Point${payload.points?.length > 1 ? 's' : ''} Relais trouvé${payload.points?.length > 1 ? 's' : ''} autour du 13006.`,
+      })
+    } catch (error) {
+      setMondialRelayTest({ ok: false, message: error.message || 'Test API 1 impossible.' })
+    } finally {
+      setTestingMondialRelay(false)
+    }
+  }
 
   const exportData = () => {
     const payload = JSON.stringify({ products, orders, exportedAt: new Date().toISOString() }, null, 2)
@@ -1098,6 +1476,59 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
 
   return (
     <div className="mt-8 grid gap-6 lg:grid-cols-3">
+      <section className="card border-fuchsia-400/25 bg-fuchsia-500/5 p-6 lg:col-span-3">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="eyebrow mb-2">Transport</p>
+            <h2 className="font-display text-xl font-bold text-white">Mondial Relay</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+              L’API 1 recherche les Points Relais et consulte le suivi. L’API 2 crée les expéditions réelles et fournit l’étiquette PDF 10 × 15 depuis chaque commande payée.
+            </p>
+          </div>
+          <div className="grid min-w-64 gap-2 sm:grid-cols-2">
+            <ConnectionBadge label="API 1 · Recherche/suivi" ready={mondialRelayStatus?.api1?.configured} loading={!mondialRelayStatus && !mondialRelayStatusError} />
+            <ConnectionBadge
+              label={`API 2 · Étiquettes${mondialRelayStatus?.api2?.environment ? ` (${mondialRelayStatus.api2.environment})` : ''}`}
+              ready={mondialRelayStatus?.api2?.configured}
+              loading={!mondialRelayStatus && !mondialRelayStatusError}
+            />
+          </div>
+        </div>
+        {mondialRelayStatus?.sender && (
+          <p className="mt-4 text-xs text-faint">
+            Expéditeur : {mondialRelayStatus.sender.name} · {mondialRelayStatus.sender.postcode} {mondialRelayStatus.sender.city}
+          </p>
+        )}
+        {mondialRelayStatusError && (
+          <p role="alert" className="mt-4 rounded-xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-xs text-rose-200">
+            {mondialRelayStatusError}
+          </p>
+        )}
+        {!mondialRelayStatus?.api2?.configured && mondialRelayStatus && (
+          <p className="mt-4 rounded-xl border border-amber-300/20 bg-amber-300/10 px-4 py-3 text-xs leading-relaxed text-amber-100">
+            API 2 inactive : dans Connect Mondial Relay, génère les identifiants d’API puis ajoute-les aux secrets serveur. Aucune clé ne doit être préfixée par VITE_ ni envoyée au navigateur.
+          </p>
+        )}
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={testMondialRelayApi1}
+            disabled={testingMondialRelay || !mondialRelayStatus?.api1?.configured}
+            className="btn-ghost disabled:opacity-50"
+          >
+            {testingMondialRelay ? 'Test en cours…' : 'Tester la recherche API 1'}
+          </button>
+          <button type="button" onClick={() => setTab('orders')} className="btn-primary">
+            Ouvrir les commandes
+          </button>
+          {mondialRelayTest && (
+            <span role="status" className={`text-xs ${mondialRelayTest.ok ? 'text-neon' : 'text-rose-300'}`}>
+              {mondialRelayTest.message}
+            </span>
+          )}
+        </div>
+      </section>
+
       <section className={`card p-6 lg:col-span-3 ${catalogIssues.length ? 'border-rose-400/25 bg-rose-500/5' : 'border-neon/20 bg-neon/5'}`}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
@@ -1180,6 +1611,17 @@ function SettingsPanel({ products, orders, resetProducts, clearAllProducts, setT
           et à la conformité légale complète.
         </p>
       </section>
+    </div>
+  )
+}
+
+function ConnectionBadge({ label, ready, loading }) {
+  return (
+    <div className={`rounded-xl border px-3 py-2 ${loading ? 'border-white/10 bg-white/[0.03]' : ready ? 'border-neon/25 bg-neon/5' : 'border-amber-300/25 bg-amber-300/5'}`}>
+      <p className="text-[11px] font-semibold text-white">{label}</p>
+      <p className={`mt-0.5 text-[11px] ${loading ? 'text-muted' : ready ? 'text-neon' : 'text-amber-200'}`}>
+        {loading ? 'Vérification…' : ready ? 'Configurée' : 'Non configurée'}
+      </p>
     </div>
   )
 }
@@ -1611,4 +2053,3 @@ function EmailingPanel() {
     </div>
   )
 }
-
