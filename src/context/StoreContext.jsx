@@ -832,7 +832,7 @@ export function StoreProvider({ children }) {
     }
     const token = adminSession?.access_token
     if (!token) throw new Error('Connexion admin requise.')
-    const res = await fetch('/api/mark-delivered', {
+    const res = await fetch('/api/mark-shipped?action=delivered', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ orderId }),
