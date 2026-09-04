@@ -66,14 +66,14 @@ export function searchRelatedProducts({ products = [], query = '', currentProduc
   })
 }
 
-export function resolveRelatedProducts(product, products = []) {
+export function resolveRelatedProducts(product, products = [], { fallback = false } = {}) {
   if (!product) return []
   const productsById = new Map(products.map((item) => [item.id, item]))
   const manualRelated = normalizeRelatedProductIds(product.relatedProductIds, product.id)
     .map((id) => productsById.get(id))
     .filter(Boolean)
 
-  if (manualRelated.length >= 4) return manualRelated.slice(0, 4)
+  if (!fallback || manualRelated.length >= 4) return manualRelated.slice(0, 4)
 
   // -- SEO & Conversion : Génération automatique de Cross-Sell si vide ou incomplet --
   const autoRelated = new Set(manualRelated.map((p) => p.id))

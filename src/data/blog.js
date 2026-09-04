@@ -80,7 +80,7 @@ export const BLOG_POSTS = [
       },
       {
         title: 'Performances : Un tirage MTL exceptionnel',
-        text: 'C\'est sur le rendu des saveurs que le XROS Pro se distingue de ses concurrents. Les cartouches XROS Series (dotées de la technologie COREX) offrent une durée de vie incroyable. Que vous vapotiez des fruités frais ou des sels de nicotine, le "hit" est parfait et la vapeur très dense pour un pod de cette taille.',
+        text: 'C\'est sur le rendu des saveurs que le XROS Pro se distingue de ses concurrents. Les <a href="/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50" class="text-neon hover:underline">cartouches XROS Series 3ml</a> (dotées de la technologie COREX) offrent une durée de vie incroyable. Que vous vapotiez des <a href="/categorie/e-liquides-fruites" class="text-neon hover:underline">e-liquides fruités</a> ou des <a href="/categorie/e-liquides-sels-de-nicotine" class="text-neon hover:underline">sels de nicotine</a>, le "hit" est parfait et la vapeur très dense pour un pod de cette taille.',
       },
       {
         title: 'Autonomie et recharge ultra-rapide',
@@ -88,7 +88,7 @@ export const BLOG_POSTS = [
       },
       {
         title: 'Notre Avis Final',
-        text: 'Le Vaporesso XROS Pro est sans conteste l\'un des meilleurs investissements pour arrêter de fumer ou pour remplacer une puff jetable. Il est intuitif, endurant et terriblement efficace.',
+        text: 'Le <a href="/categorie/marque-vaporesso" class="text-neon hover:underline">Vaporesso XROS Pro</a> est sans conteste l\'un des meilleurs investissements pour arrêter de fumer ou pour remplacer une <a href="/categorie/puffs-rechargeables" class="text-neon hover:underline">puff jetable</a>. Il est intuitif, endurant et terriblement efficace.',
       }
     ],
     faq: [
@@ -1277,11 +1277,11 @@ export const BLOG_POSTS = [
       },
       {
         title: 'Puffs rechargeables : l’alternative 100% légale',
-        text: 'Heureusement pour les anciens fumeurs, les vapes réutilisables (pods rechargeables en USB-C avec cartouches remplissables) restent totalement autorisées. Elles conservent la même compacité et le même tirage automatique sans bouton.',
+        text: 'Heureusement pour les anciens fumeurs, les <a href="/categorie/puffs-rechargeables" class="text-neon hover:underline">puffs rechargeables</a> (nos <a href="/categorie/pods" class="text-neon hover:underline">pods rechargeables compacts</a> avec cartouches remplissables) restent totalement autorisées. Elles conservent la même compacité et le même tirage automatique sans bouton.',
       },
       {
         title: 'Diviser son budget vape par 3',
-        text: 'Au-delà de la conformité, passer au pod rechargeable est extrêmement rentable. Une puff jetable coûte environ 9 € pour 600 bouffées (2 ml). Un flacon de 10 ml de e-liquide équivalent coûte environ 5,90 € et fournit 3000 bouffées !',
+        text: 'Au-delà de la conformité, passer au pod rechargeable est extrêmement rentable. Une puff jetable coûte environ 9 € pour 600 bouffées (2 ml). Un flacon de 10 ml d\'<a href="/categorie/e-liquides-sels-de-nicotine" class="text-neon hover:underline">e-liquide aux sels de nicotine</a> équivalent coûte environ 5,90 € et fournit 3000 bouffées !',
       },
     ],
     faq: [
@@ -1291,7 +1291,7 @@ export const BLOG_POSTS = [
       },
       {
         q: 'Quel pod choisir pour retrouver la sensation puff ?',
-        a: 'Les pods Vaporesso XROS, Oxva Xlim et Geekvape Wenax associés à un e-liquide aux sels de nicotine offrent exactement le même rendu et la même restitution des arômes.',
+        a: 'Les pods <a href="/categorie/marque-vaporesso" class="text-neon hover:underline">Vaporesso XROS</a>, <a href="/categorie/marque-oxva" class="text-neon hover:underline">OXVA Xlim</a> et <a href="/categorie/marque-geekvape" class="text-neon hover:underline">Geekvape</a> associés à un e-liquide aux sels de nicotine offrent exactement le même rendu et la même restitution des arômes.',
       },
     ],
     relatedProductIds: ['xros-4-mini-269', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
@@ -1318,7 +1318,7 @@ export const BLOG_POSTS = [
       },
       {
         title: 'Quel matériel utiliser ?',
-        text: 'Attention : le sel de nicotine ne doit PAS être vapoté à forte puissance ou en inhalation directe (DL). Privilégiez des pods ou clearomiseurs peu puissants avec des résistances supérieures à 0.8 ohm (10W à 18W).',
+        text: 'Attention : le sel de nicotine ne doit PAS être vapoté à forte puissance ou en inhalation directe (DL). Privilégiez nos <a href="/categorie/pods" class="text-neon hover:underline">pods rechargeables</a> ou des clearomiseurs avec des <a href="/categorie/resistances" class="text-neon hover:underline">résistances supérieures à 0.8 ohm</a> (10W à 18W). Retrouvez notre gamme d\'<a href="/categorie/e-liquides-sels-de-nicotine" class="text-neon hover:underline">e-liquides aux sels de nicotine</a>.',
       },
     ],
     faq: [

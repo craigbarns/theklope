@@ -36,7 +36,7 @@ export const CATEGORY_SEO = {
     ],
   },
   pods: {
-    seoTitle: 'Pods Rechargeables : La Petite Cigarette Électronique | THEKLOPE',
+    seoTitle: 'Pods Rechargeables : La Petite Cigarette Électronique',
     metaDescription: 'Découvrez notre sélection de pods rechargeables. Le format de cigarette électronique compact, discret et idéal pour débuter. Expédition 24h/48h.',
     h1: 'Pods Rechargeables & Cigarettes Électroniques Compactes',
     intro: 'Les pods rechargeables sont des cigarettes électroniques compactes, simples et parfaites pour débuter ou comme matériel d\'appoint. Discrets et faciles à transporter, ils sont idéaux pour les e-liquides aux sels de nicotine ou avec un taux de propylène glycol (PG) élevé.',
@@ -100,8 +100,8 @@ export const CATEGORY_SEO = {
     ],
   },
   'e-liquides-sels-de-nicotine': {
-    seoTitle: 'E-liquides Sels de Nicotine : Retrouvez le Goût de la Puff | THEKLOPE',
-    metaDescription: 'Découvrez notre gamme e-liquides aux sels de nicotine. Retrouvez la saveur intense de la puff, une douceur en gorge et un apport rapide en nicotine. Livraison 24h.',
+    seoTitle: 'E-liquides Sels de Nicotine : Retrouvez le Goût de la Puff',
+    metaDescription: 'E-liquides aux sels de nicotine : retrouvez la saveur intense de la puff, une douceur en gorge et un apport rapide en nicotine. Livraison rapide 24/48h.',
     h1: 'E-liquides aux Sels de Nicotine',
     intro: 'Les e-liquides aux sels de nicotine ont révolutionné la vape. Ils permettent de vapoter avec un taux de nicotine élevé (jusqu\'à 20mg) sans aucune irritation en gorge. C\'est exactement la même technologie que l\'on retrouve dans les puffs jetables, mais en format flacon 10ml, beaucoup plus économique et écologique.',
     sections: [
@@ -452,7 +452,7 @@ for (const cat of CATEGORIES) {
     const isBrand = cat.slug.startsWith('marque-')
     const name = cat.name
     CATEGORY_SEO[cat.slug] = {
-      seoTitle: isBrand ? `Acheter ${name} : Cigarette Électronique & E-liquide | THEKLOPE` : `${name} pour vape`,
+      seoTitle: isBrand ? `Acheter ${name} : Cigarette Électronique & E-liquide` : `${name} pour vape`,
       metaDescription: `Retrouvez toute la gamme ${name} chez THEKLOPE : kits, pods, résistances et e-liquides. Produits 100% originaux. Expédition 24/48h.`.slice(0, 155),
       h1: isBrand ? `Cigarette électronique, pods et e-liquides ${name}` : name,
       intro: `Explorez notre catalogue complet de produits **${name}**. Reconnue dans le monde de la vape pour la fiabilité de ses modèles et la qualité de ses saveurs, la marque ${name} propose du matériel et des e-liquides adaptés aux vapoteurs débutants comme expérimentés.`,

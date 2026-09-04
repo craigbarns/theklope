@@ -352,7 +352,7 @@
     },
     {
       "source": "/resistances/317-resistances-euc-vaporesso.html",
-      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "destination": "/categorie/resistances",
       "permanent": true
     },
     {
@@ -382,17 +382,17 @@
     },
     {
       "source": "/resistances/396-resistance-ub-max-lost-vape.html",
-      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "destination": "/categorie/resistances",
       "permanent": true
     },
     {
       "source": "/resistances/64-resistances-zenith-pro-r-10-ohm-innokin.html",
-      "destination": "/produit/kit-coolfire-z80-zenith-ii-innokin-88",
+      "destination": "/categorie/resistances-zenith-innokin",
       "permanent": true
     },
     {
       "source": "/clearomiseurs-reservoirs/68-clearomiseur-melo-4-d25-eleaf.html",
-      "destination": "/produit/granite-melon-66",
+      "destination": "/categorie/accessoires-clearo-tanks",
       "permanent": true
     },
     {
@@ -407,7 +407,7 @@
     },
     {
       "source": "/e-liquides-france/372-ushiro-100-ml-fighter-fuel.html",
-      "destination": "/produit/kit-aegis-max-2-max-100-geekvape-84",
+      "destination": "/categorie/e-liquides-100ml",
       "permanent": true
     },
     {
@@ -432,7 +432,7 @@
     },
     {
       "source": "/resistances/386-resistance-gti-vaporesso.html",
-      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "destination": "/categorie/resistances",
       "permanent": true
     },
     {
@@ -447,7 +447,7 @@
     },
     {
       "source": "/accus/4-accu-18650-vtc-6-3000-mah-30-a-sony.html",
-      "destination": "/produit/doric-astra-2500mah-voopoo-271",
+      "destination": "/categorie/accessoires-accus",
       "permanent": true
     },
     {
@@ -467,7 +467,7 @@
     },
     {
       "source": "/resistances/80-resistances-gt-core-vaporesso.html",
-      "destination": "/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50",
+      "destination": "/categorie/resistances",
       "permanent": true
     },
     {
@@ -517,7 +517,7 @@
     },
     {
       "source": "/e-liquides-monde/299-pack-20-heisenberg-10-ml-vampire-vape.html",
-      "destination": "/produit/kit-aegis-legend-5-et-z-subohm-5-geekvape-83",
+      "destination": "/categorie/marque-vampire-vape",
       "permanent": true
     },
     {
@@ -1151,6 +1151,10 @@
       "source": "/(.*)",
       "headers": [
         {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        },
+        {
           "key": "X-Content-Type-Options",
           "value": "nosniff"
         },
@@ -1169,6 +1173,24 @@
         {
           "key": "Content-Security-Policy",
           "value": "base-uri 'self'; frame-ancestors 'none'; object-src 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/fonts/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     },

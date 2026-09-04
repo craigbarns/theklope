@@ -153,7 +153,7 @@ for (const p of PRODUCTS) {
   // SEO Optimization : Title plus sémantique
   const title = `${p.name} - ${brandName} | ${catLabel} | THEKLOPE`
   const shortDesc = p.short ? ` ${p.short}` : ''
-  const description = `Achetez la ${catLabel.toLowerCase()} ${p.name} par ${brandName} au meilleur prix. ${shortDesc} Expédition 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
+  const description = `Achetez ${p.name} (${catLabel}) par ${brandName} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -165,6 +165,15 @@ for (const p of PRODUCTS) {
         description: p.long || p.short || p.name,
         sku: buildMerchantSku(p.id),
         brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
+        ...(p.rating && p.reviews ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: String(p.rating),
+            reviewCount: String(p.reviews),
+            bestRating: '5',
+            worstRating: '1',
+          },
+        } : {}),
         offers: {
           '@type': 'Offer',
           url: abs(path),
@@ -178,11 +187,11 @@ for (const p of PRODUCTS) {
           shippingDetails: {
             '@type': 'OfferShippingDetails',
             shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
-            shippingRate: { '@type': 'MonetaryAmount', value: '7.50', currency: 'EUR' },
+            shippingRate: { '@type': 'MonetaryAmount', value: (Number(p.price) || 0) >= 29 ? '0.00' : '7.50', currency: 'EUR' },
             deliveryTime: {
               '@type': 'ShippingDeliveryTime',
-              handlingTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
-              transitTime: { '@type': 'QuantitativeValue', minValue: 2, maxValue: 4, unitCode: 'DAY' },
+              handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+              transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
             },
           },
           hasMerchantReturnPolicy: {
@@ -254,7 +263,7 @@ for (const c of CATEGORIES) {
   // nouveautes/meilleures-ventes) pour que le HTML crawlable reflète l'app.
   const allInCat = productsByCategorySlugFrom(PRODUCTS, c.slug)
   const inCat = allInCat.slice(0, 40)
-  const title = `${seo?.seoTitle || c.name} | THEKLOPE`
+  const title = `${(seo?.seoTitle || c.name).replace(/\s*[|—–-]\s*THEKLOPE\s*$/i, '').trim()} | THEKLOPE`
   const description = (seo?.metaDescription || `${c.name} : ${c.tagline}. Sélection THEKLOPE, livraison France, paiement sécurisé. Vente réservée aux +18.`).slice(0, 160)
   const path = `/categorie/${c.slug}`
   const links = inCat.map((p) => `<li><a href="/produit/${esc(p.id)}">${esc(p.name)} — ${esc(fmtPrice(p.price))}</a></li>`).join('')

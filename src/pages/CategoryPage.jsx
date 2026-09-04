@@ -145,7 +145,7 @@ export default function CategoryPage() {
   return (
     <div className="container-page py-8">
       <Seo
-        title={`${seo?.seoTitle || category.name} | THEKLOPE`}
+        title={`${(seo?.seoTitle || category.name).replace(/\s*[|—–-]\s*THEKLOPE\s*$/i, '').trim()} | THEKLOPE`}
         description={seo?.metaDescription || `${category.name} — ${category.tagline}. Sélection THEKLOPE.`}
         schema={schema}
       />

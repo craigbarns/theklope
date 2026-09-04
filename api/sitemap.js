@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { createClient } from '@supabase/supabase-js'
 import { buildSitemapEntries, renderSitemapXml } from '../scripts/sitemap-data.mjs'
 
@@ -44,7 +46,17 @@ export default async function handler(req, res) {
 }
 
 function serveStaticFallback(res, reason) {
-  res.setHeader('Cache-Control', 'no-store')
-  res.setHeader('X-Sitemap-Fallback', reason)
-  return res.redirect(307, '/sitemap-static.xml')
+  try {
+    const staticXmlPath = resolve(process.cwd(), 'public/sitemap-static.xml')
+    const xml = readFileSync(staticXmlPath, 'utf-8')
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8')
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=3600')
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    res.setHeader('X-Sitemap-Fallback', reason)
+    return res.status(200).end(xml)
+  } catch (err) {
+    res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('X-Sitemap-Fallback', reason)
+    return res.redirect(301, '/sitemap-static.xml')
+  }
 }

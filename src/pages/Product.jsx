@@ -63,7 +63,7 @@ export default function Product() {
   const trackedProductRef = useRef(null)
   const variantsRef = useRef(null)
 
-  const relatedProducts = useMemo(() => resolveRelatedProducts(product, products), [product, products])
+  const relatedProducts = useMemo(() => resolveRelatedProducts(product, products, { fallback: true }), [product, products])
   const relatedGuides = useMemo(
     () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
     [product],
@@ -109,6 +109,15 @@ export default function Product() {
             "@type": "Brand",
             "name": product.brand || 'THEKLOPE'
           },
+          ...(product.rating && product.reviews ? {
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": String(product.rating),
+              "reviewCount": String(product.reviews),
+              "bestRating": "5",
+              "worstRating": "1"
+            }
+          } : {}),
           "category": categoryName(productCategoryKey),
           "offers": {
             "@type": "Offer",

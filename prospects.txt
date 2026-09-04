@@ -1,0 +1,93 @@
+🔍 Début du scan approfondi de prospection Netlinking...
+
+🌐 Analyse du domaine : https://fr.vapingpost.com...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ ⚠️ Aucun email trouvé. Probablement caché derrière un formulaire.
+
+🌐 Analyse du domaine : https://www.breakingvap.fr...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ✅ Trouvé !
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ 🎯 BINGO ! Emails extraits : [32mtom@breakingvap.fr[0m
+
+🌐 Analyse du domaine : https://www.aromes-et-liquides.fr...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ✅ Trouvé !
+  ├─ Check /about... ❌
+  └─ 🎯 BINGO ! Emails extraits : [32mexemple@exemple.com, votre@email.com[0m
+
+🌐 Analyse du domaine : https://vapest.fr...
+  ├─ Check / (accueil)... ✅ Trouvé !
+  ├─ Check /contact... ✅ Trouvé !
+  ├─ Check /a-propos... ✅ Trouvé !
+  ├─ Check /mentions-legales... ✅ Trouvé !
+  ├─ Check /contactez-nous... ✅ Trouvé !
+  ├─ Check /about... ✅ Trouvé !
+  └─ 🎯 BINGO ! Emails extraits : [32mcontact@vapest.fr[0m
+
+🌐 Analyse du domaine : https://www.youvape.fr...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ ⚠️ Aucun email trouvé. Probablement caché derrière un formulaire.
+
+🌐 Analyse du domaine : https://www.cigusto.com...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ ⚠️ Aucun email trouvé. Probablement caché derrière un formulaire.
+
+🌐 Analyse du domaine : https://www.blu.com...
+  ├─ Check / (accueil)... ✅ Trouvé !
+  ├─ Check /contact... ✅ Trouvé !
+  ├─ Check /a-propos... ✅ Trouvé !
+  ├─ Check /mentions-legales... ✅ Trouvé !
+  ├─ Check /contactez-nous... ✅ Trouvé !
+  ├─ Check /about... ✅ Trouvé !
+  └─ 🎯 BINGO ! Emails extraits : [32msupport-fr@blu.com, supoort-fr@blu.com, hello@petonevape.co.nz, john.doe@email.com, support-uk@blu.com[0m
+
+🌐 Analyse du domaine : https://vap-expert.fr...
+  ├─ Check / (accueil)... ✅ Trouvé !
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ 🎯 BINGO ! Emails extraits : [32mcontact.web@vap-expert.fr[0m
+
+🌐 Analyse du domaine : https://www.nicovip.com...
+  ├─ Check / (accueil)... ✅ Trouvé !
+  ├─ Check /contact... ✅ Trouvé !
+  ├─ Check /a-propos... ✅ Trouvé !
+  ├─ Check /mentions-legales... ✅ Trouvé !
+  ├─ Check /contactez-nous... ✅ Trouvé !
+  ├─ Check /about... ✅ Trouvé !
+  └─ 🎯 BINGO ! Emails extraits : [32mcommande@nicovip.com, contact@avis-verifies.com, votre@email.com[0m
+
+🌐 Analyse du domaine : https://www.vapyou.com...
+  ├─ Check / (accueil)... ❌
+  ├─ Check /contact... ❌
+  ├─ Check /a-propos... ❌
+  ├─ Check /mentions-legales... ❌
+  ├─ Check /contactez-nous... ❌
+  ├─ Check /about... ❌
+  └─ ⚠️ Aucun email trouvé. Probablement caché derrière un formulaire.
+
+💡 Conseil SEO : Exportez ces emails en CSV pour votre logiciel d'outreach (Lemlist, Woodpecker...).
