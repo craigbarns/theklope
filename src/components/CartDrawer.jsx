@@ -119,9 +119,9 @@ export default function CartDrawer() {
     updateQty(item.index, item.qty + 1)
   }
 
-  // Produits associés choisis manuellement, en stock et absents du panier.
+  // Produits associés ou suggestions pertinentes, en stock et absents du panier.
   const crossSellSuggestions = useMemo(() => {
-    return resolveCartRelatedProducts(cartDetailed, products).slice(0, 3)
+    return resolveCartRelatedProducts(cartDetailed, products, { fallback: true }).slice(0, 3)
   }, [products, cartDetailed])
 
   // Quelques produits disponibles si le panier est vide, sans signal de
@@ -299,7 +299,10 @@ export default function CartDrawer() {
               
               {crossSellSuggestions.length > 0 && (
                 <div className="mt-8 border-t border-white/8 pt-6">
-                  <p className="text-xs font-bold uppercase tracking-wider text-white mb-3">Produits associés au panier</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-white mb-3 flex items-center justify-between">
+                    <span>{remainingForFreeShipping > 0 ? 'Complétez pour la livraison offerte' : 'Produits recommandés'}</span>
+                    {remainingForFreeShipping > 0 && <span className="text-[10px] text-neon font-normal">Offerte dès 29€</span>}
+                  </p>
                   <div className="space-y-3">
                     {crossSellSuggestions.map((p) => (
                       <div key={p.id} className="flex items-center gap-3 rounded-2xl border border-white/5 bg-white/[0.01] p-3 hover:border-neon/30 transition">

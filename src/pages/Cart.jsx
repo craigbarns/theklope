@@ -41,9 +41,9 @@ export default function Cart() {
   const [feedback, setFeedback] = useState(null)
   const cartViewTrackedRef = useRef(false)
 
-  // Produits associés choisis manuellement, en stock et absents du panier.
+  // Produits associés ou suggestions pertinentes, en stock et absents du panier.
   const suggestions = useMemo(() => {
-    return resolveCartRelatedProducts(cartDetailed, products).slice(0, 4)
+    return resolveCartRelatedProducts(cartDetailed, products, { fallback: true }).slice(0, 4)
   }, [products, cartDetailed])
 
   const submitPromo = (e) => {

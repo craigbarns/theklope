@@ -349,6 +349,21 @@ export default function Product() {
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
             </div>
 
+            <p className="mt-2 text-xs font-medium flex items-center gap-1.5 flex-wrap">
+              {outOfStock ? (
+                <span className="text-rose-400">Rupture momentanée</span>
+              ) : (
+                <>
+                  <span className="inline-block h-2 w-2 rounded-full bg-neon"></span>
+                  <span className="text-neon/90">En stock — Expédié sous 24h</span>
+                  <span className="text-white/30">·</span>
+                  <span className="text-ash/90">Livraison offerte dès 29 €</span>
+                  <span className="text-white/30">·</span>
+                  <span className="text-ash/60">Retrait gratuit Marseille 188 rue de Rome</span>
+                </>
+              )}
+            </p>
+
             {Boolean(quantityPricing && quantityPricing.minQty > 0) && (
               <div className="mt-5 rounded-2xl border border-neon/30 bg-gradient-to-br from-carbon via-noir to-anthracite p-5 shadow-lg">
                 <div className="flex flex-wrap items-center justify-between gap-2">

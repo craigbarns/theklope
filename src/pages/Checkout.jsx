@@ -494,9 +494,18 @@ export default function Checkout() {
 
             {step === 3 && (
               <Section title="Paiement sécurisé">
-                <div className="mb-6 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/5 px-4 py-3 text-xs text-ash/80">
+                <div className="mb-4 flex items-center gap-2 rounded-xl border border-neon/20 bg-neon/5 px-4 py-3 text-xs text-ash/80">
                   <IconLock width={14} height={14} className="text-neon shrink-0" />
                   <span>Vous allez être redirigé vers <strong className="text-white">Mollie</strong> pour régler en toute sécurité (carte, Bancontact, etc.). Aucune donnée de carte ne transite par THEKLOPE.</span>
+                </div>
+
+                <div className="mb-6 flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted font-medium">Moyens acceptés :</span>
+                  <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-bold text-white tracking-wider">CB</span>
+                  <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-bold text-white tracking-wider">VISA</span>
+                  <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-bold text-white tracking-wider">MASTERCARD</span>
+                  <span className="rounded-md border border-white/15 bg-white/5 px-2.5 py-1 text-xs font-bold text-white tracking-wider">APPLE PAY</span>
+                  <span className="rounded-md border border-neon/30 bg-neon/10 px-2.5 py-1 text-xs font-bold text-neon tracking-wider">3D SECURE</span>
                 </div>
 
                 <div className="rounded-2xl border border-white/8 bg-white/5 p-4 text-sm">
@@ -585,6 +594,13 @@ export default function Checkout() {
             <p className="text-[11px] leading-relaxed text-muted">
               CB, Visa, Mastercard, Apple Pay. Données bancaires chiffrées de bout en bout (SSL 256 bits).
             </p>
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              <span className="rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white tracking-wider">CB</span>
+              <span className="rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white tracking-wider">VISA</span>
+              <span className="rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white tracking-wider">MASTERCARD</span>
+              <span className="rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[10px] font-bold text-white tracking-wider">APPLE PAY</span>
+              <span className="rounded border border-neon/30 bg-neon/10 px-2 py-0.5 text-[10px] font-bold text-neon tracking-wider">3D SECURE</span>
+            </div>
             <div className="border-t border-white/8 pt-3 space-y-2 text-xs text-ash/80">
               <div className="flex items-center gap-2">
                 <IconTruck width={15} height={15} className="text-neon shrink-0" />

@@ -118,7 +118,7 @@ export function resolveRelatedProducts(product, products = [], { fallback = fals
   return suggestions.slice(0, 4)
 }
 
-export function resolveCartRelatedProducts(cartDetailed = [], products = []) {
+export function resolveCartRelatedProducts(cartDetailed = [], products = [], { fallback = false } = {}) {
   const productsById = new Map(products.map((product) => [product.id, product]))
   const cartProductIds = new Set(cartDetailed.map((item) => item.product?.id).filter(Boolean))
   const seen = new Set()
@@ -132,6 +132,22 @@ export function resolveCartRelatedProducts(cartDetailed = [], products = []) {
       if (product?.stock > 0) related.push(product)
     })
   })
+
+  if (!fallback || related.length >= 4) return related
+
+  // Complète intelligemment avec des consommables universels ou best-sellers en stock
+  for (const p of products) {
+    if (related.length >= 4) break
+    if (cartProductIds.has(p.id) || seen.has(p.id) || p.stock <= 0) continue
+    const isRelevant =
+      ['cartouches', 'resistance'].includes(p.category) ||
+      p.badge === 'best-seller' ||
+      (p.category === 'eliquide' && (p.volume === 10 || p.name.includes('10ml')))
+    if (isRelevant) {
+      seen.add(p.id)
+      related.push(p)
+    }
+  }
 
   return related
 }
