@@ -1114,7 +1114,7 @@ export const BLOG_POSTS = [
         a: 'Un excellent pod pour débuter coûte entre 15€ et 25€. Un kit intermédiaire autour de 35€-45€, et les modèles surpuissants vont de 50€ à 80€.',
       },
       {
-        q: 'Quel est le meilleur tirage pour arrêter de fumer ?',
+        q: 'Quel tirage se rapproche le plus d’une cigarette traditionnelle ?',
         a: 'Le tirage MTL (indirect, serré) est le plus recommandé car il reproduit fidèlement la sensation de tirage d’une cigarette traditionnelle.',
       },
     ],
@@ -1130,7 +1130,7 @@ export const BLOG_POSTS = [
     category: 'E-liquides',
     image: '/products/e-liquide-fruits-rouges-10ml-liquidarom.webp',
     summary: 'Fruités rouges, menthe glaciale ou classic blond ? Retrouvez les références incontournables qui séduisent des milliers de vapoteurs.',
-    intro: 'Le choix du e-liquide est responsable à 80% de la réussite de votre sevrage. S’il est à votre goût et contient le bon taux de nicotine, vous ne retoucherez pas à la cigarette. Voici les grands favoris de la communauté THEKLOPE.',
+    intro: 'Le choix du e-liquide compte autant que le matériel : goût, taux de nicotine et ratio PG/VG doivent correspondre à votre usage. Voici les grands favoris de la communauté THEKLOPE.',
     sections: [
       {
         title: 'Les Meilleurs "Classics" (Goût Tabac)',
@@ -1196,15 +1196,15 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'sels-de-nicotine-guide-complet',
-    title: 'Sels de Nicotine : Le Guide Complet pour un Sevrage Réussi',
-    description: 'Tout savoir sur le sel de nicotine : différence avec la nicotine classique, dosage, matériel compatible et avantages pour arrêter de fumer.',
+    title: 'Sels de Nicotine : Le Guide Complet Dosage et Matériel',
+    description: 'Tout savoir sur le sel de nicotine : différence avec la nicotine classique, dosage, matériel compatible et sensation en gorge.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T11:15:00Z',
     readTime: '5 min',
     category: 'E-liquides',
     image: '/products/e-liquide-selad-bubble-gum-10ml_1.webp',
     summary: 'Moins d’irritation en gorge, absorption rapide et sensation proche de la cigarette classique : découvrez le secret des e-liquides aux sels de nicotine.',
-    intro: 'Apparus massivement dans l’univers de la vape grâce aux puffs, les e-liquides aux sels de nicotine ont révolutionné le sevrage tabagique en permettant de consommer des taux élevés sans sensation de brûlure en gorge.',
+    intro: 'Apparus massivement dans l’univers de la vape grâce aux puffs, les e-liquides aux sels de nicotine permettent de vapoter des taux élevés sans sensation de brûlure en gorge.',
     sections: [
       {
         title: 'Qu’est-ce que le sel de nicotine ?',
@@ -1222,7 +1222,7 @@ export const BLOG_POSTS = [
     faq: [
       {
         q: 'Quel dosage de sel de nicotine choisir ?',
-        a: 'Le 20 mg/ml est recommandé pour les gros fumeurs ou le sevrage immédiat. Le 10 mg/ml convient aux fumeurs modérés (5 à 10 cigarettes par jour).',
+        a: 'Le 20 mg/ml convient aux personnes recherchant une assimilation rapide et un dosage élevé. Le 10 mg/ml convient à un usage plus modéré (5 à 10 cigarettes par jour en équivalence tabac).',
       },
     ],
     relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
@@ -1391,7 +1391,7 @@ export const BLOG_POSTS = [
   makePost({
     slug: 'sachets-nicotine-interdits-2026',
     title: 'Sachets de Nicotine (Nicotine Pouches) Interdits au 1er Avril 2026',
-    description: 'Le décret n° 2025-898 interdit la vente des sachets de nicotine en France dès le 1er avril 2026. Analyse de la loi et alternatives pour le sevrage.',
+    description: 'Le décret n° 2025-898 interdit la vente des sachets de nicotine en France dès le 1er avril 2026. Analyse de la loi et produits de substitution disponibles.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T12:45:00Z',
     readTime: '4 min',
@@ -1405,8 +1405,8 @@ export const BLOG_POSTS = [
         text: 'Les autorités de santé ont pointé du doigt les risques d’intoxication nicotinique aiguë chez les jeunes et l’absence de recul sanitaire sur ces produits consommables par voie orale.',
       },
       {
-        title: 'Se tourner vers la vape aux sels de nicotine',
-        text: 'Pour les utilisateurs de nicotine pouches cherchant une alternative orale ou discrète sans combustion, la cigarette électronique à inhalation indirecte (MTL) associée aux sels de nicotine demeure le levier le plus efficace et encadré.',
+        title: 'La vape aux sels de nicotine, un format encadré',
+        text: 'Pour les utilisateurs de nicotine pouches cherchant un format oral ou discret sans combustion, la cigarette électronique à inhalation indirecte (MTL) associée aux sels de nicotine reste un produit réglementé et disponible, avec un dosage nicotine comparable.',
       },
     ],
     faq: [
@@ -1427,7 +1427,7 @@ export const BLOG_POSTS = [
     category: 'Conseils',
     image: '/products/alfaliquid-fraicheur-menthe-fraiche-10ml.webp',
     summary: 'Avec le paquet de cigarettes au-delà de 12.50 €, le passage à la vape permet d’économiser plus de 3000 € par an pour un fumeur un paquet/jour.',
-    intro: 'Outre les bénéfices majeurs pour la santé, l’argument économique est l’un des moteurs principaux pour arrêter le tabac. Faisons le calcul réel des dépenses.',
+    intro: 'L’argument économique reste l’un des plus marquants pour les vapoteurs. Faisons le calcul réel des dépenses.',
     sections: [
       {
         title: 'Le budget d’un fumeur en 2026',
