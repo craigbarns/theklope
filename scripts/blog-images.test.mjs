@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 import { BLOG_POSTS } from '../src/data/blog.js'
+import { PRODUCTS } from '../src/data/products.js'
 
 const publicDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'public')
 
@@ -26,4 +27,17 @@ test('chaque image de blog existe dans public/', () => {
     [],
     'Image de blog introuvable dans public/',
   )
+})
+
+test('chaque relatedProductId de blog existe dans le catalogue de produits', () => {
+  const productIds = new Set(PRODUCTS.map((p) => p.id))
+  const invalid = []
+  for (const post of BLOG_POSTS) {
+    for (const id of post.relatedProductIds || []) {
+      if (!productIds.has(id)) {
+        invalid.push(`${post.slug} -> ${id}`)
+      }
+    }
+  }
+  assert.deepEqual(invalid, [], 'Produit associé au blog introuvable dans le catalogue')
 })

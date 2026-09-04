@@ -13,7 +13,7 @@ function buildContent({ intro, sections, faq = [], cta = null }) {
       .map(
         (section) => `
           <h2>${section.title}</h2>
-          <p>${section.text}</p>
+          ${section.html ? section.html : `<p>${section.text}</p>`}
         `,
       )
       .join('')}
@@ -1220,7 +1220,7 @@ export const BLOG_POSTS = [
         a: 'Le tirage MTL (indirect, serré) est le plus recommandé car il reproduit fidèlement la sensation de tirage d’une cigarette traditionnelle.',
       },
     ],
-    relatedProductIds: ['pixo-aura-2-301', 'xros-4-mini-269', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
+    relatedProductIds: ['argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279', 'drag-s2-avec-pnp-x-voopoo-new-colors-280', 'gen-max-220w-avec-itank-t-vaporesso-noir-274'],
   }),
   makePost({
     slug: 'top-10-meilleurs-eliquides',
@@ -1257,7 +1257,7 @@ export const BLOG_POSTS = [
         a: 'Toutes les marques françaises (Alfaliquid, Pulp, Liquidarom, Petit Nuage) répondent à des normes sanitaires extrêmement strictes et garantissent une qualité irréprochable.',
       },
     ],
-    relatedProductIds: ['fr-m-10ml-alfaliquid-76', 'fruits-rouges-liquid-arom-211', 'menthe-glaciale-10ml-alfaliquid-81', 'grege-68'],
+    relatedProductIds: ['fr-m-10ml-196', 'fruits-rouges-10ml-liquidarom-226', 'fraicheur-menthe-glaciale-10ml-203', 'grege-68'],
   }),
   makePost({
     slug: 'puffs-interdites-france-loi-alternatives',
@@ -1294,7 +1294,7 @@ export const BLOG_POSTS = [
         a: 'Les pods <a href="/categorie/marque-vaporesso" class="text-neon hover:underline">Vaporesso XROS</a>, <a href="/categorie/marque-oxva" class="text-neon hover:underline">OXVA Xlim</a> et <a href="/categorie/marque-geekvape" class="text-neon hover:underline">Geekvape</a> associés à un e-liquide aux sels de nicotine offrent exactement le même rendu et la même restitution des arômes.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
+    relatedProductIds: ['argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279', 'drag-s2-avec-pnp-x-voopoo-new-colors-280'],
   }),
   makePost({
     slug: 'sels-de-nicotine-guide-complet',
@@ -1327,7 +1327,7 @@ export const BLOG_POSTS = [
         a: 'Le 20 mg/ml est recommandé pour les gros fumeurs ou le sevrage immédiat. Le 10 mg/ml convient aux fumeurs modérés (5 à 10 cigarettes par jour).',
       },
     ],
-    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+    relatedProductIds: ['fruits-rouges-givres-10ml-liquidarom-227', 'argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279'],
   }),
   makePost({
     slug: 'comment-faire-son-eliquide-diy',
@@ -1366,7 +1366,7 @@ export const BLOG_POSTS = [
       link: '/calculette-diy',
       button: 'Ouvrir la Calculette DIY',
     },
-    relatedProductIds: ['fr-m-10ml-alfaliquid-76'],
+    relatedProductIds: ['fr-m-10ml-196'],
   }),
   makePost({
     slug: 'test-vaporesso-xros-6-mini',
@@ -1399,7 +1399,7 @@ export const BLOG_POSTS = [
         a: 'Oui ! La force de la gamme XROS est la rétrocompatibilité totale avec l’ensemble des cartouches XROS (0.6, 0.8, 1.0 et 1.2 ohm).',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269'],
+    relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50'],
   }),
   makePost({
     slug: 'xros-5-vs-xros-pro-comparatif',
@@ -1432,7 +1432,7 @@ export const BLOG_POSTS = [
         a: 'Le XROS Pro possède la plus grande batterie (1200 mAh), suivi de près par les XROS 5 (1000 mAh).',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'pixo-aura-2-301'],
+    relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279'],
   }),
   makePost({
     slug: 'lost-mary-elf-bar-remplacants-legaux',
@@ -1461,7 +1461,7 @@ export const BLOG_POSTS = [
         a: 'Oui, car le dispositif principal n’est plus à usage unique et la batterie se recharge indéfiniment.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269'],
+    relatedProductIds: ['argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279', 'cartouches-xros-series-3ml-4pcs-vaporesso-50'],
   }),
   makePost({
     slug: 'quel-accu-18650-choisir-box',
@@ -1523,7 +1523,7 @@ export const BLOG_POSTS = [
         a: 'Non. L’interdiction du 1er avril 2026 concerne exclusivement les sachets de nicotine à usage oral et les produits assimilés sans tabac.',
       },
     ],
-    relatedProductIds: ['fr-m-10ml-alfaliquid-76'],
+    relatedProductIds: ['fr-m-10ml-196', 'fraicheur-menthe-glaciale-10ml-203'],
   }),
   makePost({
     slug: 'vapoter-moins-cher-que-fumer-cout',
@@ -1556,40 +1556,143 @@ export const BLOG_POSTS = [
         a: 'Un kit débutant complet avec e-liquides coûte entre 25 € et 40 € tout compris.',
       },
     ],
-    relatedProductIds: ['xros-4-mini-269', 'fr-m-10ml-alfaliquid-76'],
+    relatedProductIds: ['argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279', 'fr-m-10ml-196'],
   }),
   makePost({
     slug: 'trouver-gout-puff-en-eliquide',
     title: 'Comment Retrouver le Goût Exact de Votre Puff en E-Liquide ?',
-    description: 'Guide des équivalences de saveurs e-liquides pour remplacer vos puffs jetables préférées. Pastèque glacée, myrtille, fruits rouges et cola.',
+    description: 'Tableau des équivalences pour retrouver le goût de vos puffs jetables en e-liquide : pastèque, fruits rouges, mangue, menthe glacée et pod compatible.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T13:15:00Z',
-    readTime: '4 min',
+    readTime: '6 min',
     category: 'E-liquides',
     image: '/products/coconut-puff_1.webp',
-    summary: 'Vous regrettez le goût ultra-intense de votre ancienne puff jetable ? Voici la recette exacte pour obtenir le même rendu en flacon.',
-    intro: 'Le succès gustatif des puffs reposait sur trois piliers : un arôme surdosé, un additif frais (agent glaçant) et des sels de nicotine. Voici comment reconstituer cette sensation parfaite.',
+    summary: 'Vous regrettez le goût ultra-intense de votre ancienne puff jetable ? Voici le tableau complet d’équivalences et le matériel pour obtenir un rendu identique.',
+    intro: 'Avec l’interdiction définitive de la vente des puffs jetables en France (loi n° 2025-175), des milliers de vapoteurs cherchent à retrouver la même explosion de saveurs, la même fraîcheur givrée et la même douceur en gorge. Le secret réside dans une combinaison simple : un e-liquide aux sels de nicotine bien choisi et un pod à tirage automatique.',
     sections: [
       {
-        title: 'Règle n°1 : Choisir des e-liquides aux Sels de Nicotine',
-        text: 'Le sel de nicotine neutralise l’acidité en gorge et permet aux arômes fruités de s’exprimer pleinement sans être masqués par le "hit".',
+        title: 'Pourquoi les puffs avaient-elles un goût si spécifique ?',
+        text: 'Le succès gustatif des puffs reposait sur trois piliers indissociables : des <strong>arômes surdosés</strong> (environ 25% de concentré aromatique en plus qu’un liquide classique), un <strong>agent frais puissant</strong> (effet Ice ou Freeze immédiat) et des <strong>sels de nicotine</strong> qui neutralisent l’âpreté en gorge tout en procurant une assimilation instantanée par l’organisme.',
       },
       {
-        title: 'Règle n°2 : Choisir des gammes au profil "Puff"',
-        text: 'Des marques comme Liquideo (gamme Wpuff Flavors), JNR, Fruizee ou Freaks proposent des liquides formulés spécifiquement avec ce côté ultra-fruité et très frais.',
+        title: 'Tableau des Équivalences : De votre Puff à votre E-Liquide',
+        html: `
+          <p class="text-ash mb-4">Voici le guide de correspondance pour retrouver vos recettes favorites en flacon de e-liquide certifié TPD, beaucoup plus économique et écologique :</p>
+          <div class="overflow-x-auto my-6 rounded-2xl border border-white/10 bg-noir/40">
+            <table>
+              <thead>
+                <tr>
+                  <th>Saveur Puff Culte</th>
+                  <th>E-Liquide Équivalent THEKLOPE</th>
+                  <th>Profil Gustatif & Rendu</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Pastèque Glacée</strong> (Watermelon Ice)</td>
+                  <td><a href="/produit/pasteque-melon-10ml-295" class="text-neon font-semibold hover:underline">Pastèque Melon 10ml Liquidarom</a></td>
+                  <td>Chair de pastèque juteuse, note de melon sucré et vague givrée intense.</td>
+                </tr>
+                <tr>
+                  <td><strong>Fruits Rouges Glacés</strong> (Blue Razz / Red Berries)</td>
+                  <td><a href="/produit/fruits-rouges-givres-10ml-liquidarom-227" class="text-neon font-semibold hover:underline">Fruits Rouges Givrés 10ml Liquidarom</a></td>
+                  <td>Cocktail de baies des bois, mûres et framboises acidulées avec sensation extra-fraîche.</td>
+                </tr>
+                <tr>
+                  <td><strong>Mangue Glacée</strong> (Triple Mango / Mango Ice)</td>
+                  <td><a href="/produit/mangue-carabao-10ml-289" class="text-neon font-semibold hover:underline">Mangue Carabao 10ml Liquidarom</a></td>
+                  <td>Mangue des Philippines sucrée, ronde et pulpeuse, parfaite pour les amateurs de fruits tropicaux.</td>
+                </tr>
+                <tr>
+                  <td><strong>Fraise Givrée</strong> (Strawberry Ice / Fraise Bonbon)</td>
+                  <td><a href="/produit/fraise-sauvage-62" class="text-neon font-semibold hover:underline">Fraise Sauvage Pulp</a></td>
+                  <td>Fraise naturelle sucrée et parfumée, rondeur en bouche sans écœurement.</td>
+                </tr>
+                <tr>
+                  <td><strong>Menthe Glaciale</strong> (Cool Mint / Menthe Polaire)</td>
+                  <td><a href="/produit/fraicheur-menthe-glaciale-10ml-203" class="text-neon font-semibold hover:underline">Fraîcheur Menthe Glaciale 10ml</a></td>
+                  <td>Frisson polaire immédiat, parfait pour un hit vivifiant et une fraîcheur durable.</td>
+                </tr>
+                <tr>
+                  <td><strong>Pêche Givrée</strong> (Peach Ice / Peachy)</td>
+                  <td><a href="/produit/peche-abricot-139" class="text-neon font-semibold hover:underline">Pêche Abricot Pulp</a></td>
+                  <td>Alliance fondante de pêche jaune mûre et d’abricot gorgé de soleil.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `,
       },
       {
-        title: 'Équivalences des saveurs cultes',
-        text: '• Puff Pastèque Glacée → E-liquide Watermelon Ice ou Freeze Mangue / Pastèque. • Puff Myrtille Sûre → E-liquide Fruits Rouges Givrés. • Puff Peachy Mango → E-liquide Pêche Abricot Freaks.',
+        title: 'Le bon matériel : Pourquoi le choix du pod est déterminant',
+        text: 'Pour restituer fidèlement le tirage d’une puff, il faut impérativement un matériel fonctionnant à faible puissance (11W à 16W) avec un tirage indirect serré (MTL). Évitez absolument les grosses box puissantes avec de gros nuages. Les pods compacts comme le <a href="/produit/argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279" class="text-neon hover:underline">Voopoo Argus G2 Mini</a> ou les systèmes à <a href="/produit/cartouches-xros-series-3ml-4pcs-vaporesso-50" class="text-neon hover:underline">cartouches Vaporesso XROS</a> disposent d’un capteur d’aspiration automatique : aucun bouton, vous aspirez simplement comme sur une puff !',
+      },
+      {
+        title: 'Puff Jetable vs Pod Rechargeable : Le Bilan Financier',
+        html: `
+          <p class="text-ash mb-4">Au-delà de la conformité légale et de la préservation de la planète, le passage au pod rechargeable est extrêmement rentable :</p>
+          <div class="overflow-x-auto my-6 rounded-2xl border border-white/10 bg-noir/40">
+            <table>
+              <thead>
+                <tr>
+                  <th>Critère</th>
+                  <th>Puff Jetable (Ancien modèle)</th>
+                  <th>Pod Rechargeable + Flacons (THEKLOPE)</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Coût mensuel</strong></td>
+                  <td>~135 € (15 puffs à 9 € pour 30 jours)</td>
+                  <td>~22 € (4 flacons 10ml de e-liquide)</td>
+                </tr>
+                <tr>
+                  <td><strong>Économie nette</strong></td>
+                  <td>0 €</td>
+                  <td><strong>Plus de 110 € / mois (1 350 € / an !)</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Déchets produits</strong></td>
+                  <td>15 batteries lithium jetées par mois</td>
+                  <td>Zéro batterie jetée (recharge USB-C)</td>
+                </tr>
+                <tr>
+                  <td><strong>Statut juridique</strong></td>
+                  <td>Interdite (Loi n° 2025-175)</td>
+                  <td>100% Légal et durable</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        `,
       },
     ],
     faq: [
       {
-        q: 'Pourquoi les e-liquides classiques semblent-ils parfois moins sucrés ?',
-        a: 'Les e-liquides traditionnels sont conçus pour ne pas encrasser les résistances et éviter l’écœurement. Pour retrouver un goût très sucré, choisissez la gamme Sels de Nicotine.',
+        q: 'Quel taux de sel de nicotine choisir pour remplacer une puff 2% ?',
+        a: 'Les puffs à 2% correspondaient à 20 mg/ml de sel de nicotine. Si vous utilisiez ces puffs, optez pour un e-liquide à 20 mg/ml pour ne ressentir aucun manque. Si vous utilisiez du 1%, choisissez du 10 mg/ml.',
+      },
+      {
+        q: 'Pourquoi les e-liquides classiques en flacon semblent-ils parfois moins sucrés ?',
+        a: 'Les e-liquides traditionnels en base libre contiennent moins d’édulcorants pour prolonger la durée de vie des résistances. Pour retrouver la sensation sucrée et ultra-fraîche de la puff, optez pour les gammes Fruités Givrés et Sels de Nicotine.',
+      },
+      {
+        q: 'Est-il difficile d’entretenir un pod rechargeable ?',
+        a: 'C’est aussi simple qu’une puff : vous remplissez le réservoir par l’orifice étanche en silicone, vous clipsez la cartouche magnétique sur la batterie, et vous vapotez. Une cartouche se remplace toutes les 2 à 3 semaines.',
       },
     ],
-    relatedProductIds: ['fruits-rouges-liquid-arom-211', 'xros-4-mini-269'],
+    cta: {
+      title: 'Passez au Pod Rechargeable dès aujourd’hui',
+      text: 'Découvrez notre sélection de kits pods compacts et d’alternatives légales pour retrouver vos saveurs favorites tout en faisant des centaines d’euros d’économies.',
+      link: '/categorie/puffs-rechargeables',
+      button: 'Découvrir nos Puffs Rechargeables & Pods',
+    },
+    relatedProductIds: [
+      'pasteque-melon-10ml-295',
+      'fruits-rouges-givres-10ml-liquidarom-227',
+      'argus-g2-mini-1500mah-voopoo-offre-groupee-1-1-279',
+      'cartouches-xros-series-3ml-4pcs-vaporesso-50',
+    ],
   }),
 ]
 

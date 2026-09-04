@@ -1,111 +1,113 @@
 export const STATIC_SEO_PAGES = {
   'boutique-vape-marseille': {
-    title: 'Boutique vape Marseille et vente en ligne',
+    title: 'Boutique vape Marseille 13006 — 188 Rue de Rome',
     metaDescription:
-      'THEKLOPE, boutique vape à Marseille et e-commerce France : cigarettes électroniques, e-liquides, pods, résistances et accessoires pour adultes.',
-    h1: 'Boutique vape à Marseille et en ligne',
-    eyebrow: 'Marseille 13006',
+      'Magasin vape Marseille 13006 au 188 rue de Rome. E-liquides, cigarettes électroniques, pods et résistances. Click & Collect 1h gratuit, Tramway T3 Rome.',
+    h1: 'Boutique vape à Marseille et vente en ligne',
+    eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'THEKLOPE accompagne les vapoteurs majeurs avec une sélection de cigarettes électroniques, e-liquides, pods, résistances et accessoires disponibles en ligne et depuis Marseille.',
+      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Profitez du Click & Collect gratuit en 1h ou de la livraison rapide partout en France.',
     localBusiness: true,
     sections: [
       {
-        title: 'Boutique au 188 rue de Rome (13006)',
+        title: 'Boutique au 188 rue de Rome (13006 Marseille)',
         text:
-          'THEKLOPE est installé au 188 rue de Rome, dans le 6e arrondissement de Marseille, à deux pas du centre-ville. Vous y retrouvez une sélection de cigarettes électroniques, pods, e-liquides, résistances et accessoires pour vapoteurs majeurs.',
+          'Notre boutique physique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement). Accès immédiat via les transports RTM : Tramway T3 (stations Place de Rome ou Dragon juste devant le magasin), Métro M1 et M2 (station Castellane à 3 minutes à pied) et Métro M1 (station Estrangin). Parkings Indigo Castellane et Préfecture à proximité.',
       },
       {
-        title: 'Retrait en boutique gratuit (Click & Collect)',
+        title: 'Retrait Click & Collect 1h gratuit',
         text:
-          'Commandez en ligne sur theklope.com et choisissez le retrait gratuit en boutique à Marseille lors du paiement. Votre commande est préparée selon le stock disponible : plus de frais de livraison, et vous récupérez vos produits sur place.',
+          'Commandez en ligne sur theklope.com et retirez vos articles gratuitement en boutique 1 heure plus tard selon le stock disponible. Vous économisez les frais de port, vous évitez les délais de livraison et vous bénéficiez des conseils de notre équipe pour la mise en route.',
       },
       {
-        title: 'Conseil et compatibilité',
+        title: 'Bar à saveurs, diagnostic et compatibilité',
         text:
-          'Avant d’acheter une résistance, une cartouche ou un e-liquide, vous pouvez vérifier la compatibilité avec votre matériel auprès de l’équipe THEKLOPE, en boutique ou via le service client.',
+          'Avant d’acheter une résistance, une cartouche ou un e-liquide, venez valider la compatibilité avec votre matériel directement en boutique. Notre équipe vous oriente vers le bon ratio PG/VG et le taux de nicotine ou de sels de nicotine adapté à votre profil de sevrage.',
       },
       {
-        title: 'Livraison partout en France',
+        title: 'Quartiers desservis et expédition France entière',
         text:
-          'Vous n’êtes pas sur Marseille ? Les commandes sont expédiées dans toute la France, livraison offerte dès 29€. Le paiement est traité via un checkout sécurisé Mollie.',
+          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h, avec livraison offerte dès 29€.',
       },
     ],
     links: [
-      { to: '/boutique', label: 'Voir la boutique' },
+      { to: '/boutique', label: 'Voir toute la boutique' },
       { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique à Marseille' },
+      { to: '/categorie/puffs-rechargeables', label: 'Puffs rechargeables & alternatives' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
       { to: '/categorie/resistances', label: 'Résistances' },
-      { to: '/guides/compatibilite-resistances-cartouches', label: 'Guide : compatibilité résistances & cartouches' },
+      { to: '/guides/compatibilite-resistances-cartouches', label: 'Guide compatibilité résistances' },
       { to: '/contact', label: 'Contacter THEKLOPE' },
     ],
     faq: [
       {
         q: 'Où se trouve la boutique vape THEKLOPE à Marseille ?',
-        a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement). Vous pouvez y retirer gratuitement vos commandes passées en ligne.',
+        a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement), entre la Place Castellane et la Préfecture. Elle est directement desservie par le Tramway T3 (stations Place de Rome ou Dragon).',
       },
       {
-        q: 'Puis-je retirer ma commande en boutique à Marseille ?',
-        a: 'Oui. Le retrait en boutique (Click & Collect) est gratuit : commandez en ligne, choisissez « retrait boutique » au paiement, et récupérez votre commande au 188 rue de Rome une fois préparée.',
+        q: 'Comment fonctionne le retrait Click & Collect en boutique à Marseille ?',
+        a: 'Le retrait en boutique est 100% gratuit : passez commande sur theklope.com, cochez l’option « Retrait boutique » lors du paiement, et récupérez votre commande préparée au 188 rue de Rome sans frais ni attente.',
       },
       {
-        q: 'Peut-on commander des produits vape en ligne depuis Marseille ?',
-        a: 'Oui, les produits disponibles sur theklope.com peuvent être commandés en ligne selon le stock affiché, avec retrait boutique gratuit ou livraison en France.',
+        q: 'Quels sont les transports en commun pour venir chez THEKLOPE Marseille ?',
+        a: 'Prenez le Tramway T3 (arrêt Place de Rome ou Dragon devant la boutique), ou le Métro M1 / M2 (station Castellane à 300 mètres). Les bus RTM 54 et 81 s’arrêtent également à proximité.',
       },
       {
-        q: 'Les produits sont-ils vendus aux mineurs ?',
-        a: 'Non. THEKLOPE réserve la vente de produits de vapotage aux personnes majeures de 18 ans et plus.',
+        q: 'Peut-on tester les produits ou demander conseil sur place ?',
+        a: 'Oui ! Notre équipe en boutique à Marseille est à votre disposition pour vous expliquer le fonctionnement d’une cigarette électronique, vérifier la compatibilité de vos cartouches et résistances, et calibrer vos dosages.',
       },
     ],
   },
   'cigarette-electronique-marseille': {
-    title: 'Cigarette électronique à Marseille — kits, pods et retrait boutique',
+    title: 'Cigarette électronique Marseille 13006 — Vente & Click & Collect',
     metaDescription:
-      'Acheter une cigarette électronique à Marseille : kits débutants, pods rechargeables et box, en ligne avec retrait gratuit en boutique au 188 rue de Rome (13006).',
-    h1: 'Cigarette électronique à Marseille',
-    eyebrow: 'Marseille 13006',
+      'Acheter cigarette électronique Marseille 13006 : kits débutants, pods et box au 188 rue de Rome. Retrait Click & Collect 1h gratuit et conseils experts.',
+    h1: 'Cigarette électronique à Marseille — Vente & Retrait Boutique',
+    eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'Vous cherchez une cigarette électronique à Marseille ? THEKLOPE propose une sélection de kits, pods et box pour vapoteurs majeurs, à commander en ligne avec retrait gratuit en boutique au 188 rue de Rome.',
+      'Vous cherchez une cigarette électronique fiable à Marseille ? THEKLOPE vous propose une sélection de kits débutants, pods rechargeables et box au 188 rue de Rome (Castellane), à commander en ligne avec retrait gratuit Click & Collect en 1 heure.',
     localBusiness: true,
     sections: [
       {
-        title: 'Choisir sa première cigarette électronique',
+        title: 'Choisir sa cigarette électronique avec des experts locaux',
         text:
-          'Pour débuter, un pod rechargeable simple d’utilisation suffit souvent : compact, autonome et facile à entretenir. Les kits plus avancés (box) offrent plus de réglages et d’autonomie. En cas de doute, l’équipe THEKLOPE vous oriente selon votre usage.',
+          'Pour débuter sans risque d’échec, le choix du matériel est primordial. Un pod compact à tirage automatique reproduit la gestuelle de la cigarette sans complication technique. Pour les vapoteurs plus expérimentés, nos box électroniques offrent une autonomie renforcée et des réglages de puissance sur-mesure.',
       },
       {
-        title: 'Retrait gratuit en boutique à Marseille',
+        title: 'Retrait gratuit en boutique au 188 rue de Rome (13006)',
         text:
-          'Réservez votre cigarette électronique en ligne et récupérez-la gratuitement au 188 rue de Rome (13006 Marseille) grâce au Click & Collect. Vous vérifiez le produit sur place, sans frais de livraison.',
+          'Commandez en ligne sur theklope.com et venez récupérer votre cigarette électronique au 188 rue de Rome. Nos spécialistes préparent votre commande et peuvent vous montrer la mise en service, le remplissage du réservoir et l’amorçage de votre première résistance.',
       },
       {
-        title: 'Résistances et e-liquides compatibles',
+        title: 'Toutes les marques officielles réunies à Marseille',
         text:
-          'Une cigarette électronique se complète de résistances et d’e-liquides adaptés. Vérifiez la compatibilité de vos résistances avant l’achat et choisissez un taux de nicotine adapté à votre profil.',
+          'Retrouvez les meilleures marques certifiées d’origine : Vaporesso (gammes XROS et Gen), Voopoo (gammes Drag et Argus), Geekvape (Aegis et Wenax), Innokin (Zenith et Zlide) et Aspire (Nautilus). Zéro contrefaçon, matériel 100% garanti.',
       },
       {
-        title: 'Livraison en France si vous n’êtes pas sur place',
+        title: 'Livraison express à Marseille et en France métropolitaine',
         text:
-          'Hors de Marseille, votre commande est expédiée partout en France, livraison offerte dès 29€, avec paiement sécurisé Mollie.',
+          'Vous ne pouvez pas vous déplacer au magasin ? Toutes nos cigarettes électroniques sont expédiées sous 24h avec livraison offerte dès 29€ d’achat. Le paiement est entièrement sécurisé par la passerelle Mollie.',
       },
     ],
     links: [
-      { to: '/categorie/cigarettes-electroniques', label: 'Voir les cigarettes électroniques' },
-      { to: '/boutique-vape-marseille', label: 'La boutique de Marseille' },
-      { to: '/guides/quelle-cigarette-electronique-choisir', label: 'Guide : quelle e-cig choisir ?' },
-      { to: '/categorie/resistances', label: 'Résistances' },
+      { to: '/categorie/cigarettes-electroniques', label: 'Voir toutes les cigarettes électroniques' },
+      { to: '/categorie/pods', label: 'Pods rechargeables compacts' },
+      { to: '/boutique-vape-marseille', label: 'Boutique THEKLOPE Marseille 188 rue de Rome' },
+      { to: '/guides/quelle-cigarette-electronique-choisir', label: 'Guide d’achat cigarette électronique' },
+      { to: '/categorie/resistances', label: 'Résistances compatibles' },
     ],
     faq: [
       {
-        q: 'Où acheter une cigarette électronique à Marseille ?',
-        a: 'Chez THEKLOPE, au 188 rue de Rome (13006 Marseille). Vous pouvez commander en ligne sur theklope.com et retirer gratuitement votre cigarette électronique en boutique.',
+        q: 'Où acheter une cigarette électronique à Marseille 13006 ?',
+        a: 'Chez THEKLOPE, situé au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Vous pouvez acheter sur place ou commander en ligne avec retrait Click & Collect immédiat.',
       },
       {
-        q: 'Quelle cigarette électronique choisir pour débuter ?',
-        a: 'Un pod rechargeable est idéal pour débuter : simple, compact et facile à entretenir. Notre guide et l’équipe en boutique peuvent vous conseiller selon votre usage.',
+        q: 'Quelle cigarette électronique est recommandée pour arrêter de fumer ?',
+        a: 'Un pod compact à tirage serré (MTL) comme le Vaporesso XROS ou le Voopoo Argus est le choix le plus efficace : simple d’usage, discret et parfait avec des e-liquides aux sels de nicotine.',
       },
       {
-        q: 'Le retrait en boutique est-il payant ?',
-        a: 'Non, le retrait en boutique (Click & Collect) à Marseille est gratuit. Vous choisissez cette option lors du paiement en ligne.',
+        q: 'Le retrait boutique à Marseille est-il payant ?',
+        a: 'Non, le retrait en boutique est totalement gratuit, quel que soit le montant de votre commande sur theklope.com.',
       },
     ],
   },

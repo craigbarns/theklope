@@ -19,18 +19,63 @@ const PAGE_SIZE = 24
 
 const SUB_CATEGORIES_MAP = {
   'e-liquides': [
-    { slug: 'e-liquides', name: '10 ml' },
+    { slug: 'e-liquides', name: 'Tous les e-liquides' },
     { slug: 'e-liquides-50ml', name: '50 ml' },
     { slug: 'e-liquides-100ml', name: '100 ml' },
+    { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
+    { slug: 'e-liquides-fruites', name: 'Fruités' },
+    { slug: 'e-liquides-menthe', name: 'Menthe & Frais' },
+    { slug: 'e-liquides-tabac', name: 'Classics' },
   ],
   'cigarettes-electroniques': [
     { slug: 'cigarettes-electroniques', name: 'Kits Cigarettes Electroniques' },
-    { slug: 'pods', name: 'Pod' },
-    { slug: 'puffs-rechargeables', name: 'Puffs Rechargeable' },
+    { slug: 'pods', name: 'Pods compacts' },
+    { slug: 'puffs-rechargeables', name: 'Puffs Rechargeables' },
   ],
   resistances: [
+    { slug: 'resistances', name: 'Toutes les résistances' },
+    { slug: 'cartouches', name: 'Cartouches Pods' },
+    { slug: 'resistances-geekvape-z', name: 'Geekvape Z Series' },
+    { slug: 'resistances-pnp-voopoo', name: 'Voopoo PnP & PnP-X' },
+    { slug: 'resistances-zenith-innokin', name: 'Innokin Zenith & Zlide' },
+  ],
+  'resistances-geekvape-z': [
+    { slug: 'resistances', name: 'Toutes les résistances' },
+    { slug: 'resistances-geekvape-z', name: 'Geekvape Z Series' },
+    { slug: 'resistances-pnp-voopoo', name: 'Voopoo PnP & PnP-X' },
+    { slug: 'resistances-zenith-innokin', name: 'Innokin Zenith & Zlide' },
+    { slug: 'cartouches', name: 'Cartouches Pods' },
+  ],
+  'resistances-pnp-voopoo': [
+    { slug: 'resistances', name: 'Toutes les résistances' },
+    { slug: 'resistances-pnp-voopoo', name: 'Voopoo PnP & PnP-X' },
+    { slug: 'resistances-geekvape-z', name: 'Geekvape Z Series' },
+    { slug: 'resistances-zenith-innokin', name: 'Innokin Zenith & Zlide' },
+    { slug: 'cartouches', name: 'Cartouches Pods' },
+  ],
+  'resistances-zenith-innokin': [
+    { slug: 'resistances', name: 'Toutes les résistances' },
+    { slug: 'resistances-zenith-innokin', name: 'Innokin Zenith & Zlide' },
+    { slug: 'resistances-geekvape-z', name: 'Geekvape Z Series' },
+    { slug: 'resistances-pnp-voopoo', name: 'Voopoo PnP & PnP-X' },
+    { slug: 'cartouches', name: 'Cartouches Pods' },
+  ],
+  cartouches: [
+    { slug: 'cartouches', name: 'Toutes les cartouches' },
     { slug: 'resistances', name: 'Résistances' },
-    { slug: 'cartouches', name: 'Cartouches' },
+    { slug: 'pods', name: 'Pods rechargeables' },
+  ],
+  'puffs-rechargeables': [
+    { slug: 'puffs-rechargeables', name: 'Puffs rechargeables' },
+    { slug: 'pods', name: 'Pods compacts' },
+    { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
+    { slug: 'cartouches', name: 'Cartouches de rechange' },
+  ],
+  'e-liquides-sels-de-nicotine': [
+    { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
+    { slug: 'puffs-rechargeables', name: 'Puffs & Pods' },
+    { slug: 'e-liquides-fruites', name: 'Fruités' },
+    { slug: 'e-liquides-menthe', name: 'Menthe & Frais' },
   ],
   diy: [
     { slug: 'diy-bases', name: 'Bases neutres DIY' },

@@ -313,7 +313,7 @@ for (const c of CATEGORIES) {
 
 // ---- Articles de blog ----
 for (const b of BLOG_POSTS) {
-  const title = `${b.title} | THEKLOPE`
+  const title = b.title.replace(/\s*[|—]\s*THEKLOPE\s*$/i, '') + ' | THEKLOPE'
   const description = (b.description || b.title).slice(0, 160)
   const path = `/guides/${b.slug}`
   const jsonLd = {
@@ -479,7 +479,7 @@ for (const s of STATIC_PAGES) {
 
 for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
   const path = `/${slug}`
-  const title = `${page.title} | THEKLOPE`
+  const title = page.title.replace(/\s*[|—]\s*THEKLOPE\s*$/i, '') + ' | THEKLOPE'
   const description = page.metaDescription
   const sections = page.sections.map((s) => `<h2>${esc(s.title)}</h2><p>${esc(s.text)}</p>`).join('')
   const faq = page.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')

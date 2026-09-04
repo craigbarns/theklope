@@ -160,32 +160,36 @@ export const CATEGORY_SEO = {
     ],
   },
   cartouches: {
-    seoTitle: 'Cartouches et pods rechargeables de remplacement',
+    seoTitle: 'Cartouches Pods rechargeables : Vaporesso, Voopoo, Geekvape',
     metaDescription:
-      'Achetez vos cartouches rechargeables pour pods toutes marques : Vaporesso XROS, Geekvape, Voopoo, Innokin. Réservoirs et résistances intégrées.',
-    h1: 'Cartouches pour Pods',
+      'Cartouches pods de remplacement pour toutes marques : Vaporesso XROS, Voopoo Argus, Geekvape Wenax. Réservoirs étanches 2ml et 3ml. Expédition 24/48h.',
+    h1: 'Cartouches Pods Rechargeables de Remplacement',
     intro:
-      'Retrouvez toute la gamme de cartouches de remplacement pour vos pods rechargeables. Compatibles Vaporesso, Geekvape, Voopoo, Innokin et plus encore, pour une vape simple et sans fuite.',
+      'Trouvez la cartouche de remplacement officielle pour votre pod. Compatibles Vaporesso XROS, Voopoo Argus, Geekvape Wenax et OXVA Xlim, nos cartouches avec résistance intégrée ou remplaçable garantissent une vape propre, savoureuse et sans fuite.',
     sections: [
       {
-        title: 'Quelle cartouche pod choisir ?',
+        title: 'Cartouche scellée ou résistance remplaçable : Que choisir ?',
         text:
-          'Choisissez la cartouche adaptée à votre modèle de pod (Vaporesso XROS, Geekvape Wenax, Voopoo Argus, etc.). Les valeurs élevées (0.8 à 1.2 ohm) sont idéales pour un tirage serré MTL et les sels de nicotine.',
+          'Les cartouches scellées (résistance intégrée comme sur les pods XROS ou Argus) sont les plus simples : dès que les arômes faiblissent, remplacez la cartouche entière en un clic. Les cartouches à résistance amovible permettent de changer uniquement le coil, réduisant le coût au fil des mois.',
       },
       {
-        title: 'Quand remplacer sa cartouche ?',
+        title: 'Prolonger la durée de vie de vos cartouches et éviter les fuites',
         text:
-          'Une cartouche avec résistance intégrée se remplace dès que les saveurs s’altèrent ou qu’un goût de brûlé apparaît (généralement après 2 à 3 semaines d’utilisation).',
+          'Ne laissez jamais le réservoir s’assécher complètement. Après le premier remplissage d’une cartouche neuve, patientez systématiquement 10 minutes avant d’inhaler. Utilisez des e-liquides au ratio équilibré 50/50 PG/VG ou aux sels de nicotine, parfaitement adaptés aux cartouches pods.',
       },
     ],
     faq: [
       {
-        q: 'Comment remplir sa cartouche de pod ?',
-        a: 'Déclipsez l’embout buccal ou soulevez le bouchon en silicone étanche pour accéder au réservoir, puis remplissez avec votre e-liquide préféré.',
+        q: 'Quelle est la durée de vie moyenne d’une cartouche de pod ?',
+        a: 'Une cartouche dure entre 2 et 3 semaines selon votre rythme de consommation et la proportion d’édulcorants dans votre e-liquide. Un goût de brûlé ou une vapeur diminuée indique qu’il faut la remplacer.',
       },
       {
-        q: 'Quelle est la durée de vie d’une cartouche pod ?',
-        a: 'Une cartouche dure en moyenne entre 2 et 3 semaines selon votre fréquence d’utilisation et la sucrosité de votre e-liquide.',
+        q: 'Puis-je changer de saveur dans la même cartouche ?',
+        a: 'Oui, mais la saveur précédente persistera quelques bouffées. Pour une expérience aromatique pure, l’idéal est d’utiliser une cartouche dédiée par famille de saveurs (fruités, classics ou menthes).',
+      },
+      {
+        q: 'Comment éviter les fuites avec ma cartouche pod ?',
+        a: 'Refermez soigneusement l’opercule en silicone après remplissage, ne remplissez pas à 100% pour laisser une bulle d’air et essuyez régulièrement la base des connecteurs magnétiques.',
       },
     ],
   },
@@ -254,36 +258,138 @@ export const CATEGORY_SEO = {
     ],
   },
   resistances: {
-    seoTitle: 'Résistances cigarette électronique',
+    seoTitle: 'Résistances cigarette électronique pas chères',
     metaDescription:
-      'Résistances pour cigarette électronique : consommables compatibles, mesh, BVC, GTi, ITO et autres modèles. Sélection THEKLOPE pour vapoteurs majeurs.',
-    h1: 'Résistances pour cigarette électronique',
+      'Résistances pour cigarette électronique : consommables compatibles Mesh, BVC, GTi, PnP, Z-Coil. Durée de vie optimale et conseils anti-dry hit. Stock 24h.',
+    h1: 'Résistances pour Cigarette Électronique',
     intro:
-      'Les résistances sont des consommables essentiels pour le bon fonctionnement d’une cigarette électronique. Choisissez le modèle compatible avec votre clearomiseur, pod ou kit.',
+      'Les résistances sont les éléments moteurs de votre cigarette électronique. Retrouvez ici tous les modèles certifiés d’origine pour clearomiseurs et pods : Geekvape Z Series, Voopoo PnP, Innokin Zenith, Vaporesso GTi et bien d’autres pour une vapeur dense et des saveurs préservées.',
     sections: [
       {
-        title: 'Compatibilité avant tout',
+        title: 'Comment bien choisir sa résistance (ohms et puissance)',
         text:
-          'Une résistance doit correspondre au modèle de réservoir ou de cartouche utilisé. Vérifiez la marque, la série, la valeur en ohm et la plage de puissance recommandée.',
+          'La valeur en ohm (Ω) détermine votre style de vape : une résistance supérieure à 1.0 Ω fonctionne à faible puissance (10W-15W) pour un tirage serré MTL idéal pour les sels de nicotine. Une résistance sub-ohm inférieure à 0.5 Ω demande plus de puissance (30W-80W) pour produire de volumineux nuages en inhalation directe (DL).',
       },
       {
-        title: 'Quand changer sa résistance ?',
+        title: 'Amorçage et gestes essentiels pour éviter le goût de brûlé',
         text:
-          'Un goût de brûlé, une baisse de vapeur, des fuites ou une saveur moins nette peuvent indiquer qu’il faut remplacer la résistance. L’amorçage avant la première utilisation reste indispensable.',
+          'Une résistance neuve doit toujours être amorcée. Déposez 4 à 5 gouttes de e-liquide directement sur le coton apparent, remplissez le réservoir et patientez 10 minutes avant la première bouffée. Commencez à vaper à une puissance légèrement inférieure aux recommandations du fabricant.',
       },
     ],
     faq: [
       {
-        q: 'Comment savoir si une résistance est compatible ?',
-        a: 'Comparez la référence indiquée par le fabricant avec votre clearomiseur ou pod. En cas de doute, contactez THEKLOPE avant commande.',
+        q: 'Quand faut-il changer la résistance de sa cigarette électronique ?',
+        a: 'La durée de vie moyenne est de 2 à 3 semaines (soit 30 à 60 ml de e-liquide). Changez-la dès l’apparition d’un goût âcre ou brûlé, d’une perte notable de saveur ou de glouglous répétés.',
       },
       {
-        q: 'Comment amorcer une résistance neuve ?',
-        a: 'Déposez quelques gouttes de e-liquide sur le coton visible, remplissez le réservoir, puis attendez plusieurs minutes avant de vapoter à puissance modérée.',
+        q: 'Comment savoir si une résistance est compatible avec mon réservoir ?',
+        a: 'Chaque clearomiseur ou pod n’accepte qu’une famille précise de résistances (ex : Geekvape Z, Voopoo PnP, Innokin Zenith). Vérifiez la référence exacte sur la boîte de votre réservoir ou contactez notre équipe.',
       },
       {
-        q: 'Pourquoi une résistance donne-t-elle un goût de brûlé ?',
-        a: 'Le goût de brûlé peut venir d’un coton insuffisamment imbibé, d’une puissance trop élevée, d’un liquide trop épais ou d’une résistance usée.',
+        q: 'Quel e-liquide utiliser pour ne pas encrasser ma résistance trop vite ?',
+        a: 'Les e-liquides très sucrés ou trop dosés en glycérine végétale (High VG) encrassent le coton plus rapidement. Pour les petites résistances MTL, un ratio 50/50 ou 70/30 PG/VG assure une longévité maximale.',
+      },
+    ],
+  },
+  'resistances-geekvape-z': {
+    seoTitle: 'Résistances Geekvape Z Series (Zeus) pas chères',
+    metaDescription:
+      'Résistances Geekvape Z Series pour clearomiseurs Z Subohm et Z Fli Tank : Z 0.15, 0.2, 0.25 et 0.4 ohm. Vape DL puissante. Expédition 24/48h.',
+    h1: 'Résistances Geekvape Z Series (Z Subohm & Z Fli)',
+    intro:
+      'Les résistances Geekvape Série Z (anciennement Zeus Subohm) sont les références incontournables de la vape en inhalation directe (DL). Conçues en Mesh de haute qualité, elles garantissent une production colossale de vapeur et une réactivité instantanée sur les box Aegis Legend, Touch et Max.',
+    sections: [
+      {
+        title: 'Quelle résistance Geekvape Z choisir ? Plages de puissance',
+        text:
+          'Geekvape propose plusieurs déclinaisons pour adapter votre vape : La Z 0.15 Ω XM (70W à 85W) offre une durée de vie doublée et une vapeur ultra-dense. La Z 0.2 Ω (70W à 80W) est le grand classique pour une saveur chaude. La Z 0.25 Ω Dual Coil (45W à 57W) offre une vapeur plus douce et économique. La Z 0.4 Ω (50W à 60W) privilégie l’autonomie de batterie.',
+      },
+      {
+        title: 'Compatibilité clearomiseurs et conseils anti-fuites',
+        text:
+          'Ces résistances sont compatibles avec les clearomiseurs Z Subohm, Z Subohm SE, Z Fli Tank et les kits Aegis Legend 2 (L200), Legend 3 et Aegis Max. Utilisez impérativement des e-liquides à fort taux de glycérine végétale (VG à 70% ou plus) pour éviter les fuites. Amorcez toujours votre résistance avec 5 gouttes sur le coton avant la première utilisation.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Combien de temps dure une résistance Geekvape Z ?',
+        a: 'En moyenne, une résistance Geekvape Z dure entre 2 et 3 semaines (soit 50 à 80 ml de e-liquide), notamment avec la nouvelle version XM au maillage Mesh renforcé.',
+      },
+      {
+        q: 'Quel e-liquide utiliser avec les résistances Geekvape Z ?',
+        a: 'Ces résistances sub-ohm nécessitent des e-liquides épais, avec un ratio minimum de 30/70 PG/VG ou 50/50. Les e-liquides trop fluides (fort taux de PG) risquent de provoquer des suintements.',
+      },
+      {
+        q: 'Comment éviter le goût de brûlé lors du changement de résistance ?',
+        a: 'Imbibez le coton avec quelques gouttes de e-liquide, installez la résistance, remplissez le réservoir et patientez 10 minutes. Démarrez ensuite à 10W sous la puissance recommandée pendant 5 bouffées.',
+      },
+    ],
+  },
+  'resistances-pnp-voopoo': {
+    seoTitle: 'Résistances Voopoo PnP et PnP-X pas chères',
+    metaDescription:
+      'Résistances PnP et PnP-X Voopoo pour Drag, Argus et Vinci : 0.15, 0.2, 0.3 et 0.6 ohm. Système antifuite 4 couches. Expédition 24/48h THEKLOPE.',
+    h1: 'Résistances Voopoo PnP et PnP-X',
+    intro:
+      'Les résistances PnP et la nouvelle génération PnP-X de Voopoo équipent les célèbres kits Drag S2, Drag X2, Argus et Vinci. Grâce à leur technologie de maillage thermique et à leur système antifuite 4 couches breveté, elles procurent des saveurs pures sans aucun suintement.',
+    sections: [
+      {
+        title: 'Gamme PnP-X vs PnP classique : Bien choisir sa référence',
+        text:
+          'Attention à la compatibilité : les nouvelles résistances PnP-X sont spécialement conçues pour les cartouches PnP-X (Drag S2, Drag X2, Argus Pro 2). La gamme PnP classique (VM1, VM5, VM6, TM2) reste dédiée aux kits Drag X/S de première génération, Argus Pod Tank et Vinci.',
+      },
+      {
+        title: 'Tableau des valeurs en ohm et wattages recommandés',
+        text:
+          'PnP-X 0.15 Ω (60-80W) : inhalation directe DTL puissante et nuages massifs. PnP-X 0.2 Ω (40-60W) : équilibre idéal vapeur/saveur en sub-ohm. PnP-X 0.3 Ω (32-40W) : tirage RDL aérien restrictif. PnP-X 0.6 Ω (18-23W) : tirage polyvalent compatible e-liquides 50/50 et sels de nicotine.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les résistances PnP-X sont-elles compatibles avec les anciens pods Drag ?',
+        a: 'Non, les résistances PnP-X ont un diamètre et une structure différents. Elles sont exclusivement compatibles avec les cartouches et clearomiseurs PnP-X (Drag S2, Drag X2). Pour les anciens kits, choisissez les résistances PnP classiques.',
+      },
+      {
+        q: 'Quel taux de nicotine utiliser avec les résistances Voopoo PnP ?',
+        a: 'Pour les résistances sub-ohm (0.15Ω et 0.2Ω), ne dépassez pas 3 à 6 mg/ml de nicotine. Pour un sevrage avec 10 ou 20 mg/ml (ou sels de nicotine), optez pour les versions 0.6Ω, 0.8Ω ou 1.2Ω.',
+      },
+      {
+        q: 'Pourquoi ma résistance Voopoo fuit-elle ?',
+        a: 'Les fuites surviennent si la puissance de vape est trop faible par rapport à la valeur en ohm, ou si le e-liquide est trop fluide. Utilisez un e-liquide à 70% VG pour les 0.15/0.2Ω et respectez les plages de wattage gravées sur la résistance.',
+      },
+    ],
+  },
+  'resistances-zenith-innokin': {
+    seoTitle: 'Résistances Innokin Zenith et Zlide Z-Coil',
+    metaDescription:
+      'Résistances Z-Coil Innokin pour Zenith, Zlide, Zenith II et Kroma-Z : 0.3, 0.8, 1.2 et 1.6 ohm. Le meilleur tirage serré MTL. Expédition 24/48h.',
+    h1: 'Résistances Z-Coil Innokin Zenith & Zlide',
+    intro:
+      'Les résistances Z-Coils Innokin sont la référence mondiale pour le tirage serré indirect (MTL). Plébiscitées par les vapoteurs débutants et les fumeurs en transition, elles reproduisent fidèlement la sensation du tabac et subliment les sels de nicotine et e-liquides 50/50.',
+    sections: [
+      {
+        title: 'Quelle résistance Z-Coil choisir pour votre clearomiseur ?',
+        text:
+          'La Z-Coil 1.6 Ω (10-14W) en Kanthal est la reine du sevrage tabagique, parfaite pour les forts taux de nicotine et les sels de nicotine. La Z-Coil 1.2 Ω (10-14W) offre un tirage doux et silencieux. La Z-Coil 0.8 Ω (15-18W) délivre une vapeur plus tiède et dense. La Z-Coil 0.3 Ω (30-40W) permet une vape semi-directe (RDL) savoureuse sur Zenith Pro et Zenith II.',
+      },
+      {
+        title: 'Compatibilité totale avec la gamme Zenith et Zlide',
+        text:
+          'Toutes les résistances Z-Coil sont 100% compatibles avec l’ensemble de la famille Innokin : Zenith, Zenith D22, Zenith Pro, Zenith II, Zlide, Zlide Top, kits Coolfire Z50, Z60, Z80 et le pod Kroma-Z.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelle résistance Zenith choisir pour les sels de nicotine ?',
+        a: 'La résistance 1.6 ohm (10-14W) ou 1.2 ohm (10-14W) est idéale pour les e-liquides aux sels de nicotine (10mg ou 20mg) car sa chauffe modérée préserve la molécule et évite toute irritation.',
+      },
+      {
+        q: 'Quel e-liquide utiliser avec les résistances Z-Coil Innokin ?',
+        a: 'Privilégiez les e-liquides fluides ou équilibrés, avec un ratio de 50/50 PG/VG ou 70/30 PG/VG. Évitez les e-liquides à plus de 60% de VG qui pourraient assécher le coton et provoquer un dry hit.',
+      },
+      {
+        q: 'Comment changer la résistance d’un clearomiseur Zenith sans vider le réservoir ?',
+        a: 'C’est l’un des grands atouts du Zenith : dévissez la bague inférieure, tirez simplement sur la résistance usée et insérez la nouvelle sans qu’une seule goutte de liquide ne s’échappe.',
       },
     ],
   },
@@ -322,32 +428,36 @@ export const CATEGORY_SEO = {
     ],
   },
   'puffs-rechargeables': {
-    seoTitle: 'Puffs rechargeables & alternatives légales',
+    seoTitle: 'Puffs Rechargeables & Alternatives Légales à la Puff',
     metaDescription:
-      'Puffs jetables interdites : découvrez nos puffs rechargeables et pods économiques 100% légaux en France. Vente réservée aux adultes.',
-    h1: 'Puffs rechargeables et alternatives légales',
+      'Puffs jetables interdites en France : découvrez nos puffs rechargeables et pods économiques légaux. Retrouvez les saveurs puff dès 5,90€. Livraison 24/48h.',
+    h1: 'Puffs Rechargeables & Alternatives Légales',
     intro:
-      'Suite à la loi du 24 février 2025, la vente de puffs jetables est interdite en France. THEKLOPE vous propose les meilleures alternatives légales : les puffs rechargeables et pods compacts, beaucoup plus économiques et respectueux de l’environnement.',
+      'En application de la loi n° 2025-175, la commercialisation des puffs jetables est interdite en France. THEKLOPE vous accompagne avec les meilleures alternatives légales : puffs rechargeables et pods compacts, jusqu’à 4 fois plus économiques et respectueux de l’environnement.',
     sections: [
       {
-        title: 'Qu’est-ce qu’une puff rechargeable ?',
+        title: 'Puff rechargeable vs Puff jetable : Pourquoi vous êtes gagnant',
         text:
-          'Une puff rechargeable (ou pod) conserve la simplicité d’une puff classique mais dispose d’une batterie rechargeable en USB-C et d’une cartouche remplissable. Vous ne jetez plus la batterie à chaque fois, ce qui divise votre budget vape par trois.',
+          'Une puff rechargeable fonctionne avec une batterie durable USB-C et des cartouches remplissables de e-liquide aux sels de nicotine. Vous conservez la même compacité, le tirage automatique sans bouton et le rendu sucré et frais de la puff, tout en divisant votre budget vape mensuel par 3 ou 4.',
       },
       {
-        title: 'Les puffs jetables sont-elles interdites ?',
+        title: 'Comment retrouver le goût exact de votre ancienne puff ?',
         text:
-          'Oui, la loi n° 2025-175 interdit la vente des dispositifs à usage unique. Les modèles présentés ici sont tous équipés d’un réservoir remplissable ou d’une cartouche remplaçable, en totale conformité avec la législation française actuelle.',
+          'Le secret du goût des puffs réside dans l’association de sels de nicotine et d’arômes surdosés fruités et givrés. En choisissant un pod rechargeable compact (Vaporesso XROS ou Voopoo Argus) couplé à nos e-liquides aux sels de nicotine (Pastèque Givrée, Fruits Rouges, Mangue), vous obtenez un rendu strictement identique.',
       },
     ],
     faq: [
       {
-        q: 'Quel modèle choisir pour remplacer ma puff jetable ?',
-        a: 'Les modèles avec tirage automatique (sans bouton) et cartouches intégrées comme les pods Vaporesso, Oxva ou les systèmes "Big Puff" rechargeables offrent exactement la même sensation.',
+        q: 'Les puffs rechargeables sont-elles autorisées par la loi ?',
+        a: 'Oui. La loi n° 2025-175 cible exclusivement les cigarettes électroniques jetables à usage unique. Les dispositifs dont la batterie est rechargeable en USB et dont le réservoir est remplissable ou amovible sont parfaitement légaux.',
       },
       {
-        q: 'Quel e-liquide utiliser pour retrouver le goût de ma puff ?',
-        a: 'Les puffs utilisent des "sels de nicotine". Pour retrouver cette douceur en gorge et ces saveurs intenses, orientez-vous vers notre catégorie E-liquides Sels de Nicotine.',
+        q: 'Combien d’argent vais-je économiser en passant à la puff rechargeable ?',
+        a: 'Un vapoteur consommant 1 puff jetable tous les 2 jours dépensait environ 135 € par mois. Avec un pod rechargeable et des flacons de 10 ml de sels de nicotine (équivalant à 5 puffs chacun), la dépense mensuelle tombe à environ 22 €, soit plus de 1 350 € économisés par an.',
+      },
+      {
+        q: 'Quel est le matériel le plus simple pour remplacer une puff ?',
+        a: 'Les pods automatiques sans bouton (comme le Voopoo Argus ou le Vaporesso XROS) : il suffit d’aspirer pour déclencher la vapeur. Aucun réglage de puissance n’est nécessaire.',
       },
     ],
   },
