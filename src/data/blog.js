@@ -671,9 +671,9 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'eliquide-sans-nicotine',
-    title: 'E-Liquide Sans Nicotine (0 mg) : Danger, Sevrage et Meilleurs Goûts',
+    title: 'E-liquide sans nicotine (0 mg) : composition, intérêt et goûts',
     description:
-      'Pourquoi vapoter sans nicotine ? Effet sur la santé, aide au sevrage du geste, grands formats 50ml/100ml et sélection des meilleures saveurs en 0 mg.',
+      'Ce que contient vraiment un e-liquide 0 mg, à qui il s’adresse, comment le doser en 50/100 ml et quelles saveurs choisir pour garder le geste.',
     date: '1 Juillet 2026',
     isoDate: '2026-07-01T08:00:00+02:00',
     readTime: '4 min',
@@ -1370,8 +1370,8 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'test-vaporesso-xros-6-mini',
-    title: 'Test & Avis Vaporesso XROS 6 & 6 Mini : Le Meilleur Pod MTL en 2026 ?',
-    description: 'Test complet du pod Vaporesso XROS 6 & XROS 6 Mini : autonomie batterie, tirage MTL, nouvelles cartouches Corex 2.0 et verdict de nos experts vape.',
+    title: 'XROS 6 ou XROS 6 Mini : lequel choisir ? Test complet',
+    description: 'XROS 6 ou XROS 6 Mini ? Autonomie, format, tirage MTL et cartouches Corex 2.0 comparés point par point, avec notre verdict selon votre usage.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T11:45:00Z',
     readTime: '4 min',

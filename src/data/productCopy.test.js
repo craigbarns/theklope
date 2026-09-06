@@ -3,6 +3,8 @@ import test from 'node:test'
 
 import {
   buildProductLong,
+  buildProductSeoDescription,
+  buildProductSeoTitle,
   buildProductShort,
   enrichProductCopy,
   sanitizeProductSpecs,
@@ -91,4 +93,55 @@ test('hardware fallback copy uses correct French agreement', () => {
     category: 'ecig',
     specs: {},
   }), /cigarette électronique sélectionnée/)
+})
+
+// --- Gabarits SEO partagés client / pré-rendu ---------------------------------
+test('la méta-description mène par les caractéristiques et écarte la copie générique', () => {
+  const description = buildProductSeoDescription({
+    name: 'MANGUE ABRICOT',
+    brand: 'THEKLOPE',
+    type: 'E-liquide',
+    nicotine: [0, 3, 6, 12, 16],
+    stock: 12,
+    short: 'Un produit de qualité sélectionné par THEKLOPE pour sa fiabilité et ses saveurs.',
+    specs: { Contenance: '10 ml', Ratio: '50 PG / 50 VG' },
+  })
+
+  assert.match(description, /^MANGUE ABRICOT : E-liquide · 10 ml/)
+  assert.match(description, /nicotine 0 à 16 mg/)          // plage, pas la liste complète
+  assert.doesNotMatch(description, /sélectionné par THEKLOPE pour sa fiabilité/)
+  assert.doesNotMatch(description, /au meilleur prix/)
+  // La marque était citée trois fois dans la zone affichée ; marque maison,
+  // elle n'a plus à y figurer du tout.
+  assert.equal((description.match(/THEKLOPE/g) || []).length, 0)
+})
+
+test('la méta-description conserve une description réelle et signale la rupture', () => {
+  const description = buildProductSeoDescription({
+    name: 'Lady Killer 60 ml',
+    brand: 'Adalya',
+    type: 'E-liquide',
+    stock: 0,
+    short: 'Pastèque glacée et fruits rouges, inspiré des recettes chicha.',
+  })
+
+  assert.match(description, /Pastèque glacée et fruits rouges/)
+  assert.doesNotMatch(description, /En stock/)
+})
+
+test('le titre n’ajoute la marque que si le nom ne la porte pas déjà', () => {
+  assert.equal(
+    buildProductSeoTitle({ name: 'Drag H40', brand: 'Voopoo' }),
+    'Acheter Drag H40 Voopoo | THEKLOPE',
+  )
+  assert.equal(
+    buildProductSeoTitle({ name: 'Drag H40 - Voopoo', brand: 'Voopoo' }),
+    'Acheter Drag H40 - Voopoo | THEKLOPE',
+  )
+})
+
+test('la marque maison n’est jamais répétée dans le titre ni la description', () => {
+  const product = { name: 'MANGUE ABRICOT', brand: 'THEKLOPE', type: 'E-liquide', stock: 5 }
+  assert.equal(buildProductSeoTitle(product), 'Acheter MANGUE ABRICOT | THEKLOPE')
+  assert.doesNotMatch(buildProductSeoDescription(product), /THEKLOPE/)
 })

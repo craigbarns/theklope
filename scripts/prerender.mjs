@@ -24,7 +24,7 @@ const dist = resolve(root, 'dist')
 const BASE_URL = (process.env.PUBLIC_BASE_URL || 'https://www.theklope.com').replace(/\/$/, '')
 const DEFAULT_OG = `${BASE_URL}/og-image-v2.jpg`
 
-const { enrichProductCopy } = await import(resolve(root, 'src/data/productCopy.js'))
+const { enrichProductCopy, buildProductSeoTitle, buildProductSeoDescription } = await import(resolve(root, 'src/data/productCopy.js'))
 const {
   CATEGORIES,
   categoryName,
@@ -150,10 +150,11 @@ for (const p of PRODUCTS) {
   const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
   const brandName = p.brand || 'THEKLOPE'
   
-  // SEO Optimization : Title plus sémantique
-  const title = `${p.name} - ${brandName} | ${catLabel} | THEKLOPE`
-  const shortDesc = p.short ? ` ${p.short}` : ''
-  const description = `Achetez ${p.name} (${catLabel}) par ${brandName} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`.slice(0, 160)
+  // Titre et description viennent du module partagé : le HTML pré-rendu et
+  // l'appli hydratée annonçaient auparavant deux titres différents pour la
+  // même page.
+  const title = buildProductSeoTitle(p)
+  const description = buildProductSeoDescription(p)
   const path = `/produit/${p.id}`
   const jsonLd = {
     '@context': 'https://schema.org',

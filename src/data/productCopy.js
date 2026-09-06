@@ -206,3 +206,54 @@ export function enrichProductCopy(product) {
     long: isGenericProductCopy(long) ? buildProductLong(base) : long,
   }
 }
+
+// =============================================================================
+// Titre et méta-description des fiches produit — source de vérité PARTAGÉE
+// entre le rendu client (src/pages/Product.jsx) et le pré-rendu statique
+// (scripts/prerender.mjs). Les deux portaient auparavant leurs propres
+// gabarits, divergents : le HTML servi à Googlebot annonçait un titre, l'appli
+// hydratée le réécrivait avec un autre.
+// =============================================================================
+
+// Google n'affiche qu'environ 155 caractères de description. L'ancien gabarit
+// dépensait les 60 premiers en « Achetez X par Y au meilleur prix sur THEKLOPE »
+// avant d'enchaîner sur le texte de remplissage que porte la quasi-totalité du
+// catalogue : la marque citée trois fois, aucune information exploitable.
+// On mène donc par les caractéristiques réelles, et la copie générique est
+// écartée au lieu d'être répétée.
+// « THEKLOPE » est déjà le suffixe du titre et le nom du site : le répéter
+// comme marque produit donnait « Acheter X THEKLOPE | THEKLOPE » sur les 217
+// références en marque maison.
+const HOUSE_BRAND = 'theklope'
+const displayBrand = (product = {}) => {
+  const brand = String(product.brand || '').trim()
+  if (!brand || brand.toLowerCase() === HOUSE_BRAND) return ''
+  return String(product.name || '').toLowerCase().includes(brand.toLowerCase()) ? '' : brand
+}
+
+export function buildProductSeoDescription(product = {}) {
+  const brand = displayBrand(product)
+  const specs = product.specs || {}
+
+  const nicotine = Array.isArray(product.nicotine) && product.nicotine.length
+    ? (product.nicotine.length > 1
+      // Plage plutôt que liste : « 0 à 16 mg » tient là où « 0/3/6/12/16 mg »
+      // repousse le reste au-delà de la zone affichée.
+      ? `nicotine ${Math.min(...product.nicotine)} à ${Math.max(...product.nicotine)} mg`
+      : `nicotine ${product.nicotine[0]} mg`)
+    : ''
+
+  const facts = [product.type, specs.Contenance, nicotine, specs.Ratio].filter(Boolean).join(' · ')
+
+  return [
+    `${product.name}${brand ? ` — ${brand}` : ''}${facts ? ` : ${facts}.` : '.'}`,
+    isGenericProductCopy(product.short) ? '' : product.short,
+    product.stock > 0 ? 'En stock, expédié sous 24/48h.' : '',
+    'Livraison offerte dès 29 €, retrait à Marseille.',
+  ].filter(Boolean).join(' ')
+}
+
+export function buildProductSeoTitle(product = {}) {
+  const brand = displayBrand(product)
+  return `Acheter ${product.name}${brand ? ` ${brand}` : ''} | THEKLOPE`
+}

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
+import { buildProductSeoTitle, buildProductSeoDescription } from '../data/productCopy.js'
 import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
@@ -336,10 +337,9 @@ export default function Product() {
   const brandName = product.brand || ''
   const hasBrandInName = brandName && product.name.toLowerCase().includes(brandName.toLowerCase())
   const brandSuffix = brandName && !hasBrandInName ? ` ${brandName}` : ''
-  const brandMention = brandName ? ` par ${brandName}` : ''
-  const shortDesc = product.short ? ` ${product.short}` : ''
-  const seoTitle = `Acheter ${product.name}${brandSuffix} | THEKLOPE`
-  const seoDescription = `Acheter ${product.name}${brandMention} au meilleur prix sur THEKLOPE.${shortDesc} Expédition rapide 24/48h en France, livraison offerte dès 29€.`
+  // Gabarits partagés avec le pré-rendu : voir src/data/productCopy.js.
+  const seoTitle = buildProductSeoTitle(product)
+  const seoDescription = buildProductSeoDescription(product)
 
   const fav = isFavorite(product.id)
   // Fil d'Ariane : la route catégorie utilise le slug (/categorie/:slug), alors
