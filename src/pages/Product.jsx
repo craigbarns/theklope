@@ -60,8 +60,10 @@ export default function Product() {
   const [ohm, setOhm] = useState(onlyChoice(ohmOptions))
   const [added, setAdded] = useState(false)
   const [addError, setAddError] = useState('')
+  const [showMobilePurchaseBar, setShowMobilePurchaseBar] = useState(false)
   const trackedProductRef = useRef(null)
   const variantsRef = useRef(null)
+  const purchaseControlsRef = useRef(null)
 
   const relatedProducts = useMemo(() => resolveRelatedProducts(product, products, { fallback: true }), [product, products])
   const relatedGuides = useMemo(
@@ -205,6 +207,22 @@ export default function Product() {
       trackedProductRef.current = product.id
     }
   }, [cookiesChoice, product])
+
+  useEffect(() => {
+    const controls = purchaseControlsRef.current
+    if (!product || !controls || typeof IntersectionObserver === 'undefined') {
+      setShowMobilePurchaseBar(false)
+      return undefined
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      // La barre devient utile seulement après avoir dépassé le CTA principal.
+      // Avant lui, elle ne masque donc ni le titre, ni le prix, ni les variantes.
+      setShowMobilePurchaseBar(!entry.isIntersecting && entry.boundingClientRect.bottom < 0)
+    }, { threshold: 0.05 })
+    observer.observe(controls)
+    return () => observer.disconnect()
+  }, [product])
 
   const cartProductQty = product
     ? cart.reduce(
@@ -445,7 +463,7 @@ export default function Product() {
             </div>
 
             {/* Quantité + CTA */}
-            <div className="mt-7 flex flex-col gap-3">
+            <div ref={purchaseControlsRef} className="mt-7 flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center rounded-full border border-white/15">
                   <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-11 w-11 place-items-center text-ash/70 hover:text-white" aria-label="Diminuer">
@@ -584,23 +602,25 @@ export default function Product() {
       </div>
 
       {/* Barre d'achat persistante (mobile) */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--line)] bg-noir/90 backdrop-blur-xl lg:hidden">
-        <div className="container-page flex items-center gap-3 py-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium text-white">{product.name}</p>
-            <p className="font-display text-base font-bold text-neon">{formatPrice(product.price)}</p>
+      {showMobilePurchaseBar && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--line)] bg-noir/90 backdrop-blur-xl lg:hidden">
+          <div className="container-page flex items-center gap-3 py-3" style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium text-white">{product.name}</p>
+              <p className="font-display text-base font-bold text-neon">{formatPrice(product.price)}</p>
+            </div>
+            <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary shrink-0 px-6 disabled:cursor-not-allowed disabled:opacity-50">
+              {outOfStock
+                ? 'Rupture'
+                : stockLimitReached
+                  ? 'Stock maximum'
+                  : added
+                    ? <><IconCheck width={18} height={18} /> Ajouté</>
+                    : <><IconCart width={18} height={18} /> Ajouter</>}
+            </button>
           </div>
-          <button onClick={() => handleAdd()} disabled={outOfStock || stockLimitReached} className="btn-primary shrink-0 px-6 disabled:cursor-not-allowed disabled:opacity-50">
-            {outOfStock
-              ? 'Rupture'
-              : stockLimitReached
-                ? 'Stock maximum'
-                : added
-                  ? <><IconCheck width={18} height={18} /> Ajouté</>
-                  : <><IconCart width={18} height={18} /> Ajouter</>}
-          </button>
         </div>
-      </div>
+      )}
     </>
   )
 }

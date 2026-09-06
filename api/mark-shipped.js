@@ -7,6 +7,7 @@
 // =============================================================================
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
 import { authenticateAdminRequest } from './_lib/adminAuth.js'
+import { CHECKOUT_ORDER_ID_RE } from './_lib/checkout.js'
 import { sendEmail, emailLayout, escapeHtml, escapeHtmlWithLineBreaks, euro, FROM_CHECKOUT } from './_lib/email.js'
 import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 import { formatOrderItemLabel } from './_lib/orderPresentation.js'
@@ -31,6 +32,9 @@ export default async function handler(req, res) {
       body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
     } catch {
       return res.status(400).json({ error: 'Corps JSON invalide.' })
+    }
+    if (String(req.query?.action || '').trim() === 'delivered') {
+      return markDelivered(body, res)
     }
     const orderId = String(body.orderId || '').trim()
     const tracking = String(body.tracking || '').trim().slice(0, 120)
@@ -148,5 +152,53 @@ export default async function handler(req, res) {
   } catch (err) {
     console.error('mark-shipped error:', err)
     return res.status(500).json({ error: err.message || 'Erreur serveur.' })
+  }
+}
+
+async function markDelivered(body, res) {
+  const orderId = String(body.orderId || '').trim()
+  if (!CHECKOUT_ORDER_ID_RE.test(orderId)) {
+    return res.status(400).json({ error: 'Identifiant de commande invalide.' })
+  }
+
+  try {
+    const { data: order, error } = await supabaseAdmin
+      .from('orders')
+      .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason')
+      .eq('id', orderId)
+      .maybeSingle()
+    if (error) throw error
+    if (!order) return res.status(404).json({ error: 'Commande introuvable.' })
+    if (order.payment_status !== 'paid') {
+      return res.status(409).json({ error: 'Seule une commande payée peut être livrée.' })
+    }
+    if (order.checkout_review_required_at || order.checkout_review_reason) {
+      return res.status(409).json({ error: 'Cette commande exige une vérification Mollie.' })
+    }
+    if (order.status === 'delivered') {
+      return res.status(200).json({ ok: true, status: 'delivered', alreadyDelivered: true })
+    }
+    if (!['shipped', 'ready_for_pickup'].includes(order.status)) {
+      return res.status(409).json({ error: `Transition impossible depuis le statut ${order.status}.` })
+    }
+
+    const { data: transitioned, error: updateError } = await supabaseAdmin
+      .from('orders')
+      .update({ status: 'delivered' })
+      .eq('id', orderId)
+      .eq('status', order.status)
+      .eq('payment_status', 'paid')
+      .is('checkout_review_required_at', null)
+      .is('checkout_review_reason', null)
+      .select('id')
+      .maybeSingle()
+    if (updateError) throw updateError
+    if (!transitioned) {
+      return res.status(409).json({ error: 'Le statut a changé. Rechargez la commande.' })
+    }
+    return res.status(200).json({ ok: true, status: 'delivered', alreadyDelivered: false })
+  } catch (error) {
+    console.error('mark-delivered error:', error)
+    return res.status(500).json({ error: error.message || 'Erreur serveur.' })
   }
 }

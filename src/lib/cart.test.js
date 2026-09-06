@@ -115,6 +115,21 @@ test('variant values are canonicalized against catalog values', () => {
   assert.deepEqual(result, { ok: true, variant: { color: 'Rouge', nicotine: 3 } })
 })
 
+test('editorial e-liquid subcategories expose their flavor and nicotine choices', () => {
+  const product = {
+    name: 'Pêche 10 ml',
+    category: 'eliquide-fruite',
+    flavors: ['Pêche'],
+    nicotine: [0, 3],
+  }
+
+  assert.deepEqual(getProductVariantChoices(product).map(({ key }) => key), ['flavor', 'nicotine'])
+  assert.deepEqual(resolveProductVariant(product, { flavor: 'pêche', nicotine: '3' }), {
+    ok: true,
+    variant: { flavor: 'Pêche', nicotine: 3 },
+  })
+})
+
 test('editing a variant is atomic and merges an identical cart line', () => {
   const cart = [
     { productId: 'liquid', qty: 1, variant: { nicotine: 0 } },

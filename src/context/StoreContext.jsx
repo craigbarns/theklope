@@ -19,6 +19,7 @@ import {
 import { getPaidOrders } from '../lib/dashboard.js'
 import { normalizeRelatedProductIds, removeProductAndReferences } from '../lib/relatedProducts.js'
 import { readCatalogBootstrap } from '../lib/catalogBootstrap.js'
+import { isDiyCategory, isEliquidCategory } from '../lib/productCategory.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -117,7 +118,7 @@ const normalizeProduct = (product) => {
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, id),
   }
   normalized.category = getProductCategoryKey(normalized)
-  if (!['eliquide', 'diy'].includes(normalized.category)) {
+  if (!isEliquidCategory(normalized.category) && !isDiyCategory(normalized.category)) {
     normalized.nicotine = []
     normalized.flavors = []
   }
@@ -831,7 +832,7 @@ export function StoreProvider({ children }) {
     }
     const token = adminSession?.access_token
     if (!token) throw new Error('Connexion admin requise.')
-    const res = await fetch('/api/mark-delivered', {
+    const res = await fetch('/api/mark-shipped?action=delivered', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ orderId }),

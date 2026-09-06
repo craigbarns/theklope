@@ -56,6 +56,20 @@ test('resistance keywords never move products out of another explicit category',
   assert.equal(productMatchesCategory(product, 'resistance'), false)
 })
 
+test('editorial e-liquid subcategories remain visible in the parent and explicit category', () => {
+  const product = {
+    id: 'peche-liquidarom',
+    name: 'Pêche 10 ml - Liquidarom',
+    category: 'eliquide-fruite',
+    type: 'E-liquide',
+  }
+
+  assert.equal(productMatchesCategory(product, 'eliquide'), true)
+  assert.equal(productMatchesCategory(product, 'eliquide-fruite'), true)
+  assert.deepEqual(productsByCategorySlugFrom([product], 'e-liquides'), [product])
+  assert.deepEqual(productsByCategorySlugFrom([product], 'e-liquides-fruites'), [product])
+})
+
 test('DIY is a product category and filters independently from accessories', () => {
   const diyCategory = CATEGORIES.find(({ slug }) => slug === 'diy')
   const products = [

@@ -137,6 +137,35 @@ Le webhook Mollie ne peut pas joindre `localhost` : utilisez un tunnel (ngrok)
 et mettez son URL dans `PUBLIC_BASE_URL`. Lancez les fonctions `api/` avec
 `vercel dev` (le simple `vite` ne sert pas les routes `/api`).
 
+## Expéditions — Mondial Relay
+
+L’admin sépare volontairement les deux services Mondial Relay :
+
+- **API 1 (SOAP)** : recherche des Points Relais / Lockers et consultation du suivi ;
+- **API 2 (REST/XML)** : création d’une expédition réelle et récupération de l’étiquette PDF 10 × 15.
+
+Les anciennes méthodes de création d’étiquette de l’API 1 ne sont pas utilisées : Mondial Relay
+indique qu’elles ne sont plus maintenues. Depuis `/admin?tab=settings`, les badges confirment que
+chaque API est configurée. Dans une commande payée « En préparation », le bloc Mondial Relay permet
+de saisir le poids, choisir une livraison en Point Relais/Locker ou à domicile si le contrat le permet,
+rechercher un Point Relais, créer l’expédition, imprimer le PDF et relire le suivi. Le numéro obtenu
+alimente automatiquement le contrôle d’expédition existant avant l’e-mail client.
+
+Variables serveur à définir dans Vercel (jamais avec le préfixe `VITE_`) :
+
+```bash
+MONDIAL_RELAY_API1_ENSEIGNE
+MONDIAL_RELAY_API1_PRIVATE_KEY
+MONDIAL_RELAY_API2_LOGIN
+MONDIAL_RELAY_API2_PASSWORD
+MONDIAL_RELAY_API2_CUSTOMER_ID
+MONDIAL_RELAY_API2_URL
+```
+
+Les coordonnées expéditeur peuvent être remplacées avec les variables
+`MONDIAL_RELAY_SENDER_*` documentées dans `.env.example`. La création en production est réelle :
+vérifiez le poids et le Point Relais avec le client avant de confirmer.
+
 ## Structure du projet
 
 ```

@@ -1,3 +1,5 @@
+import { categoryMatches, isEliquidCategory } from './productCategory.js'
+
 // =============================================================================
 // Tarification THEKLOPE — source de vérité PARTAGÉE entre le client (Vite) et
 // les fonctions serverless (api/). Le serveur recalcule toujours le montant à
@@ -78,7 +80,7 @@ const normBrand = (b) => String(b || '')
 const normVolume = (v) => String(v || '').trim().toLowerCase().replace(/\s+/g, '')
 const is10ml = (l) => normVolume(l.volume) === '10ml'
 const isTierVolume = (l, volumes) => volumes.includes(normVolume(l.volume))
-const isEliquid = (l) => (l.category || 'eliquide') === 'eliquide'
+const isEliquid = (line) => !line.category || isEliquidCategory(line.category)
 const lineSubtotalCents = (line) => (
   toCents(line.price) * (Number(line.qty) || 0)
 )
@@ -142,7 +144,7 @@ export const isCompletePack = (lines = []) => {
   return (
     active.some((line) => ['ecig', 'pod'].includes(line.category)) &&
     active.some((line) => PACK_CONSUMABLE_CATEGORIES.includes(line.category)) &&
-    active.some((line) => line.category === 'eliquide')
+    active.some((line) => isEliquid(line))
   )
 }
 
@@ -151,7 +153,7 @@ export const isCompletePack = (lines = []) => {
 const getCompletePackSubtotalCents = (lines = []) => {
   const active = lines.filter((line) => Number(line?.qty) > 0)
   const highestPriceCents = (categories) => active
-    .filter((line) => categories.includes(line.category))
+    .filter((line) => categories.some((category) => categoryMatches(line.category, category)))
     .reduce((highest, line) => Math.max(highest, toCents(line.price)), 0)
 
   if (!isCompletePack(active)) return 0

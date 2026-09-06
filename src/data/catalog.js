@@ -6,6 +6,8 @@
 // `products.js`, importé dynamiquement uniquement quand on en a besoin.
 // =============================================================================
 
+import { isEliquidProduct } from '../lib/productCategory.js'
+
 export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
@@ -113,40 +115,44 @@ export const isPackProduct = (p = {}) => {
 }
 
 export const isSelsNicotine = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
   return /\b(sel|sels)\s+de\s+nicotine\b/i.test(normalizedProductText(p)) || p.nicotine?.includes(20)
 }
 
 export const isEliquide50ml = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
   return /\b50\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 50
 }
 
 export const isEliquide100ml = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
   return /\b100\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 100
 }
 
 export const isEliquideTabac = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
+  if (p.category === 'eliquide-tabac') return true
   const text = normalizedProductText(p)
   return /\b(tabac|classic|blond|brun|virginia)\b/i.test(text)
 }
 
 export const isEliquideFruite = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
+  if (p.category === 'eliquide-fruite') return true
   const text = normalizedProductText(p)
   return /\b(fruit[eé]s?|fraise|framboise|mangue|p[eê]che|abricot|pomme|melon|pasteque|fruits?\s+rouges?|citron|cassis|fruits?\s+des\s+bois)\b/i.test(text)
 }
 
 export const isEliquideMenthe = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
+  if (p.category === 'eliquide-menthe') return true
   const text = normalizedProductText(p)
   return /\b(menthe|frais|glaciale|eucalyptus|freeze|ice)\b/i.test(text)
 }
 
 export const isEliquideGourmand = (p = {}) => {
-  if (p.category !== 'eliquide') return false
+  if (!isEliquidProduct(p)) return false
+  if (p.category === 'eliquide-gourmand') return true
   const text = normalizedProductText(p)
   return /\b(gourmands?|vanille|caramel|caf[eé]|biscuit|tarte|noisette|chocolat|pop-corn)\b/i.test(text)
 }
@@ -170,6 +176,7 @@ export const productMatchesCategory = (product, categoryKey) => {
     return pBrand.includes(brandName) || pText.includes(brandName)
   }
   if (categoryKey === 'resistance') return isResistanceProduct(product)
+  if (categoryKey === 'eliquide') return isEliquidProduct(product)
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
   if (categoryKey === 'pack') return isPackProduct(product)
   if (categoryKey === 'sels-nicotine') return isSelsNicotine(product)

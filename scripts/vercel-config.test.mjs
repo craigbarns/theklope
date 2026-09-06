@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { readFile } from 'node:fs/promises'
+import { readdir, readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -71,4 +71,15 @@ test('checkout cleanup is scheduled at most daily for Hobby compatibility', () =
   assert.ok(cleanup, 'Missing cleanup checkout cron')
   assert.equal(cleanup.schedule, '20 3 * * *')
   assert.equal(config.crons.filter((cron) => cron.path === cleanup.path).length, 1)
+})
+
+test('file-based API routes stay within the Vercel Hobby function limit', async () => {
+  const entries = await readdir(resolve(root, 'api'), { recursive: true, withFileTypes: true })
+  const functions = entries.filter((entry) => (
+    entry.isFile()
+    && entry.name.endsWith('.js')
+    && !entry.name.endsWith('.test.js')
+    && !entry.parentPath.split('/').includes('_lib')
+  ))
+  assert.ok(functions.length <= 12, `Vercel Hobby accepts 12 functions; found ${functions.length}`)
 })
