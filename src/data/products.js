@@ -5,7 +5,6 @@
 // Il est lourd : importez-le dynamiquement (await import('../data/products.js')).
 // Les constantes et helpers légers sont dans `catalog.js`.
 // =============================================================================
-
 export const PRODUCTS = [
   {
     "id": "act-1-0",
@@ -15,8 +14,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 248,
     "stock": 73,
     "badge": "promo",
     "nicotine": [
@@ -50,8 +47,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 141,
     "stock": 139,
     "badge": null,
     "nicotine": [
@@ -85,8 +80,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 155,
     "stock": 127,
     "badge": null,
     "nicotine": [
@@ -120,8 +113,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 227,
     "stock": 60,
     "badge": null,
     "nicotine": [
@@ -156,8 +147,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": 71.9,
-    "rating": 4.5,
-    "reviews": 180,
     "stock": 80,
     "badge": "promo",
     "nicotine": [
@@ -192,8 +181,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 65,
     "stock": 140,
     "badge": null,
     "nicotine": [
@@ -228,8 +215,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 173,
     "stock": 34,
     "badge": null,
     "nicotine": [
@@ -264,8 +249,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 78,
     "stock": 48,
     "badge": "promo",
     "nicotine": [
@@ -299,8 +282,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 126,
     "stock": 124,
     "badge": null,
     "nicotine": [
@@ -334,8 +315,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 152,
     "stock": 132,
     "badge": null,
     "nicotine": [
@@ -369,8 +348,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 41,
     "stock": 82,
     "badge": null,
     "nicotine": [
@@ -404,8 +381,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 67,
     "stock": 105,
     "badge": null,
     "nicotine": [
@@ -440,8 +415,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 192,
     "stock": 28,
     "badge": "nouveau",
     "nicotine": [
@@ -475,8 +448,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 249,
     "stock": 68,
     "badge": null,
     "nicotine": [
@@ -510,8 +481,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.6,
-    "reviews": 131,
     "stock": 90,
     "badge": "promo",
     "nicotine": [
@@ -545,8 +514,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 134,
     "stock": 129,
     "badge": null,
     "nicotine": [
@@ -580,8 +547,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 184,
     "stock": 8,
     "badge": null,
     "nicotine": [
@@ -615,8 +580,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 157,
     "stock": 82,
     "badge": null,
     "nicotine": [
@@ -650,8 +613,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 136,
     "stock": 120,
     "badge": null,
     "nicotine": [
@@ -685,8 +646,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 77,
     "stock": 56,
     "badge": null,
     "nicotine": [
@@ -720,8 +679,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 204,
     "stock": 79,
     "badge": null,
     "nicotine": [
@@ -755,8 +712,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 67,
     "stock": 109,
     "badge": "promo",
     "nicotine": [
@@ -790,8 +745,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 205,
     "stock": 7,
     "badge": null,
     "nicotine": [
@@ -825,8 +778,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 176,
     "stock": 33,
     "badge": null,
     "nicotine": [
@@ -860,8 +811,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 234,
     "stock": 32,
     "badge": "nouveau",
     "nicotine": [
@@ -895,8 +844,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 219,
     "stock": 82,
     "badge": null,
     "nicotine": [
@@ -930,8 +877,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 150,
     "stock": 48,
     "badge": null,
     "nicotine": [
@@ -965,8 +910,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 246,
     "stock": 8,
     "badge": null,
     "nicotine": [],
@@ -991,8 +934,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 102,
     "stock": 87,
     "badge": null,
     "nicotine": [],
@@ -1017,8 +958,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 181,
     "stock": 145,
     "badge": null,
     "nicotine": [
@@ -1052,8 +991,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 85,
     "stock": 108,
     "badge": null,
     "nicotine": [
@@ -1087,8 +1024,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 75,
     "stock": 103,
     "badge": null,
     "nicotine": [
@@ -1122,8 +1057,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 243,
     "stock": 7,
     "badge": null,
     "nicotine": [
@@ -1157,8 +1090,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 179,
     "stock": 116,
     "badge": null,
     "nicotine": [
@@ -1192,8 +1123,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 40,
     "stock": 46,
     "badge": null,
     "nicotine": [
@@ -1227,8 +1156,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.8,
-    "reviews": 211,
     "stock": 143,
     "badge": "promo",
     "nicotine": [
@@ -1258,8 +1185,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 24,
     "stock": 134,
     "badge": "nouveau",
     "nicotine": [
@@ -1293,8 +1218,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 56,
     "stock": 74,
     "badge": null,
     "nicotine": [
@@ -1328,8 +1251,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 65,
     "stock": 68,
     "badge": null,
     "nicotine": [
@@ -1363,8 +1284,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 119,
     "stock": 98,
     "badge": null,
     "nicotine": [
@@ -1398,8 +1317,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 99,
     "stock": 83,
     "badge": null,
     "nicotine": [
@@ -1433,8 +1350,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 100,
     "stock": 91,
     "badge": null,
     "nicotine": [
@@ -1468,8 +1383,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 134,
     "stock": 67,
     "badge": "promo",
     "nicotine": [
@@ -1503,8 +1416,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 70,
     "stock": 118,
     "badge": null,
     "nicotine": [
@@ -1538,8 +1449,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 149,
     "stock": 78,
     "badge": null,
     "nicotine": [
@@ -1573,8 +1482,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 247,
     "stock": 75,
     "badge": null,
     "nicotine": [
@@ -1608,8 +1515,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 113,
     "stock": 82,
     "badge": null,
     "nicotine": [
@@ -1643,8 +1548,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 201,
     "stock": 51,
     "badge": null,
     "nicotine": [
@@ -1678,8 +1581,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 160,
     "stock": 136,
     "badge": "nouveau",
     "nicotine": [
@@ -1713,8 +1614,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 156,
     "stock": 56,
     "badge": "promo",
     "nicotine": [
@@ -1748,8 +1647,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 139,
     "stock": 36,
     "badge": null,
     "nicotine": [
@@ -1784,8 +1681,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 238,
     "stock": 29,
     "badge": null,
     "nicotine": [
@@ -1819,8 +1714,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 177,
     "stock": 69,
     "badge": null,
     "nicotine": [
@@ -1854,8 +1747,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 223,
     "stock": 119,
     "badge": null,
     "nicotine": [
@@ -1889,8 +1780,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 117,
     "stock": 107,
     "badge": null,
     "nicotine": [
@@ -1924,8 +1813,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 189,
     "stock": 97,
     "badge": null,
     "nicotine": [
@@ -1959,8 +1846,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 101,
     "stock": 86,
     "badge": "promo",
     "nicotine": [
@@ -1994,8 +1879,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 123,
     "stock": 26,
     "badge": null,
     "nicotine": [
@@ -2029,8 +1912,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 187,
     "stock": 37,
     "badge": null,
     "nicotine": [
@@ -2064,8 +1945,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 137,
     "stock": 149,
     "badge": null,
     "nicotine": [
@@ -2099,8 +1978,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 160,
     "stock": 17,
     "badge": "nouveau",
     "nicotine": [
@@ -2134,8 +2011,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 30,
     "stock": 6,
     "badge": null,
     "nicotine": [
@@ -2169,8 +2044,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 204,
     "stock": 109,
     "badge": null,
     "nicotine": [
@@ -2204,8 +2077,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.8,
-    "reviews": 102,
     "stock": 145,
     "badge": "promo",
     "nicotine": [
@@ -2239,8 +2110,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 168,
     "stock": 78,
     "badge": null,
     "nicotine": [
@@ -2274,8 +2143,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 217,
     "stock": 143,
     "badge": null,
     "nicotine": [
@@ -2309,8 +2176,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 223,
     "stock": 110,
     "badge": null,
     "nicotine": [
@@ -2344,8 +2209,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 66,
     "stock": 5,
     "badge": null,
     "nicotine": [
@@ -2379,8 +2242,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 180,
     "stock": 61,
     "badge": null,
     "nicotine": [
@@ -2414,8 +2275,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 240,
     "stock": 108,
     "badge": null,
     "nicotine": [],
@@ -2440,8 +2299,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.3,
-    "reviews": 217,
     "stock": 91,
     "badge": "promo",
     "nicotine": [
@@ -2475,8 +2332,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 186,
     "stock": 144,
     "badge": null,
     "nicotine": [
@@ -2510,8 +2365,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 76,
     "stock": 130,
     "badge": "nouveau",
     "nicotine": [
@@ -2545,8 +2398,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 152,
     "stock": 144,
     "badge": null,
     "nicotine": [
@@ -2580,8 +2431,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 23,
     "stock": 90,
     "badge": null,
     "nicotine": [
@@ -2615,8 +2464,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 239,
     "stock": 51,
     "badge": null,
     "nicotine": [
@@ -2650,8 +2497,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 32,
     "stock": 109,
     "badge": null,
     "nicotine": [
@@ -2685,8 +2530,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.8,
-    "reviews": 162,
     "stock": 64,
     "badge": "promo",
     "nicotine": [
@@ -2720,8 +2563,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 155,
     "stock": 63,
     "badge": null,
     "nicotine": [
@@ -2755,8 +2596,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 29,
     "stock": 40,
     "badge": null,
     "nicotine": [
@@ -2790,8 +2629,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 24,
     "stock": 58,
     "badge": null,
     "nicotine": [
@@ -2825,8 +2662,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 161,
     "stock": 103,
     "badge": null,
     "nicotine": [
@@ -2860,8 +2695,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 83,
     "stock": 139,
     "badge": null,
     "nicotine": [
@@ -2895,8 +2728,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 30,
     "stock": 90,
     "badge": null,
     "nicotine": [
@@ -2931,8 +2762,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": 71.9,
-    "rating": 4.5,
-    "reviews": 16,
     "stock": 126,
     "badge": "promo",
     "nicotine": [
@@ -2967,8 +2796,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 198,
     "stock": 32,
     "badge": null,
     "nicotine": [
@@ -3003,8 +2830,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 236,
     "stock": 5,
     "badge": null,
     "nicotine": [
@@ -3039,8 +2864,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 184,
     "stock": 28,
     "badge": null,
     "nicotine": [
@@ -3075,8 +2898,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": 47.9,
-    "rating": 4.5,
-    "reviews": 243,
     "stock": 71,
     "badge": "promo",
     "nicotine": [
@@ -3111,8 +2932,6 @@ export const PRODUCTS = [
     "type": "Kit complet",
     "price": 54.90,
     "oldPrice": 64.90,
-    "rating": 4.8,
-    "reviews": 12,
     "stock": 44,
     "badge": "nouveau",
     "colors": ["Noir", "Argent", "Bleu", "Gunmetal"],
@@ -3138,8 +2957,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 92,
     "stock": 144,
     "badge": null,
     "nicotine": [
@@ -3173,8 +2990,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 197,
     "stock": 68,
     "badge": null,
     "nicotine": [
@@ -3209,8 +3024,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": 47.9,
-    "rating": 4.8,
-    "reviews": 66,
     "stock": 45,
     "badge": "promo",
     "nicotine": [
@@ -3245,8 +3058,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 198,
     "stock": 52,
     "badge": null,
     "nicotine": [
@@ -3280,8 +3091,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 175,
     "stock": 22,
     "badge": null,
     "nicotine": [
@@ -3315,8 +3124,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 189,
     "stock": 55,
     "badge": null,
     "nicotine": [
@@ -3350,8 +3157,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 14,
     "stock": 56,
     "badge": "nouveau",
     "nicotine": [
@@ -3385,8 +3190,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 177,
     "stock": 68,
     "badge": null,
     "nicotine": [
@@ -3420,8 +3223,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.5,
-    "reviews": 20,
     "stock": 73,
     "badge": "promo",
     "nicotine": [
@@ -3455,8 +3256,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 127,
     "stock": 117,
     "badge": null,
     "nicotine": [
@@ -3490,8 +3289,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 76,
     "stock": 136,
     "badge": null,
     "nicotine": [
@@ -3525,8 +3322,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 212,
     "stock": 125,
     "badge": null,
     "nicotine": [
@@ -3560,8 +3355,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 37,
     "stock": 18,
     "badge": null,
     "nicotine": [
@@ -3595,8 +3388,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 119,
     "stock": 24,
     "badge": null,
     "nicotine": [
@@ -3630,8 +3421,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 247,
     "stock": 37,
     "badge": null,
     "nicotine": [
@@ -3665,8 +3454,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 98,
     "stock": 86,
     "badge": "promo",
     "nicotine": [
@@ -3700,8 +3487,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 157,
     "stock": 137,
     "badge": null,
     "nicotine": [
@@ -3735,8 +3520,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 94,
     "stock": 32,
     "badge": null,
     "nicotine": [
@@ -3770,8 +3553,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 67,
     "stock": 30,
     "badge": "nouveau",
     "nicotine": [
@@ -3805,8 +3586,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 44,
     "stock": 9,
     "badge": null,
     "nicotine": [
@@ -3840,8 +3619,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 146,
     "stock": 98,
     "badge": null,
     "nicotine": [
@@ -3875,8 +3652,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 240,
     "stock": 43,
     "badge": null,
     "nicotine": [
@@ -3910,8 +3685,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.3,
-    "reviews": 101,
     "stock": 45,
     "badge": "promo",
     "nicotine": [
@@ -3945,8 +3718,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 156,
     "stock": 115,
     "badge": null,
     "nicotine": [
@@ -3980,8 +3751,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 207,
     "stock": 15,
     "badge": null,
     "nicotine": [
@@ -4015,8 +3784,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 192,
     "stock": 110,
     "badge": null,
     "nicotine": [
@@ -4050,8 +3817,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 101,
     "stock": 103,
     "badge": null,
     "nicotine": [
@@ -4085,8 +3850,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 113,
     "stock": 136,
     "badge": null,
     "nicotine": [
@@ -4120,8 +3883,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 171,
     "stock": 37,
     "badge": null,
     "nicotine": [
@@ -4155,8 +3916,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 22,
     "stock": 69,
     "badge": "promo",
     "nicotine": [
@@ -4190,8 +3949,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 153,
     "stock": 16,
     "badge": "nouveau",
     "nicotine": [
@@ -4225,8 +3982,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 155,
     "stock": 72,
     "badge": null,
     "nicotine": [
@@ -4260,8 +4015,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 86,
     "stock": 57,
     "badge": null,
     "nicotine": [
@@ -4295,8 +4048,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 44,
     "stock": 7,
     "badge": null,
     "nicotine": [
@@ -4330,8 +4081,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 70,
     "stock": 33,
     "badge": null,
     "nicotine": [
@@ -4365,8 +4114,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 164,
     "stock": 77,
     "badge": null,
     "nicotine": [
@@ -4400,8 +4147,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 68,
     "stock": 140,
     "badge": "promo",
     "nicotine": [
@@ -4435,8 +4180,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 81,
     "stock": 120,
     "badge": null,
     "nicotine": [
@@ -4470,8 +4213,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 176,
     "stock": 50,
     "badge": null,
     "nicotine": [
@@ -4505,8 +4246,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 46,
     "stock": 36,
     "badge": null,
     "nicotine": [
@@ -4540,8 +4279,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 39,
     "stock": 111,
     "badge": null,
     "nicotine": [
@@ -4575,8 +4312,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 187,
     "stock": 125,
     "badge": null,
     "nicotine": [
@@ -4610,8 +4345,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 230,
     "stock": 28,
     "badge": "nouveau",
     "nicotine": [
@@ -4645,8 +4378,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 82,
     "stock": 136,
     "badge": "promo",
     "nicotine": [
@@ -4680,8 +4411,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 239,
     "stock": 21,
     "badge": null,
     "nicotine": [
@@ -4715,8 +4444,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 218,
     "stock": 106,
     "badge": null,
     "nicotine": [
@@ -4750,8 +4477,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 233,
     "stock": 19,
     "badge": null,
     "nicotine": [
@@ -4785,8 +4510,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 54,
     "stock": 102,
     "badge": null,
     "nicotine": [
@@ -4820,8 +4543,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 146,
     "stock": 23,
     "badge": null,
     "nicotine": [
@@ -4855,8 +4576,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 128,
     "stock": 32,
     "badge": null,
     "nicotine": [
@@ -4890,8 +4609,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 204,
     "stock": 97,
     "badge": "promo",
     "nicotine": [
@@ -4925,8 +4642,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 28,
     "stock": 35,
     "badge": null,
     "nicotine": [
@@ -4960,8 +4675,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 59,
     "stock": 57,
     "badge": null,
     "nicotine": [
@@ -4995,8 +4708,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 62,
     "stock": 122,
     "badge": null,
     "nicotine": [
@@ -5031,8 +4742,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": 47.9,
-    "rating": 4.7,
-    "reviews": 90,
     "stock": 120,
     "badge": "promo",
     "nicotine": [
@@ -5067,8 +4776,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 86,
     "stock": 149,
     "badge": null,
     "nicotine": [
@@ -5102,8 +4809,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 37,
     "stock": 113,
     "badge": null,
     "nicotine": [
@@ -5138,8 +4843,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 106,
     "stock": 24,
     "badge": null,
     "nicotine": [
@@ -5174,8 +4877,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 166,
     "stock": 88,
     "badge": null,
     "nicotine": [
@@ -5209,8 +4910,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 10,
     "stock": 55,
     "badge": null,
     "nicotine": [
@@ -5244,8 +4943,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 240,
     "stock": 10,
     "badge": null,
     "nicotine": [
@@ -5279,8 +4976,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 207,
     "stock": 92,
     "badge": null,
     "nicotine": [
@@ -5314,8 +5009,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 197,
     "stock": 36,
     "badge": null,
     "nicotine": [
@@ -5349,8 +5042,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 88,
     "stock": 133,
     "badge": null,
     "nicotine": [
@@ -5384,8 +5075,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.8,
-    "reviews": 164,
     "stock": 77,
     "badge": "promo",
     "nicotine": [
@@ -5419,8 +5108,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 89,
     "stock": 36,
     "badge": null,
     "nicotine": [
@@ -5454,8 +5141,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 175,
     "stock": 58,
     "badge": "nouveau",
     "nicotine": [
@@ -5489,8 +5174,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 191,
     "stock": 79,
     "badge": null,
     "nicotine": [
@@ -5524,8 +5207,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 165,
     "stock": 50,
     "badge": null,
     "nicotine": [
@@ -5559,8 +5240,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 229,
     "stock": 46,
     "badge": null,
     "nicotine": [
@@ -5594,8 +5273,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 93,
     "stock": 26,
     "badge": null,
     "nicotine": [
@@ -5629,8 +5306,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.9,
-    "reviews": 63,
     "stock": 11,
     "badge": "promo",
     "nicotine": [
@@ -5664,8 +5339,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 69,
     "stock": 21,
     "badge": null,
     "nicotine": [
@@ -5699,8 +5372,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 152,
     "stock": 61,
     "badge": null,
     "nicotine": [
@@ -5734,8 +5405,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 26,
     "stock": 21,
     "badge": null,
     "nicotine": [
@@ -5769,8 +5438,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 81,
     "stock": 134,
     "badge": null,
     "nicotine": [
@@ -5804,8 +5471,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 136,
     "stock": 66,
     "badge": null,
     "nicotine": [
@@ -5839,8 +5504,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 135,
     "stock": 6,
     "badge": null,
     "nicotine": [
@@ -5874,8 +5537,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.5,
-    "reviews": 81,
     "stock": 129,
     "badge": "promo",
     "nicotine": [
@@ -5909,8 +5570,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 122,
     "stock": 25,
     "badge": null,
     "nicotine": [
@@ -5944,8 +5603,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 68,
     "stock": 89,
     "badge": null,
     "nicotine": [
@@ -5979,8 +5636,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 20,
     "stock": 23,
     "badge": null,
     "nicotine": [
@@ -6014,8 +5669,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 17,
     "stock": 91,
     "badge": null,
     "nicotine": [
@@ -6049,8 +5702,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 69,
     "stock": 72,
     "badge": null,
     "nicotine": [
@@ -6084,8 +5735,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 103,
     "stock": 52,
     "badge": null,
     "nicotine": [
@@ -6119,8 +5768,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.8,
-    "reviews": 118,
     "stock": 13,
     "badge": "promo",
     "nicotine": [
@@ -6154,8 +5801,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 46,
     "stock": 34,
     "badge": null,
     "nicotine": [
@@ -6189,8 +5834,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 111,
     "stock": 48,
     "badge": null,
     "nicotine": [
@@ -6224,8 +5867,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 143,
     "stock": 55,
     "badge": null,
     "nicotine": [
@@ -6259,8 +5900,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 85,
     "stock": 133,
     "badge": null,
     "nicotine": [
@@ -6294,8 +5933,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 99,
     "stock": 81,
     "badge": "nouveau",
     "nicotine": [
@@ -6329,8 +5966,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 187,
     "stock": 22,
     "badge": null,
     "nicotine": [
@@ -6364,8 +5999,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.4,
-    "reviews": 51,
     "stock": 46,
     "badge": "promo",
     "nicotine": [
@@ -6399,8 +6032,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 46,
     "stock": 45,
     "badge": null,
     "nicotine": [
@@ -6434,8 +6065,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 23,
     "stock": 128,
     "badge": null,
     "nicotine": [
@@ -6469,8 +6098,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 181,
     "stock": 9,
     "badge": null,
     "nicotine": [
@@ -6504,8 +6131,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 48,
     "stock": 99,
     "badge": null,
     "nicotine": [
@@ -6540,8 +6165,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 84,
     "stock": 37,
     "badge": null,
     "nicotine": [],
@@ -6566,8 +6189,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 105,
     "stock": 99,
     "badge": null,
     "nicotine": [
@@ -6601,8 +6222,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.6,
-    "reviews": 240,
     "stock": 62,
     "badge": "promo",
     "nicotine": [
@@ -6636,8 +6255,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 103,
     "stock": 34,
     "badge": null,
     "nicotine": [
@@ -6671,8 +6288,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 54,
     "stock": 79,
     "badge": null,
     "nicotine": [
@@ -6706,8 +6321,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 164,
     "stock": 95,
     "badge": "nouveau",
     "nicotine": [
@@ -6741,8 +6354,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 70,
     "stock": 112,
     "badge": null,
     "nicotine": [
@@ -6776,8 +6387,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 24,
     "stock": 108,
     "badge": null,
     "nicotine": [
@@ -6811,8 +6420,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 106,
     "stock": 30,
     "badge": null,
     "nicotine": [
@@ -6846,8 +6453,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.5,
-    "reviews": 98,
     "stock": 126,
     "badge": "promo",
     "nicotine": [
@@ -6881,8 +6486,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 196,
     "stock": 133,
     "badge": null,
     "nicotine": [
@@ -6916,8 +6519,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 108,
     "stock": 49,
     "badge": null,
     "nicotine": [
@@ -6951,8 +6552,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 117,
     "stock": 21,
     "badge": null,
     "nicotine": [
@@ -6986,8 +6585,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 217,
     "stock": 69,
     "badge": null,
     "nicotine": [
@@ -7021,8 +6618,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 226,
     "stock": 149,
     "badge": null,
     "nicotine": [
@@ -7056,8 +6651,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 179,
     "stock": 136,
     "badge": null,
     "nicotine": [
@@ -7091,8 +6684,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 183,
     "stock": 125,
     "badge": "promo",
     "nicotine": [
@@ -7126,8 +6717,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 130,
     "stock": 94,
     "badge": "nouveau",
     "nicotine": [
@@ -7161,8 +6750,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.6,
-    "reviews": 149,
     "stock": 111,
     "badge": "promo",
     "nicotine": [
@@ -7192,8 +6779,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 174,
     "stock": 67,
     "badge": null,
     "nicotine": [
@@ -7223,8 +6808,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 150,
     "stock": 73,
     "badge": null,
     "nicotine": [
@@ -7258,8 +6841,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 46,
     "stock": 140,
     "badge": null,
     "nicotine": [
@@ -7289,8 +6870,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 172,
     "stock": 45,
     "badge": null,
     "nicotine": [
@@ -7324,8 +6903,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.3,
-    "reviews": 95,
     "stock": 85,
     "badge": "promo",
     "nicotine": [
@@ -7355,8 +6932,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 90,
     "stock": 58,
     "badge": null,
     "nicotine": [
@@ -7390,8 +6965,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 16,
     "stock": 135,
     "badge": null,
     "nicotine": [],
@@ -7416,8 +6989,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 62,
     "stock": 109,
     "badge": null,
     "nicotine": [
@@ -7452,8 +7023,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 205,
     "stock": 53,
     "badge": null,
     "nicotine": [],
@@ -7478,8 +7047,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 121,
     "stock": 71,
     "badge": null,
     "nicotine": [
@@ -7514,8 +7081,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 21,
     "stock": 28,
     "badge": "nouveau",
     "nicotine": [
@@ -7549,8 +7114,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 203,
     "stock": 72,
     "badge": null,
     "nicotine": [
@@ -7580,8 +7143,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 126,
     "stock": 71,
     "badge": null,
     "nicotine": [
@@ -7615,8 +7176,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 184,
     "stock": 146,
     "badge": null,
     "nicotine": [
@@ -7646,8 +7205,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.4,
-    "reviews": 132,
     "stock": 7,
     "badge": "promo",
     "nicotine": [
@@ -7677,8 +7234,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 17,
     "stock": 130,
     "badge": null,
     "nicotine": [
@@ -7708,8 +7263,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 40,
     "stock": 82,
     "badge": null,
     "nicotine": [
@@ -7739,8 +7292,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 149,
     "stock": 116,
     "badge": null,
     "nicotine": [
@@ -7774,8 +7325,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 185,
     "stock": 22,
     "badge": null,
     "nicotine": [
@@ -7805,8 +7354,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 23,
     "stock": 40,
     "badge": null,
     "nicotine": [
@@ -7840,8 +7387,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 180,
     "stock": 88,
     "badge": null,
     "nicotine": [
@@ -7875,8 +7420,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 246,
     "stock": 19,
     "badge": null,
     "nicotine": [
@@ -7910,8 +7453,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 228,
     "stock": 95,
     "badge": "nouveau",
     "nicotine": [
@@ -7945,8 +7486,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 166,
     "stock": 144,
     "badge": null,
     "nicotine": [
@@ -7980,8 +7519,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 56,
     "stock": 133,
     "badge": null,
     "nicotine": [
@@ -8015,8 +7552,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.7,
-    "reviews": 192,
     "stock": 139,
     "badge": "promo",
     "nicotine": [
@@ -8050,8 +7585,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 236,
     "stock": 65,
     "badge": null,
     "nicotine": [
@@ -8085,8 +7618,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 51,
     "stock": 108,
     "badge": null,
     "nicotine": [
@@ -8120,8 +7651,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 27,
     "stock": 62,
     "badge": null,
     "nicotine": [
@@ -8155,8 +7684,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 71,
     "stock": 45,
     "badge": null,
     "nicotine": [
@@ -8190,8 +7717,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 216,
     "stock": 29,
     "badge": null,
     "nicotine": [
@@ -8225,8 +7750,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 137,
     "stock": 130,
     "badge": null,
     "nicotine": [
@@ -8260,8 +7783,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": 6.9,
-    "rating": 4.8,
-    "reviews": 131,
     "stock": 17,
     "badge": "promo",
     "nicotine": [
@@ -8295,8 +7816,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 125,
     "stock": 43,
     "badge": null,
     "nicotine": [
@@ -8330,8 +7849,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 28,
     "stock": 8,
     "badge": "nouveau",
     "nicotine": [
@@ -8365,8 +7882,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 136,
     "stock": 110,
     "badge": null,
     "nicotine": [
@@ -8400,8 +7915,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 213,
     "stock": 13,
     "badge": null,
     "nicotine": [
@@ -8435,8 +7948,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 39,
     "stock": 90,
     "badge": null,
     "nicotine": [
@@ -8466,8 +7977,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 102,
     "stock": 60,
     "badge": null,
     "nicotine": [
@@ -8497,8 +8006,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.5,
-    "reviews": 131,
     "stock": 74,
     "badge": "promo",
     "nicotine": [
@@ -8528,8 +8035,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 25,
     "stock": 54,
     "badge": null,
     "nicotine": [
@@ -8559,8 +8064,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 161,
     "stock": 25,
     "badge": null,
     "nicotine": [
@@ -8594,8 +8097,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 10,
     "stock": 8,
     "badge": null,
     "nicotine": [
@@ -8629,8 +8130,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 212,
     "stock": 48,
     "badge": null,
     "nicotine": [
@@ -8660,8 +8159,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 161,
     "stock": 39,
     "badge": null,
     "nicotine": [
@@ -8695,8 +8192,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 143,
     "stock": 73,
     "badge": null,
     "nicotine": [
@@ -8726,8 +8221,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 188,
     "stock": 15,
     "badge": "nouveau",
     "nicotine": [
@@ -8757,8 +8250,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 186,
     "stock": 123,
     "badge": null,
     "nicotine": [
@@ -8788,8 +8279,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 114,
     "stock": 114,
     "badge": null,
     "nicotine": [
@@ -8819,8 +8308,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.9,
-    "reviews": 249,
     "stock": 7,
     "badge": "promo",
     "nicotine": [
@@ -8850,8 +8337,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 150,
     "stock": 145,
     "badge": null,
     "nicotine": [
@@ -8881,8 +8366,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 49,
     "stock": 133,
     "badge": null,
     "nicotine": [
@@ -8916,8 +8399,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 249,
     "stock": 136,
     "badge": null,
     "nicotine": [
@@ -8947,8 +8428,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 229,
     "stock": 71,
     "badge": null,
     "nicotine": [
@@ -8978,8 +8457,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.4,
-    "reviews": 115,
     "stock": 77,
     "badge": "promo",
     "nicotine": [
@@ -9009,8 +8486,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 183,
     "stock": 6,
     "badge": null,
     "nicotine": [
@@ -9040,8 +8515,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 93,
     "stock": 27,
     "badge": null,
     "nicotine": [
@@ -9071,8 +8544,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 190,
     "stock": 97,
     "badge": null,
     "nicotine": [
@@ -9107,8 +8578,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": 71.9,
-    "rating": 4.9,
-    "reviews": 53,
     "stock": 92,
     "badge": "promo",
     "nicotine": [
@@ -9143,8 +8612,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 44.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 139,
     "stock": 15,
     "badge": null,
     "nicotine": [
@@ -9179,8 +8646,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 110,
     "stock": 111,
     "badge": null,
     "nicotine": [
@@ -9215,8 +8680,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 232,
     "stock": 17,
     "badge": null,
     "nicotine": [
@@ -9251,8 +8714,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": 71.9,
-    "rating": 4.8,
-    "reviews": 193,
     "stock": 82,
     "badge": "promo",
     "nicotine": [
@@ -9287,8 +8748,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 159,
     "stock": 47,
     "badge": null,
     "nicotine": [
@@ -9323,8 +8782,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 57,
     "stock": 49,
     "badge": null,
     "nicotine": [
@@ -9359,8 +8816,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 228,
     "stock": 130,
     "badge": null,
     "nicotine": [
@@ -9395,8 +8850,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": 47.9,
-    "rating": 4.4,
-    "reviews": 218,
     "stock": 94,
     "badge": "promo",
     "nicotine": [
@@ -9431,8 +8884,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 111,
     "stock": 121,
     "badge": null,
     "nicotine": [
@@ -9467,8 +8918,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 58,
     "stock": 26,
     "badge": null,
     "nicotine": [
@@ -9503,8 +8952,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 59.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 161,
     "stock": 145,
     "badge": null,
     "nicotine": [
@@ -9539,8 +8986,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": 47.9,
-    "rating": 4.8,
-    "reviews": 193,
     "stock": 20,
     "badge": "promo",
     "nicotine": [
@@ -9575,8 +9020,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 14,
     "stock": 145,
     "badge": null,
     "nicotine": [
@@ -9611,8 +9054,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 62,
     "stock": 71,
     "badge": null,
     "nicotine": [
@@ -9647,8 +9088,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 37,
     "stock": 25,
     "badge": null,
     "nicotine": [
@@ -9683,8 +9122,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": 29.9,
-    "rating": 4.4,
-    "reviews": 207,
     "stock": 61,
     "badge": "promo",
     "nicotine": [
@@ -9719,8 +9156,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 48,
     "stock": 84,
     "badge": null,
     "nicotine": [
@@ -9755,8 +9190,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 152,
     "stock": 67,
     "badge": null,
     "nicotine": [
@@ -9791,8 +9224,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 29.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 182,
     "stock": 72,
     "badge": null,
     "nicotine": [
@@ -9827,8 +9258,6 @@ export const PRODUCTS = [
     "type": "Pod",
     "price": 24.9,
     "oldPrice": 29.9,
-    "rating": 4.4,
-    "reviews": 117,
     "stock": 30,
     "badge": "promo",
     "nicotine": [
@@ -9863,8 +9292,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.8,
-    "reviews": 105,
     "stock": 132,
     "badge": "promo",
     "nicotine": [
@@ -9894,8 +9321,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 221,
     "stock": 86,
     "badge": null,
     "nicotine": [
@@ -9925,8 +9350,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 85,
     "stock": 71,
     "badge": null,
     "nicotine": [
@@ -9956,8 +9379,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 97,
     "stock": 79,
     "badge": "nouveau",
     "nicotine": [
@@ -9991,8 +9412,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 236,
     "stock": 96,
     "badge": null,
     "nicotine": [
@@ -10026,8 +9445,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": 24.9,
-    "rating": 4.9,
-    "reviews": 240,
     "stock": 12,
     "badge": "promo",
     "nicotine": [
@@ -10057,8 +9474,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 108,
     "stock": 123,
     "badge": null,
     "nicotine": [
@@ -10088,8 +9503,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 123,
     "stock": 31,
     "badge": null,
     "nicotine": [
@@ -10123,8 +9536,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 206,
     "stock": 30,
     "badge": null,
     "nicotine": [
@@ -10154,8 +9565,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 190,
     "stock": 120,
     "badge": null,
     "nicotine": [
@@ -10185,8 +9594,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 38,
     "stock": 129,
     "badge": null,
     "nicotine": [
@@ -10220,8 +9627,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 92,
     "stock": 86,
     "badge": null,
     "nicotine": [
@@ -10251,8 +9656,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 111,
     "stock": 96,
     "badge": null,
     "nicotine": [
@@ -10282,8 +9685,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.5,
-    "reviews": 225,
     "stock": 72,
     "badge": null,
     "nicotine": [
@@ -10317,8 +9718,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.3,
-    "reviews": 34,
     "stock": 100,
     "badge": null,
     "nicotine": [
@@ -10349,8 +9748,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": 15.9,
-    "rating": 4.5,
-    "reviews": 233,
     "stock": 8,
     "badge": "promo",
     "nicotine": [],
@@ -10376,8 +9773,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.8,
-    "reviews": 99,
     "stock": 21,
     "badge": null,
     "nicotine": [],
@@ -10403,8 +9798,6 @@ export const PRODUCTS = [
     "type": "Accessoire",
     "price": 12.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 156,
     "stock": 46,
     "badge": null,
     "nicotine": [],
@@ -10429,8 +9822,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 151,
     "stock": 11,
     "badge": null,
     "nicotine": [
@@ -10460,8 +9851,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 66,
     "stock": 42,
     "badge": null,
     "nicotine": [
@@ -10491,8 +9880,6 @@ export const PRODUCTS = [
     "type": "Cigarette électronique",
     "price": 39.9,
     "oldPrice": null,
-    "rating": 4.4,
-    "reviews": 131,
     "stock": 137,
     "badge": null,
     "nicotine": [
@@ -10527,8 +9914,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 5.9,
     "oldPrice": null,
-    "rating": 4.7,
-    "reviews": 178,
     "stock": 98,
     "badge": null,
     "nicotine": [
@@ -10562,8 +9947,6 @@ export const PRODUCTS = [
     "type": "E-liquide",
     "price": 19.9,
     "oldPrice": null,
-    "rating": 4.6,
-    "reviews": 115,
     "stock": 33,
     "badge": null,
     "nicotine": [
@@ -10593,8 +9976,6 @@ export const PRODUCTS = [
     "type": "Booster",
     "price": 1.5,
     "oldPrice": null,
-    "rating": 4.9,
-    "reviews": 142,
     "stock": 500,
     "badge": "best-seller",
     "nicotine": [
@@ -10618,22 +9999,18 @@ export const PRODUCTS = [
     "image": "/products/product-placeholder.svg"
   }
 ];
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 PRODUCTS.forEach((p) => {
   const nameLower = p.name.toLowerCase();
-
   // Category classification: ecig/pod kits become packs
   if ((p.category === 'ecig' || p.category === 'pod') && /\bkit\b/.test(nameLower)) {
     p.category = 'pack';
   }
-
   // Ne jamais écraser une marque explicitement relue dans la source. Les
   // heuristiques ci-dessous ne servent qu'aux anciennes lignes non renseignées.
   if (p.brand && p.brand !== 'THEKLOPE') return;
-
   // Brand classification based on keywords in name
   if (nameLower.includes('geekvape') || nameLower.includes('geek-vape') || nameLower.includes('aegis') || nameLower.includes('obelisk') || nameLower.includes('wenax') || nameLower.includes('zeus')) {
     p.brand = 'Geekvape';
@@ -10670,11 +10047,9 @@ PRODUCTS.forEach((p) => {
   } else if (nameLower.includes('selad')) {
     p.brand = 'Selad';
   }
-
   // Une marque inconnue reste explicitement THEKLOPE : inventer un fabricant
   // à partir de la catégorie rend les filtres et les fiches trompeurs.
 });
-
 // Corrections commerciales vérifiées contre le catalogue live. Ce fichier ne
 // sert qu'au développement local ; les déploiements chargent Supabase, mais le
 // mode local ne doit pas proposer du matériel à 5,90 € comme un e-liquide.
@@ -10758,7 +10133,6 @@ const STATIC_CATALOG_CORRECTIONS = {
   // restent consultables en local mais ne peuvent plus être ajoutées au panier.
   'gtx-70': { stock: 0, badge: null }
 };
-
 PRODUCTS.forEach((product) => {
   const correction = STATIC_CATALOG_CORRECTIONS[product.id];
   if (correction) Object.assign(product, correction);
