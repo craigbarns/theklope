@@ -555,6 +555,126 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  'marque-vaporesso': {
+    seoTitle: 'Vaporesso : Pods XROS, Kits Luxe & Résistances GTi / GTX',
+    metaDescription:
+      'Gamme officielle Vaporesso : pods XROS 4 et 6, kits Luxe, Gen et Armour, cartouches et résistances GTi. Matériel certifié 100% original. Expédié sous 24h.',
+    h1: 'Cigarettes Électroniques, Pods XROS & Résistances Vaporesso',
+    intro:
+      'Découvrez tout l’univers Vaporesso chez THEKLOPE. Des célèbres pods de la gamme XROS réputés pour leur rendu de saveurs sans fuite, jusqu’aux box puissantes Gen et kits Luxe, retrouvez le matériel officiel et les résistances GTi et GTX.',
+    sections: [
+      {
+        title: 'Pourquoi choisir le matériel Vaporesso ?',
+        text:
+          'Leader mondial de la vape, Vaporesso se distingue par la technologie de ses résistances Corex et le chipset Axon. Que vous cherchiez un tirage serré MTL discret ou une vape subohm aérienne et puissante, le matériel Vaporesso garantit une fiabilité exemplaire.',
+      },
+      {
+        title: 'Cartouches XROS et résistances de rechange officielles',
+        text:
+          'Prolongez la durée de vie de votre équipement avec nos cartouches officielles pour Vaporesso XROS (disponibles en 0.4, 0.6, 0.8, 1.0 et 1.2 ohm) et nos packs de résistances GTi pour réservoir iTank.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les produits Vaporesso vendus sur THEKLOPE sont-ils authentiques ?',
+        a: 'Oui, 100% de nos cigarettes électroniques, pods et résistances Vaporesso proviennent des circuits de distribution officiels certifiés, avec code de sécurité vérifiable.',
+      },
+      {
+        q: 'Quel e-liquide utiliser avec un pod Vaporesso XROS ?',
+        a: 'Les pods XROS fonctionnent idéalement avec des e-liquides au ratio 50/50 PG/VG ou avec des e-liquides aux sels de nicotine pour un sevrage en douceur.',
+      },
+    ],
+  },
+  'marque-geekvape': {
+    seoTitle: 'Geekvape : Kits Aegis, Pods Wenax & Résistances Z Series',
+    metaDescription:
+      'Tout l\'univers Geekvape : kits Aegis Legend et Solo, pods Wenax, clearomiseurs Z Subohm et résistances Z-Coil officielles. Stock en France, livraison 24/48h.',
+    h1: 'Cigarettes Électroniques, Kits Aegis & Résistances Geekvape',
+    intro:
+      'Reconnue pour sa robustesse légendaire (norme IP68 tri-proof résistante aux chocs, poussières et eau), la marque Geekvape propose des box tout-terrain, des pods intuitifs Wenax et les célèbres clearomiseurs Z Subohm.',
+    sections: [
+      {
+        title: 'La technologie Geekvape : solidité et performances',
+        text:
+          'Les kits Aegis (Legend, Solo, Touch) sont conçus pour durer dans toutes les conditions. Associés aux réservoirs Zeus (Z Subohm) à flux d’air par le haut anti-fuites, ils procurent une vapeur abondante et des saveurs intenses.',
+      },
+      {
+        title: 'Résistances Geekvape Z Series certifiées d’origine',
+        text:
+          'Retrouvez les résistances Z Coil en mesh pour vos clearomiseurs Z Subohm et Z Fli (0.15, 0.2, 0.25, 0.4 ohm) afin de conserver une restitution des saveurs optimale.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Pourquoi les clearomiseurs Geekvape Z ne fuient-ils pas ?',
+        a: 'Le système d’arrivée d’air par le haut (top-airflow) propre à la gamme Zeus et Z Subohm empêche l’e-liquide de s’écouler par la base, éliminant tout risque de fuite.',
+      },
+      {
+        q: 'Quel taux de VG est conseillé avec les kits Aegis ?',
+        a: 'Les résistances Z Series pour Aegis fonctionnent au mieux avec des e-liquides à fort taux de Glycérine Végétale (au moins 70% VG) pour éviter les projections.',
+      },
+    ],
+  },
+  'marque-voopoo': {
+    seoTitle: 'Voopoo : Pods Drag S2, H40, Argus & Résistances PnP-X',
+    metaDescription:
+      'Matériel officiel Voopoo : pods Drag S2, Drag X2, H40, Argus et Doric. Résistances PnP et PnP-X en stock, 100% certifiées. Livraison offerte dès 29€.',
+    h1: 'Pods, Kits Drag & Résistances PnP / PnP-X Voopoo',
+    intro:
+      'Plébiscitée pour sa gamme emblématique Drag et son chipset Gene ultra-réactif, Voopoo allie finition cuir élégante et simplicité d’utilisation grâce à son système de cartouches aimantées et de résistances PnP.',
+    sections: [
+      {
+        title: 'Pods Drag et Argus : l’ergonomie au service du vapoteur',
+        text:
+          'Du pod ultra-compact Argus G2 au kit Drag S2 / X2 nouvelle génération, Voopoo propose un matériel polyvalent adapté aussi bien aux débutants qu’aux vapoteurs avancés à la recherche d’autonomie.',
+      },
+      {
+        title: 'Écosystème de résistances Voopoo PnP et PnP-X',
+        text:
+          'La nouvelle plateforme PnP-X garantit une longévité accrue (jusqu’à 100 ml sans altération de goût) et une étanchéité brevetée à 4 niveaux. Disponibles en plusieurs valeurs pour s’adapter à votre tirage.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelle est la différence entre les résistances PnP et PnP-X ?',
+        a: 'Les PnP-X intègrent un coton thermo-résistant breveté et 4 joints d’étanchéité, offrant une durée de vie doublée et une protection totale contre les suintements par rapport aux PnP classiques.',
+      },
+      {
+        q: 'Comment régler son pod Drag Voopoo ?',
+        a: 'La plupart des pods Drag intègrent le mode SMART qui détecte automatiquement la valeur de votre résistance et ajuste la puissance idéale pour ne jamais brûler votre coton.',
+      },
+    ],
+  },
+  'marque-aspire': {
+    seoTitle: 'Aspire : Kits Zelos 3, PockeX, Nautilus & Résistances BVC',
+    metaDescription:
+      'Boutique Aspire officielle : kits Zelos 3, PockeX, clearomiseurs Nautilus et résistances BVC / Nautilus Mesh garanties d\'origine. Expédition rapide 24h.',
+    h1: 'Cigarettes Électroniques, Kits Zelos & Résistances Aspire',
+    intro:
+      'Pionnier historique de la vape MTL (inhalation indirecte), Aspire est la marque de référence pour arrêter de fumer sereinement grâce à la précision de ses clearomiseurs Nautilus et la simplicité de ses kits Zelos.',
+    sections: [
+      {
+        title: 'Le tirage parfait pour le sevrage tabagique',
+        text:
+          'Avec le kit Zelos 3 ou le mythique clearomiseur Nautilus 3, Aspire propose le tirage serré le plus proche de la cigarette traditionnelle, favorisant une absorption efficace de la nicotine sans irritation.',
+      },
+      {
+        title: 'Résistances Nautilus BVC et Mesh d’origine',
+        text:
+          'Universelles et compatibles avec de nombreux réservoirs, les résistances Aspire Nautilus (0.7, 1.0, 1.6, 1.8 ohm) offrent un rendu aromatique d’une fidélité exceptionnelle.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelle résistance Aspire choisir pour débuter ?',
+        a: 'La résistance Nautilus 1.8 ohm ou 1.0 ohm Mesh est idéale pour débuter : elle consomme peu d’e-liquide, offre un hit doux et fonctionne parfaitement avec les taux de nicotine élevés ou les sels de nicotine.',
+      },
+      {
+        q: 'Combien de temps dure une résistance Nautilus ?',
+        a: 'En moyenne, une résistance Nautilus Aspire dure 2 à 3 semaines pour une consommation normale avec un e-liquide équilibré (50/50 PG/VG).',
+      },
+    ],
+  },
 }
 
 for (const cat of CATEGORIES) {

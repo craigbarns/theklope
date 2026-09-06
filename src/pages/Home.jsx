@@ -95,8 +95,8 @@ export default function Home() {
   return (
     <>
       <Seo
-        title="Boutique Cigarette Électronique, E-liquides & Puffs à Marseille | THEKLOPE"
-        description="Boutique de cigarette électronique et vape à Marseille (et en ligne). Large choix de kits, pods, puffs et e-liquides au meilleur prix. Expédition 24/48h."
+        title="THEKLOPE : Boutique Vape en Ligne & Magasin Marseille — Cigarette Électronique"
+        description="L'alternative n°1 à Le Petit Vapoteur & Taklope : kits, pods, e-liquides et résistances. Livraison offerte dès 29€, expédition 24h & retrait 1h Marseille."
         schema={homeSchema}
       />
 

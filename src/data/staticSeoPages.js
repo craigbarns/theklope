@@ -1,8 +1,8 @@
 export const STATIC_SEO_PAGES = {
   'boutique-vape-marseille': {
-    title: 'Boutique vape Marseille 13006 — 188 Rue de Rome',
+    title: 'Magasin Vape & E-Cigarette Marseille 13006 — 188 Rue de Rome | THEKLOPE',
     metaDescription:
-      'Magasin vape Marseille 13006 au 188 rue de Rome. E-liquides, cigarettes électroniques, pods et résistances. Click & Collect 1h gratuit, Tramway T3 Rome.',
+      'Boutique vape Marseille Castellane / Rue de Rome : e-liquides, puffs rechargeables, kits et résistances. Retrait Click & Collect gratuit en 1h au 188 rue de Rome.',
     h1: 'Boutique vape à Marseille et vente en ligne',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
@@ -59,9 +59,9 @@ export const STATIC_SEO_PAGES = {
     ],
   },
   'cigarette-electronique-marseille': {
-    title: 'Cigarette électronique Marseille 13006 — Vente & Click & Collect',
+    title: 'Magasin Cigarette Électronique Marseille — Rue de Rome / Castellane | THEKLOPE',
     metaDescription:
-      'Acheter cigarette électronique Marseille 13006 : kits débutants, pods et box au 188 rue de Rome. Retrait Click & Collect 1h gratuit et conseils experts.',
+      'Achat cigarette électronique Marseille 6e : kits débutants, pods et e-liquides au 188 rue de Rome. Conseil personnalisé en boutique et Click & Collect 1h.',
     h1: 'Cigarette électronique à Marseille — Vente & Retrait Boutique',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:

@@ -499,9 +499,9 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'quand-changer-resistance',
-    title: 'Quand changer sa résistance de cigarette électronique ?',
+    title: 'Quand Changer sa Résistance de Vape ? Les 5 Signes d\'Usure | THEKLOPE',
     description:
-      'Signes d’usure d’une résistance de cigarette électronique : goût de brûlé, baisse de vapeur, fuites, amorçage et compatibilité.',
+      'Goût de brûlé, fuite ou manque de vapeur ? Découvrez les 5 signes indiquant qu\'il faut changer votre résistance et nos conseils pour doubler sa durée de vie.',
     date: '5 Juillet 2026',
     isoDate: '2026-07-05T08:00:00+02:00',
     readTime: '5 min',
@@ -671,9 +671,9 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'eliquide-sans-nicotine',
-    title: 'E-liquide sans nicotine : ce qu’il faut savoir',
+    title: 'E-Liquide Sans Nicotine (0 mg) : Danger, Sevrage et Meilleurs Goûts',
     description:
-      'Informations utiles sur les e-liquides sans nicotine : usages, saveurs, matériel compatible, grands formats et précautions.',
+      'Pourquoi vapoter sans nicotine ? Effet sur la santé, aide au sevrage du geste, grands formats 50ml/100ml et sélection des meilleures saveurs en 0 mg.',
     date: '1 Juillet 2026',
     isoDate: '2026-07-01T08:00:00+02:00',
     readTime: '4 min',
@@ -1261,8 +1261,8 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'puffs-interdites-france-loi-alternatives',
-    title: 'Puffs Interdites en France en 2025-2026 : Tout sur la Loi et Vos Alternatives',
-    description: 'La vente de puffs jetables est définitivement interdite en France par la loi n° 2025-175. Découvrez ce qui change et les meilleures solutions légales.',
+    title: 'Puffs Interdites en France : Date d\'Application, Loi & Meilleures Alternatives',
+    description: 'Loi interdiction des puffs jetables en France : calendrier, sanctions et comparatif des 4 meilleures alternatives rechargeables dès 5,90 €. Guide complet.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T11:00:00Z',
     readTime: '6 min',
@@ -1370,8 +1370,8 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'test-vaporesso-xros-6-mini',
-    title: 'Test & Avis Vaporesso XROS 6 Mini : Le Meilleur Pod Compact ?',
-    description: 'Notre avis d’expert sur le pod Vaporesso XROS 6 Mini. Autonomie, rendu des saveurs, compatibilité cartouches et bilan complet.',
+    title: 'Test & Avis Vaporesso XROS 6 & 6 Mini : Le Meilleur Pod MTL en 2026 ?',
+    description: 'Test complet du pod Vaporesso XROS 6 & XROS 6 Mini : autonomie batterie, tirage MTL, nouvelles cartouches Corex 2.0 et verdict de nos experts vape.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T11:45:00Z',
     readTime: '4 min',
@@ -1465,8 +1465,8 @@ export const BLOG_POSTS = [
   }),
   makePost({
     slug: 'quel-accu-18650-choisir-box',
-    title: 'Quel Accu 18650 Choisir pour sa Box Electronique ? Guide Sécurité',
-    description: 'Sélection des meilleurs accus 18650 (Sony VTC6, Samsung 30Q, LG HG2, Ucell). Autonomie, courant de décharge (CDM) et consignes de sécurité.',
+    title: 'Quel Accu 18650 Choisir pour sa Box ? Comparatif & Sécurité 2026',
+    description: 'Sony VTC6, Samsung 25R/30Q, LG HG2 : quel est le meilleur accu 18650 pour votre cigarette électronique ? Guide autonomie (mAh), CDM (Ampères) et sécurité.',
     date: '30 Juil 2026',
     isoDate: '2026-07-30T12:30:00Z',
     readTime: '6 min',
