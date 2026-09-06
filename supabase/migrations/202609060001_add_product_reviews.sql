@@ -28,7 +28,9 @@ CREATE INDEX IF NOT EXISTS product_reviews_status_idx ON public.product_reviews 
 
 -- 2. Create view for review stats
 -- This view aggregates published reviews for each product
-CREATE OR REPLACE VIEW public.product_review_stats AS
+DROP VIEW IF EXISTS public.product_review_stats;
+
+CREATE VIEW public.product_review_stats AS
 SELECT 
   product_id,
   count(*) as review_count,
