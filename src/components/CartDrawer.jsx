@@ -241,6 +241,23 @@ export default function CartDrawer() {
                   </span>
                 )}
               </p>
+              {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && (
+                <div className="mt-3 rounded-2xl border border-neon/30 bg-carbon/80 p-2.5 shadow-sm">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-xs font-semibold text-white">Booster de Nicotine 20mg 50/50</p>
+                      <p className="text-[10px] text-neon font-bold">1,50 € · Complétez pour débloquer la livraison offerte</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => addToCart('booster-nicotine-20mg-50-50-theklope', 1)}
+                      className="btn-primary min-h-0 px-3 py-1 text-xs font-bold shrink-0"
+                    >
+                      + Ajouter
+                    </button>
+                  </div>
+                </div>
+              )}
               {totals.bundleProgress?.length > 0 && (
                 <div className="mt-3">
                   <BundleProgress hints={totals.bundleProgress} compact />

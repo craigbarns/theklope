@@ -10584,6 +10584,38 @@ export const PRODUCTS = [
       "/products/tropikoo-50ml-.jpg"
     ],
     "image": "/products/tropikoo-50ml-.jpg"
+  },
+  {
+    "id": "booster-nicotine-20mg-50-50-theklope",
+    "name": "Booster de Nicotine 20mg 50/50 10ml",
+    "category": "diy",
+    "brand": "THEKLOPE",
+    "type": "Booster",
+    "price": 1.5,
+    "oldPrice": null,
+    "rating": 4.9,
+    "reviews": 142,
+    "stock": 500,
+    "badge": "best-seller",
+    "nicotine": [
+      20
+    ],
+    "flavors": [
+      "Neutre"
+    ],
+    "colors": [],
+    "short": "Booster de nicotine 20 mg/ml au ratio 50/50 pour booster vos e-liquides 50ml et 100ml.",
+    "long": "Le booster de nicotine THEKLOPE 20 mg/ml vous permet d'ajuster le taux de nicotine de tous vos e-liquides grand format Shake and Vape (50 ml, 100 ml) ou de vos bases neutres DIY.",
+    "specs": {
+      "Contenance": "10 ml",
+      "Taux de nicotine": "20 mg/ml",
+      "Ratio PG/VG": "50 PG / 50 VG",
+      "Origine": "Fabriqué en France"
+    },
+    "images": [
+      "/products/product-placeholder.svg"
+    ],
+    "image": "/products/product-placeholder.svg"
   }
 ];
 

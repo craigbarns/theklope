@@ -6,6 +6,8 @@ import { IconSearch, IconHeart, IconCart, IconMenu, IconClose, IconUser, IconChe
 import { CATEGORIES } from '../data/catalog.js'
 import { MAIN_NAV } from '../data/navigation.js'
 
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+
 export default function Header() {
   const { cartCount, favorites, setSearchOpen, setCartOpen } = useStore()
   const [scrolled, setScrolled] = useState(false)
@@ -53,11 +55,20 @@ export default function Header() {
         <div className="container-page flex flex-wrap items-center justify-center gap-x-4 gap-y-1 py-2 text-center text-[11px] font-bold tracking-wide sm:text-xs">
           <span className="text-neon">🚚 Livraison OFFERTE dès 29 €</span>
           <span>·</span>
+          <a
+            href={STORE_REVIEW_SUMMARY.googleUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-neon transition inline-flex items-center gap-1"
+          >
+            <span className="text-amber-400">★</span> {STORE_REVIEW_SUMMARY.compactLabel}
+          </a>
+          <span>·</span>
           <span className="text-electric">🎁 -15% code BIENVENUE</span>
           <span className="hidden sm:inline">·</span>
           <span className="hidden sm:inline">⚡ Coursier Marseille</span>
           <span className="hidden md:inline">·</span>
-          <span className="hidden md:inline">🏬 Retrait Boutique 188 Rue de Rome</span>
+          <span className="hidden md:inline">🏬 Retrait 1h 188 Rue de Rome</span>
         </div>
       </div>
 

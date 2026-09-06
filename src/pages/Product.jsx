@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import { CATEGORIES, categoryName, getProductCategoryKey } from '../data/catalog.js'
+import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct } from '../data/catalog.js'
+import { isEliquidProduct } from '../lib/productCategory.js'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
@@ -37,6 +39,7 @@ export default function Product() {
     cart,
     getProduct,
     addToCart,
+    addItemsToCart,
     setCartOpen,
     toggleFavorite,
     isFavorite,
@@ -61,6 +64,9 @@ export default function Product() {
   const [added, setAdded] = useState(false)
   const [addError, setAddError] = useState('')
   const [showMobilePurchaseBar, setShowMobilePurchaseBar] = useState(false)
+  const [boosterCount, setBoosterCount] = useState(0)
+  const [includeResistance, setIncludeResistance] = useState(true)
+  const [includeLiquid, setIncludeLiquid] = useState(true)
   const trackedProductRef = useRef(null)
   const variantsRef = useRef(null)
   const purchaseControlsRef = useRef(null)
@@ -70,6 +76,31 @@ export default function Product() {
     () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
     [product],
   )
+
+  const isLargeFormatEliquid = useMemo(() => {
+    if (!product) return false
+    return (
+      isEliquide50ml(product) ||
+      isEliquide100ml(product) ||
+      (isEliquidProduct(product) && (Number(product.volume) >= 50 || /50\s*ml|100\s*ml/i.test(product.name)))
+    )
+  }, [product])
+
+  const bundleItems = useMemo(() => {
+    if (!product || !['ecig', 'pod', 'pack'].includes(product.category)) return null
+    const matchingResistance =
+      relatedProducts.find((p) => (isResistanceProduct(p) || isCartoucheProduct(p)) && p.stock > 0) ||
+      products.find((p) => (isResistanceProduct(p) || isCartoucheProduct(p)) && p.brand === product.brand && p.stock > 0) ||
+      products.find((p) => (isResistanceProduct(p) || isCartoucheProduct(p)) && p.stock > 0)
+
+    const matchingLiquid =
+      relatedProducts.find((p) => isEliquidProduct(p) && p.stock > 0) ||
+      products.find((p) => isEliquidProduct(p) && p.badge === 'best-seller' && p.stock > 0) ||
+      products.find((p) => isEliquidProduct(p) && p.stock > 0)
+
+    if (!matchingResistance || !matchingLiquid) return null
+    return { resistance: matchingResistance, liquid: matchingLiquid }
+  }, [product, relatedProducts, products])
 
   const productSchema = useMemo(() => {
     if (!product) return null
@@ -290,7 +321,18 @@ export default function Product() {
       variantsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return false
     }
-    const wasAdded = addToCart(product.id, Math.min(requestedQty, maxQty), variantResolution.variant)
+    const finalQty = Math.min(requestedQty, maxQty)
+    const itemsToAdd = [
+      { productId: product.id, qty: finalQty, variant: variantResolution.variant },
+    ]
+    if (isLargeFormatEliquid && boosterCount > 0) {
+      itemsToAdd.push({
+        productId: 'booster-nicotine-20mg-50-50-theklope',
+        qty: finalQty * boosterCount,
+        variant: {},
+      })
+    }
+    const wasAdded = addItemsToCart(itemsToAdd)
     if (!wasAdded) {
       setAddError('Le stock vient d’évoluer. Vérifiez votre panier avant de réessayer.')
       return false
@@ -299,6 +341,32 @@ export default function Product() {
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
     return true
+  }
+
+  const bundleTotal = (() => {
+    if (!product || !bundleItems) return 0
+    let total = Number(product.price) || 0
+    if (includeResistance && bundleItems.resistance) total += Number(bundleItems.resistance.price) || 0
+    if (includeLiquid && bundleItems.liquid) total += Number(bundleItems.liquid.price) || 0
+    return total
+  })()
+
+  const handleAddBundle = () => {
+    if (!bundleItems) return
+    const items = [
+      { productId: product.id, qty: 1, variant: variantResolution.variant || {} },
+    ]
+    if (includeResistance && bundleItems.resistance) {
+      items.push({ productId: bundleItems.resistance.id, qty: 1, variant: {} })
+    }
+    if (includeLiquid && bundleItems.liquid) {
+      items.push({ productId: bundleItems.liquid.id, qty: 1, variant: {} })
+    }
+    const wasAdded = addItemsToCart(items)
+    if (wasAdded) {
+      setAdded(true)
+      setTimeout(() => setAdded(false), 2000)
+    }
   }
 
   return (
@@ -363,8 +431,18 @@ export default function Product() {
             <p className="text-xs uppercase tracking-wider text-faint">{product.brand} · {product.type}</p>
             <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{product.name}</h1>
 
-            <div className="mt-5 flex items-baseline gap-3">
+            <div className="mt-5 flex flex-wrap items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
+              <a
+                href={STORE_REVIEW_SUMMARY.googleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-xs text-ash hover:border-neon/30 transition sm:ml-auto"
+              >
+                <span className="text-amber-400 font-bold">★★★★★</span>
+                <span className="font-bold text-white">{STORE_REVIEW_SUMMARY.ratingLabel}</span>
+                <span className="text-faint">({STORE_REVIEW_SUMMARY.countLabel})</span>
+              </a>
             </div>
 
             <p className="mt-2 text-xs font-medium flex items-center gap-1.5 flex-wrap">
@@ -462,6 +540,59 @@ export default function Product() {
               )}
             </div>
 
+            {/* Option Shake & Vape pour e-liquides 50ml / 100ml */}
+            {isLargeFormatEliquid && (
+              <div className="mt-6 rounded-2xl border border-neon/30 bg-carbon/80 p-4 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-neon flex items-center gap-1.5">
+                    <span>⚡</span> Option Shake & Vape (Boosters de Nicotine)
+                  </span>
+                  <span className="text-[11px] text-muted">Prêt à mélanger</span>
+                </div>
+                <p className="mt-1 text-xs text-ash/80">
+                  Grand format vendu sans nicotine (0 mg). Ajoutez vos boosters 20 mg 50/50 en 1 clic pour obtenir votre dosage :
+                </p>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setBoosterCount(0)}
+                    className={`rounded-xl border p-2.5 text-center transition ${
+                      boosterCount === 0
+                        ? 'border-neon bg-neon/15 text-white font-bold shadow-glow-sm'
+                        : 'border-white/10 bg-noir/50 text-ash/70 hover:border-white/20'
+                    }`}
+                  >
+                    <span className="block text-xs font-semibold">0 mg / ml</span>
+                    <span className="text-[10px] text-muted">Sans booster (0 €)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBoosterCount(1)}
+                    className={`rounded-xl border p-2.5 text-center transition ${
+                      boosterCount === 1
+                        ? 'border-neon bg-neon/15 text-white font-bold shadow-glow-sm'
+                        : 'border-white/10 bg-noir/50 text-ash/70 hover:border-white/20'
+                    }`}
+                  >
+                    <span className="block text-xs font-semibold">≈ 3 mg / ml</span>
+                    <span className="text-[10px] text-neon font-bold">+1 booster (+1,50 €)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBoosterCount(2)}
+                    className={`rounded-xl border p-2.5 text-center transition ${
+                      boosterCount === 2
+                        ? 'border-neon bg-neon/15 text-white font-bold shadow-glow-sm'
+                        : 'border-white/10 bg-noir/50 text-ash/70 hover:border-white/20'
+                    }`}
+                  >
+                    <span className="block text-xs font-semibold">≈ 6 mg / ml</span>
+                    <span className="text-[10px] text-neon font-bold">+2 boosters (+3,00 €)</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Quantité + CTA */}
             <div ref={purchaseControlsRef} className="mt-7 flex flex-col gap-3">
               <div className="flex flex-wrap items-center gap-3">
@@ -531,6 +662,82 @@ export default function Product() {
             )}
           </div>
         </div>
+
+        {/* Pack Prêt à vaper (Souvent achetés ensemble) */}
+        {bundleItems && (
+          <div className="mt-12 rounded-3xl border border-neon/30 bg-gradient-to-br from-carbon via-noir to-anthracite p-6 sm:p-8 shadow-card">
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+              <div>
+                <span className="chip border-neon/30 text-neon mb-2 inline-block text-xs">✨ Pack Prêt à Vaper</span>
+                <h2 className="font-display text-xl sm:text-2xl font-bold text-white">Souvent achetés ensemble</h2>
+                <p className="text-xs text-ash/80 mt-1">
+                  Recevez tout le nécessaire pour démarrer immédiatement (Appareil + Résistances adaptées + E-liquide).
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-xs text-muted">Prix total de la sélection :</span>
+                <div className="font-display text-2xl font-bold text-neon">{formatPrice(bundleTotal)}</div>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* 1. Appareil actuel */}
+              <div className="card p-4 flex items-center gap-3 border-white/15 bg-white/[0.02]">
+                <ProductImage src={product.image} alt={product.name} className="h-16 w-16 rounded-xl object-cover bg-carbon p-1 shrink-0" width={64} height={64} />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold text-neon uppercase tracking-wider">Appareil sélectionné</span>
+                  <p className="truncate text-xs font-semibold text-white mt-0.5">{product.name}</p>
+                  <p className="text-xs font-bold text-white mt-0.5">{formatPrice(product.price)}</p>
+                </div>
+              </div>
+
+              {/* 2. Résistances compatibles */}
+              <label className={`card p-4 flex items-center gap-3 cursor-pointer transition border ${includeResistance ? 'border-neon/40 bg-neon/5' : 'border-white/10 opacity-60'}`}>
+                <input
+                  type="checkbox"
+                  checked={includeResistance}
+                  onChange={(e) => setIncludeResistance(e.target.checked)}
+                  className="rounded border-white/20 text-neon focus:ring-neon shrink-0 h-4 w-4"
+                />
+                <ProductImage src={bundleItems.resistance.image} alt={bundleItems.resistance.name} className="h-16 w-16 rounded-xl object-cover bg-carbon p-1 shrink-0" width={64} height={64} />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold text-electric uppercase tracking-wider">Résistances adaptées</span>
+                  <p className="truncate text-xs font-semibold text-white mt-0.5">{bundleItems.resistance.name}</p>
+                  <p className="text-xs font-bold text-neon mt-0.5">+{formatPrice(bundleItems.resistance.price)}</p>
+                </div>
+              </label>
+
+              {/* 3. E-liquide */}
+              <label className={`card p-4 flex items-center gap-3 cursor-pointer transition border ${includeLiquid ? 'border-neon/40 bg-neon/5' : 'border-white/10 opacity-60'}`}>
+                <input
+                  type="checkbox"
+                  checked={includeLiquid}
+                  onChange={(e) => setIncludeLiquid(e.target.checked)}
+                  className="rounded border-white/20 text-neon focus:ring-neon shrink-0 h-4 w-4"
+                />
+                <ProductImage src={bundleItems.liquid.image} alt={bundleItems.liquid.name} className="h-16 w-16 rounded-xl object-cover bg-carbon p-1 shrink-0" width={64} height={64} />
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">E-liquide au choix</span>
+                  <p className="truncate text-xs font-semibold text-white mt-0.5">{bundleItems.liquid.name}</p>
+                  <p className="text-xs font-bold text-neon mt-0.5">+{formatPrice(bundleItems.liquid.price)}</p>
+                </div>
+              </label>
+            </div>
+
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-white/10 pt-4">
+              <span className="text-xs text-faint">
+                Garantie matériel 2 ans · Expédié sous 24h · Satisfait ou remboursé
+              </span>
+              <button
+                type="button"
+                onClick={handleAddBundle}
+                className="btn-primary w-full sm:w-auto px-6 py-2.5 text-xs font-bold shrink-0"
+              >
+                <IconCart width={16} height={16} /> Ajouter le pack au panier ({formatPrice(bundleTotal)})
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Description détaillée + specs */}
         <div className="mt-14 grid gap-10 lg:grid-cols-[1.4fr_1fr]">

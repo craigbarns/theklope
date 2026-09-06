@@ -8,6 +8,7 @@ import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '..
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
+import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import {
   IconArrowRight,
   IconShield,
@@ -126,7 +127,19 @@ export default function Home() {
                 Voir les catégories
               </Link>
             </div>
-            <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted">
+            <div className="mt-5 flex items-center gap-3">
+              <a
+                href={STORE_REVIEW_SUMMARY.googleUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 text-xs text-ash hover:border-neon/40 transition shadow-sm"
+              >
+                <span className="text-amber-400 font-bold">★★★★★</span>
+                <span className="font-bold text-white">4,7 / 5</span>
+                <span className="text-muted">sur 412 avis clients Google</span>
+              </a>
+            </div>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted">
               <span className="flex items-center gap-2"><IconTruck width={18} height={18} className="text-neon" /> Offerte dès 29 € (24/48h)</span>
               <span className="flex items-center gap-2"><IconShield width={18} height={18} className="text-neon" /> Paiement 100% sécurisé</span>
               <span className="flex items-center gap-2"><IconCheck width={18} height={18} className="text-neon" /> Boutique Physique 188 rue de Rome</span>
