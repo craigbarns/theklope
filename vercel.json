@@ -81,6 +81,126 @@
       "permanent": true
     },
     {
+      "source": "/categorie/eliquides",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/eliquide",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/e-liquide",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/eliquides",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/eliquide",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquides",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/e-liquide",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/cigarettes-electroniques",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/cigarette-electronique",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/cigarette-electronique",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/pods",
+      "destination": "/categorie/pods",
+      "permanent": true
+    },
+    {
+      "source": "/pod",
+      "destination": "/categorie/pods",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/pod",
+      "destination": "/categorie/pods",
+      "permanent": true
+    },
+    {
+      "source": "/resistance",
+      "destination": "/categorie/resistances",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/resistance",
+      "destination": "/categorie/resistances",
+      "permanent": true
+    },
+    {
+      "source": "/cartouches",
+      "destination": "/categorie/cartouches",
+      "permanent": true
+    },
+    {
+      "source": "/cartouche",
+      "destination": "/categorie/cartouches",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/cartouche",
+      "destination": "/categorie/cartouches",
+      "permanent": true
+    },
+    {
+      "source": "/accessoires",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/accessoire",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/accessoire",
+      "destination": "/categorie/accessoires",
+      "permanent": true
+    },
+    {
+      "source": "/puffs",
+      "destination": "/categorie/puffs-rechargeables",
+      "permanent": true
+    },
+    {
+      "source": "/puff",
+      "destination": "/categorie/puffs-rechargeables",
+      "permanent": true
+    },
+    {
+      "source": "/puffs-rechargeables",
+      "destination": "/categorie/puffs-rechargeables",
+      "permanent": true
+    },
+    {
       "source": "/content/1-:slug",
       "destination": "/livraison-retours",
       "permanent": true
