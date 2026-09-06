@@ -13,6 +13,7 @@ import {
   searchRelatedProducts,
 } from '../lib/relatedProducts.js'
 import { getPaidOrders } from '../lib/dashboard.js'
+import { getSupabase } from '../lib/supabase.js'
 import {
   IconArrowRight,
   IconBolt,
@@ -2055,45 +2056,12 @@ function EmailingPanel() {
   )
 }
 
-function ReviewsPanel() {
-  const { supabase, adminSession } = useStore()
-  const [reviews, setReviews] = useState([])
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (adminSession) fetchReviews()
-  }, [adminSession])
-
-  async function fetchReviews() {
-    setLoading(true)
-    const { data } = await supabase
-      .from('product_reviews')
-      .select('*')
-      .order('created_at', { ascending: false })
-    
-    if (data) setReviews(data)
-    setLoading(false)
-  }
-
-  async function updateStatus(id, status) {
-    const { error } = await supabase
-      .from('product_reviews')
-      .update({ status })
-      .eq('id', id)
-      
-    if (!error) {
-      setReviews(reviews.map(r => r.id === id ? { ...r, status } : r))
-    }
-  }
-
-  if (loading) return <div className="p-8 text-center text-muted">Chargement...</div>
-
-  const pending = reviews.filter(r => r.status === 'pending')
-  const published = reviews.filter(r => r.status === 'published')
-  const rejected = reviews.filter(r => r.status === 'rejected')
-
-  const ReviewCard = ({ r }) => (
-    <div key={r.id} className="card p-4 space-y-3">
+// Extrait du corps de ReviewsPanel : défini à l'intérieur, ce composant était
+// recréé à chaque rendu, ce qui forçait React à démonter puis remonter toutes
+// les cartes à la moindre modération.
+function ReviewCard({ r, onUpdateStatus, busy }) {
+  return (
+    <div className="card p-4 space-y-3">
       <div className="flex justify-between items-start">
         <div>
           <h4 className="font-semibold text-white">{r.author_name} <span className="text-muted text-xs font-normal">sur {r.product_id}</span></h4>
@@ -2103,26 +2071,100 @@ function ReviewsPanel() {
         </div>
         <div className="flex gap-2">
           {r.status !== 'published' && (
-            <button onClick={() => updateStatus(r.id, 'published')} className="rounded bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20">Publier</button>
+            <button disabled={busy} onClick={() => onUpdateStatus(r.id, 'published')} className="rounded bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50">Publier</button>
           )}
           {r.status !== 'rejected' && (
-            <button onClick={() => updateStatus(r.id, 'rejected')} className="rounded bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/20">Rejeter</button>
+            <button disabled={busy} onClick={() => onUpdateStatus(r.id, 'rejected')} className="rounded bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/20 disabled:opacity-50">Rejeter</button>
           )}
           {r.status !== 'pending' && (
-            <button onClick={() => updateStatus(r.id, 'pending')} className="rounded bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10">En attente</button>
+            <button disabled={busy} onClick={() => onUpdateStatus(r.id, 'pending')} className="rounded bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10 disabled:opacity-50">En attente</button>
           )}
         </div>
       </div>
     </div>
   )
+}
+
+function ReviewsPanel() {
+  const { adminSession } = useStore()
+  const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [busyId, setBusyId] = useState(null)
+
+  useEffect(() => {
+    if (!adminSession) return undefined
+    let active = true
+
+    // `getSupabase()` est asynchrone : la librairie est chargée à la demande
+    // pour ne pas peser sur le bundle visiteur. Même idiome que ImageUploader.
+    const load = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const sb = await getSupabase()
+        if (!sb) throw new Error('Supabase n’est pas configuré.')
+
+        const { data, error: fetchError } = await sb
+          .from('product_reviews')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        if (fetchError) throw new Error(fetchError.message)
+        if (active) setReviews(data || [])
+      } catch (err) {
+        // Sans cette remontée, un refus RLS se traduisait par une liste vide
+        // indiscernable d'une absence réelle d'avis.
+        if (active) setError(err.message || 'Chargement des avis impossible.')
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+
+    load()
+    return () => { active = false }
+  }, [adminSession])
+
+  async function updateStatus(id, status) {
+    setBusyId(id)
+    setError('')
+    try {
+      const sb = await getSupabase()
+      if (!sb) throw new Error('Supabase n’est pas configuré.')
+
+      const { error: updateError } = await sb
+        .from('product_reviews')
+        .update({ status })
+        .eq('id', id)
+
+      if (updateError) throw new Error(updateError.message)
+      // Forme fonctionnelle : deux modérations rapprochées ne s'écrasent plus.
+      setReviews((current) => current.map((r) => (r.id === id ? { ...r, status } : r)))
+    } catch (err) {
+      setError(err.message || 'Modération impossible.')
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  if (loading) return <div className="p-8 text-center text-muted">Chargement...</div>
+
+  const pending = reviews.filter(r => r.status === 'pending')
+  const published = reviews.filter(r => r.status === 'published')
+  const rejected = reviews.filter(r => r.status === 'rejected')
 
   return (
     <div className="space-y-12">
+      {error && (
+        <p className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {error}
+        </p>
+      )}
       <section>
         <h3 className="font-display text-xl font-bold text-white mb-4">À modérer ({pending.length})</h3>
         {pending.length === 0 ? <p className="text-muted">Aucun avis en attente.</p> : (
           <div className="space-y-4">
-            {pending.map(r => <ReviewCard key={r.id} r={r} />)}
+            {pending.map(r => <ReviewCard key={r.id} r={r} onUpdateStatus={updateStatus} busy={busyId === r.id} />)}
           </div>
         )}
       </section>
@@ -2131,7 +2173,7 @@ function ReviewsPanel() {
         <h3 className="font-display text-xl font-bold text-white mb-4">Publiés ({published.length})</h3>
         {published.length === 0 ? <p className="text-muted">Aucun avis publié.</p> : (
           <div className="space-y-4">
-            {published.map(r => <ReviewCard key={r.id} r={r} />)}
+            {published.map(r => <ReviewCard key={r.id} r={r} onUpdateStatus={updateStatus} busy={busyId === r.id} />)}
           </div>
         )}
       </section>
@@ -2140,10 +2182,16 @@ function ReviewsPanel() {
         <h3 className="font-display text-xl font-bold text-white mb-4">Rejetés ({rejected.length})</h3>
         {rejected.length === 0 ? <p className="text-muted">Aucun avis rejeté.</p> : (
           <div className="space-y-4">
-            {rejected.map(r => <ReviewCard key={r.id} r={r} />)}
+            {rejected.map(r => <ReviewCard key={r.id} r={r} onUpdateStatus={updateStatus} busy={busyId === r.id} />)}
           </div>
         )}
       </section>
+
+      <p className="text-xs text-faint">
+        Les avis négatifs doivent être publiés au même titre que les positifs : filtrer
+        les mauvais avis relève des mêmes dispositions que les faux avis. Le rejet est
+        réservé au contenu illicite, hors sujet, ou contenant des données personnelles.
+      </p>
     </div>
   )
 }
