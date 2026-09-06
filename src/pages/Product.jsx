@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
@@ -29,6 +29,7 @@ import {
   IconShield,
   IconCheck,
   IconArrowRight,
+  IconStar,
 } from '../components/icons.jsx'
 
 export default function Product() {
@@ -70,6 +71,20 @@ export default function Product() {
   const trackedProductRef = useRef(null)
   const variantsRef = useRef(null)
   const purchaseControlsRef = useRef(null)
+
+  const [searchParams] = useSearchParams()
+  const reviewOrderParam = searchParams.get('review_order') || ''
+  const reviewTokenParam = searchParams.get('token') || ''
+  const isReviewUrl = Boolean(reviewOrderParam && reviewTokenParam)
+
+  const [reviewsData, setReviewsData] = useState({ reviews: [], stats: null, loading: true })
+  const [reviewRating, setReviewRating] = useState(5)
+  const [reviewAuthor, setReviewAuthor] = useState('')
+  const [reviewTitle, setReviewTitle] = useState('')
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewSubmitting, setReviewSubmitting] = useState(false)
+  const [reviewSuccess, setReviewSuccess] = useState(false)
+  const [reviewError, setReviewError] = useState('')
 
   const relatedProducts = useMemo(() => resolveRelatedProducts(product, products, { fallback: true }), [product, products])
   const relatedGuides = useMemo(
@@ -192,7 +207,33 @@ export default function Product() {
               "returnMethod": "https://schema.org/ReturnByMail",
               "returnFees": "https://schema.org/ReturnFeesCustomerResponsibility"
             }
-          }
+          },
+          ...(Number(reviewsData?.stats?.review_count) >= 3 && Number(reviewsData?.stats?.average_rating) > 0 ? {
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": Number(reviewsData.stats.average_rating).toFixed(1),
+              "reviewCount": Number(reviewsData.stats.review_count),
+              "bestRating": "5",
+              "worstRating": "1",
+            },
+          } : {}),
+          ...(Array.isArray(reviewsData?.reviews) && reviewsData.reviews.length > 0 ? {
+            "review": reviewsData.reviews.slice(0, 5).map((r) => ({
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": String(r.rating),
+                "bestRating": "5",
+                "worstRating": "1",
+              },
+              "author": {
+                "@type": "Person",
+                "name": r.author_name || 'Client vérifié',
+              },
+              "reviewBody": r.comment || '',
+              ...(r.created_at ? { "datePublished": r.created_at.split('T')[0] } : {}),
+            })),
+          } : {})
         },
         {
           "@type": "BreadcrumbList",
@@ -206,7 +247,7 @@ export default function Product() {
       ]
     }
     return schema
-  }, [product])
+  }, [product, reviewsData])
 
   useEffect(() => {
     if (!product) return
@@ -258,6 +299,31 @@ export default function Product() {
     if (!product) return
     setQty((current) => Math.min(current, Math.max(1, remainingStock)))
   }, [product, remainingStock])
+
+  useEffect(() => {
+    if (!product?.id) return
+    let cancelled = false
+    fetch(`/api/product-route?action=reviews&id=${encodeURIComponent(product.id)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled) return
+        if (data?.ok) {
+          setReviewsData({
+            reviews: data.reviews || [],
+            stats: data.stats || null,
+            loading: false,
+          })
+        } else {
+          setReviewsData({ reviews: [], stats: null, loading: false })
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setReviewsData({ reviews: [], stats: null, loading: false })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [product?.id])
 
   const pageState = getProductPageState({ product, catalogReady, syncStatus })
   if (pageState === PRODUCT_PAGE_STATE.loading) return <ProductLoading />
@@ -360,6 +426,58 @@ export default function Product() {
     }
   }
 
+  const handleSubmitReview = async (e) => {
+    e.preventDefault()
+    setReviewError('')
+    if (!reviewAuthor.trim()) {
+      setReviewError('Veuillez indiquer votre prénom ou nom.')
+      return
+    }
+    if (!reviewComment.trim() || reviewComment.trim().length < 5) {
+      setReviewError('Votre avis doit comporter au moins 5 caractères.')
+      return
+    }
+    if (!reviewOrderParam || !reviewTokenParam) {
+      setReviewError('Lien d’avis incomplet ou invalide. Seuls les acheteurs ayant reçu un e-mail avec leur lien sécurisé peuvent déposer un avis vérifié.')
+      return
+    }
+
+    setReviewSubmitting(true)
+    try {
+      const res = await fetch('/api/product-route', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: reviewOrderParam,
+          productId: product.id,
+          token: reviewTokenParam,
+          rating: reviewRating,
+          authorName: reviewAuthor.trim(),
+          title: reviewTitle.trim() || undefined,
+          comment: reviewComment.trim(),
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data?.ok) {
+        setReviewError(data?.error || 'Erreur lors du dépôt de l’avis.')
+        return
+      }
+      setReviewSuccess(true)
+      const refreshed = await fetch(`/api/product-route?action=reviews&id=${encodeURIComponent(product.id)}`).then((r) => r.json())
+      if (refreshed?.ok) {
+        setReviewsData({
+          reviews: refreshed.reviews || [],
+          stats: refreshed.stats || null,
+          loading: false,
+        })
+      }
+    } catch {
+      setReviewError('Une erreur réseau est survenue. Veuillez réessayer ultérieurement.')
+    } finally {
+      setReviewSubmitting(false)
+    }
+  }
+
   return (
     <>
       <Seo
@@ -424,6 +542,16 @@ export default function Product() {
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3">
               <span className="font-display text-3xl font-bold text-white">{formatPrice(product.price)}</span>
+              {Number(reviewsData?.stats?.review_count) > 0 && (
+                <a
+                  href="#avis"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-1 text-xs text-ash hover:border-neon/30 transition"
+                >
+                  <span className="text-amber-400 font-bold">{'★'.repeat(Math.min(5, Math.max(1, Math.round(reviewsData.stats.average_rating))))}</span>
+                  <span className="font-bold text-white">{Number(reviewsData.stats.average_rating).toFixed(1)}/5</span>
+                  <span className="text-emerald-400 font-medium">({reviewsData.stats.review_count} avis produit)</span>
+                </a>
+              )}
               <a
                 href={STORE_REVIEW_SUMMARY.googleUrl}
                 target="_blank"
@@ -766,6 +894,200 @@ export default function Product() {
             </dl>
           </div>
         </div>
+
+        {/* Section Avis clients vérifiés */}
+        <section id="avis" className="mt-16 scroll-mt-24 border-t border-white/10 pt-12">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-3">
+                <h2 className="font-display text-2xl font-bold text-white">Avis clients vérifiés</h2>
+                {Number(reviewsData?.stats?.review_count) > 0 && (
+                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
+                    {reviewsData.stats.review_count} avis
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-ash/70">
+                Avis 100% authentiques issus d’acheteurs vérifiés. Aucun avis n’est rémunéré ni modifié (conforme Directive Omnibus).
+              </p>
+            </div>
+
+            {Number(reviewsData?.stats?.review_count) > 0 && (
+              <div className="flex items-center gap-3 card p-3 px-4 shrink-0 bg-carbon">
+                <div className="text-center">
+                  <span className="font-display text-2xl font-bold text-white leading-none">
+                    {Number(reviewsData.stats.average_rating).toFixed(1)}
+                  </span>
+                  <span className="text-xs text-muted"> / 5</span>
+                </div>
+                <div className="border-l border-white/10 pl-3">
+                  <div className="flex text-amber-400 text-sm">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <span key={star}>
+                        {star <= Math.round(reviewsData.stats.average_rating) ? '★' : '☆'}
+                      </span>
+                    ))}
+                  </div>
+                  <span className="text-[11px] text-faint">
+                    Sur {reviewsData.stats.review_count} évaluation{reviewsData.stats.review_count > 1 ? 's' : ''}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Formulaire de dépôt d'avis (affiché lorsqu'un acheteur arrive avec son lien sécurisé de commande) */}
+          {isReviewUrl && !reviewSuccess && (
+            <div className="mt-8 rounded-2xl border border-neon/30 bg-carbon p-6 shadow-xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-neon">Votre expérience d'achat</span>
+                  <h3 className="mt-1 font-display text-lg font-bold text-white">
+                    Donner votre avis sur {product.name}
+                  </h3>
+                  <p className="text-xs text-faint mt-0.5">Commande N° {reviewOrderParam} · Achat vérifié</p>
+                </div>
+              </div>
+
+              <form onSubmit={handleSubmitReview} className="mt-6 space-y-4">
+                {reviewError && (
+                  <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-300">
+                    {reviewError}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-semibold text-white mb-2">Votre note globale</label>
+                  <div className="flex items-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        type="button"
+                        key={star}
+                        onClick={() => setReviewRating(star)}
+                        className="text-2xl transition hover:scale-110 focus:outline-none"
+                      >
+                        <span className={star <= reviewRating ? 'text-amber-400' : 'text-white/20'}>★</span>
+                      </button>
+                    ))}
+                    <span className="ml-2 text-xs font-medium text-ash">
+                      {reviewRating === 5 && 'Excellent'}
+                      {reviewRating === 4 && 'Très bien'}
+                      {reviewRating === 3 && 'Moyen'}
+                      {reviewRating === 2 && 'Décevant'}
+                      {reviewRating === 1 && 'Très mauvais'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="block text-xs font-semibold text-white mb-1.5">Votre prénom ou nom *</label>
+                    <input
+                      type="text"
+                      required
+                      value={reviewAuthor}
+                      onChange={(e) => setReviewAuthor(e.target.value)}
+                      placeholder="Ex: Thomas D."
+                      className="input w-full text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-white mb-1.5">Titre de l'avis (optionnel)</label>
+                    <input
+                      type="text"
+                      value={reviewTitle}
+                      onChange={(e) => setReviewTitle(e.target.value)}
+                      placeholder="Ex: Parfait pour ma vape quotidienne"
+                      className="input w-full text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-white mb-1.5">Votre avis détaillé *</label>
+                  <textarea
+                    required
+                    rows={4}
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Rendu des saveurs, autonomie, qualité de fabrication..."
+                    className="input w-full text-sm resize-none"
+                  />
+                  <p className="mt-1 text-[11px] text-faint">Minimum 5 caractères. Les avis contenant des propos injurieux ou contraires à la loi ne seront pas publiés.</p>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={reviewSubmitting}
+                    className="btn-primary px-6 py-2.5 text-xs font-bold disabled:opacity-50"
+                  >
+                    {reviewSubmitting ? 'Publication...' : 'Publier mon avis vérifié'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {reviewSuccess && (
+            <div className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center">
+              <span className="text-2xl">🎉</span>
+              <h3 className="mt-2 font-display text-base font-bold text-white">Merci pour votre retour !</h3>
+              <p className="mt-1 text-xs text-ash/80">
+                Votre avis vérifié a bien été enregistré et publié. Merci de faire grandir la communauté THEKLOPE.
+              </p>
+            </div>
+          )}
+
+          {/* Liste des avis publiés */}
+          {reviewsData.reviews?.length > 0 ? (
+            <div className="mt-8 space-y-4">
+              {reviewsData.reviews.map((rev) => (
+                <div key={rev.id} className="card p-5 bg-carbon/50">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="flex text-amber-400 text-sm">
+                        {[1, 2, 3, 4, 5].map((s) => (
+                          <span key={s}>{s <= rev.rating ? '★' : '☆'}</span>
+                        ))}
+                      </div>
+                      {rev.title && <span className="font-semibold text-white text-sm">{rev.title}</span>}
+                    </div>
+                    {rev.created_at && (
+                      <span className="text-[11px] text-faint">
+                        {new Date(rev.created_at).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="mt-3 text-sm leading-relaxed text-ash/90 whitespace-pre-line">{rev.comment}</p>
+
+                  <div className="mt-4 flex items-center gap-2 text-xs border-t border-white/5 pt-3">
+                    <span className="font-medium text-white">{rev.author_name}</span>
+                    {rev.verified_purchase && (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                        <IconCheck width={12} height={12} /> Achat vérifié
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : !isReviewUrl && !reviewSuccess ? (
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.02] p-8 text-center">
+              <p className="text-sm text-ash/80">
+                Il n’y a pas encore d’avis client sur ce produit.
+              </p>
+              <p className="mt-1 text-xs text-faint">
+                Un lien d’évaluation sécurisé est transmis à chaque acheteur après expédition de sa commande.
+              </p>
+            </div>
+          ) : null}
+        </section>
 
         {/* Produits associés choisis dans l'administration */}
         {relatedProducts.length > 0 && (

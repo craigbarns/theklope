@@ -10,6 +10,7 @@ import {
   mollieOrderIdFromMetadata,
 } from './checkout.js'
 import { formatOrderItemLabel } from './orderPresentation.js'
+import { createReviewToken } from './productReviews.js'
 import {
   sendEmail,
   emailLayout,
@@ -804,4 +805,10 @@ export async function sendRestockReminders(client = supabaseAdmin) {
   }
 
   return { count: orders.length, sent: sentCount }
+}
+
+export function generateOrderReviewLink(orderId, productId, baseUrl = 'https://www.theklope.com') {
+  if (!orderId || !productId) throw new Error('orderId and productId are required to generate review link')
+  const token = createReviewToken({ orderId, productId })
+  return `${baseUrl.replace(/\/+$/, '')}/produit/${encodeURIComponent(productId)}?review_order=${encodeURIComponent(orderId)}&token=${encodeURIComponent(token)}#avis`
 }

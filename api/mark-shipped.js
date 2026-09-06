@@ -11,6 +11,7 @@ import { CHECKOUT_ORDER_ID_RE } from './_lib/checkout.js'
 import { sendEmail, emailLayout, escapeHtml, escapeHtmlWithLineBreaks, euro, FROM_CHECKOUT } from './_lib/email.js'
 import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 import { formatOrderItemLabel } from './_lib/orderPresentation.js'
+import { generateOrderReviewLink } from './_lib/orders.js'
 
 export default async function handler(req, res) {
   setNoStore(res)
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
     // 2. Récupérer la commande
     const { data: order, error: orderError } = await supabaseAdmin
       .from('orders')
-      .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason, shipping_email_sent_at, customer, address, shipping, total, order_items(name, qty, variant, line_total)')
+      .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason, shipping_email_sent_at, customer, address, shipping, total, order_items(product_id, name, qty, variant, line_total)')
       .eq('id', orderId)
       .maybeSingle()
     if (orderError) throw orderError
@@ -93,7 +94,16 @@ export default async function handler(req, res) {
     let emailError = null
     if (customer.email && !emailAlreadySent) {
       const items = (order.order_items || [])
-        .map((it) => `<tr><td style="padding:6px 0;color:#e5e5e5">${escapeHtml(formatOrderItemLabel(it))} × ${Number(it.qty)}</td><td style="padding:6px 0;text-align:right;color:#e5e5e5">${euro(it.line_total)}</td></tr>`)
+        .map((it) => {
+          let reviewAction = ''
+          if (it.product_id) {
+            try {
+              const reviewLink = generateOrderReviewLink(order.id, it.product_id)
+              reviewAction = `<div style="margin-top:4px"><a href="${escapeHtml(reviewLink)}" style="display:inline-block;font-size:12px;color:#35FF8A;text-decoration:none;font-weight:600">★ Évaluer ce produit →</a></div>`
+            } catch {}
+          }
+          return `<tr><td style="padding:6px 0;color:#e5e5e5;border-bottom:1px solid #262626">${escapeHtml(formatOrderItemLabel(it))} × ${Number(it.qty)}${reviewAction}</td><td style="padding:6px 0;text-align:right;color:#e5e5e5;vertical-align:top;border-bottom:1px solid #262626">${euro(it.line_total)}</td></tr>`
+        })
         .join('')
       const trackingBlock = tracking
         && !isPickup

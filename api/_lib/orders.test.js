@@ -4,6 +4,7 @@ import test from 'node:test'
 import {
   completedFullRefundProof,
   ensureFullOrderRefund,
+  generateOrderReviewLink,
   hasMollieChargeback,
   orderConfirmationFulfillmentHtml,
   restockReminderEmailHtml,
@@ -12,6 +13,7 @@ import {
   syncOrderFromMolliePayment,
   validateMolliePaymentForOrder,
 } from './orders.js'
+import { verifyReviewToken } from './productReviews.js'
 
 const order = {
   id: 'TK-0123456789ABCDEF',
@@ -417,4 +419,19 @@ test('sendRestockReminders handles empty client or zero eligible orders graceful
   }
   const resultEmpty = await sendRestockReminders(mockClient)
   assert.deepEqual(resultEmpty, { count: 0, sent: 0 })
+})
+
+test('generateOrderReviewLink generates verifiable link with order and token query params', () => {
+  const orderId = 'TK-999888'
+  const productId = 'h40-voopoo'
+  const urlString = generateOrderReviewLink(orderId, productId)
+
+  assert.match(urlString, /^https:\/\/www\.theklope\.com\/produit\/h40-voopoo\?review_order=TK-999888&token=/)
+  assert.match(urlString, /#avis$/)
+
+  const parsed = new URL(urlString)
+  const token = parsed.searchParams.get('token')
+  assert.ok(token)
+  assert.equal(verifyReviewToken({ orderId, productId, token }), true)
+  assert.equal(verifyReviewToken({ orderId, productId: 'wrong-product', token }), false)
 })
