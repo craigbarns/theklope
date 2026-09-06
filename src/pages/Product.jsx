@@ -217,7 +217,7 @@ export default function Product() {
               "worstRating": "1",
             },
           } : {}),
-          ...(Array.isArray(reviewsData?.reviews) && reviewsData.reviews.length > 0 ? {
+          ...(Number(reviewsData?.stats?.review_count) >= 3 && Array.isArray(reviewsData?.reviews) && reviewsData.reviews.length > 0 ? {
             "review": reviewsData.reviews.slice(0, 5).map((r) => ({
               "@type": "Review",
               "reviewRating": {

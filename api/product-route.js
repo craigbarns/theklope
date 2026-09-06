@@ -1,5 +1,7 @@
 import { hasSupabaseAdmin, supabaseAdmin } from './_lib/supabaseAdmin.js'
 import { verifyReviewToken, validateReviewInput } from './_lib/productReviews.js'
+import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
+import { enforceRequestRateLimits } from './_lib/rateLimit.js'
 
 const PRODUCT_ID_RE = /^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,158}[A-Za-z0-9])?$/
 
@@ -34,10 +36,19 @@ const sendHtml = (req, res, status, title, message) => {
 }
 
 export default async function handler(req, res) {
+  setNoStore(res)
+
+  if (req.method === 'POST' || (req.method === 'OPTIONS' && req.headers?.origin)) {
+    if (!configureSameOriginCors(req, res, 'POST, GET, OPTIONS')) {
+      return res.status(403).json({ ok: false, error: 'Forbidden' })
+    }
+    if (req.method === 'OPTIONS') return res.status(200).end()
+  }
+
   // 1. Dépôt d'un avis produit vérifié (POST)
   if (req.method === 'POST') {
     const { orderId, productId, token, rating, authorName, comment, title } = req.body || {}
-
+    
     // Validation de la signature cryptographique (token HMAC)
     const isTokenValid = verifyReviewToken({ orderId, productId, token })
     if (!isTokenValid) {
@@ -55,6 +66,13 @@ export default async function handler(req, res) {
 
     if (!hasSupabaseAdmin) {
       return res.status(503).json({ ok: false, error: "Service temporairement indisponible." })
+    }
+
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'submit-review', limit: 10, windowSeconds: 3600 }
+    ])
+    if (!rateLimit.allowed) {
+      return res.status(429).json({ ok: false, error: 'Trop de tentatives, réessayez plus tard.' })
     }
 
     // Vérification de la commande dans Supabase
@@ -76,7 +94,7 @@ export default async function handler(req, res) {
     // Vérifier que la commande contient bien ce produit
     const items = order.order_items || []
     const containsProduct = items.some((it) => it.product_id === productId)
-    if (!containsProduct && items.length > 0 && items.some((it) => Boolean(it.product_id))) {
+    if (!containsProduct) {
       return res.status(403).json({ ok: false, error: 'Ce produit ne figure pas dans votre commande.' })
     }
 
@@ -93,7 +111,7 @@ export default async function handler(req, res) {
         title: validation.data.title,
         comment: validation.data.comment,
         verified_purchase: true,
-        status: 'published',
+        status: 'pending',
       })
       .select('id')
       .single()
