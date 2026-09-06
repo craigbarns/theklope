@@ -31,6 +31,7 @@ const TABS = [
   { id: 'overview', label: 'Vue d’ensemble' },
   { id: 'products', label: 'Produits' },
   { id: 'orders', label: 'Commandes' },
+  { id: 'reviews', label: 'Avis' },
   { id: 'emailing', label: 'Campagnes E-mailing' },
   { id: 'settings', label: 'Pilotage' },
 ]
@@ -2050,6 +2051,99 @@ function EmailingPanel() {
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function ReviewsPanel() {
+  const { supabase, adminSession } = useStore()
+  const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (adminSession) fetchReviews()
+  }, [adminSession])
+
+  async function fetchReviews() {
+    setLoading(true)
+    const { data } = await supabase
+      .from('product_reviews')
+      .select('*')
+      .order('created_at', { ascending: false })
+    
+    if (data) setReviews(data)
+    setLoading(false)
+  }
+
+  async function updateStatus(id, status) {
+    const { error } = await supabase
+      .from('product_reviews')
+      .update({ status })
+      .eq('id', id)
+      
+    if (!error) {
+      setReviews(reviews.map(r => r.id === id ? { ...r, status } : r))
+    }
+  }
+
+  if (loading) return <div className="p-8 text-center text-muted">Chargement...</div>
+
+  const pending = reviews.filter(r => r.status === 'pending')
+  const published = reviews.filter(r => r.status === 'published')
+  const rejected = reviews.filter(r => r.status === 'rejected')
+
+  const ReviewCard = ({ r }) => (
+    <div key={r.id} className="card p-4 space-y-3">
+      <div className="flex justify-between items-start">
+        <div>
+          <h4 className="font-semibold text-white">{r.author_name} <span className="text-muted text-xs font-normal">sur {r.product_id}</span></h4>
+          <div className="text-xs text-muted mt-1">{new Date(r.created_at).toLocaleString('fr-FR')} — Note: {r.rating}/5</div>
+          {r.title && <div className="text-sm font-medium text-white mt-2">{r.title}</div>}
+          <p className="text-sm text-ash mt-1 whitespace-pre-wrap">{r.comment}</p>
+        </div>
+        <div className="flex gap-2">
+          {r.status !== 'published' && (
+            <button onClick={() => updateStatus(r.id, 'published')} className="rounded bg-emerald-500/10 px-3 py-1.5 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/20">Publier</button>
+          )}
+          {r.status !== 'rejected' && (
+            <button onClick={() => updateStatus(r.id, 'rejected')} className="rounded bg-rose-500/10 px-3 py-1.5 text-xs font-semibold text-rose-400 hover:bg-rose-500/20">Rejeter</button>
+          )}
+          {r.status !== 'pending' && (
+            <button onClick={() => updateStatus(r.id, 'pending')} className="rounded bg-white/5 px-3 py-1.5 text-xs font-semibold text-white hover:bg-white/10">En attente</button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  return (
+    <div className="space-y-12">
+      <section>
+        <h3 className="font-display text-xl font-bold text-white mb-4">À modérer ({pending.length})</h3>
+        {pending.length === 0 ? <p className="text-muted">Aucun avis en attente.</p> : (
+          <div className="space-y-4">
+            {pending.map(r => <ReviewCard key={r.id} r={r} />)}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Publiés ({published.length})</h3>
+        {published.length === 0 ? <p className="text-muted">Aucun avis publié.</p> : (
+          <div className="space-y-4">
+            {published.map(r => <ReviewCard key={r.id} r={r} />)}
+          </div>
+        )}
+      </section>
+
+      <section>
+        <h3 className="font-display text-xl font-bold text-white mb-4">Rejetés ({rejected.length})</h3>
+        {rejected.length === 0 ? <p className="text-muted">Aucun avis rejeté.</p> : (
+          <div className="space-y-4">
+            {rejected.map(r => <ReviewCard key={r.id} r={r} />)}
+          </div>
+        )}
+      </section>
     </div>
   )
 }
