@@ -40,6 +40,21 @@ WHERE status = 'published'
 GROUP BY product_id;
 
 -- 3. RLS Policies
--- Only service_role (supabaseAdmin) can insert, select, or modify reviews via API
--- Public anon should NOT have direct access, as API route handles fetching and inserting.
--- Note: service_role bypasses RLS automatically, but we define a default deny-all by simply enabling RLS without policies for anon/authenticated.
+DROP POLICY IF EXISTS "Allow service_role full access to product_reviews" ON public.product_reviews;
+CREATE POLICY "Allow service_role full access to product_reviews"
+  ON public.product_reviews
+  AS PERMISSIVE
+  FOR ALL
+  TO service_role
+  USING (true)
+  WITH CHECK (true);
+
+-- Allow authenticated admins to read and update reviews via the client
+DROP POLICY IF EXISTS "Authenticated admins can manage product reviews" ON public.product_reviews;
+CREATE POLICY "Authenticated admins can manage product reviews"
+  ON public.product_reviews
+  AS PERMISSIVE
+  FOR ALL
+  TO authenticated
+  USING ((SELECT public.is_admin()))
+  WITH CHECK ((SELECT public.is_admin()));
