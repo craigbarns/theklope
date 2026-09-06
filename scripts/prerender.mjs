@@ -165,15 +165,6 @@ for (const p of PRODUCTS) {
         description: p.long || p.short || p.name,
         sku: buildMerchantSku(p.id),
         brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
-        ...(p.rating && p.reviews ? {
-          aggregateRating: {
-            '@type': 'AggregateRating',
-            ratingValue: String(p.rating),
-            reviewCount: String(p.reviews),
-            bestRating: '5',
-            worstRating: '1',
-          },
-        } : {}),
         offers: {
           '@type': 'Offer',
           url: abs(path),
