@@ -102,6 +102,27 @@ export default function Checkout() {
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
   const shippingCost = !selectedShipping || shippingIsFree ? 0 : selectedShipping.price
   const grandTotal = Math.round((Math.max(0, totals.subtotal - totals.discount) + shippingCost) * 100) / 100
+  // Dès que le code postal est complet et que Mondial Relay est choisi, la
+  // recherche part seule : le client n'a rien à cliquer pour voir le point le
+  // plus proche de chez lui. Le bouton reste là pour relancer manuellement.
+  useEffect(() => {
+    if (!selectedShipping?.requiresRelayPoint) return undefined
+    const postcode = String(address.zip || '').replace(/\s+/g, '')
+    if (!FRENCH_POSTCODE.test(postcode) || relayPoint) return undefined
+
+    let active = true
+    const timer = window.setTimeout(() => {
+      if (active) searchRelayPoints(postcode)
+    }, 400)
+    return () => {
+      active = false
+      window.clearTimeout(timer)
+    }
+    // searchRelayPoints est stable pour un rendu donné ; on ne veut relancer
+    // que sur un vrai changement de code postal ou de mode de livraison.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address.zip, selectedShipping?.requiresRelayPoint, relayPoint])
+
   const cartState = { cart, cartDetailed, catalogReady }
   const cartCatalogResolved = isCartCatalogResolved(cartState)
   const cartVerified = isCartCatalogVerified(cartState)
@@ -499,7 +520,7 @@ export default function Checkout() {
                   <Section title="Votre Point Relais">
                     <div className="flex flex-wrap items-end gap-3">
                       <Field
-                        label="Code postal de recherche"
+                        label="Votre code postal"
                         name="relayPostcode"
                         inputMode="numeric"
                         value={address.zip}
@@ -541,7 +562,7 @@ export default function Checkout() {
 
                     {!relayPoint && relayPoints.length > 0 && (
                       <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
-                        {relayPoints.map((point) => (
+                        {relayPoints.map((point, index) => (
                           <li key={point.id}>
                             <button
                               type="button"
@@ -549,13 +570,26 @@ export default function Checkout() {
                                 setRelayPoint(point)
                                 setCheckoutError('')
                               }}
-                              className="w-full rounded-lg border border-white/10 p-3 text-left transition hover:border-neon/40"
+                              className={`w-full rounded-lg border p-3 text-left transition hover:border-neon/40 ${
+                                index === 0 ? 'border-neon/30 bg-neon/[0.03]' : 'border-white/10'
+                              }`}
                             >
-                              <p className="text-sm font-medium text-white">{point.name}</p>
+                              <div className="flex items-start justify-between gap-3">
+                                <p className="text-sm font-medium text-white">{point.name}</p>
+                                {point.distanceMeters != null && (
+                                  <span className="shrink-0 text-xs font-semibold text-neon">
+                                    {(point.distanceMeters / 1000).toFixed(1)} km
+                                  </span>
+                                )}
+                              </div>
                               <p className="mt-0.5 text-xs text-faint">
                                 {point.address} — {point.postcode} {point.city}
-                                {point.distanceMeters ? ` · ${(point.distanceMeters / 1000).toFixed(1)} km` : ''}
                               </p>
+                              {index === 0 && (
+                                <span className="mt-1.5 inline-block rounded-full bg-neon/15 px-2 py-0.5 text-[11px] font-semibold text-neon">
+                                  Le plus proche
+                                </span>
+                              )}
                             </button>
                           </li>
                         ))}
@@ -564,8 +598,8 @@ export default function Checkout() {
 
                     {!relayPoint && relayPoints.length === 0 && !relayError && (
                       <p className="mt-3 text-xs text-faint">
-                        Saisissez votre code postal puis lancez la recherche pour choisir
-                        le Point Relais qui vous arrange.
+                        Saisissez votre code postal : les Points Relais autour de chez vous
+                        s’affichent automatiquement, du plus proche au plus éloigné.
                       </p>
                     )}
                   </Section>

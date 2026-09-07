@@ -246,6 +246,16 @@ export async function searchRelayPoints({ postcode, country = 'FR', weightGrams 
     }))
     .filter((point) => point.id)
 
+  // Tri par distance croissante : l'API ne garantit pas l'ordre, or le client
+  // doit voir en premier le point relais le plus proche de chez lui. Les points
+  // sans distance connue passent en fin de liste plutôt que de la polluer.
+  points.sort((left, right) => {
+    if (left.distanceMeters == null && right.distanceMeters == null) return 0
+    if (left.distanceMeters == null) return 1
+    if (right.distanceMeters == null) return -1
+    return left.distanceMeters - right.distanceMeters
+  })
+
   return points
 }
 

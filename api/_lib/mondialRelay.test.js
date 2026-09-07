@@ -187,3 +187,33 @@ test('API 2 exposes business errors without treating them as transport retries',
     ),
   )
 })
+
+test('les Points Relais sont triés du plus proche au plus éloigné', async () => {
+  // L'API renvoie ici volontairement dans le désordre, et un point sans
+  // distance connue : le client doit voir le plus proche en premier.
+  const point = (num, name, distance) =>
+    `<PointRelais_Details><STAT>0</STAT><Num>${num}</Num><LgAdr1>${name}</LgAdr1>`
+    + `<LgAdr3>1 RUE DU TEST</LgAdr3><CP>13006</CP><Ville>MARSEILLE</Ville><Pays>FR</Pays>`
+    + (distance === null ? '' : `<Distance>${distance}</Distance>`)
+    + '</PointRelais_Details>'
+
+  const fetchImpl = async () => new Response(
+    '<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body>'
+    + '<WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/">'
+    + '<WSI4_PointRelais_RechercheResult><STAT>0</STAT><PointsRelais>'
+    + point('30003', 'LOIN', 3200)
+    + point('10001', 'INCONNU', null)
+    + point('20002', 'PROCHE', 450)
+    + point('40004', 'MOYEN', 1100)
+    + '</PointsRelais></WSI4_PointRelais_RechercheResult>'
+    + '</WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>',
+    { status: 200, headers: { 'Content-Type': 'text/xml' } },
+  )
+
+  const points = await searchRelayPoints({ postcode: '13006' }, { config, fetchImpl })
+
+  assert.deepEqual(points.map((p) => p.name), ['PROCHE', 'MOYEN', 'LOIN', 'INCONNU'])
+  assert.equal(points[0].distanceMeters, 450)
+  // Distance inconnue : en fin de liste, jamais présentée comme « la plus proche ».
+  assert.equal(points.at(-1).distanceMeters, null)
+})
