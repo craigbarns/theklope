@@ -42,3 +42,48 @@ test('validateReviewInput checks rating, authorName and comment bounds', () => {
   assert.equal(validateReviewInput({ rating: 4, authorName: '', comment: 'Valide comment' }).ok, false)
   assert.equal(validateReviewInput({ rating: 4, authorName: 'A', comment: 'xyz' }).ok, false)
 })
+
+// --- Le système d'avis ne doit jamais faire tomber la chaîne de paiement -----
+// orders.js importe ce module, et mollie-webhook / payment-status / cancel-order
+// / mark-shipped / cleanup-checkouts importent orders.js. Un throw au chargement
+// laissait le client être débité sans que la commande soit jamais confirmée.
+
+test('le module s’importe même sans REVIEW_TOKEN_SECRET', async () => {
+  const previous = process.env.REVIEW_TOKEN_SECRET
+  delete process.env.REVIEW_TOKEN_SECRET
+  try {
+    // Import frais : c'est bien le chargement du module qui est testé.
+    const mod = await import(`./productReviews.js?nosecret=${Date.now()}`)
+    assert.equal(typeof mod.createReviewToken, 'function')
+    assert.equal(typeof mod.verifyReviewToken, 'function')
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_TOKEN_SECRET
+    else process.env.REVIEW_TOKEN_SECRET = previous
+  }
+})
+
+test('la chaîne de paiement s’importe sans REVIEW_TOKEN_SECRET', async () => {
+  const previous = process.env.REVIEW_TOKEN_SECRET
+  delete process.env.REVIEW_TOKEN_SECRET
+  try {
+    const orders = await import(`./orders.js?nosecret=${Date.now()}`)
+    assert.equal(typeof orders.syncOrderFromMolliePayment, 'function')
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_TOKEN_SECRET
+    else process.env.REVIEW_TOKEN_SECRET = previous
+  }
+})
+
+test('sans secret, la vérification de token refuse au lieu de lever', () => {
+  const previous = process.env.REVIEW_TOKEN_SECRET
+  delete process.env.REVIEW_TOKEN_SECRET
+  try {
+    assert.equal(
+      verifyReviewToken({ orderId: 'TK-1', productId: 'h40-voopoo', token: 'a.b' }),
+      false,
+    )
+  } finally {
+    if (previous === undefined) delete process.env.REVIEW_TOKEN_SECRET
+    else process.env.REVIEW_TOKEN_SECRET = previous
+  }
+})
