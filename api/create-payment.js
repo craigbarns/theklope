@@ -287,6 +287,7 @@ export default async function handler(req, res) {
       promoCode,
       customer = {},
       address = {},
+      relayPoint = null,
       acquisition,
       ageConfirmed,
     } = body
@@ -323,7 +324,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Coordonnées client invalides.' })
     }
 
-    const fulfillment = validateFulfillment(shippingMethodId, address)
+    const fulfillment = validateFulfillment(shippingMethodId, address, relayPoint)
     if (!fulfillment.ok) {
       return res.status(400).json({ error: fulfillment.error })
     }
@@ -355,6 +356,9 @@ export default async function handler(req, res) {
       customer: normalizedCustomer,
       address: normalizedAddress,
       shippingMethodId,
+      // Changer de Point Relais doit produire une nouvelle tentative, pas
+      // rejouer la précédente avec l'ancien point.
+      relayPointId: fulfillment.relayPoint?.id || null,
       promoCode: normalizedPromo,
       lines: intentLines,
     })
@@ -463,7 +467,14 @@ export default async function handler(req, res) {
       p_payload_hash: payloadHash,
       p_customer: normalizedCustomer,
       p_address: normalizedAddress,
-      p_shipping: totals.shippingMethod || {},
+      p_shipping: fulfillment.relayPoint
+        ? {
+          ...(totals.shippingMethod || {}),
+          // Même clé que celle lue par api/mondial-relay.js pour l'étiquette :
+          // le choix du client devient la source, l'admin n'a plus à en choisir un.
+          mondialRelay: { relayId: fulfillment.relayPoint.id, point: fulfillment.relayPoint },
+        }
+        : (totals.shippingMethod || {}),
       p_subtotal: totals.subtotal,
       p_discount: totals.discount,
       p_shipping_cost: totals.shipping,

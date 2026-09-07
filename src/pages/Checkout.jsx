@@ -30,7 +30,7 @@ import {
 
 // Méthodes de livraison : prix/labels viennent du module partagé (source de
 // vérité, identique au serveur), on n'ajoute ici que l'icône d'affichage.
-const SHIPPING_ICONS = { poste: IconTruck, coursier: IconBolt, pickup: IconTruck }
+const SHIPPING_ICONS = { relais: IconTruck, poste: IconTruck, coursier: IconBolt, pickup: IconTruck }
 const SHIPPING_METHODS = SHARED_SHIPPING_METHODS.map((m) => ({ ...m, icon: SHIPPING_ICONS[m.id] || IconTruck }))
 const FRENCH_POSTCODE = /^\d{5}$/
 const MARSEILLE_POSTCODE = /^130(?:0[1-9]|1[0-6])$/
@@ -54,6 +54,10 @@ export default function Checkout() {
 
   const [step, setStep] = useState(1)
   const [shipping, setShipping] = useState('poste')
+  const [relayPoint, setRelayPoint] = useState(null)
+  const [relayPoints, setRelayPoints] = useState([])
+  const [relaySearching, setRelaySearching] = useState(false)
+  const [relayError, setRelayError] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [checkoutError, setCheckoutError] = useState('')
   const stepContentRef = useRef(null)
@@ -63,6 +67,38 @@ export default function Checkout() {
   const paymentInfoTrackedRef = useRef(false)
 
   const selectedShipping = SHIPPING_METHODS.find((m) => m.id === shipping) || null
+
+  // Recherche des Points Relais autour du code postal saisi. L'annuaire est
+  // interrogé côté serveur (api/mondial-relay.js) : les identifiants Mondial
+  // Relay ne quittent jamais le serveur.
+  const searchRelayPoints = async (postcode) => {
+    const clean = String(postcode || '').replace(/\s+/g, '')
+    if (!/^\d{5}$/.test(clean)) {
+      setRelayError('Saisissez un code postal à 5 chiffres pour chercher un Point Relais.')
+      return
+    }
+    setRelaySearching(true)
+    setRelayError('')
+    try {
+      const response = await fetch('/api/mondial-relay?action=relay-points', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postcode: clean }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(payload.error || 'Recherche impossible.')
+      const points = payload.points || []
+      setRelayPoints(points)
+      if (points.length === 0) {
+        setRelayError('Aucun Point Relais trouvé autour de ce code postal.')
+      }
+    } catch (error) {
+      setRelayPoints([])
+      setRelayError(error.message || 'Recherche des Points Relais impossible.')
+    } finally {
+      setRelaySearching(false)
+    }
+  }
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
   const shippingCost = !selectedShipping || shippingIsFree ? 0 : selectedShipping.price
   const grandTotal = Math.round((Math.max(0, totals.subtotal - totals.discount) + shippingCost) * 100) / 100
@@ -164,6 +200,13 @@ export default function Checkout() {
         )
         return
       }
+      if (selectedShipping.requiresRelayPoint && !relayPoint) {
+        reportCheckoutError(
+          'Choisissez votre Point Relais pour continuer.',
+          'relay_point_missing',
+        )
+        return
+      }
       if (shipping !== 'pickup') {
         if (!isFrenchPostcode) {
           reportCheckoutError(
@@ -229,6 +272,7 @@ export default function Checkout() {
           phone: customer.phone,
         },
         address: shipping === 'pickup' ? {} : address,
+        relayPoint: selectedShipping?.requiresRelayPoint ? relayPoint : null,
         acquisition: getStoredAcquisition(),
       }
       const payload = JSON.stringify(requestBody)
@@ -426,6 +470,13 @@ export default function Checkout() {
                             onChange={() => {
                               setCheckoutError('')
                               setShipping(m.id)
+                              // Un point relais choisi ne doit pas survivre à un
+                              // changement de mode de livraison.
+                              if (!m.requiresRelayPoint) {
+                                setRelayPoint(null)
+                                setRelayPoints([])
+                                setRelayError('')
+                              }
                             }}
                             className="sr-only"
                           />
@@ -444,6 +495,82 @@ export default function Checkout() {
                     })}
                   </div>
                 </Section>
+                {selectedShipping?.requiresRelayPoint && (
+                  <Section title="Votre Point Relais">
+                    <div className="flex flex-wrap items-end gap-3">
+                      <Field
+                        label="Code postal de recherche"
+                        name="relayPostcode"
+                        inputMode="numeric"
+                        value={address.zip}
+                        onChange={updateAddress('zip')}
+                        className="flex-1 min-w-[10rem]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => searchRelayPoints(address.zip)}
+                        disabled={relaySearching}
+                        className="btn-ghost px-5 py-2.5 disabled:opacity-50"
+                      >
+                        {relaySearching ? 'Recherche…' : 'Chercher'}
+                      </button>
+                    </div>
+
+                    {relayError && (
+                      <p className="mt-3 text-sm text-rose-300">{relayError}</p>
+                    )}
+
+                    {relayPoint && (
+                      <div className="mt-4 rounded-lg border border-neon/40 bg-neon/5 p-4">
+                        <p className="text-sm font-semibold text-white">
+                          <IconCheck width={16} height={16} className="mr-1.5 inline text-neon" />
+                          {relayPoint.name}
+                        </p>
+                        <p className="mt-1 text-xs text-muted">
+                          {relayPoint.address} — {relayPoint.postcode} {relayPoint.city}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setRelayPoint(null)}
+                          className="mt-2 text-xs text-faint underline hover:text-white"
+                        >
+                          Choisir un autre point
+                        </button>
+                      </div>
+                    )}
+
+                    {!relayPoint && relayPoints.length > 0 && (
+                      <ul className="mt-4 max-h-80 space-y-2 overflow-y-auto">
+                        {relayPoints.map((point) => (
+                          <li key={point.id}>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setRelayPoint(point)
+                                setCheckoutError('')
+                              }}
+                              className="w-full rounded-lg border border-white/10 p-3 text-left transition hover:border-neon/40"
+                            >
+                              <p className="text-sm font-medium text-white">{point.name}</p>
+                              <p className="mt-0.5 text-xs text-faint">
+                                {point.address} — {point.postcode} {point.city}
+                                {point.distanceMeters ? ` · ${(point.distanceMeters / 1000).toFixed(1)} km` : ''}
+                              </p>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+
+                    {!relayPoint && relayPoints.length === 0 && !relayError && (
+                      <p className="mt-3 text-xs text-faint">
+                        Saisissez votre code postal puis lancez la recherche pour choisir
+                        le Point Relais qui vous arrange.
+                      </p>
+                    )}
+                  </Section>
+                )}
+
                 {shipping && shipping !== 'pickup' ? (
                   <Section title="Adresse de livraison">
                     <div className="grid gap-4 sm:grid-cols-2">
@@ -513,6 +640,14 @@ export default function Checkout() {
                     <span className="text-muted">Livraison</span>
                     <span className="break-words text-white sm:text-right">{selectedShipping?.label} — {selectedShipping?.detail}</span>
                   </div>
+                  {relayPoint && (
+                    <div className="grid gap-1 py-1 sm:grid-cols-[auto_1fr] sm:gap-4">
+                      <span className="text-muted">Point Relais</span>
+                      <span className="break-words text-white sm:text-right">
+                        {relayPoint.name} — {relayPoint.address}, {relayPoint.postcode} {relayPoint.city}
+                      </span>
+                    </div>
+                  )}
                   {shipping !== 'pickup' && address.deliveryInstructions.trim() && (
                     <div className="grid gap-1 py-1 sm:grid-cols-[auto_1fr] sm:gap-4">
                       <span className="text-muted">Instructions</span>

@@ -10,9 +10,14 @@ import { categoryMatches, isEliquidCategory } from './productCategory.js'
 export const FREE_SHIPPING_THRESHOLD = 29
 export const DEFAULT_SHIPPING_COST = 7.5
 
-// Modes de livraison. Click & Collect (retrait boutique) = gratuit ; La Poste et
-// Coursier Marseille = 7,50 € (offerts dès 29 € via le seuil ci-dessus).
+// Modes de livraison. Click & Collect (retrait boutique) = gratuit ; Mondial
+// Relay = 3,90 € ; La Poste et Coursier Marseille = 7,50 €. Tous offerts dès
+// 29 € via le seuil ci-dessus.
+//
+// `relais` exige que le client ait choisi un Point Relais : le serveur refuse
+// la commande sans (voir validateFulfillment dans api/_lib/orderValidation.js).
 export const SHIPPING_METHODS = [
+  { id: 'relais', label: 'Mondial Relay', detail: 'Point Relais au choix, 3–5 j (offerte dès 29 €)', price: 3.9, requiresRelayPoint: true },
   { id: 'poste', label: 'La Poste Colissimo', detail: 'Livraison 2–4 j (offerte dès 29 €)', price: 7.5 },
   { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 29 €)', price: 7.5 },
   { id: 'pickup', label: 'Click & Collect', detail: 'Retrait gratuit en boutique — 188 rue de Rome', price: 0 },
@@ -254,7 +259,7 @@ export function computeBundleProgress(lines = []) {
 
 // Calcule les totaux de façon déterministe.
 //   lines: [{ price, qty, brand, volume, category }]
-//   shippingMethodId: 'poste' | 'coursier' | 'pickup' (optionnel)
+//   shippingMethodId: 'relais' | 'poste' | 'coursier' | 'pickup' (optionnel)
 //   promoCode: chaîne (optionnel)
 export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) {
   const subtotalCents = lines.reduce((sum, line) => sum + lineSubtotalCents(line), 0)

@@ -1,5 +1,6 @@
 import { authenticateAdminRequest } from './_lib/adminAuth.js'
 import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
+import { enforceRequestRateLimits } from './_lib/rateLimit.js'
 import {
   createMondialRelayLabel,
   getMondialRelayConfig,
@@ -19,6 +20,13 @@ const ACTION_METHODS = {
 }
 const LABEL_STATUSES = new Set(['processing'])
 
+// La recherche de Points Relais est la seule action ouverte au public : le
+// client doit pouvoir choisir son point relais au checkout, avant d'avoir la
+// moindre commande. Elle ne lit que l'annuaire Mondial Relay — aucune donnée
+// THEKLOPE — et reste limitée en débit. Tout le reste (étiquettes, suivi,
+// statut) demeure réservé aux administrateurs.
+const PUBLIC_ACTIONS = new Set(['relay-points'])
+
 export default async function handler(req, res) {
   setNoStore(res)
   if (!configureSameOriginCors(req, res, 'GET, POST, OPTIONS')) {
@@ -32,9 +40,18 @@ export default async function handler(req, res) {
   if (req.method !== expectedMethod) return res.status(405).json({ error: 'Méthode non autorisée.' })
   if (!hasSupabaseAdmin) return res.status(500).json({ error: 'Base de données non configurée.' })
 
-  const adminAuth = await authenticateAdminRequest(req)
-  if (!adminAuth.ok) return res.status(adminAuth.status).json({ error: adminAuth.error })
-  if (action === 'status') return res.status(200).json(publicMondialRelayStatus())
+  if (PUBLIC_ACTIONS.has(action)) {
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'relay-points', limit: 60, windowSeconds: 3600 },
+    ])
+    if (!rateLimit.allowed) {
+      return res.status(429).json({ error: 'Trop de recherches, réessayez dans quelques minutes.' })
+    }
+  } else {
+    const adminAuth = await authenticateAdminRequest(req)
+    if (!adminAuth.ok) return res.status(adminAuth.status).json({ error: adminAuth.error })
+    if (action === 'status') return res.status(200).json(publicMondialRelayStatus())
+  }
 
   let body
   try {
@@ -84,7 +101,7 @@ async function createLabel(body, res) {
   const orderId = String(body.orderId || '').trim()
   const weightGrams = Math.round(Number(body.weightGrams))
   const deliveryMode = String(body.deliveryMode || '24R').trim().toUpperCase()
-  const relayId = normalizeRelayId(body.relayId)
+  const requestedRelayId = normalizeRelayId(body.relayId)
   if (!orderId) return res.status(400).json({ error: 'orderId manquant.' })
 
   const config = getMondialRelayConfig()
@@ -113,6 +130,17 @@ async function createLabel(body, res) {
   }
 
   const previous = order.shipping?.mondialRelay || {}
+
+  // Le Point Relais choisi par le client au checkout fait foi. L'admin n'a plus
+  // à en désigner un : il n'en fournit que si la commande n'en porte aucun
+  // (commandes antérieures à la sélection côté client, ou autre mode).
+  const relayId = normalizeRelayId(previous.relayId) || requestedRelayId
+  if (deliveryMode === '24R' && !relayId) {
+    return res.status(400).json({
+      error: 'Aucun Point Relais sur cette commande. Sélectionnez-en un pour créer l’étiquette.',
+      code: 'relay_point_missing',
+    })
+  }
   if (previous.shipmentNumber && previous.labelUrl) {
     return res.status(200).json({
       ok: true,

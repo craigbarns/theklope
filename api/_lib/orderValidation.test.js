@@ -145,3 +145,59 @@ test('delivery instructions reject invalid types and excessive content', () => {
   assert.equal(validateFulfillment('poste', { ...address, deliveryInstructions: { floor: 3 } }).ok, false)
   assert.equal(validateFulfillment('poste', { ...address, deliveryInstructions: ['3e étage'] }).ok, false)
 })
+
+// --- Mondial Relay : le Point Relais est choisi par le client ----------------
+const RELAY_ADDRESS = {
+  street: '188 rue de Rome',
+  zip: '13006',
+  city: 'Marseille',
+  country: 'France',
+}
+const RELAY_POINT = {
+  id: 'FR-012345',
+  name: 'TABAC DE LA PLACE',
+  address: '12 place Castellane',
+  postcode: '13006',
+  city: 'Marseille',
+  country: 'FR',
+}
+
+test('la livraison en Point Relais est refusée sans point choisi', () => {
+  const result = validateFulfillment('relais', RELAY_ADDRESS, null)
+  assert.equal(result.ok, false)
+  assert.match(result.error, /Point Relais/)
+})
+
+test('un identifiant de Point Relais mal formé est refusé', () => {
+  for (const id of ['', '  ', 'FR', 'nimportequoi', '<script>', 'FR-']) {
+    const result = validateFulfillment('relais', RELAY_ADDRESS, { ...RELAY_POINT, id })
+    assert.equal(result.ok, false, `attendu refusé pour « ${id} »`)
+  }
+})
+
+test('un Point Relais valide est accepté et normalisé', () => {
+  const result = validateFulfillment('relais', RELAY_ADDRESS, RELAY_POINT)
+  assert.equal(result.ok, true)
+  assert.equal(result.relayPoint.id, 'FR-012345')
+  assert.equal(result.relayPoint.name, 'TABAC DE LA PLACE')
+  assert.equal(result.method.price, 3.9)
+})
+
+test('les libellés du Point Relais sont bornés, seul l’identifiant fait foi', () => {
+  const result = validateFulfillment('relais', RELAY_ADDRESS, {
+    ...RELAY_POINT,
+    name: 'x'.repeat(500),
+    address: 'y'.repeat(500),
+  })
+  assert.equal(result.ok, true)
+  assert.ok(result.relayPoint.name.length <= 120)
+  assert.ok(result.relayPoint.address.length <= 200)
+})
+
+test('les autres modes de livraison ne réclament aucun Point Relais', () => {
+  for (const id of ['poste', 'pickup']) {
+    const result = validateFulfillment(id, RELAY_ADDRESS, null)
+    assert.equal(result.ok, true, `attendu accepté pour ${id}`)
+    assert.equal(result.relayPoint, undefined)
+  }
+})
