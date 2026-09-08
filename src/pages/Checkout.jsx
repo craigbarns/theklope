@@ -102,27 +102,6 @@ export default function Checkout() {
   const shippingIsFree = promo?.type === 'shipping' || totals.subtotal >= totals.freeShippingThreshold
   const shippingCost = !selectedShipping || shippingIsFree ? 0 : selectedShipping.price
   const grandTotal = Math.round((Math.max(0, totals.subtotal - totals.discount) + shippingCost) * 100) / 100
-  // Dès que le code postal est complet et que Mondial Relay est choisi, la
-  // recherche part seule : le client n'a rien à cliquer pour voir le point le
-  // plus proche de chez lui. Le bouton reste là pour relancer manuellement.
-  useEffect(() => {
-    if (!selectedShipping?.requiresRelayPoint) return undefined
-    const postcode = String(address.zip || '').replace(/\s+/g, '')
-    if (!FRENCH_POSTCODE.test(postcode) || relayPoint) return undefined
-
-    let active = true
-    const timer = window.setTimeout(() => {
-      if (active) searchRelayPoints(postcode)
-    }, 400)
-    return () => {
-      active = false
-      window.clearTimeout(timer)
-    }
-    // searchRelayPoints est stable pour un rendu donné ; on ne veut relancer
-    // que sur un vrai changement de code postal ou de mode de livraison.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [address.zip, selectedShipping?.requiresRelayPoint, relayPoint])
-
   const cartState = { cart, cartDetailed, catalogReady }
   const cartCatalogResolved = isCartCatalogResolved(cartState)
   const cartVerified = isCartCatalogVerified(cartState)
@@ -152,6 +131,28 @@ export default function Checkout() {
     deliveryInstructions: '',
   })
   const [ageAccepted, setAgeAccepted] = useState(false)
+
+  // Dès que le code postal est complet et que Mondial Relay est choisi, la
+  // recherche part seule : le client n'a rien à cliquer pour voir le point le
+  // plus proche de chez lui. Le bouton reste là pour relancer manuellement.
+  useEffect(() => {
+    if (!selectedShipping?.requiresRelayPoint) return undefined
+    const postcode = String(address.zip || '').replace(/\s+/g, '')
+    if (!FRENCH_POSTCODE.test(postcode) || relayPoint) return undefined
+
+    let active = true
+    const timer = window.setTimeout(() => {
+      if (active) searchRelayPoints(postcode)
+    }, 400)
+    return () => {
+      active = false
+      window.clearTimeout(timer)
+    }
+    // searchRelayPoints est stable pour un rendu donné ; on ne veut relancer
+    // que sur un vrai changement de code postal ou de mode de livraison.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address.zip, selectedShipping?.requiresRelayPoint, relayPoint])
+
   const cleanPostcode = address.zip.trim()
   const isFrenchPostcode = FRENCH_POSTCODE.test(cleanPostcode)
   const isMarseillePostcode = MARSEILLE_POSTCODE.test(cleanPostcode)
