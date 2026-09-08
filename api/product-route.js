@@ -68,9 +68,17 @@ export default async function handler(req, res) {
       return res.status(503).json({ ok: false, error: "Service temporairement indisponible." })
     }
 
-    const rateLimit = await enforceRequestRateLimits(req, [
-      { scope: 'submit-review', limit: 10, windowSeconds: 3600 }
-    ])
+    // Même filet que la recherche de Points Relais : une erreur du compteur ne
+    // doit pas ressortir en 500 muet chez le client.
+    let rateLimit
+    try {
+      rateLimit = await enforceRequestRateLimits(req, [
+        { scope: 'submit_review', limit: 10, windowSeconds: 3600 },
+      ])
+    } catch (error) {
+      console.error('submit-review rate limit error:', error?.message || error)
+      return res.status(503).json({ ok: false, error: 'Dépôt d’avis momentanément indisponible.' })
+    }
     if (!rateLimit.allowed) {
       return res.status(429).json({ ok: false, error: 'Trop de tentatives, réessayez plus tard.' })
     }

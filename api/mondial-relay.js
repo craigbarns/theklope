@@ -41,9 +41,18 @@ export default async function handler(req, res) {
   if (!hasSupabaseAdmin) return res.status(500).json({ error: 'Base de données non configurée.' })
 
   if (PUBLIC_ACTIONS.has(action)) {
-    const rateLimit = await enforceRequestRateLimits(req, [
-      { scope: 'relay-points', limit: 60, windowSeconds: 3600 },
-    ])
+    // La limitation de débit ne doit jamais tomber en 500 muet : sans ce
+    // filet, une erreur du compteur ressortait chez le client comme un échec
+    // inexplicable de la recherche de Points Relais.
+    let rateLimit
+    try {
+      rateLimit = await enforceRequestRateLimits(req, [
+        { scope: 'relay_points', limit: 60, windowSeconds: 3600 },
+      ])
+    } catch (error) {
+      console.error('mondial relay rate limit error:', error?.message || error)
+      return res.status(503).json({ error: 'Recherche de Point Relais momentanément indisponible.' })
+    }
     if (!rateLimit.allowed) {
       return res.status(429).json({ error: 'Trop de recherches, réessayez dans quelques minutes.' })
     }
