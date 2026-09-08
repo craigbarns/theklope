@@ -421,7 +421,16 @@ test('sendRestockReminders handles empty client or zero eligible orders graceful
   assert.deepEqual(resultEmpty, { count: 0, sent: 0 })
 })
 
-test('generateOrderReviewLink generates verifiable link with order and token query params', () => {
+test('generateOrderReviewLink generates verifiable link with order and token query params', (t) => {
+  // Le lien est signé : sans REVIEW_TOKEN_SECRET la fonction lève, à dessein.
+  // Le test doit donc fournir un secret, comme la production.
+  const previous = process.env.REVIEW_TOKEN_SECRET
+  process.env.REVIEW_TOKEN_SECRET = 'secret-de-test-generateOrderReviewLink'
+  t.after(() => {
+    if (previous === undefined) delete process.env.REVIEW_TOKEN_SECRET
+    else process.env.REVIEW_TOKEN_SECRET = previous
+  })
+
   const orderId = 'TK-999888'
   const productId = 'h40-voopoo'
   const urlString = generateOrderReviewLink(orderId, productId)

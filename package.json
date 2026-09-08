@@ -9,14 +9,15 @@
   },
   "scripts": {
     "dev": "vite",
-    "test": "REVIEW_TOKEN_SECRET=test-secret node --test",
+    "test": "node --test && node scripts/smoke-render.mjs",
     "sitemap": "node scripts/generate-sitemap.mjs",
     "indexnow": "node scripts/ping-indexnow.mjs",
     "prebuild": "node scripts/generate-sitemap.mjs && node scripts/generate-llms-full.mjs",
     "build": "vite build",
     "postbuild": "node scripts/prerender.mjs",
     "prerender": "node scripts/prerender.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:render": "node scripts/smoke-render.mjs"
   },
   "dependencies": {
     "@mollie/api-client": "^4.3.2",
