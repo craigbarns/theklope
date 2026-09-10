@@ -1,9 +1,12 @@
-import { categoryMatches } from './productCategory.js'
+import { supportsFlavorVariants } from './productCategory.js'
 
+// `supports` borne les dimensions propres aux produits parfumés (e-liquides,
+// DIY, cartouches pré-remplies, puffs). Le matériel reste exclu : ses saveurs
+// et taux de nicotine hérités sont des données parasites, jamais des choix.
 export const CART_VARIANT_FIELDS = Object.freeze([
   { key: 'color', productField: 'colors', label: 'Couleur' },
-  { key: 'flavor', productField: 'flavors', label: 'Saveur', categories: ['eliquide', 'diy'] },
-  { key: 'nicotine', productField: 'nicotine', label: 'Taux de nicotine', suffix: ' mg', categories: ['eliquide', 'diy'] },
+  { key: 'flavor', productField: 'flavors', label: 'Saveur', supports: supportsFlavorVariants },
+  { key: 'nicotine', productField: 'nicotine', label: 'Taux de nicotine', suffix: ' mg', supports: supportsFlavorVariants },
   { key: 'ohm', productField: 'ohmOptions', label: 'Résistance', suffix: ' Ω' },
 ])
 
@@ -17,7 +20,7 @@ const variantKey = (variant = {}) => JSON.stringify(
 export function getProductVariantOptions(product = {}, key) {
   const definition = CART_VARIANT_FIELDS.find((entry) => entry.key === key)
   if (!definition) return []
-  if (definition.categories && !definition.categories.some((category) => categoryMatches(product?.category, category))) return []
+  if (definition.supports && !definition.supports(product?.category)) return []
   const source = Array.isArray(product?.[definition.productField]) ? product[definition.productField] : []
   return source.filter(hasValue)
 }
