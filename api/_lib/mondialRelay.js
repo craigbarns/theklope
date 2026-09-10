@@ -155,7 +155,7 @@ const soapEnvelope = (method, params, security) => {
   return `<?xml version="1.0" encoding="utf-8"?><soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><${method} xmlns="${API1_NAMESPACE}">${fields}</${method}></soap:Body></soap:Envelope>`
 }
 
-async function callApi1(method, params, { config = getMondialRelayConfig(), fetchImpl = fetch } = {}) {
+async function callApi1(method, params, { config = getMondialRelayConfig(), fetchImpl = fetch, withRaw = false } = {}) {
   if (!config.api1.configured) {
     throw new MondialRelayError('Les identifiants Mondial Relay API 1 ne sont pas configurés.', {
       code: 'api1_not_configured',
@@ -187,16 +187,23 @@ async function callApi1(method, params, { config = getMondialRelayConfig(), fetc
       retryable: response.status >= 500,
     })
   }
-  return parseXml(xml, 'Mondial Relay API 1')
+  const payload = parseXml(xml, 'Mondial Relay API 1')
+  return withRaw ? { payload, xml } : payload
 }
 
-export async function searchRelayPoints({ postcode, country = 'FR', weightGrams = 1000, limit = 10 } = {}, options = {}) {
-  const cleanPostcode = compact(postcode).replace(/\s+/g, '')
-  if (!/^\d{5}$/.test(cleanPostcode)) {
-    throw new MondialRelayError('Le code postal doit contenir 5 chiffres.', { code: 'invalid_postcode' })
-  }
-  const config = options.config || getMondialRelayConfig()
-  const params = {
+// Paramètres de WSI4_PointRelais_Recherche. Extrait pour que la recherche et le
+// diagnostic administrateur interrogent rigoureusement la même requête : un
+// diagnostic qui divergerait de l'appel réel ne prouverait rien.
+function relaySearchParams({
+  cleanPostcode,
+  config,
+  country = 'FR',
+  weightGrams = 1000,
+  limit = 10,
+  searchAction = '24R',
+  radiusKm = 20,
+} = {}) {
+  return {
     Enseigne: config.api1.enseigne,
     Pays: upper(country) || 'FR',
     NumPointRelais: '',
@@ -206,13 +213,27 @@ export async function searchRelayPoints({ postcode, country = 'FR', weightGrams 
     Longitude: '',
     Taille: '',
     Poids: String(Math.max(10, Math.min(30_000, Math.round(Number(weightGrams) || 1000)))),
-    Action: '24R',
+    Action: upper(searchAction) || '24R',
     DelaiEnvoi: '0',
-    RayonRecherche: '20',
+    RayonRecherche: String(Math.max(1, Math.min(100, Math.round(Number(radiusKm) || 20)))),
     TypeActivite: '',
     NACE: '',
     NombreResultats: String(Math.max(1, Math.min(30, Math.round(Number(limit) || 10)))),
   }
+}
+
+const relayPostcodeOrThrow = (postcode) => {
+  const cleanPostcode = compact(postcode).replace(/\s+/g, '')
+  if (!/^\d{5}$/.test(cleanPostcode)) {
+    throw new MondialRelayError('Le code postal doit contenir 5 chiffres.', { code: 'invalid_postcode' })
+  }
+  return cleanPostcode
+}
+
+export async function searchRelayPoints({ postcode, country = 'FR', weightGrams = 1000, limit = 10 } = {}, options = {}) {
+  const cleanPostcode = relayPostcodeOrThrow(postcode)
+  const config = options.config || getMondialRelayConfig()
+  const params = relaySearchParams({ cleanPostcode, config, country, weightGrams, limit })
   const payload = await callApi1('WSI4_PointRelais_Recherche', params, { ...options, config })
   const result = payload?.Envelope?.Body?.WSI4_PointRelais_RechercheResponse?.WSI4_PointRelais_RechercheResult
   if (!result) {
@@ -257,6 +278,69 @@ export async function searchRelayPoints({ postcode, country = 'FR', weightGrams 
   })
 
   return points
+}
+
+// Masque un identifiant de configuration : assez visible pour repérer une faute
+// de frappe ou une valeur vide, jamais assez pour être réutilisé s'il fuite dans
+// une capture d'écran ou un ticket de support.
+const maskIdentifier = (value) => {
+  const clean = compact(value)
+  if (!clean) return ''
+  if (clean.length <= 4) return '*'.repeat(clean.length)
+  return `${clean.slice(0, 2)}${'*'.repeat(clean.length - 4)}${clean.slice(-2)}`
+}
+
+// Diagnostic réservé à l'administration. Une recherche qui ne renvoie aucun
+// Point Relais est silencieuse par conception : si Mondial Relay répond sans
+// STAT et sans point, `searchRelayPoints` retourne une liste vide sans erreur.
+// Cette fonction rejoue exactement la même requête et expose ce que le service a
+// réellement répondu — code STAT, nombre de points, extrait du XML — pour
+// distinguer une zone sans point relais d'un refus silencieux du service.
+// La clé privée et la signature ne sont jamais retournées.
+export async function diagnoseRelayPointSearch({
+  postcode,
+  country = 'FR',
+  weightGrams = 1000,
+  limit = 10,
+  searchAction = '24R',
+  radiusKm = 20,
+} = {}, options = {}) {
+  const cleanPostcode = relayPostcodeOrThrow(postcode)
+  const config = options.config || getMondialRelayConfig()
+  const params = relaySearchParams({
+    cleanPostcode,
+    config,
+    country,
+    weightGrams,
+    limit,
+    searchAction,
+    radiusKm,
+  })
+
+  const { payload, xml } = await callApi1('WSI4_PointRelais_Recherche', params, {
+    ...options,
+    config,
+    withRaw: true,
+  })
+
+  const result = payload?.Envelope?.Body?.WSI4_PointRelais_RechercheResponse?.WSI4_PointRelais_RechercheResult
+  const details = list(result?.PointsRelais?.PointRelais_Details)
+  const soapFault = payload?.Envelope?.Body?.Fault
+
+  return {
+    request: { ...params, Enseigne: maskIdentifier(params.Enseigne) },
+    enseigneConfigured: Boolean(compact(config.api1.enseigne)),
+    privateKeyConfigured: Boolean(compact(config.api1.privateKey)),
+    api1Url: config.api1.url,
+    soapFault: soapFault
+      ? compact(soapFault.faultstring || soapFault.Reason?.Text || 'Fault SOAP')
+      : null,
+    responseRootFound: Boolean(result),
+    stat: compact(result?.STAT) || null,
+    rawPointCount: details.length,
+    pointStats: details.slice(0, 5).map((point) => compact(point?.STAT) || null),
+    xmlExcerpt: String(xml || '').slice(0, 2000),
+  }
 }
 
 export async function traceMondialRelayShipment(shipmentNumber, options = {}) {
