@@ -1454,9 +1454,32 @@ function SettingsPanel({
       })
       const payload = await response.json().catch(() => ({}))
       if (!response.ok || payload.error) throw new Error(payload.error || 'Test API 1 impossible.')
+      const found = payload.points?.length || 0
+      if (found > 0) {
+        setMondialRelayTest({
+          ok: true,
+          message: `Connexion confirmée : ${found} Point${found > 1 ? 's' : ''} Relais trouvé${found > 1 ? 's' : ''} autour du 13006.`,
+        })
+        return
+      }
+
+      // Zéro point relais est ambigu : Mondial Relay peut avoir refusé la
+      // requête sans le dire. On relit alors sa réponse brute pour afficher la
+      // cause réelle au lieu d'un « aucun point trouvé » qui n'explique rien.
+      const debugResponse = await fetch('/api/mondial-relay?action=relay-points-debug', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${adminSession.access_token}`,
+        },
+        body: JSON.stringify({ postcode: '13006', weightGrams: 1000 }),
+      })
+      const debug = await debugResponse.json().catch(() => ({}))
       setMondialRelayTest({
-        ok: true,
-        message: `Connexion confirmée : ${payload.points?.length || 0} Point${payload.points?.length > 1 ? 's' : ''} Relais trouvé${payload.points?.length > 1 ? 's' : ''} autour du 13006.`,
+        ok: false,
+        message: 'Connexion établie mais aucun Point Relais retourné autour du 13006.',
+        debug: debugResponse.ok && !debug.error ? debug : null,
+        debugError: debugResponse.ok ? debug.error || null : debug.error || 'Diagnostic indisponible.',
       })
     } catch (error) {
       setMondialRelayTest({ ok: false, message: error.message || 'Test API 1 impossible.' })
@@ -1529,6 +1552,46 @@ function SettingsPanel({
             </span>
           )}
         </div>
+        {mondialRelayTest?.debugError && (
+          <p className="mt-3 text-xs text-rose-300">Diagnostic : {mondialRelayTest.debugError}</p>
+        )}
+        {mondialRelayTest?.debug && (
+          <details className="mt-3 rounded-xl border border-white/10 bg-noir/40 p-3">
+            <summary className="cursor-pointer text-xs font-semibold text-white">
+              Réponse brute de Mondial Relay (diagnostic)
+            </summary>
+            <dl className="mt-3 space-y-1.5 text-xs text-muted">
+              <MondialRelayDebugRow
+                label="Code STAT"
+                value={mondialRelayTest.debug.stat ?? 'aucun code renvoyé'}
+              />
+              <MondialRelayDebugRow label="Points bruts reçus" value={mondialRelayTest.debug.rawPointCount} />
+              <MondialRelayDebugRow
+                label="Bloc réponse trouvé"
+                value={mondialRelayTest.debug.responseRootFound ? 'oui' : 'non'}
+              />
+              <MondialRelayDebugRow
+                label="Enseigne configurée"
+                value={mondialRelayTest.debug.enseigneConfigured ? 'oui' : 'non'}
+              />
+              <MondialRelayDebugRow
+                label="Clé privée configurée"
+                value={mondialRelayTest.debug.privateKeyConfigured ? 'oui' : 'non'}
+              />
+              {mondialRelayTest.debug.soapFault && (
+                <MondialRelayDebugRow label="Erreur SOAP" value={mondialRelayTest.debug.soapFault} />
+              )}
+              <MondialRelayDebugRow label="URL API 1" value={mondialRelayTest.debug.api1Url} />
+              <MondialRelayDebugRow
+                label="Requête envoyée"
+                value={`CP ${mondialRelayTest.debug.request?.CP} · Action ${mondialRelayTest.debug.request?.Action} · Rayon ${mondialRelayTest.debug.request?.RayonRecherche} km · Poids ${mondialRelayTest.debug.request?.Poids} g · Enseigne ${mondialRelayTest.debug.request?.Enseigne}`}
+              />
+            </dl>
+            <pre className="mt-3 max-h-56 overflow-auto whitespace-pre-wrap break-all rounded-lg bg-black/40 p-2 text-[10px] leading-relaxed text-ash/70">
+              {mondialRelayTest.debug.xmlExcerpt}
+            </pre>
+          </details>
+        )}
       </section>
 
       <section className={`card p-6 lg:col-span-3 ${catalogIssues.length ? 'border-rose-400/25 bg-rose-500/5' : 'border-neon/20 bg-neon/5'}`}>
@@ -1802,6 +1865,15 @@ function parseSpecs(value) {
     .map((line) => line.split(':'))
     .filter(([key, ...rest]) => key?.trim() && rest.join(':').trim())
     .reduce((out, [key, ...rest]) => ({ ...out, [key.trim()]: rest.join(':').trim() }), {})
+}
+
+function MondialRelayDebugRow({ label, value }) {
+  return (
+    <div className="grid gap-1 sm:grid-cols-[180px_1fr]">
+      <dt className="text-faint">{label}</dt>
+      <dd className="break-words text-ash/80">{String(value)}</dd>
+    </div>
+  )
 }
 
 function variantLabel(variant = {}) {

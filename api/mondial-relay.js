@@ -3,6 +3,7 @@ import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 import { enforceRequestRateLimits } from './_lib/rateLimit.js'
 import {
   createMondialRelayLabel,
+  diagnoseRelayPointSearch,
   getMondialRelayConfig,
   MondialRelayError,
   normalizeRelayId,
@@ -15,6 +16,7 @@ import { hasSupabaseAdmin, supabaseAdmin } from './_lib/supabaseAdmin.js'
 const ACTION_METHODS = {
   status: 'GET',
   'relay-points': 'POST',
+  'relay-points-debug': 'POST',
   tracking: 'POST',
   'create-label': 'POST',
 }
@@ -79,6 +81,21 @@ export default async function handler(req, res) {
       return res.status(200).json({ points })
     }
 
+    // Diagnostic administrateur : une recherche sans résultat est silencieuse
+    // par conception. Cette action rejoue la même requête et rend la réponse
+    // brute de Mondial Relay pour distinguer une zone réellement sans Point
+    // Relais d'un refus silencieux du service.
+    if (action === 'relay-points-debug') {
+      const diagnostic = await diagnoseRelayPointSearch({
+        postcode: body.postcode,
+        weightGrams: body.weightGrams,
+        country: body.country,
+        searchAction: body.searchAction,
+        radiusKm: body.radiusKm,
+      })
+      return res.status(200).json(diagnostic)
+    }
+
     if (action === 'tracking') {
       const tracking = await traceMondialRelayShipment(body.shipmentNumber)
       return res.status(200).json(tracking)
@@ -99,6 +116,7 @@ export default async function handler(req, res) {
     console.error(`mondial relay ${action} error:`, error)
     const messages = {
       'relay-points': 'Recherche Point Relais impossible.',
+      'relay-points-debug': 'Diagnostic Point Relais impossible.',
       tracking: 'Suivi Mondial Relay impossible.',
       'create-label': 'Création de l’étiquette Mondial Relay impossible.',
     }

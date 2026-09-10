@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import {
   buildShipmentCreationXml,
   createMondialRelayLabel,
+  diagnoseRelayPointSearch,
   getMondialRelayConfig,
   MondialRelayError,
   normalizeFrenchPhone,
@@ -139,6 +140,54 @@ test('API 1 relay search signs the SOAP request and parses relay details', async
     photoUrl: '',
     mapUrl: '',
   }])
+})
+
+test('the relay diagnostic reports an empty answer without leaking credentials', async () => {
+  let request
+  const fetchImpl = async (url, init) => {
+    request = { url, ...init }
+    // Réponse observée en production : ni STAT, ni point relais. La recherche
+    // normale reste alors silencieuse, le diagnostic doit la rendre lisible.
+    return new Response(`<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/"><WSI4_PointRelais_RechercheResult><PointsRelais/></WSI4_PointRelais_RechercheResult></WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>`, { status: 200 })
+  }
+
+  const diagnostic = await diagnoseRelayPointSearch({ postcode: '13006' }, { config, fetchImpl })
+
+  assert.equal(diagnostic.responseRootFound, true)
+  assert.equal(diagnostic.stat, null)
+  assert.equal(diagnostic.rawPointCount, 0)
+  assert.equal(diagnostic.enseigneConfigured, true)
+  assert.equal(diagnostic.privateKeyConfigured, true)
+  assert.equal(diagnostic.request.CP, '13006')
+  assert.equal(diagnostic.request.Action, '24R')
+  assert.match(diagnostic.xmlExcerpt, /WSI4_PointRelais_RechercheResult/)
+
+  // La requête réelle est signée, mais ni la clé privée ni l'enseigne en clair
+  // ne doivent ressortir du diagnostic.
+  assert.match(request.body, /<Security>[A-F0-9]{32}<\/Security>/)
+  const serialized = JSON.stringify(diagnostic)
+  assert.doesNotMatch(serialized, /private!/)
+  assert.doesNotMatch(serialized, /TESTSHOP/)
+})
+
+test('the relay diagnostic can widen the search to another action and radius', async () => {
+  let request
+  const fetchImpl = async (url, init) => {
+    request = { url, ...init }
+    return new Response(`<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/"><WSI4_PointRelais_RechercheResult><STAT>0</STAT><PointsRelais><PointRelais_Details><STAT>0</STAT><Num>99</Num></PointRelais_Details></PointsRelais></WSI4_PointRelais_RechercheResult></WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>`, { status: 200 })
+  }
+
+  const diagnostic = await diagnoseRelayPointSearch(
+    { postcode: '13006', searchAction: '24L', radiusKm: 50 },
+    { config, fetchImpl },
+  )
+
+  assert.equal(diagnostic.stat, '0')
+  assert.equal(diagnostic.rawPointCount, 1)
+  assert.equal(diagnostic.request.Action, '24L')
+  assert.equal(diagnostic.request.RayonRecherche, '50')
+  assert.match(request.body, /<Action>24L<\/Action>/)
+  assert.match(request.body, /<RayonRecherche>50<\/RayonRecherche>/)
 })
 
 test('API 1 tracing parses shipment events', async () => {
