@@ -19,7 +19,7 @@ import {
 import { getPaidOrders } from '../lib/dashboard.js'
 import { normalizeRelatedProductIds, removeProductAndReferences } from '../lib/relatedProducts.js'
 import { readCatalogBootstrap } from '../lib/catalogBootstrap.js'
-import { isDiyCategory, isEliquidCategory } from '../lib/productCategory.js'
+import { supportsFlavorVariants } from '../lib/productCategory.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -118,7 +118,11 @@ const normalizeProduct = (product) => {
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, id),
   }
   normalized.category = getProductCategoryKey(normalized)
-  if (!isEliquidCategory(normalized.category) && !isDiyCategory(normalized.category)) {
+  // Le matériel (kits, box, pods vides) ne porte ni saveur ni nicotine : ces
+  // valeurs héritées sont parasites. Les consommables parfumés — e-liquides,
+  // DIY, cartouches pré-remplies et puffs — les conservent, sinon la saveur
+  // saisie en administration serait effacée avant même d'être proposée.
+  if (!supportsFlavorVariants(normalized.category)) {
     normalized.nicotine = []
     normalized.flavors = []
   }

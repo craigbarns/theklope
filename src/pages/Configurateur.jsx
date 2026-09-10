@@ -5,7 +5,7 @@ import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import { IconCheck } from '../components/icons.jsx'
-import { isResistanceProduct } from '../data/catalog.js'
+import { isCartoucheProduct, isResistanceProduct } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
 import { getProductVariantChoices, resolveProductVariant } from '../lib/cart.js'
 import {
@@ -35,9 +35,12 @@ export default function Configurateur() {
   }, [products])
 
   // 2. La catégorie resistance est canonique ; le helper conserve aussi les
-  // anciennes références encore classées comme accessoires.
+  // anciennes références encore classées comme accessoires. Les cartouches sont
+  // ajoutées explicitement : `isResistanceProduct` les exclut par construction,
+  // alors que l'étape s'intitule « Résistance/cartouche » — sans elles, un pod
+  // rechargeable n'avait aucun consommable à proposer dans le pack sur mesure.
   const clearomizers = useMemo(() => {
-    return products.filter((p) => p.stock > 0 && isResistanceProduct(p))
+    return products.filter((p) => p.stock > 0 && (isResistanceProduct(p) || isCartoucheProduct(p)))
   }, [products])
 
   // 3. Filtrer les e-liquides
