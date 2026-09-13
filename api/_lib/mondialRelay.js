@@ -406,13 +406,20 @@ function addressXml(address, { recipient = false } = {}) {
   const { houseNo, streetName } = splitStreet(address.street)
   const name = splitPersonName(address.name)
   const phone = normalizeFrenchPhone(address.phone)
+  // Mondial Relay envoie l'avis de mise à disposition — et le code d'ouverture
+  // d'un Locker — par SMS sur MobileNo. Ce champ était vide en dur : le SMS ne
+  // pouvait donc jamais partir et le client ne recevait son code que par e-mail,
+  // voire pas du tout. On l'alimente dès que le numéro est un mobile français
+  // (+336 / +337) ; un numéro fixe reste dans PhoneNo, seul endroit où il a du
+  // sens, car un SMS vers un fixe n'arriverait nulle part.
+  const mobile = /^\+33[67]\d{8}$/.test(phone) ? phone : ''
   const email = compact(address.email).slice(0, 70)
   if (!streetName || !/^\d{5}$/.test(compact(address.postcode)) || !labelText(address.city, 30)) {
     throw new MondialRelayError(`${recipient ? 'Adresse destinataire' : 'Adresse expéditeur'} incomplète.`, {
       code: recipient ? 'invalid_recipient_address' : 'invalid_sender_address',
     })
   }
-  return `<Address><Title></Title><Firstname>${escapeXml(name.firstName)}</Firstname><Lastname>${escapeXml(name.lastName)}</Lastname><Streetname>${escapeXml(streetName)}</Streetname><HouseNo>${escapeXml(houseNo)}</HouseNo><CountryCode>${escapeXml(upper(address.countryCode) || 'FR')}</CountryCode><PostCode>${escapeXml(compact(address.postcode).slice(0, 10))}</PostCode><City>${escapeXml(labelText(address.city, 30))}</City><AddressAdd1>${escapeXml(name.displayName)}</AddressAdd1><AddressAdd2></AddressAdd2><AddressAdd3>${escapeXml(labelText(address.extra, 30))}</AddressAdd3><PhoneNo>${escapeXml(phone)}</PhoneNo><MobileNo></MobileNo><Email>${escapeXml(email)}</Email></Address>`
+  return `<Address><Title></Title><Firstname>${escapeXml(name.firstName)}</Firstname><Lastname>${escapeXml(name.lastName)}</Lastname><Streetname>${escapeXml(streetName)}</Streetname><HouseNo>${escapeXml(houseNo)}</HouseNo><CountryCode>${escapeXml(upper(address.countryCode) || 'FR')}</CountryCode><PostCode>${escapeXml(compact(address.postcode).slice(0, 10))}</PostCode><City>${escapeXml(labelText(address.city, 30))}</City><AddressAdd1>${escapeXml(name.displayName)}</AddressAdd1><AddressAdd2></AddressAdd2><AddressAdd3>${escapeXml(labelText(address.extra, 30))}</AddressAdd3><PhoneNo>${escapeXml(phone)}</PhoneNo><MobileNo>${escapeXml(mobile)}</MobileNo><Email>${escapeXml(email)}</Email></Address>`
 }
 
 export function buildShipmentCreationXml({
