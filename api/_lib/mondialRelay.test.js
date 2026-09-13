@@ -81,6 +81,13 @@ test('normalizers accept Mondial Relay and French phone formats', () => {
   assert.equal(normalizeRelayId('fr12345'), 'FR-12345')
   assert.equal(normalizeRelayId('FR-12345'), 'FR-12345')
   assert.equal(normalizeRelayId('invalid'), '')
+
+  // Régression : un motif limité à 5 chiffres vidait toute recherche, alors que
+  // les numéros servis en comportent couramment 6 (zéro de tête significatif).
+  assert.equal(normalizeRelayId('005630'), 'FR-005630')
+  assert.equal(normalizeRelayId('FR-005630'), 'FR-005630')
+  assert.equal(normalizeRelayId('ES-012345'), 'ES-012345')
+  assert.equal(normalizeRelayId('123'), '')
   assert.equal(normalizeFrenchPhone('06 12 34 56 78'), '+33612345678')
   assert.equal(normalizeFrenchPhone('0033 6 12 34 56 78'), '+33612345678')
 })
@@ -108,6 +115,50 @@ test('home labels require a valid French phone', () => {
     }, config),
     (error) => error instanceof MondialRelayError && error.code === 'recipient_phone_required',
   )
+})
+
+// Régression du défaut de production : tous les Points Relais revenaient avec un
+// numéro à 6 chiffres, que `normalizeRelayId` rejetait. Chaque point recevait un
+// identifiant vide puis disparaissait au filtrage — la recherche répondait 200
+// avec une liste vide et le client lisait « Aucun Point Relais trouvé », quel que
+// soit le code postal saisi.
+test('API 1 relay search keeps six-digit relay numbers', async () => {
+  const fetchImpl = async () => new Response(
+    `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/"><WSI4_PointRelais_RechercheResult><STAT>0</STAT><PointsRelais><PointRelais_Details><STAT>0</STAT><Num>005630</Num><LgAdr1>TABAC DE LA PLACE</LgAdr1><LgAdr3>2 PLACE CASTELLANE</LgAdr3><CP>13006</CP><Ville>MARSEILLE</Ville><Pays>FR</Pays><Distance>420</Distance></PointRelais_Details></PointsRelais></WSI4_PointRelais_RechercheResult></WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>`,
+    { status: 200, headers: { 'Content-Type': 'text/xml' } },
+  )
+
+  const points = await searchRelayPoints({ postcode: '13006' }, { config, fetchImpl })
+
+  assert.equal(points.length, 1)
+  assert.equal(points[0].id, 'FR-005630')
+  assert.equal(points[0].number, '005630')
+  assert.equal(points[0].city, 'MARSEILLE')
+})
+
+// Le silence était le vrai danger : un format d'identifiant non reconnu doit
+// désormais remonter une erreur explicite plutôt qu'une liste vide indiscernable
+// d'une zone réellement sans Point Relais.
+test('API 1 relay search fails loudly when no served point can be read', async () => {
+  const fetchImpl = async () => new Response(
+    `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/"><WSI4_PointRelais_RechercheResult><STAT>0</STAT><PointsRelais><PointRelais_Details><STAT>0</STAT><Num>ABC!</Num><LgAdr1>POINT ILLISIBLE</LgAdr1><CP>13006</CP><Ville>MARSEILLE</Ville><Pays>FR</Pays></PointRelais_Details></PointsRelais></WSI4_PointRelais_RechercheResult></WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>`,
+    { status: 200, headers: { 'Content-Type': 'text/xml' } },
+  )
+
+  await assert.rejects(
+    searchRelayPoints({ postcode: '13006' }, { config, fetchImpl }),
+    (error) => error instanceof MondialRelayError && error.code === 'api1_unreadable_points',
+  )
+})
+
+// Une zone réellement sans Point Relais reste un résultat vide, sans erreur.
+test('API 1 relay search returns an empty list when the carrier serves no point', async () => {
+  const fetchImpl = async () => new Response(
+    `<?xml version="1.0"?><soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"><soap:Body><WSI4_PointRelais_RechercheResponse xmlns="http://www.mondialrelay.fr/webservice/"><WSI4_PointRelais_RechercheResult><STAT>0</STAT><PointsRelais/></WSI4_PointRelais_RechercheResult></WSI4_PointRelais_RechercheResponse></soap:Body></soap:Envelope>`,
+    { status: 200, headers: { 'Content-Type': 'text/xml' } },
+  )
+
+  assert.deepEqual(await searchRelayPoints({ postcode: '13006' }, { config, fetchImpl }), [])
 })
 
 test('API 1 relay search signs the SOAP request and parses relay details', async () => {

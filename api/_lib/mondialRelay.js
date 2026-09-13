@@ -39,9 +39,16 @@ const orderReference = (value) => upper(value)
   .replace(/[^0-9A-Z_ -]/g, '')
   .slice(-15)
 
+// L'identifiant d'un Point Relais est émis par Mondial Relay, pas par nous : le
+// valider contre une longueur devinée revient à jeter des points parfaitement
+// valides. Le motif précédent exigeait exactement 5 chiffres, alors que les
+// numéros renvoyés en comportent couramment 6 (ex. 005630) : chaque point
+// recevait donc un identifiant vide et disparaissait au filtrage, ce qui
+// produisait « Aucun Point Relais trouvé » pour tous les codes postaux.
+// On normalise (majuscules, préfixe pays) sans présumer de la longueur exacte.
 const normalizeRelayId = (value) => {
   const raw = upper(value).replace(/\s+/g, '')
-  const match = /^(?:([A-Z]{2})-?)?(\d{5})$/.exec(raw)
+  const match = /^(?:([A-Z]{2})-?)?(\d{4,10})$/.exec(raw)
   if (!match) return ''
   return `${match[1] || 'FR'}-${match[2]}`
 }
@@ -249,8 +256,8 @@ export async function searchRelayPoints({ postcode, country = 'FR', weightGrams 
       code: `api1_stat_${stat}`,
     })
   }
-  const points = pointDetails
-    .filter((point) => !point.STAT || String(point.STAT) === '0')
+  const servedPoints = pointDetails.filter((point) => !point.STAT || String(point.STAT) === '0')
+  const points = servedPoints
     .map((point) => ({
       id: normalizeRelayId(`${point.Pays || country}-${point.Num || ''}`),
       number: compact(point.Num),
@@ -266,6 +273,18 @@ export async function searchRelayPoints({ postcode, country = 'FR', weightGrams 
       mapUrl: compact(point.URL_Plan),
     }))
     .filter((point) => point.id)
+
+  // Un point servi par Mondial Relay mais dont l'identifiant n'est pas reconnu
+  // était jusqu'ici écarté en silence : la recherche renvoyait une liste vide et
+  // le client lisait « Aucun Point Relais trouvé », sans que rien ne signale le
+  // défaut. Si le transporteur a servi des points et qu'aucun n'est exploitable,
+  // c'est un défaut de lecture de notre côté : il doit être bruyant.
+  if (servedPoints.length > 0 && points.length === 0) {
+    throw new MondialRelayError(
+      'Points Relais reçus mais illisibles : format d’identifiant non reconnu.',
+      { code: 'api1_unreadable_points' },
+    )
+  }
 
   // Tri par distance croissante : l'API ne garantit pas l'ordre, or le client
   // doit voir en premier le point relais le plus proche de chez lui. Les points
