@@ -92,6 +92,39 @@ test('normalizers accept Mondial Relay and French phone formats', () => {
   assert.equal(normalizeFrenchPhone('0033 6 12 34 56 78'), '+33612345678')
 })
 
+// Mondial Relay notifie le destinataire par SMS sur MobileNo — c'est ce message
+// qui porte le code d'ouverture d'un Locker. Le champ etait vide en dur, donc
+// aucun SMS ne pouvait partir.
+test('un mobile francais alimente MobileNo pour que Mondial Relay puisse envoyer le SMS', () => {
+  const xml = buildShipmentCreationXml(shipmentInput, config)
+  assert.match(xml, /<MobileNo>\+33612345678<\/MobileNo>/)
+  assert.match(xml, /<PhoneNo>\+33612345678<\/PhoneNo>/)
+
+  const surSept = buildShipmentCreationXml({
+    ...shipmentInput,
+    customer: { ...shipmentInput.customer, phone: '07 65 43 21 09' },
+  }, config)
+  assert.match(surSept, /<MobileNo>\+33765432109<\/MobileNo>/)
+})
+
+test('un numero fixe reste hors de MobileNo : un SMS n’y arriverait pas', () => {
+  const xml = buildShipmentCreationXml({
+    ...shipmentInput,
+    customer: { ...shipmentInput.customer, phone: '04 91 55 55 55' },
+  }, config)
+  assert.match(xml, /<PhoneNo>\+33491555555<\/PhoneNo>/)
+  assert.match(xml, /<MobileNo><\/MobileNo>/)
+})
+
+test('un destinataire sans telephone ne produit ni PhoneNo ni MobileNo', () => {
+  const xml = buildShipmentCreationXml({
+    ...shipmentInput,
+    customer: { ...shipmentInput.customer, phone: '' },
+  }, config)
+  assert.match(xml, /<PhoneNo><\/PhoneNo>/)
+  assert.match(xml, /<MobileNo><\/MobileNo>/)
+})
+
 test('shipment XML follows API 2 order and escapes credentials and customer data', () => {
   const xml = buildShipmentCreationXml(shipmentInput, config)
 
