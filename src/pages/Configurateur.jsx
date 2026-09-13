@@ -14,7 +14,7 @@ import {
 } from '../lib/configurator.js'
 
 export default function Configurateur() {
-  const { products, addItemsToCart, applyPromo } = useStore()
+  const { products, addItemsToCart } = useStore()
   const navigate = useNavigate()
 
   const [step, setStep] = useState(1) // 1: Box, 2: Clearomiseur, 3: E-liquide, 4: Recap
@@ -70,8 +70,6 @@ export default function Configurateur() {
   const clearomizerPrice = selectedClearomizer?.price || 0
   const eliquidPrice = selectedEliquid?.price || 0
   const subtotal = Math.round((boxPrice + clearomizerPrice + eliquidPrice) * 100) / 100
-  const discount = Math.round((subtotal * 0.15) * 100) / 100
-  const finalPrice = Math.round((subtotal - discount) * 100) / 100
 
   const configComplete = Boolean(selectedBox && selectedClearomizer && selectedEliquid)
   const configuratorSelections = configComplete ? [
@@ -154,14 +152,6 @@ export default function Configurateur() {
       return
     }
     setAddError('')
-
-    // Appliquer l'ajustement tarifaire du pack, qui sera détaillé au panier.
-    applyPromo('PACK15', {
-      eligibilityLines: [currentBox, currentClearomizer, currentEliquid].map((product) => ({
-        category: product.category,
-        qty: 1,
-      })),
-    })
 
     // Rediriger ou notifier
     navigate('/panier')
@@ -459,17 +449,9 @@ export default function Configurateur() {
             )}
 
             <dl className="mt-6 space-y-2.5 border-t border-white/8 pt-5 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted">Sous-total</dt>
-                <dd className="text-white">{formatPrice(subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted">Ajustement tarifaire</dt>
-                <dd className="text-neon">{discount > 0 ? `- ${formatPrice(discount)}` : '0,00 €'}</dd>
-              </div>
               <div className="flex justify-between border-t border-white/8 pt-3">
                 <dt className="font-semibold text-white">Total</dt>
-                <dd className="font-display text-base font-bold text-white">{formatPrice(finalPrice)}</dd>
+                <dd className="font-display text-base font-bold text-white">{formatPrice(subtotal)}</dd>
               </div>
             </dl>
 

@@ -37,7 +37,7 @@ export default function Newsletter() {
           <div>
             <p className="eyebrow mb-3">Newsletter</p>
             <h2 className="font-display text-2xl font-bold text-white sm:text-3xl">
-              Recevez nos nouveautés et offres exclusives
+              Recevez nos nouveautés et nos conseils d’utilisation
             </h2>
             <p className="mt-3 text-sm text-muted">
               Inscrivez-vous pour être informé en avant-première des sorties produits, ventes privées et
@@ -49,7 +49,7 @@ export default function Newsletter() {
               <div className="rounded-2xl border border-neon/30 bg-neon/10 px-5 py-4 text-neon">
                 <p className="flex items-center gap-3 font-medium"><IconCheck /> Merci, votre inscription est confirmée !</p>
                 <p className="mt-2 text-sm text-ash/80">
-                  Votre code de bienvenue : <strong className="text-neon">BIENVENUE</strong> — -15% sur votre première commande.
+                  Vous recevrez nos nouveautés et nos conseils d’utilisation.
                 </p>
               </div>
             ) : (
@@ -69,7 +69,7 @@ export default function Newsletter() {
                     />
                   </div>
                   <button type="submit" disabled={loading} className="btn-primary shrink-0 disabled:opacity-60">
-                    {loading ? '...' : "S'inscrire & recevoir -15%"}
+                    {loading ? '...' : "S'inscrire"}
                   </button>
                 </form>
                 {error && <p className="mt-2 text-xs text-rose-300">{error}</p>}

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  PROMO_CODES,
   computeBundleProgress,
   computeTotals,
   getCompletePackSubtotal,
@@ -14,42 +15,6 @@ const device = { category: 'ecig', price: 40, qty: 1 }
 const accessory = { category: 'accessoire', price: 20, qty: 1 }
 const resistance = { category: 'resistance', price: 30, qty: 1 }
 const liquid = { category: 'eliquide', price: 10, qty: 1, volume: '10ml', brand: 'Other' }
-
-test('PACK15 is rejected outside a complete configured pack', () => {
-  const totals = computeTotals({ lines: [device], promoCode: 'PACK15' })
-  assert.equal(totals.promo, null)
-  assert.equal(totals.promoRejected, true)
-  assert.equal(totals.discount, 0)
-})
-
-test('PACK15 applies to a device, accessory and e-liquid composition', () => {
-  const lines = [device, accessory, liquid]
-  assert.equal(isCompletePack(lines), true)
-  const totals = computeTotals({ lines, promoCode: 'PACK15' })
-  assert.equal(totals.promo.code, 'PACK15')
-  assert.equal(totals.discount, 10.5)
-  assert.equal(totals.total, 59.5)
-})
-
-test('PACK15 accepts the canonical resistance category', () => {
-  const lines = [device, resistance, liquid]
-  assert.equal(isCompletePack(lines), true)
-  const totals = computeTotals({ lines, promoCode: 'PACK15' })
-  assert.equal(totals.promo.code, 'PACK15')
-  assert.equal(totals.discount, 12)
-  assert.equal(totals.total, 68)
-})
-
-test('editorial e-liquid subcategories remain eligible for PACK15', () => {
-  const featuredLiquid = { ...liquid, category: 'eliquide-fruite' }
-  const lines = [device, accessory, featuredLiquid]
-
-  assert.equal(isCompletePack(lines), true)
-  assert.equal(getCompletePackSubtotal(lines), 70)
-  const totals = computeTotals({ lines, shippingMethodId: 'pickup', promoCode: 'PACK15' })
-  assert.equal(totals.promo.code, 'PACK15')
-  assert.equal(totals.discount, 10.5)
-})
 
 test('editorial e-liquid subcategories receive the advertised quantity price', () => {
   const product = {
@@ -68,50 +33,29 @@ test('editorial e-liquid subcategories receive the advertised quantity price', (
   assert.equal(totals.total, 59)
 })
 
-test('regular promo codes keep working outside packs', () => {
-  const totals = computeTotals({ lines: [device], promoCode: 'THEKLOPE10' })
-  assert.equal(totals.discount, 4)
-  assert.equal(totals.total, 36)
+test('aucun code de remise ne subsiste (conformite L3513-4)', () => {
+  // Article L3513-4 du code de la sante publique : toute publicite, directe ou
+  // indirecte, en faveur des produits du vapotage est interdite. Ce test empeche
+  // la reintroduction d'un code de remise sans decision explicite.
+  assert.deepEqual(Object.keys(PROMO_CODES), [])
+
+  for (const code of ['THEKLOPE10', 'BIENVENUE', 'BIENVENUE15', 'PACK15', 'LIVRAISON']) {
+    const totals = computeTotals({ lines: [device], shippingMethodId: 'pickup', promoCode: code })
+    assert.equal(totals.promo, null, `${code} ne doit plus etre reconnu`)
+    assert.equal(totals.appliedPromo, null, `${code} ne doit plus s'appliquer`)
+    assert.equal(totals.discount, 0, `${code} ne doit accorder aucune remise`)
+  }
 })
 
-test('percentage promo codes round half cents deterministically', () => {
-  const tenPercent = computeTotals({
-    lines: [{ category: 'ecig', price: 1.45, qty: 1 }],
+test('le tarif quantite automatique reste applique sans aucun code', () => {
+  // Le prix de lot subsiste (« Pack 20 e-liquides »), seule sa mise en avant
+  // publicitaire a ete retiree des pages.
+  const totals = computeTotals({
+    lines: [{ category: 'eliquide', price: 5.9, qty: 20, volume: '10ml', brand: 'Pulp' }],
     shippingMethodId: 'pickup',
-    promoCode: 'THEKLOPE10',
   })
-  assert.equal(tenPercent.discount, 0.15)
-  assert.equal(tenPercent.total, 1.3)
-
-  const fifteenPercent = computeTotals({
-    lines: [{ category: 'ecig', price: 6.9, qty: 1 }],
-    shippingMethodId: 'pickup',
-    promoCode: 'BIENVENUE',
-  })
-  assert.equal(fifteenPercent.discount, 1.04)
-  assert.equal(fifteenPercent.total, 5.86)
-
-  const fifteenPercentAlias = computeTotals({
-    lines: [{ category: 'ecig', price: 6.9, qty: 1 }],
-    shippingMethodId: 'pickup',
-    promoCode: 'bienvenue15',
-  })
-  assert.equal(fifteenPercentAlias.discount, 1.04)
-  assert.equal(fifteenPercentAlias.total, 5.86)
-})
-
-test('PACK15 discounts one configured pack, not extra quantities or unrelated items', () => {
-  const lines = [
-    { ...device, qty: 2 },
-    accessory,
-    liquid,
-    { ...resistance, qty: 3 },
-  ]
-  assert.equal(getCompletePackSubtotal(lines), 80)
-  const totals = computeTotals({ lines, promoCode: 'PACK15' })
-  assert.equal(totals.subtotal, 200)
-  assert.equal(totals.discount, 12)
-  assert.equal(totals.total, 188)
+  assert.equal(totals.discountSource, 'auto')
+  assert.equal(totals.total, 88.5)
 })
 
 test('50ml and 100ml receive the same automatic discount from four units', () => {
@@ -262,27 +206,6 @@ test('product quantity information uses resolved volume and exact cart arithmeti
     exampleTotal: 59.7,
   })
   assert.equal(getQuantityPricingRule({ category: 'accessoire', volume: '50ml', price: 19.9 }), null)
-})
-
-test('a valid code is only marked applied when it actually sets price or shipping', () => {
-  const automaticWins = computeTotals({
-    lines: [{ category: 'eliquide', price: 5.9, qty: 20, volume: '10ml', brand: 'Pulp' }],
-    promoCode: 'BIENVENUE',
-  })
-  assert.equal(automaticWins.promo.code, 'BIENVENUE')
-  assert.equal(automaticWins.discountSource, 'auto')
-  assert.equal(automaticWins.appliedPromo, null)
-
-  const percentCodeWins = computeTotals({ lines: [device], promoCode: 'THEKLOPE10' })
-  assert.equal(percentCodeWins.discountSource, 'promo')
-  assert.equal(percentCodeWins.appliedPromo.code, 'THEKLOPE10')
-
-  const shippingCodeAppliesWithQuantityPricing = computeTotals({
-    lines: [{ category: 'eliquide', price: 5.9, qty: 20, volume: '10ml', brand: 'Pulp' }],
-    promoCode: 'LIVRAISON',
-  })
-  assert.equal(shippingCodeAppliesWithQuantityPricing.discountSource, 'auto')
-  assert.equal(shippingCodeAppliesWithQuantityPricing.appliedPromo.code, 'LIVRAISON')
 })
 
 test('volume discount excludes other categories and other bottle sizes', () => {

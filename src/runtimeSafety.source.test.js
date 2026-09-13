@@ -24,7 +24,6 @@ test('cart drawer defines every restored-cart delivery value it renders', async 
   const source = await readSource('./components/CartDrawer.jsx')
   const renderIndex = source.indexOf('\n  return (')
 
-  assert.match(source, /import BundleProgress from ['"]\.\/BundleProgress\.jsx['"]/)
   assert.ok(renderIndex >= 0, 'CartDrawer render must be found')
   for (const name of ['freeShippingThreshold', 'remainingForFreeShipping', 'freeShippingPct']) {
     const declarationIndex = source.indexOf(`const ${name} =`)

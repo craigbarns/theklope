@@ -3,7 +3,7 @@ import path from 'node:path'
 
 // Configuration
 const SENDER = 'THEKLOPE <contact@theklope.com>'
-const SUBJECT = '🎉 Bienvenue sur le nouveau site THEKLOPE ! -15% & Offres e-liquides'
+const SUBJECT = 'Bienvenue sur le nouveau site THEKLOPE'
 const CSV_PATH = path.resolve('clients_theklope_clean.csv')
 const HTML_PATH = path.resolve('scripts/email-campaign-nouveau-site.html')
 const LOG_PATH = path.resolve('scripts/campaign_sent_log.json')

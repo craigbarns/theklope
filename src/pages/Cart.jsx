@@ -28,30 +28,18 @@ export default function Cart() {
     updateCartVariant,
     removeItem,
     totals,
-    promo,
-    applyPromo,
-    removePromo,
     products,
     catalogReady,
     cookiesChoice,
     syncStatus,
     refreshRemoteData,
   } = useStore()
-  const [code, setCode] = useState('')
-  const [feedback, setFeedback] = useState(null)
   const cartViewTrackedRef = useRef(false)
 
   // Produits associés ou suggestions pertinentes, en stock et absents du panier.
   const suggestions = useMemo(() => {
     return resolveCartRelatedProducts(cartDetailed, products, { fallback: true }).slice(0, 4)
   }, [products, cartDetailed])
-
-  const submitPromo = (e) => {
-    e.preventDefault()
-    const res = applyPromo(code)
-    setFeedback(res)
-    if (res.ok) setCode('')
-  }
 
   const cartState = { cart, cartDetailed, catalogReady }
   const cartCatalogResolved = isCartCatalogResolved(cartState)
@@ -232,27 +220,6 @@ export default function Cart() {
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="card p-6">
             <h2 className="font-display text-lg font-bold text-white">Récapitulatif</h2>
-
-            <form onSubmit={submitPromo} className="mt-4">
-              {promo ? (
-                <div className="flex items-center justify-between rounded-xl border border-neon/30 bg-neon/10 px-4 py-3 text-sm">
-                  <span className="text-ash/80">
-                    Code « {promo.code} » · {totals.appliedPromo?.code === promo.code
-                      ? promo.label
-                      : 'enregistré, tarif quantité plus avantageux'}
-                  </span>
-                  <button type="button" onClick={() => { removePromo(); setFeedback(null) }} className="text-muted hover:text-white">Retirer</button>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <input value={code} onChange={(e) => setCode(e.target.value)} placeholder="Code promo" className="input" />
-                  <button type="submit" className="btn-ghost shrink-0 px-5">OK</button>
-                </div>
-              )}
-              {feedback && !promo && (
-                <p className={`mt-2 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-400'}`}>{feedback.message}</p>
-              )}
-            </form>
 
             <dl className="mt-5 space-y-3 border-t border-white/8 pt-5 text-sm">
               <Row label="Sous-total" value={formatPrice(totals.subtotal)} />
