@@ -164,6 +164,37 @@ export function validateFulfillment(shippingMethodId, address = {}, relayPoint =
     }
   }
 
+  // Mondial Relay : le colis est livré AU Point Relais, pas chez le client.
+  // L'adresse de livraison est donc celle du point choisi — comme le retrait en
+  // boutique ci-dessus déduit la sienne. Réclamer en plus l'adresse personnelle
+  // du client était une saisie inutile qui faisait abandonner le tunnel.
+  if (method.requiresRelayPoint) {
+    const relay = normalizeRelayPoint(relayPoint)
+    if (!relay.ok) return relay
+    if (!/^\d{5}$/.test(relay.value.postcode) || !relay.value.address || !relay.value.city) {
+      return { ok: false, error: 'Point Relais incomplet. Choisissez-en un autre dans la liste.' }
+    }
+    const relayInstructions = normalizeDeliveryInstructions(
+      address && typeof address === 'object' && !Array.isArray(address)
+        ? address.deliveryInstructions
+        : '',
+    )
+    if (!relayInstructions.ok) return relayInstructions
+    return {
+      ok: true,
+      method,
+      address: {
+        street: relay.value.address,
+        extra: `Point Relais ${relay.value.name}`.trim(),
+        zip: relay.value.postcode,
+        city: relay.value.city,
+        country: 'France',
+        deliveryInstructions: relayInstructions.value,
+      },
+      relayPoint: relay.value,
+    }
+  }
+
   if (!address || typeof address !== 'object' || Array.isArray(address)) {
     return { ok: false, error: 'Adresse de livraison invalide.' }
   }
@@ -188,19 +219,6 @@ export function validateFulfillment(shippingMethodId, address = {}, relayPoint =
   }
   if (method.id === 'coursier' && !/^130(?:0[1-9]|1[0-6])$/.test(normalized.zip)) {
     return { ok: false, error: 'La livraison par coursier est reservee aux 16 arrondissements de Marseille.' }
-  }
-
-  // Mondial Relay : sans Point Relais choisi, la commande est refusée. Le
-  // navigateur ne décide de rien — c'est ce contrôle qui fait foi.
-  if (method.requiresRelayPoint) {
-    const relay = normalizeRelayPoint(relayPoint)
-    if (!relay.ok) return relay
-    return {
-      ok: true,
-      method,
-      address: { ...normalized, country: 'France' },
-      relayPoint: relay.value,
-    }
   }
 
   return { ok: true, method, address: { ...normalized, country: 'France' } }

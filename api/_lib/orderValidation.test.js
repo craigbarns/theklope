@@ -194,6 +194,37 @@ test('les libellés du Point Relais sont bornés, seul l’identifiant fait foi'
   assert.ok(result.relayPoint.address.length <= 200)
 })
 
+// Le colis part AU Point Relais : réclamer en plus l'adresse personnelle du
+// client était une saisie inutile en plein tunnel de paiement.
+test('une commande en Point Relais est acceptée sans aucune adresse client', () => {
+  for (const sansAdresse of [undefined, null, {}]) {
+    const result = validateFulfillment('relais', sansAdresse, RELAY_POINT)
+    assert.equal(result.ok, true, `attendu accepté pour ${JSON.stringify(sansAdresse)}`)
+    assert.equal(result.relayPoint.id, 'FR-012345')
+  }
+})
+
+test('l’adresse de livraison d’une commande en Point Relais est celle du point', () => {
+  // Même si le client a saisi son adresse personnelle auparavant, elle ne doit
+  // pas devenir l'adresse de livraison : le transporteur livre le point relais.
+  const result = validateFulfillment('relais', RELAY_ADDRESS, RELAY_POINT)
+  assert.equal(result.ok, true)
+  assert.equal(result.address.street, '12 place Castellane')
+  assert.equal(result.address.zip, '13006')
+  assert.equal(result.address.city, 'Marseille')
+  assert.equal(result.address.country, 'France')
+  assert.match(result.address.extra, /TABAC DE LA PLACE/)
+})
+
+test('un Point Relais sans adresse exploitable est refusé plutôt que non étiquetable', () => {
+  // L'étiquette Mondial Relay exige rue, code postal à 5 chiffres et ville :
+  // mieux vaut refuser au paiement que produire une commande inexpédiable.
+  for (const incomplet of [{ postcode: '' }, { postcode: '130' }, { address: '' }, { city: '' }]) {
+    const result = validateFulfillment('relais', null, { ...RELAY_POINT, ...incomplet })
+    assert.equal(result.ok, false, `attendu refusé pour ${JSON.stringify(incomplet)}`)
+  }
+})
+
 test('les autres modes de livraison ne réclament aucun Point Relais', () => {
   for (const id of ['poste', 'pickup']) {
     const result = validateFulfillment(id, RELAY_ADDRESS, null)
