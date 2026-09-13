@@ -63,8 +63,6 @@ export default function Header() {
           >
             <span className="text-amber-400">★</span> {STORE_REVIEW_SUMMARY.compactLabel}
           </a>
-          <span>·</span>
-          <span className="text-electric">🎁 -15% code BIENVENUE</span>
           <span className="hidden sm:inline">·</span>
           <span className="hidden sm:inline">⚡ Coursier Marseille</span>
           <span className="hidden md:inline">·</span>

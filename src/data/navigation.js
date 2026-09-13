@@ -1,6 +1,6 @@
 export const MAIN_NAV = [
   { to: '/boutique', label: 'Boutique' },
-  { to: '/configurateur', label: 'Pack Sur Mesure -15%' },
+  { to: '/configurateur', label: 'Pack Sur Mesure' },
   {
     to: '/categorie/e-liquides',
     label: 'E-liquides',

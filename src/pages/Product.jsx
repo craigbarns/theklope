@@ -18,7 +18,6 @@ import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import { relatedGuidesForProduct } from '../data/productGuides.js'
 import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
-import { getQuantityPricingRule } from '../lib/pricing.js'
 import { buildMerchantSku } from '../lib/merchantSku.js'
 import {
   IconHeart,
@@ -348,7 +347,6 @@ export default function Product() {
   const productCategoryKey = getProductCategoryKey(product)
   const productCategoryEntry = CATEGORIES.find((c) => c.key === productCategoryKey)
   const productCategoryPath = productCategoryEntry ? `/categorie/${productCategoryEntry.slug}` : '/boutique'
-  const quantityPricing = getQuantityPricingRule(product)
   const outOfStock = product.stock <= 0
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
@@ -578,56 +576,6 @@ export default function Product() {
                 </>
               )}
             </p>
-
-            {Boolean(quantityPricing && quantityPricing.minQty > 0) && (
-              <div className="mt-5 rounded-2xl border border-neon/30 bg-gradient-to-br from-carbon via-noir to-anthracite p-5 shadow-lg">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-xs font-bold uppercase tracking-wider text-neon flex items-center gap-1.5">
-                    <span>🔥</span> Tarifs TTC selon la quantité (Dégressifs)
-                  </span>
-                  <span className="rounded-full bg-neon/15 border border-neon/40 px-2.5 py-0.5 text-xs font-bold text-neon">
-                    -{quantityPricing.discountPercent}% dès {quantityPricing.minQty} unités
-                  </span>
-                </div>
-
-                <div className="mt-3 overflow-hidden rounded-xl border border-white/10 bg-noir/60">
-                  <table className="w-full text-left text-xs">
-                    <thead className="border-b border-white/10 bg-white/[0.03] text-faint uppercase font-bold">
-                      <tr>
-                        <th className="py-2.5 px-3">Quantité</th>
-                        <th className="py-2.5 px-3">Prix unitaire TTC</th>
-                        <th className="py-2.5 px-3 text-right">Remise</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-white/5">
-                      <tr>
-                        <td className="py-2.5 px-3 text-ash/80">1 à {quantityPricing.minQty - 1} flacons</td>
-                        <td className="py-2.5 px-3 font-semibold text-white">{formatPrice(product.price)} / flacon</td>
-                        <td className="py-2.5 px-3 text-right text-muted">-</td>
-                      </tr>
-                      <tr className="bg-neon/10 font-bold">
-                        <td className="py-2.5 px-3 text-white">
-                          {quantityPricing.minQty} flacons et +
-                          <span className="ml-2 inline-block rounded bg-neon px-1.5 py-0.5 text-[10px] text-noir uppercase font-extrabold">
-                            Meilleur prix
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-neon font-extrabold text-sm">
-                          {formatPrice(quantityPricing.discountedUnitPrice)} / flacon
-                        </td>
-                        <td className="py-2.5 px-3 text-right text-neon font-extrabold">
-                          -{quantityPricing.discountPercent}%
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <p className="mt-3 text-[11px] leading-relaxed text-muted">
-                  💡 {quantityPricing.conditionLabel}. La remise est calculée automatiquement dans votre panier !
-                </p>
-              </div>
-            )}
 
             <p className="mt-5 text-ash/70">{product.short}</p>
 

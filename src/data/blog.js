@@ -103,9 +103,9 @@ export const BLOG_POSTS = [
     ],
     cta: {
       title: 'Envie d\'essayer le XROS Pro ?',
-      text: 'Découvrez-le dans notre configurateur de pack. Associez-le avec vos e-liquides favoris et obtenez -15% sur le total !',
+      text: 'Découvrez-le dans notre configurateur de pack et associez-le avec vos e-liquides favoris.',
       link: '/configurateur',
-      button: 'Créer mon Pack XROS Pro (-15%)',
+      button: 'Créer mon Pack XROS Pro',
     },
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50'],
   }),
@@ -362,9 +362,9 @@ export const BLOG_POSTS = [
     ],
     cta: {
       title: 'Besoin d\'aide pour créer votre pack sur-mesure ?',
-      text: 'Utilisez notre Configurateur Intelligent. Composez votre pack (Cigarette + E-liquide + Accessoires) et profitez d\'une remise immédiate de 15%.',
+      text: 'Utilisez notre Configurateur Intelligent pour composer votre pack : cigarette électronique, e-liquide et accessoires.',
       link: '/configurateur',
-      button: 'Lancer le Configurateur THEKLOPE (-15%)',
+      button: 'Lancer le Configurateur THEKLOPE',
     },
     relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'q16-pro-146', 'doric-astra-2500mah-voopoo-271'],
   }),

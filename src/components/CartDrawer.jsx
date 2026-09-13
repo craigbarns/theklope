@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
-import BundleProgress from './BundleProgress.jsx'
 import ProductImage from './ProductImage.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
 import {
@@ -37,8 +36,6 @@ export default function CartDrawer() {
     cookiesChoice,
     syncStatus,
     refreshRemoteData,
-    promo,
-    removePromo,
   } = useStore()
   const dialogRef = useRef(null)
   const closeButtonRef = useRef(null)
@@ -258,11 +255,6 @@ export default function CartDrawer() {
                   </div>
                 </div>
               )}
-              {totals.bundleProgress?.length > 0 && (
-                <div className="mt-3">
-                  <BundleProgress hints={totals.bundleProgress} compact />
-                </div>
-              )}
             </div>
             <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
               {cartDetailed.map((item) => (
@@ -358,23 +350,6 @@ export default function CartDrawer() {
             </div>
 
             <footer className="border-t border-white/10 px-5 py-5">
-              {promo && (
-                <div className="mb-4 rounded-xl border border-neon/30 bg-neon/5 p-2.5 flex items-center justify-between text-xs text-neon">
-                  <span className="font-medium">
-                    Code <strong className="font-bold">{promo.code}</strong> · {totals.appliedPromo?.code === promo.code
-                      ? promo.label
-                      : 'enregistré, tarif quantité plus avantageux'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={removePromo}
-                    className="text-[11px] text-ash/70 hover:text-white underline ml-2 shrink-0"
-                  >
-                    Retirer
-                  </button>
-                </div>
-              )}
-
               <dl className="mb-3 space-y-2 text-sm">
                 <div className="flex items-center justify-between">
                   <dt className="text-muted">Sous-total</dt>

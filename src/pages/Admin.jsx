@@ -1936,11 +1936,6 @@ const EMAIL_TEMPLATE_PREVIEW = `<!DOCTYPE html>
           <h2 style="color:#fff;font-size:20px;margin-top:24px;">Coucou ! Bienvenue sur notre tout nouveau site 🎉</h2>
           <p style="color:#b0b0b0;font-size:14px;line-height:1.6;">Retrouvez toute l'expérience THEKLOPE, une navigation ultra-rapide et vos produits préférés !</p>
 
-          <div style="background:rgba(53,255,138,0.08);border:1px solid rgba(53,255,138,0.3);border-radius:12px;padding:14px;margin:20px 0;">
-            <p style="color:#35FF8A;margin:0;font-size:12px;font-weight:bold;text-transform:uppercase;">Code Promo de Bienvenue</p>
-            <p style="color:#fff;margin:6px 0 0;font-size:17px;font-weight:bold;">-15% avec le code : <span style="color:#35FF8A;border:1px dashed #35FF8A;padding:2px 8px;border-radius:6px;">BIENVENUE</span></p>
-          </div>
-
           <div style="background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:16px;margin-bottom:12px;text-align:left;">
             <p style="color:#35FF8A;margin:0;font-size:11px;font-weight:bold;">FORMAT 10 ML</p>
             <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 10 ml dès <span style="color:#35FF8A;">2.95 €*</span></p>
@@ -1962,7 +1957,7 @@ const EMAIL_TEMPLATE_PREVIEW = `<!DOCTYPE html>
 </html>`
 
 function EmailingPanel() {
-  const [subject, setSubject] = useState('🎉 Bienvenue sur le nouveau site THEKLOPE ! -15% & Offres e-liquides')
+  const [subject, setSubject] = useState('Bienvenue sur le nouveau site THEKLOPE')
   const [testEmail, setTestEmail] = useState('')
   const [sendingTest, setSendingTest] = useState(false)
   const [testResult, setTestResult] = useState(null)
@@ -2044,9 +2039,8 @@ function EmailingPanel() {
           <p className="mt-1 text-xs text-muted">contact@theklope.com</p>
         </div>
         <div className="card p-5">
-          <p className="eyebrow">Offres incluses</p>
-          <p className="mt-2 text-sm font-bold text-white">10ml dès 2.95€ · 50ml dès 14.92€</p>
-          <p className="mt-1 text-xs text-electric">Code BIENVENUE (-15%)</p>
+          <p className="eyebrow">Contenu inclus</p>
+          <p className="mt-2 text-sm font-bold text-white">Présentation du nouveau site</p>
         </div>
       </div>
 

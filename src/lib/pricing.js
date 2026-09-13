@@ -23,13 +23,13 @@ export const SHIPPING_METHODS = [
   { id: 'pickup', label: 'Click & Collect', detail: 'Retrait gratuit en boutique — 188 rue de Rome', price: 0 },
 ]
 
-export const PROMO_CODES = {
-  THEKLOPE10: { type: 'percent', value: 10, label: '-10%' },
-  BIENVENUE: { type: 'percent', value: 15, label: '-15% première commande' },
-  BIENVENUE15: { type: 'percent', value: 15, label: '-15% première commande' },
-  LIVRAISON: { type: 'shipping', value: 0, label: 'Livraison offerte' },
-  PACK15: { type: 'percent', value: 15, label: '-15% Pack Sur Mesure', eligibility: 'complete-pack' },
-}
+// CONFORMITÉ — article L3513-4 du code de la santé publique : toute publicité,
+// directe ou indirecte, en faveur des produits du vapotage est interdite. Les
+// codes de remise en pourcentage (bienvenue, pack, remise générale) ont donc été
+// retirés. Les retirer d'ici neutralise aussi un code déjà enregistré dans le
+// navigateur d'un client : `normalizePromo` ne le reconnaît plus et il cesse de
+// s'appliquer. N'ajoutez pas de nouveau code de remise sans validation juridique.
+export const PROMO_CODES = {}
 
 const PACK_CONSUMABLE_CATEGORIES = ['accessoire', 'resistance']
 

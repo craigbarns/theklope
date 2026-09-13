@@ -742,7 +742,6 @@ export function restockReminderEmailHtml(customerName) {
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#e5e5e5;line-height:1.8">
         <li>Livraison rapide sous 24/48h partout en France</li>
         <li>Livraison offerte dès 29€ d'achat</li>
-        <li>Remises sur volumes 10ml, 50ml et packs sur mesure</li>
       </ul>
     </div>
     <div style="text-align:center;margin:28px 0 12px">
