@@ -293,7 +293,14 @@ export default function Checkout() {
           email: customer.email,
           phone: customer.phone,
         },
-        address: shipping === 'pickup' ? {} : address,
+        // Retrait boutique et Point Relais : l'adresse de livraison est déduite
+        // côté serveur du lieu choisi. On n'envoie que les instructions, jamais
+        // une adresse personnelle que la commande n'utilise pas.
+        address: shipping === 'pickup'
+          ? {}
+          : selectedShipping?.requiresRelayPoint
+            ? { deliveryInstructions: address.deliveryInstructions }
+            : address,
         relayPoint: selectedShipping?.requiresRelayPoint ? relayPoint : null,
         acquisition: getStoredAcquisition(),
       }
@@ -606,7 +613,7 @@ export default function Checkout() {
                   </Section>
                 )}
 
-                {shipping && shipping !== 'pickup' ? (
+                {shipping && shipping !== 'pickup' && !selectedShipping?.requiresRelayPoint ? (
                   <Section title="Adresse de livraison">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field label="Adresse" name="street" value={address.street} onChange={updateAddress('street')} required className="sm:col-span-2" autoComplete="address-line1" />
@@ -645,6 +652,10 @@ export default function Checkout() {
                 ) : shipping === 'pickup' ? (
                   <div className="mb-5 rounded-lg border border-neon/20 bg-neon/5 px-4 py-4 text-sm text-ash/80">
                     Retrait gratuit au 188 rue de Rome, 13006 Marseille. Aucune adresse de livraison n'est nécessaire.
+                  </div>
+                ) : selectedShipping?.requiresRelayPoint ? (
+                  <div className="mb-5 rounded-lg border border-neon/20 bg-neon/5 px-4 py-4 text-sm text-ash/80">
+                    Votre colis est livré au Point Relais choisi ci-dessus. Aucune adresse de livraison n'est nécessaire.
                   </div>
                 ) : (
                   <div className="mb-5 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-4 text-sm text-muted">
