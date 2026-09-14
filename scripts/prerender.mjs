@@ -516,8 +516,12 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 }
 
 // ---- Page d'accueil (/) ----
-const homeTitle = 'Vape Shop Marseille & Boutique Vape en Ligne | THEKLOPE'
-const homeDescription = "Boutique de vape et e-liquides à Marseille et en ligne. Découvrez nos kits, pods, e-liquides et produits DIY. Livraison rapide 24/48h et conseils d'experts."
+// C'est ce titre et cette description que Google affiche pour l'accueil : le
+// pré-rendu écrase index.html et l'app. Ils doivent donc rester identiques à
+// ceux de src/pages/Home.jsx, sous peine d'annoncer deux choses différentes
+// selon que le visiteur est un robot ou un navigateur.
+const homeTitle = 'Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE'
+const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit en 1h, livraison offerte dès 29 €.'
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [

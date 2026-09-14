@@ -96,9 +96,18 @@ export default function Home() {
 
   return (
     <>
+      {/*
+        SEO — l'ancienne description citait deux enseignes concurrentes et
+        revendiquait le premier rang. Search Console montrait le résultat :
+        ~3 000 impressions sur leurs noms de marque pour 1 seul clic, ce qui
+        écrasait le taux de clic global sans rien rapporter. Le titre et la
+        description ciblent désormais l'intention réellement rentable —
+        « cigarette électronique Marseille », « magasin cigarette électronique » —
+        et affichent l'adresse, signal de proximité décisif en recherche locale.
+      */}
       <Seo
-        title="THEKLOPE : Boutique Vape en Ligne & Magasin Marseille — Cigarette Électronique"
-        description="L'alternative n°1 à Le Petit Vapoteur & Taklope : kits, pods, e-liquides et résistances. Livraison offerte dès 29€, expédition 24h & retrait 1h Marseille."
+        title="Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE"
+        description="Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit en 1h, livraison offerte dès 29 €."
         schema={homeSchema}
       />
 
