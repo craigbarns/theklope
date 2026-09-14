@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { buildProductSeoTitle, buildProductSeoDescription } from '../data/productCopy.js'
-import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct } from '../data/catalog.js'
+import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct, findAvailableNicotineBooster } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
@@ -91,6 +91,11 @@ export default function Product() {
     () => (product ? relatedGuidesForProduct(getProductCategoryKey(product), BLOG_POSTS) : []),
     [product],
   )
+
+  // Le booster doit exister dans le catalogue live et etre en stock : sans ce
+  // controle, l'option Shake & Vape s'affichait meme quand la reference etait
+  // absente de Supabase, et l'ajout echouait sur un message de stock trompeur.
+  const nicotineBooster = useMemo(() => findAvailableNicotineBooster(products), [products])
 
   const isLargeFormatEliquid = useMemo(() => {
     if (!product) return false
@@ -380,9 +385,9 @@ export default function Product() {
     const itemsToAdd = [
       { productId: product.id, qty: finalQty, variant: variantResolution.variant },
     ]
-    if (isLargeFormatEliquid && boosterCount > 0) {
+    if (isLargeFormatEliquid && boosterCount > 0 && nicotineBooster) {
       itemsToAdd.push({
-        productId: 'booster-nicotine-20mg-50-50-theklope',
+        productId: nicotineBooster.id,
         qty: finalQty * boosterCount,
         variant: {},
       })
@@ -608,7 +613,7 @@ export default function Product() {
             </div>
 
             {/* Option Shake & Vape pour e-liquides 50ml / 100ml */}
-            {isLargeFormatEliquid && (
+            {isLargeFormatEliquid && nicotineBooster && (
               <div className="mt-6 rounded-2xl border border-neon/30 bg-carbon/80 p-4 shadow-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-neon flex items-center gap-1.5">

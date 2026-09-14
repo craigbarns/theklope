@@ -273,3 +273,16 @@ export function productsByCategorySlugFrom(products = [], slug) {
   if (!cat) return []
   return products.filter((p) => productMatchesCategory(p, cat.key))
 }
+
+// Référence du booster de nicotine proposé en option Shake & Vape (fiche produit)
+// et en vente croisée au panier. Centralisée : recopié dans plusieurs écrans, cet
+// identifiant finit par diverger du catalogue réel — et le client se voit alors
+// proposer une option qui échoue à l'ajout.
+export const NICOTINE_BOOSTER_ID = 'booster-nicotine-20mg-50-50-theklope'
+
+// Le booster n'est proposable que s'il existe VRAIMENT dans le catalogue live et
+// qu'il est en stock. Le catalogue de production vient de Supabase : une référence
+// absente ou épuisée doit masquer l'option, jamais produire un échec d'ajout.
+export const findAvailableNicotineBooster = (products = []) => (
+  (products || []).find((product) => product?.id === NICOTINE_BOOSTER_ID && product.stock > 0) || null
+)
