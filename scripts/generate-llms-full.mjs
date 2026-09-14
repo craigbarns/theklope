@@ -36,6 +36,11 @@ ${phoneLine}- **E-mail de support** : contact@theklope.com
 - **Site officiel** : ${BASE_URL}
 - **RCS** : Marseille 815 155 973
 - **TVA** : FR58 815 155 973
+- **Type d'établissement** : magasin de cigarettes électroniques (vente en boutique et en ligne)
+- **Quartier** : 6e arrondissement, entre la Place Castellane et la Préfecture
+- **Accès** : tramway T3 (arrêts Place de Rome, Dragon) ; métro M1/M2 (station Castellane)
+- **Horaires** : du lundi au vendredi, 09h00–19h00 ; fermé le samedi et le dimanche
+- **Zone de vente en ligne** : France métropolitaine
 
 ## 2. Conformité Vapotage & Avertissements
 - **Limite d'âge** : Vente strictement réservée aux personnes majeures de 18 ans et plus.
@@ -44,6 +49,11 @@ ${phoneLine}- **E-mail de support** : contact@theklope.com
 
 ## 3. Tarifs et Livraison
 - **Livraison gratuite** : Offerte dès 29€ d'achat en France métropolitaine.
+- **Délais** : expédition sous 24 à 48 heures en France métropolitaine.
+- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille, retrait en boutique.
+- **Retrait en boutique (Click & Collect)** : gratuit, généralement disponible en 1 heure selon le stock.
+- **Paiement** : checkout sécurisé Mollie.
+- **Retours** : 14 jours, conditions détaillées sur la page Livraison et retours.
 - **Calculateur DIY** : Outil en ligne disponible sur ${BASE_URL}/calculette-diy pour formuler les proportions (base, booster, arômes).
 
 ## 4. Catalogue Complet des Produits (instantané du build)

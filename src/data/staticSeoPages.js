@@ -111,6 +111,63 @@ export const STATIC_SEO_PAGES = {
       },
     ],
   },
+  // Page locale ciblant « puff marseille » : 433 impressions sur 90 jours en
+  // position moyenne 6,2, sans page dediee jusqu'ici. L'angle est factuel : les
+  // puffs jetables ne sont plus commercialisees en France, la demande se reporte
+  // sur les modeles rechargeables que la boutique propose effectivement.
+  'puff-marseille': {
+    title: 'Puff Marseille — Puffs Rechargeables au 188 rue de Rome | THEKLOPE',
+    metaDescription:
+      'Puffs rechargeables à Marseille : alternatives conformes aux puffs jetables, disponibles au 188 rue de Rome (13006) et en ligne. Retrait gratuit en 1h.',
+    h1: 'Puff à Marseille : les modèles rechargeables',
+    eyebrow: 'Marseille 13006 — Castellane',
+    intro:
+      'Les puffs jetables ne sont plus commercialisées en France. THEKLOPE propose à Marseille les puffs rechargeables, qui reprennent le format compact et le tirage serré des jetables tout en étant rechargeables en e-liquide et en batterie. Disponibles au 188 rue de Rome (13006) ou en livraison partout en France.',
+    localBusiness: true,
+    sections: [
+      {
+        title: 'Puff rechargeable : ce qui change concrètement',
+        text:
+          'Le format, la prise en main et le tirage serré restent ceux d’une puff. La différence tient à la recharge : vous remplissez la cartouche avec l’e-liquide de votre choix et vous rechargez la batterie en USB-C, au lieu de jeter l’appareil. Vous choisissez donc votre saveur et votre taux de nicotine, ce qu’une jetable ne permettait pas.',
+      },
+      {
+        title: 'Essayer et se faire conseiller au 188 rue de Rome',
+        text:
+          'La boutique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement), accessible en tramway T3 (arrêts Place de Rome ou Dragon) et en métro M1/M2 (station Castellane). Notre équipe vous montre la mise en route, le remplissage et l’entretien de la cartouche avant l’achat.',
+      },
+      {
+        title: 'Choisir son taux de nicotine',
+        text:
+          'Le taux se choisit selon votre consommation de tabac actuelle, pas selon la saveur. Les sels de nicotine conviennent aux formats compacts car ils procurent une sensation en gorge plus douce à dosage équivalent. Nous vous orientons en boutique, et nos guides détaillent la correspondance entre habitudes de fumeur et dosage.',
+      },
+      {
+        title: 'Vente strictement réservée aux majeurs',
+        text:
+          'La vente de produits du vapotage est interdite aux mineurs de moins de 18 ans. Les produits contenant de la nicotine créent une forte dépendance et leur usage est déconseillé aux non-fumeurs. Ces produits ne constituent pas un traitement de sevrage : pour une démarche d’arrêt du tabac, parlez-en à un professionnel de santé.',
+      },
+    ],
+    links: [
+      { to: '/categorie/puffs-rechargeables', label: 'Voir les puffs rechargeables' },
+      { to: '/categorie/pods', label: 'Pods rechargeables compacts' },
+      { to: '/categorie/e-liquides-sels-de-nicotine', label: 'E-liquides aux sels de nicotine' },
+      { to: '/boutique-vape-marseille', label: 'La boutique de Marseille' },
+    ],
+    faq: [
+      {
+        q: 'Où acheter une puff à Marseille ?',
+        a: 'Chez THEKLOPE, au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Les puffs jetables n’étant plus commercialisées en France, nous proposons les modèles rechargeables, sur place ou en commande en ligne avec retrait gratuit en 1h.',
+      },
+      {
+        q: 'Quelle différence entre une puff jetable et une puff rechargeable ?',
+        a: 'Le format et le tirage sont identiques. La puff rechargeable se remplit avec l’e-liquide de votre choix et se recharge en USB-C, là où la jetable était remplie une seule fois puis jetée. Vous maîtrisez donc la saveur et le taux de nicotine.',
+      },
+      {
+        q: 'Quel taux de nicotine choisir pour une puff rechargeable ?',
+        a: 'Il dépend de votre consommation de tabac actuelle et non de la saveur. Les sels de nicotine sont adaptés aux formats compacts, car la sensation en gorge reste douce à dosage équivalent. Notre équipe vous conseille en boutique.',
+      },
+    ],
+  },
+
   'conformite-vape': {
     title: 'Conformité vape, nicotine et vente aux majeurs',
     metaDescription:
