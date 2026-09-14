@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import ProductImage from './ProductImage.jsx'
 import { resolveCartRelatedProducts } from '../lib/relatedProducts.js'
+import { findAvailableNicotineBooster } from '../data/catalog.js'
 import {
   getProductVariantChoices,
   isCartCatalogResolved,
@@ -115,6 +116,11 @@ export default function CartDrawer() {
     })
     updateQty(item.index, item.qty + 1)
   }
+
+  // Meme garde-fou que sur la fiche produit : ne jamais proposer un booster
+  // absent du catalogue live ou epuise, l'ajout echouerait sur un message de
+  // stock trompeur.
+  const nicotineBooster = useMemo(() => findAvailableNicotineBooster(products), [products])
 
   // Produits associés ou suggestions pertinentes, en stock et absents du panier.
   const crossSellSuggestions = useMemo(() => {
@@ -232,13 +238,13 @@ export default function CartDrawer() {
               </div>
               <p className="mt-2 text-[11px] text-faint flex justify-between items-center">
                 <span>Retrait gratuit en boutique à Marseille · Coursier jour même disponible</span>
-                {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && (
+                {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && nicotineBooster && (
                   <span className="text-[10px] font-bold text-neon bg-neon/10 px-2 py-0.5 rounded-full border border-neon/20">
                     Presque atteint !
                   </span>
                 )}
               </p>
-              {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && (
+              {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && nicotineBooster && (
                 <div className="mt-3 rounded-2xl border border-neon/30 bg-carbon/80 p-2.5 shadow-sm">
                   <div className="flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
@@ -247,7 +253,7 @@ export default function CartDrawer() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => addToCart('booster-nicotine-20mg-50-50-theklope', 1)}
+                      onClick={() => addToCart(nicotineBooster.id, 1)}
                       className="btn-primary min-h-0 px-3 py-1 text-xs font-bold shrink-0"
                     >
                       + Ajouter
