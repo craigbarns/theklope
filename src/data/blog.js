@@ -58,6 +58,12 @@ const makePost = ({
   image,
   summary,
   content: buildContent({ intro, sections, faq, cta }),
+  // La FAQ est déjà fondue dans le HTML de `content` pour l'affichage. On la
+  // conserve aussi sous forme structurée : sans elle, impossible d'émettre le
+  // balisage FAQPage que Google utilise pour afficher les questions dépliables
+  // dans ses résultats — or c'est précisément ce qui gagne de la place, donc du
+  // taux de clic, aux positions 8 à 14 où se trouvent les guides.
+  faq: Array.isArray(faq) ? faq : [],
   relatedProductIds,
 })
 
