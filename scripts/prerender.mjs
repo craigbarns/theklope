@@ -28,6 +28,7 @@ const { enrichProductCopy, buildProductSeoTitle, buildProductSeoDescription } = 
 const {
   CATEGORIES,
   categoryName,
+  findBrandCategory,
   featuredProducts,
   getProductCategoryKey,
   productMatchesCategory,
@@ -149,6 +150,10 @@ for (const p of PRODUCTS) {
   const catLabel = cat ? cat.name : (p.type || catKey)
   const catPath = cat ? `/categorie/${cat.slug}` : '/boutique'
   const brandName = p.brand || 'THEKLOPE'
+  // Les pages de marque n'étaient liées que depuis /categories. Le lien doit
+  // exister dans le HTML pré-rendu : c'est lui que Google lit en premier, et
+  // c'est de là que ces pages tirent leur autorité interne.
+  const brandCategory = findBrandCategory(p.brand)
   
   // Titre et description viennent du module partagé : le HTML pré-rendu et
   // l'appli hydratée annonçaient auparavant deux titres différents pour la
@@ -214,7 +219,9 @@ for (const p of PRODUCTS) {
         <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(catLabel)} ${esc(p.name)} par ${esc(brandName)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
       </div></div>
       <div>
-        <p class="text-xs uppercase tracking-wider text-faint">${esc(p.brand || 'THEKLOPE')} · ${esc(p.type || catLabel)}</p>
+        <p class="text-xs uppercase tracking-wider text-faint">${brandCategory
+          ? `<a href="/categorie/${esc(brandCategory.slug)}">${esc(p.brand)}</a>`
+          : esc(p.brand || 'THEKLOPE')} · ${esc(p.type || catLabel)}</p>
         <h1 class="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">${esc(p.name)}</h1>
         <p class="mt-5"><strong>${esc(fmtPrice(p.price))}</strong>${p.oldPrice ? ` <s>${esc(fmtPrice(p.oldPrice))}</s>` : ''}</p>
         <p class="mt-5">${esc(p.long || p.short || '')}</p>

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { buildProductSeoTitle, buildProductSeoDescription } from '../data/productCopy.js'
-import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct, findAvailableNicotineBooster } from '../data/catalog.js'
+import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct, findAvailableNicotineBooster, findBrandCategory } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
@@ -96,6 +96,10 @@ export default function Product() {
   // controle, l'option Shake & Vape s'affichait meme quand la reference etait
   // absente de Supabase, et l'ajout echouait sur un message de stock trompeur.
   const nicotineBooster = useMemo(() => findAvailableNicotineBooster(products), [products])
+
+  // Lien contextuel vers la page de la marque quand elle existe : c'est la
+  // principale source d'autorite interne de ces pages, autrement orphelines.
+  const brandCategory = useMemo(() => findBrandCategory(product?.brand), [product?.brand])
 
   const isLargeFormatEliquid = useMemo(() => {
     if (!product) return false
@@ -540,7 +544,17 @@ export default function Product() {
 
           {/* Infos */}
           <div>
-            <p className="text-xs uppercase tracking-wider text-faint">{product.brand} · {product.type}</p>
+            <p className="text-xs uppercase tracking-wider text-faint">
+              {brandCategory ? (
+                <Link
+                  to={`/categorie/${brandCategory.slug}`}
+                  className="transition hover:text-neon focus-visible:text-neon"
+                >
+                  {product.brand}
+                </Link>
+              ) : product.brand}
+              {' · '}{product.type}
+            </p>
             <h1 className="mt-2 font-display text-3xl font-bold text-white sm:text-4xl">{product.name}</h1>
 
             <div className="mt-5 flex flex-wrap items-baseline gap-3">

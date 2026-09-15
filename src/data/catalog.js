@@ -286,3 +286,28 @@ export const NICOTINE_BOOSTER_ID = 'booster-nicotine-20mg-50-50-theklope'
 export const findAvailableNicotineBooster = (products = []) => (
   (products || []).find((product) => product?.id === NICOTINE_BOOSTER_ID && product.stock > 0) || null
 )
+
+// Les 17 pages de marque ont un contenu propre (titre, intro, sections, FAQ)
+// mais n'étaient liées que depuis /categories. Sans lien interne contextuel,
+// Google ne leur transmet presque aucune autorité : elles stagnaient en position
+// 27 à 42 pour ~5 100 impressions et 11 clics sur 90 jours.
+// Chaque fiche produit affiche déjà sa marque. La lier vers sa page sert le
+// visiteur (voir toute la gamme) et distribue l'autorité des fiches produits,
+// qui sont les pages les mieux classées du site.
+const brandKey = (value) => String(value || '')
+  .normalize('NFD')
+  .replace(/[̀-ͯ]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]/g, '')
+
+const BRAND_CATEGORIES_BY_NAME = new Map(
+  CATEGORIES
+    .filter((category) => String(category.slug).startsWith('marque-'))
+    .map((category) => [brandKey(category.name), category]),
+)
+
+// Renvoie la catégorie de marque correspondant au champ `brand` d'un produit,
+// ou null. La normalisation absorbe les écarts de graphie entre le catalogue et
+// les catégories (« Tjuice » / « T-Juice »). Toutes les marques n'ont pas de
+// page : on ne lie que celles qui en ont réellement une.
+export const findBrandCategory = (brand) => BRAND_CATEGORIES_BY_NAME.get(brandKey(brand)) || null
