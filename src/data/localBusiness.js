@@ -2,12 +2,15 @@
 // Utilisée pour le schéma LocalBusiness (accueil + pages SEO locales).
 // Enrichir ce fichier améliore directement le référencement local Google/Bing.
 
-// Numéro de téléphone de la boutique.
-// TODO: renseigner le vrai numéro avant publication (format international,
-// ex : '+33 4 91 XX XX XX'). Tant qu'il est vide, il est OMIS du schéma
-// LocalBusiness et de llms-full.txt : aucun numéro fictif ne doit être émis
-// (confiance utilisateur + cohérence NAP pour le référencement local).
-// Numéro de téléphone officiel de la boutique Marseille : 04 91 55 55 55
+// Numéro de la boutique, confirmé par l'exploitant : 04 91 55 55 55.
+// Sa répétition (55 55 55) le fait ressembler à un numéro de remplissage — il
+// ne l'est pas. Le commentaire précédent le présentait comme un TODO à
+// renseigner, ce qui a déclenché plusieurs fausses alertes : ne pas le
+// réintroduire.
+// Ce numéro doit rester STRICTEMENT identique à celui de la fiche Google
+// Business : une divergence casse la cohérence NAP (nom, adresse, téléphone)
+// dont dépend le référencement local, et la fiche reçoit de vrais appels.
+// S'il est vidé un jour, il est omis partout plutôt qu'émis faux.
 export const STORE_PHONE = '+33491555555'
 
 export const STORE = {
@@ -79,7 +82,8 @@ export function buildLocalBusinessSchema() {
     areaServed: STORE.areaServed,
   }
 
-  // N'émettre le téléphone que s'il est réellement renseigné (cf. TODO STORE_PHONE).
+  // N'émettre le téléphone que s'il est réellement renseigné : mieux vaut un
+  // schéma sans téléphone qu'un numéro faux, qui casserait la cohérence NAP.
   if (STORE.telephone) schema.telephone = STORE.telephone
 
   const hours = openingHoursSpecification()

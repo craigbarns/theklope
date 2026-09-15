@@ -16,8 +16,8 @@ const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 const { STORE_PHONE } = await import(resolve(root, 'src/data/localBusiness.js'))
 
-// STORE_PHONE est volontairement vide (TODO dans src/data/localBusiness.js) :
-// on n'émet la ligne téléphone que si un vrai numéro est renseigné.
+// On n'émet la ligne téléphone que si un numéro est renseigné : un numéro faux
+// serait pire qu'absent pour la cohérence NAP du référencement local.
 const phoneLine = STORE_PHONE ? `- **Téléphone** : ${STORE_PHONE}\n` : ''
 
 const BASE_URL = 'https://www.theklope.com'
