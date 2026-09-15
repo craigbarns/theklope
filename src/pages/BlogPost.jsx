@@ -39,8 +39,11 @@ export default function BlogPost() {
   // Schéma structuré BlogPosting (GEO)
   const schema = useMemo(() => {
     if (!post) return null
-    return {
-      '@context': 'https://schema.org',
+    // @graph plutôt qu'un type unique : le guide déclare à la fois l'article et
+    // sa FAQ. Sans le bloc FAQPage, les questions affichées dans la page restent
+    // invisibles pour Google, qui ne peut donc pas les proposer en questions
+    // dépliables dans ses résultats — la surface gagnée qui fait le taux de clic.
+    const blogPosting = {
       '@type': 'BlogPosting',
       mainEntityOfPage: {
         '@type': 'WebPage',
@@ -63,6 +66,23 @@ export default function BlogPost() {
           url: 'https://www.theklope.com/logo.png',
         },
       },
+    }
+
+    return {
+      '@context': 'https://schema.org',
+      '@graph': [
+        blogPosting,
+        ...(post.faq?.length
+          ? [{
+            '@type': 'FAQPage',
+            mainEntity: post.faq.map((item) => ({
+              '@type': 'Question',
+              name: item.q,
+              acceptedAnswer: { '@type': 'Answer', text: item.a },
+            })),
+          }]
+          : []),
+      ],
     }
   }, [post])
 

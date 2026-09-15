@@ -330,6 +330,20 @@ for (const b of BLOG_POSTS) {
           { '@type': 'ListItem', position: 3, name: b.title, item: abs(path) },
         ],
       },
+      // La FAQ du guide est affichée dans la page mais n'était pas déclarée à
+      // Google : sans FAQPage, pas de questions dépliables dans les résultats,
+      // donc moins de surface affichée et un taux de clic plus faible. Même
+      // motif que les pages de catégorie et les pages locales.
+      ...(b.faq?.length
+        ? [{
+          '@type': 'FAQPage',
+          mainEntity: b.faq.map((item) => ({
+            '@type': 'Question',
+            name: item.q,
+            acceptedAnswer: { '@type': 'Answer', text: item.a },
+          })),
+        }]
+        : []),
     ],
   }
   const content = `
