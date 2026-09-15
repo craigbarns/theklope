@@ -1,3 +1,5 @@
+import { isAnalyticsPageAllowed, isInternalAnalyticsPath, sanitizeAnalyticsUrl } from './analyticsPolicy.js'
+
 const GA_MEASUREMENT_ID = 'G-SF5BGR7ZXQ'
 const CONSENT_STORAGE_KEY = 'tk_cookies'
 const REVIEWS_CONSENT_STORAGE_KEY = 'tk_reviews_consent'
@@ -58,6 +60,21 @@ export const hasAnalyticsConsent = () => (
   runtimeAnalyticsConsent ?? readConsent(CONSENT_STORAGE_KEY) === 'accepted'
 )
 
+// Consent alone does not authorize measurement of administration or previews.
+export const canTrackAnalytics = () => (
+  typeof window !== 'undefined'
+  && hasAnalyticsConsent()
+  && isAnalyticsPageAllowed(window.location.href)
+)
+
+// Vercel keeps its script after React unmounts: check the current permission
+// for every event, including callbacks installed before a refusal/navigation.
+export function filterVercelAnalyticsEvent(event) {
+  if (!canTrackAnalytics()) return null
+  const url = sanitizeAnalyticsUrl(event?.url)
+  return url ? { ...event, url } : null
+}
+
 export const hasReviewsConsent = () => {
   if (runtimeReviewsConsent !== null) return runtimeReviewsConsent
   const saved = readConsent(REVIEWS_CONSENT_STORAGE_KEY)
@@ -102,7 +119,10 @@ export function buildAnalyticsPageContext({ href, referrer } = {}) {
 
   return {
     page_location: pageLocation,
-    ...(referrerUrl ? { page_referrer: referrerUrl.toString() } : {}),
+    // Returning from administration must not disclose its private URL either.
+    ...(referrerUrl ? {
+      page_referrer: isInternalAnalyticsPath(referrerUrl.pathname) ? '' : referrerUrl.toString(),
+    } : {}),
   }
 }
 
@@ -209,7 +229,7 @@ export function parsePurchaseSnapshot(raw, now = Date.now()) {
 }
 
 const persistAcquisition = (touch) => {
-  if (typeof window === 'undefined' || !touch || !hasAnalyticsConsent()) return false
+  if (!touch || !canTrackAnalytics()) return false
   try {
     const previous = readStoredAcquisitionRecord()
     const now = Date.now()
@@ -230,8 +250,13 @@ const persistAcquisition = (touch) => {
 // transmise au serveur. L'acceptation la persiste ; un refus explicite l'efface.
 export function captureAcquisition({ href, referrer, capturedAt } = {}) {
   if (typeof window === 'undefined' && !href) return null
+  const currentHref = href || window.location.href
+  if (!isAnalyticsPageAllowed(currentHref)) {
+    pendingAcquisition = null
+    return null
+  }
   const touch = buildAcquisitionTouch({
-    href: href || window.location.href,
+    href: currentHref,
     referrer: referrer ?? (typeof document === 'undefined' ? '' : document.referrer),
     capturedAt,
   })
@@ -249,7 +274,7 @@ export function captureAcquisition({ href, referrer, capturedAt } = {}) {
 // existe, l'objet JSON peut être joint tel quel à create-payment puis stocké
 // côté serveur avec la commande (firstTouch, lastTouch, consentRecordedAt).
 export function getStoredAcquisition() {
-  if (!hasAnalyticsConsent()) return null
+  if (!canTrackAnalytics()) return null
   const record = readStoredAcquisitionRecord()
   if (!record?.firstTouch || !record?.lastTouch) return null
   return {
@@ -267,7 +292,7 @@ const ensureGtagQueue = () => {
 }
 
 export function loadGoogleAnalytics() {
-  if (typeof window === 'undefined' || !hasAnalyticsConsent()) return Promise.resolve(false)
+  if (!canTrackAnalytics()) return Promise.resolve(false)
   if (googleAnalyticsPromise) return googleAnalyticsPromise
 
   window[`ga-disable-${GA_MEASUREMENT_ID}`] = false
@@ -380,8 +405,12 @@ export function revokeOptionalServices({ analytics = true, reviews = true, analy
 }
 
 export function trackEvent(name, params = {}) {
-  if (typeof window === 'undefined' || !hasAnalyticsConsent()) return false
-  if (typeof window.gtag !== 'function') loadGoogleAnalytics()
+  if (!canTrackAnalytics()) return false
+  // A previous administration visit may have disabled an existing gtag.
+  // Restore its configuration before queueing an allowed public event.
+  if (typeof window.gtag !== 'function' || window[`ga-disable-${GA_MEASUREMENT_ID}`] === true) {
+    loadGoogleAnalytics()
+  }
   if (typeof window.gtag !== 'function') return false
   window.gtag('event', name, {
     ...params,
@@ -393,9 +422,11 @@ export function trackEvent(name, params = {}) {
 }
 
 export async function trackEventWhenReady(name, params = {}) {
-  if (typeof window === 'undefined' || !hasAnalyticsConsent()) return false
+  if (!canTrackAnalytics()) return false
+  const pageLocation = sanitizeAnalyticsUrl(window.location.href)
   const loaded = await loadGoogleAnalytics()
-  if (!loaded || typeof window.gtag !== 'function') return false
+  if (!loaded || !canTrackAnalytics() || typeof window.gtag !== 'function') return false
+  if (sanitizeAnalyticsUrl(window.location.href) !== pageLocation) return false
   window.gtag('event', name, {
     ...params,
     ...buildAnalyticsPageContext(),
@@ -411,7 +442,7 @@ const pagePathWithoutQuery = (value) => {
 
 export function trackPageView(path) {
   const pagePath = pagePathWithoutQuery(path)
-  if (!pagePath || pagePath === lastPageView || !hasAnalyticsConsent()) return false
+  if (!pagePath || isInternalAnalyticsPath(pagePath) || pagePath === lastPageView || !canTrackAnalytics()) return false
   const tracked = trackEvent('page_view', {
     // Les paramètres libres (`q`, identifiants de retour paiement, etc.) ne
     // quittent jamais le navigateur dans un événement de page.

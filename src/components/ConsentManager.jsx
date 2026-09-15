@@ -12,6 +12,7 @@ import {
   isPageReadyForAnalytics,
   SEO_READY_EVENT,
 } from '../lib/pageReadiness.js'
+import { isAnalyticsPageAllowed } from '../lib/analyticsPolicy.js'
 
 export default function ConsentManager() {
   const { cookiesChoice } = useStore()
@@ -19,7 +20,8 @@ export default function ConsentManager() {
   const path = location.pathname
   const [seoReadyPathname, setSeoReadyPathname] = useState(() => getPageSeoReadyPathname())
   const pageReady = isPageReadyForAnalytics(location.pathname, seoReadyPathname)
-  const analyticsAllowed = cookiesChoice === 'accepted'
+  const consentAccepted = cookiesChoice === 'accepted'
+  const analyticsAllowed = consentAccepted && isAnalyticsPageAllowed(window.location.href)
 
   useEffect(() => {
     const syncSeoReadyPathname = (event) => {
@@ -34,7 +36,7 @@ export default function ConsentManager() {
 
   useEffect(() => {
     setOptionalServicesConsent({
-      analytics: analyticsAllowed,
+      analytics: consentAccepted,
       reviews: false,
       analyticsDecision: cookiesChoice,
     })
@@ -62,7 +64,7 @@ export default function ConsentManager() {
       active = false
       if (pageViewTimer !== null) window.clearTimeout(pageViewTimer)
     }
-  }, [analyticsAllowed, cookiesChoice, pageReady, path])
+  }, [analyticsAllowed, consentAccepted, cookiesChoice, pageReady, path])
 
   return null
 }
