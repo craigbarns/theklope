@@ -21,6 +21,73 @@
       "permanent": true
     },
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "query",
+          "key": "q",
+          "value": "(?i).*(Marque-|Disponibilit|Catégories-|Cat%C3%A9gories-|Nicotine-|Contenance-|Saveurs?-|Prix-).*"
+        }
+      ],
+      "destination": "/boutique?",
+      "permanent": true
+    },
+    {
+      "source": "/connexion",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/nouveaux-produits",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/meilleures%20ventes",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/meilleures-ventes",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/plan-site",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/reduction",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
+      "source": "/suivi-commande-invite",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/ecig",
+      "destination": "/categorie/cigarettes-electroniques",
+      "permanent": true
+    },
+    {
+      "source": "/categorie/eliquide",
+      "destination": "/categorie/e-liquides",
+      "permanent": true
+    },
+    {
+      "source": "/download/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/download",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/blog",
       "destination": "/guides",
       "permanent": true
