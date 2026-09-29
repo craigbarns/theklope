@@ -1,14 +1,19 @@
 import { SHIPPING_METHODS } from '../../src/lib/pricing.js'
 import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
-import { categoryMatches } from '../../src/lib/productCategory.js'
+import { supportsFlavorVariants } from '../../src/lib/productCategory.js'
 
 export const MAX_CART_LINES = 100
 export const MAX_LINE_QUANTITY = 100
 
+// Le 4e élément est le prédicat de catégorie : il DOIT être le même que côté
+// navigateur (src/lib/cart.js). Les deux listes avaient divergé — le navigateur
+// proposait une saveur sur les cartouches et les puffs, que le serveur refusait
+// ensuite au paiement (« ne propose pas cette option de saveur »). Le client
+// remplissait son panier et ne pouvait pas payer. Une seule règle, partagée.
 const VARIANT_FIELDS = [
   ['color', 'colors', 'couleur'],
-  ['flavor', 'flavors', 'saveur', ['eliquide', 'diy']],
-  ['nicotine', 'nicotine', 'taux de nicotine', ['eliquide', 'diy']],
+  ['flavor', 'flavors', 'saveur', supportsFlavorVariants],
+  ['nicotine', 'nicotine', 'taux de nicotine', supportsFlavorVariants],
   ['ohm', 'ohmOptions', 'resistance'],
 ]
 
@@ -76,8 +81,8 @@ export function normalizeVariant(product, input = {}) {
   }
 
   const variant = {}
-  for (const [key, productField, label, categories] of VARIANT_FIELDS) {
-    const fieldApplies = !categories || categories.some((category) => categoryMatches(product?.category, category))
+  for (const [key, productField, label, supports] of VARIANT_FIELDS) {
+    const fieldApplies = !supports || supports(product?.category)
     const allowed = fieldApplies && Array.isArray(product?.[productField])
       ? product[productField].filter((value) => value !== '' && value != null)
       : []
