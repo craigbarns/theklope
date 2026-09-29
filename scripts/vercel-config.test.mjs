@@ -69,7 +69,9 @@ test('specific legacy category redirects are evaluated before the generic numeri
 test('checkout cleanup is scheduled at most daily for Hobby compatibility', () => {
   const cleanup = config.crons?.find((cron) => cron.path === '/api/cleanup-checkouts')
   assert.ok(cleanup, 'Missing cleanup checkout cron')
-  assert.equal(cleanup.schedule, '20 3 * * *')
+  // Une seule exécution par jour (minute et heure fixes) : c'est la limite du
+  // plan Hobby. L'heure elle-même est libre (matinée pour les e-mails d'avis).
+  assert.match(cleanup.schedule, /^\d{1,2} \d{1,2} \* \* \*$/)
   assert.equal(config.crons.filter((cron) => cron.path === cleanup.path).length, 1)
 })
 
