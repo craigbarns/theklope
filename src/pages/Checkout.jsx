@@ -53,7 +53,10 @@ export default function Checkout() {
   }, [setCartOpen])
 
   const [step, setStep] = useState(1)
-  const [shipping, setShipping] = useState('poste')
+  // Mondial Relay par défaut : c'est le mode payant le moins cher (3,90 €).
+  // Avec La Poste (7,50 €) présélectionnée, un flacon à 5,90 € affichait un
+  // total de 13,40 € dès l'arrivée — des frais plus chers que le produit.
+  const [shipping, setShipping] = useState('relais')
   const [relayPoint, setRelayPoint] = useState(null)
   const [relayPoints, setRelayPoints] = useState([])
   const [relaySearching, setRelaySearching] = useState(false)
