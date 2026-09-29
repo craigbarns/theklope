@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
-import { CATEGORIES, BADGES } from '../data/catalog.js'
+import { CATEGORIES, BADGES, isResistanceProduct } from '../data/catalog.js'
 import { findCatalogIssues } from '../data/catalogQuality.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
@@ -267,6 +267,7 @@ export default function Admin() {
       {tab === 'orders' && (
         <OrdersPanel
           orders={orders}
+          products={products}
           updateOrderStatus={async (orderId, status) => {
             try {
               setActionError('')
@@ -818,6 +819,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
 
 function OrdersPanel({
   orders,
+  products = [],
   updateOrderStatus,
   markShipped,
   cancelOrder,
@@ -826,6 +828,7 @@ function OrdersPanel({
   mondialRelayStatus,
 }) {
   const reviewRequiredCount = orders.filter((order) => order.checkoutReviewRequiredAt).length
+  const productsById = new Map(products.map((product) => [product.id, product]))
   return (
     <section className="card mt-8 p-5 sm:p-6">
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -922,6 +925,11 @@ function OrdersPanel({
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-white">{item.name}</p>
                       <p className="text-xs text-faint">x{item.qty} · {variantLabel(item.variant)}</p>
+                      {isMissingOhm(item, productsById) && (
+                        <p className="mt-1 text-[11px] font-semibold text-amber-300">
+                          Valeur Ω non enregistrée — à confirmer avec le client avant l’envoi
+                        </p>
+                      )}
                     </div>
                     <span className="text-sm font-semibold text-white">{formatPrice(item.lineTotal)}</span>
                   </div>
@@ -1874,6 +1882,17 @@ function MondialRelayDebugRow({ label, value }) {
       <dd className="break-words text-ash/80">{String(value)}</dd>
     </div>
   )
+}
+
+// Une résistance commandée sans valeur Ω est expédiée à l'aveugle. L'étiquette
+// affichait alors « Standard », ce qui masquait le trou au lieu de le signaler.
+// Cause habituelle : le champ « Valeurs Ω disponibles » est vide sur la fiche,
+// donc le client n'a jamais eu de choix à faire.
+function isMissingOhm(item, productsById) {
+  const product = productsById.get(item.productId)
+  if (!product || !isResistanceProduct(product)) return false
+  const ohm = item.variant?.ohm
+  return ohm === undefined || ohm === null || ohm === ''
 }
 
 function variantLabel(variant = {}) {
