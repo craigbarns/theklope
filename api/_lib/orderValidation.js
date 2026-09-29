@@ -1,6 +1,7 @@
 import { SHIPPING_METHODS } from '../../src/lib/pricing.js'
 import { MAX_DELIVERY_INSTRUCTIONS_LENGTH } from '../../src/lib/delivery.js'
 import { supportsFlavorVariants } from '../../src/lib/productCategory.js'
+import { isVariantOptionOutOfStock, nicotineOutOfStockError } from '../../src/lib/variantStock.js'
 
 export const MAX_CART_LINES = 100
 export const MAX_LINE_QUANTITY = 100
@@ -102,6 +103,9 @@ export function normalizeVariant(product, input = {}) {
       if (allowed.length > 1) {
         return { ok: false, error: `Choisissez une option de ${label} pour ${product.name}.` }
       }
+      if (isVariantOptionOutOfStock(product, key, allowed[0])) {
+        return { ok: false, error: nicotineOutOfStockError(product, allowed[0]) }
+      }
       variant[key] = allowed[0]
       continue
     }
@@ -109,6 +113,10 @@ export function normalizeVariant(product, input = {}) {
     const selected = allowed.find((value) => comparable(value) === comparable(provided))
     if (selected === undefined) {
       return { ok: false, error: `Option ${label} indisponible pour ${product.name}.` }
+    }
+    // Taux coché « en rupture » dans l'admin : refusé même par un appel direct.
+    if (isVariantOptionOutOfStock(product, key, selected)) {
+      return { ok: false, error: nicotineOutOfStockError(product, selected) }
     }
     variant[key] = selected
   }

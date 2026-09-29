@@ -34,6 +34,7 @@ export async function loadProducts() {
           stock: row.stock,
           badge: row.badge,
           nicotine: row.nicotine,
+          nicotineOutOfStock: row.nicotine_out_of_stock || [],
           flavors: row.flavors,
           colors: row.colors,
           ohmOptions: row.ohm_options,

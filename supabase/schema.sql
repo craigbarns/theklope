@@ -17,6 +17,7 @@ create table if not exists public.products (
   stock integer not null default 0,
   badge text,
   nicotine jsonb not null default '[]'::jsonb,
+  nicotine_out_of_stock jsonb not null default '[]'::jsonb,
   flavors jsonb not null default '[]'::jsonb,
   colors jsonb not null default '[]'::jsonb,
   short text not null default '',
@@ -36,6 +37,8 @@ alter table public.products add column if not exists ohm text;
 alter table public.products add column if not exists ohm_options jsonb not null default '[]'::jsonb;
 -- Migration : sélection manuelle et ordonnée des produits associés.
 alter table public.products add column if not exists related_product_ids jsonb not null default '[]'::jsonb;
+-- Migration : taux de nicotine en rupture (cochés depuis l'admin).
+alter table public.products add column if not exists nicotine_out_of_stock jsonb not null default '[]'::jsonb;
 
 do $$
 begin

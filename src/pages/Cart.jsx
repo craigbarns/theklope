@@ -12,6 +12,7 @@ import {
   isCartCatalogVerified,
   resolveProductVariant,
 } from '../lib/cart.js'
+import { isVariantOptionOutOfStock } from '../lib/variantStock.js'
 import {
   toAnalyticsItem,
   trackEvent,
@@ -314,9 +315,14 @@ function VariantEditor({ product, variant = {}, onChange }) {
               className="rounded-lg border border-white/12 bg-carbon px-2 py-1 text-xs text-white outline-none focus:border-neon"
             >
               {selected === undefined && <option value="">Choisir</option>}
-              {options.map((option) => (
-                <option key={String(option)} value={String(option)}>{option}{suffix}</option>
-              ))}
+              {options.map((option) => {
+                const unavailable = isVariantOptionOutOfStock(product, key, option)
+                return (
+                  <option key={String(option)} value={String(option)} disabled={unavailable}>
+                    {option}{suffix}{unavailable ? ' — rupture' : ''}
+                  </option>
+                )
+              })}
             </select>
           </label>
         )

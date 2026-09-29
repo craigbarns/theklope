@@ -18,6 +18,7 @@ import { resolveRelatedProducts } from '../lib/relatedProducts.js'
 import { relatedGuidesForProduct } from '../data/productGuides.js'
 import { BLOG_POSTS } from '../data/blog.js'
 import { getProductVariantOptions, resolveProductVariant } from '../lib/cart.js'
+import { isNicotineOutOfStock, isProductOrderable } from '../lib/variantStock.js'
 import { buildMerchantSku } from '../lib/merchantSku.js'
 import {
   IconHeart,
@@ -55,12 +56,15 @@ export default function Product() {
   const flavorOptions = getProductVariantOptions(product, 'flavor')
   const nicotineOptions = getProductVariantOptions(product, 'nicotine')
   const ohmOptions = getProductVariantOptions(product, 'ohm')
+  // Un seul taux encore disponible est présélectionné, comme une option unique.
+  const availableNicotine = (candidate) => getProductVariantOptions(candidate, 'nicotine')
+    .filter((value) => !isNicotineOutOfStock(candidate, value))
 
   const [activeImg, setActiveImg] = useState(0)
   const [qty, setQty] = useState(1)
   const [color, setColor] = useState(onlyChoice(colorOptions))
   const [flavor, setFlavor] = useState(onlyChoice(flavorOptions))
-  const [nicotine, setNicotine] = useState(onlyChoice(nicotineOptions))
+  const [nicotine, setNicotine] = useState(onlyChoice(availableNicotine(product)))
   const [ohm, setOhm] = useState(onlyChoice(ohmOptions))
   const [added, setAdded] = useState(false)
   const [addError, setAddError] = useState('')
@@ -175,7 +179,7 @@ export default function Product() {
             "validFrom": priceValidFrom,
             "priceValidUntil": priceValidUntil,
             "itemCondition": "https://schema.org/NewCondition",
-            "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "availability": isProductOrderable(product) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": {
               "@type": "Organization",
               "name": "THEKLOPE",
@@ -264,7 +268,7 @@ export default function Product() {
     setQty(1)
     setColor(onlyChoice(getProductVariantOptions(product, 'color')))
     setFlavor(onlyChoice(getProductVariantOptions(product, 'flavor')))
-    setNicotine(onlyChoice(getProductVariantOptions(product, 'nicotine')))
+    setNicotine(onlyChoice(availableNicotine(product)))
     setOhm(onlyChoice(getProductVariantOptions(product, 'ohm')))
     setAddError('')
   }, [product])
@@ -356,7 +360,8 @@ export default function Product() {
   const productCategoryKey = getProductCategoryKey(product)
   const productCategoryEntry = CATEGORIES.find((c) => c.key === productCategoryKey)
   const productCategoryPath = productCategoryEntry ? `/categorie/${productCategoryEntry.slug}` : '/boutique'
-  const outOfStock = product.stock <= 0
+  // Stock global épuisé, ou tous les taux de nicotine cochés « en rupture ».
+  const outOfStock = !isProductOrderable(product)
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
   const hasNicotine = nicotineOptions.some((n) => Number(n) > 0)
@@ -613,6 +618,7 @@ export default function Product() {
                   value={nicotine}
                   onChange={(value) => { setNicotine(value); setAddError('') }}
                   render={(n) => `${n} mg`}
+                  isUnavailable={(n) => isNicotineOutOfStock(product, n)}
                 />
               )}
               {ohmOptions.length > 0 && (
@@ -1184,7 +1190,8 @@ function CatalogUnavailable() {
   )
 }
 
-function VariantPicker({ label, options, value, onChange, render = (x) => x }) {
+function VariantPicker({ label, options, value, onChange, render = (x) => x, isUnavailable = () => false }) {
+  const hasUnavailable = options.some((opt) => isUnavailable(opt))
   return (
     <fieldset>
       <legend className="mb-2 text-sm font-medium text-white">
@@ -1194,22 +1201,35 @@ function VariantPicker({ label, options, value, onChange, render = (x) => x }) {
         </span>
       </legend>
       <div className="flex flex-wrap gap-2">
-        {options.map((opt) => (
-          <button
-            type="button"
-            key={String(opt)}
-            onClick={() => onChange(opt)}
-            aria-pressed={value === opt}
-            className={`rounded-full border px-4 py-2 text-sm transition ${
-              value === opt
-                ? 'border-neon bg-neon/15 text-neon'
-                : 'border-white/12 text-ash/75 hover:border-white/30'
-            }`}
-          >
-            {render(opt)}
-          </button>
-        ))}
+        {options.map((opt) => {
+          const unavailable = isUnavailable(opt)
+          return (
+            <button
+              type="button"
+              key={String(opt)}
+              onClick={() => { if (!unavailable) onChange(opt) }}
+              disabled={unavailable}
+              aria-pressed={value === opt}
+              aria-label={unavailable ? `${render(opt)} — en rupture` : undefined}
+              title={unavailable ? 'En rupture — bientôt de retour' : undefined}
+              className={`rounded-full border px-4 py-2 text-sm transition ${
+                unavailable
+                  ? 'cursor-not-allowed border-white/8 text-white/30 line-through decoration-white/40'
+                  : value === opt
+                    ? 'border-neon bg-neon/15 text-neon'
+                    : 'border-white/12 text-ash/75 hover:border-white/30'
+              }`}
+            >
+              {render(opt)}
+            </button>
+          )
+        })}
       </div>
+      {hasUnavailable && (
+        <p className="mt-2 text-xs text-faint">
+          Les taux barrés sont en rupture pour le moment. Besoin d’un taux précis ? Passez à la boutique ou appelez-nous.
+        </p>
+      )}
     </fieldset>
   )
 }

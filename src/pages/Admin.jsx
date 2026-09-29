@@ -53,6 +53,7 @@ const emptyProduct = {
   image: '/products/product-placeholder.svg',
   images: '',
   nicotine: '0, 3, 6',
+  nicotineOutOfStock: [],
   flavors: '',
   colors: '',
   short: '',
@@ -586,6 +587,17 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                     <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${product.stock <= 10 ? 'bg-amber-400 text-noir' : 'bg-white/10 text-white'}`}>
                       {product.stock}
                     </span>
+                    {product.nicotine?.length > 1 && (
+                      <NicotineStockToggles
+                        compact
+                        rates={product.nicotine}
+                        outOfStock={product.nicotineOutOfStock}
+                        onToggle={(rate) => onSave({
+                          ...toFormProduct(product),
+                          nicotineOutOfStock: toggleNicotineRate(product.nicotineOutOfStock, rate),
+                        })}
+                      />
+                    )}
                   </td>
                   <td className="px-4 py-4 text-muted">{product.badge ? BADGES[product.badge]?.label || product.badge : '-'}</td>
                   <td className="py-4 pl-4">
@@ -786,6 +798,14 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
             productName={form.name}
           />
           <Field label="Nicotine (mg/ml, si applicable)" value={form.nicotine} onChange={update('nicotine')} placeholder="20 pour un booster, vide sinon" />
+          <NicotineStockToggles
+            rates={parseNicotineList(form.nicotine)}
+            outOfStock={form.nicotineOutOfStock}
+            onToggle={(rate) => setForm((prev) => ({
+              ...prev,
+              nicotineOutOfStock: toggleNicotineRate(prev.nicotineOutOfStock, rate),
+            }))}
+          />
           <Field label="Saveurs" value={form.flavors} onChange={update('flavors')} placeholder="Menthe, Classic, Fruits rouges" />
           <Field label="Couleurs" value={form.colors} onChange={update('colors')} placeholder="Noir, Argent, Bleu" />
           <div className="grid grid-cols-2 gap-3">
@@ -1862,9 +1882,65 @@ function toFormProduct(product) {
     flavors: (product.flavors || []).join(', '),
     colors: (product.colors || []).join(', '),
     ohmOptions: (product.ohmOptions || []).join(', '),
+    nicotineOutOfStock: [...(product.nicotineOutOfStock || [])],
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, product.id),
     specsText: Object.entries(product.specs || {}).map(([key, value]) => `${key}: ${value}`).join('\n'),
   }
+}
+
+function parseNicotineList(value) {
+  return String(value || '')
+    .split(',')
+    .map((entry) => entry.trim().replace(',', '.'))
+    .filter(Boolean)
+    .map(Number)
+    .filter(Number.isFinite)
+}
+
+function toggleNicotineRate(outOfStock = [], rate) {
+  const current = Array.isArray(outOfStock) ? outOfStock : []
+  return current.some((entry) => Number(entry) === Number(rate))
+    ? current.filter((entry) => Number(entry) !== Number(rate))
+    : [...current, Number(rate)]
+}
+
+// Un clic bascule un taux entre « disponible » et « en rupture ». Le stock
+// chiffré reste global : seul le taux coché devient non commandable sur le site.
+function NicotineStockToggles({ rates = [], outOfStock = [], onToggle, compact = false }) {
+  if (!rates.length) return null
+  const isOut = (rate) => (outOfStock || []).some((entry) => Number(entry) === Number(rate))
+  return (
+    <div className={compact ? 'mt-2' : '-mt-1'}>
+      {!compact && (
+        <p className="mb-1.5 text-xs font-medium text-white">
+          Taux en rupture <span className="font-normal text-muted">— cliquez un taux pour le passer en rupture ou le remettre en vente</span>
+        </p>
+      )}
+      <div className="flex flex-wrap gap-1">
+        {rates.map((rate) => {
+          const out = isOut(rate)
+          return (
+            <button
+              type="button"
+              key={rate}
+              onClick={() => onToggle(rate)}
+              aria-pressed={out}
+              title={out ? `${rate} mg en rupture — cliquer pour remettre en vente` : `${rate} mg en vente — cliquer pour passer en rupture`}
+              className={`rounded-full border font-semibold transition ${
+                compact ? 'px-1.5 py-0.5 text-[10px]' : 'px-2.5 py-1 text-xs'
+              } ${
+                out
+                  ? 'border-rose-400/50 bg-rose-500/15 text-rose-300 line-through'
+                  : 'border-white/12 text-ash hover:border-white/30'
+              }`}
+            >
+              {rate} mg
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 function parseSpecs(value) {
