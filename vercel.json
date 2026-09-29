@@ -4,7 +4,7 @@
   "crons": [
     {
       "path": "/api/cleanup-checkouts",
-      "schedule": "20 3 * * *"
+      "schedule": "50 7 * * *"
     }
   ],
   "trailingSlash": false,
