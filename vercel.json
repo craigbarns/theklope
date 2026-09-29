@@ -153,11 +153,6 @@
       "permanent": true
     },
     {
-      "source": "/categorie/eliquide",
-      "destination": "/categorie/e-liquides",
-      "permanent": true
-    },
-    {
       "source": "/categorie/e-liquide",
       "destination": "/categorie/e-liquides",
       "permanent": true
