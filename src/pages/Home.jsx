@@ -202,24 +202,26 @@ export default function Home() {
 
       {/* CATÉGORIES MISES EN AVANT */}
       <section className="container-page py-10">
-        <div className="grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-5">
-          {heroCats.map((c) => (
+        <div className="grid gap-3 grid-cols-2 sm:gap-5 lg:grid-cols-5">
+          {heroCats.map((c, index) => (
             <Link
               key={c.slug}
               to={`/categorie/${c.slug}`}
-              className="card-interactive group relative flex min-h-44 flex-col justify-between overflow-hidden p-6"
+              className={`card-interactive group relative flex min-h-36 flex-col justify-between overflow-hidden p-4 sm:min-h-44 sm:p-6 ${
+                index === heroCats.length - 1 && heroCats.length % 2 === 1 ? 'col-span-2 lg:col-span-1' : ''
+              }`}
             >
               <div className="pointer-events-none absolute -right-8 -top-8 h-40 w-40 rounded-full bg-neon/10 blur-2xl transition group-hover:bg-neon/25" />
               <ProductImage
                 src={catThumb(c.key, products)}
                 alt=""
                 loading="lazy"
-                className="relative ml-auto h-24 w-24 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3"
+                className="relative ml-auto h-16 w-16 rounded-2xl object-cover opacity-90 transition-all duration-500 ease-premium group-hover:scale-105 group-hover:rotate-3 sm:h-24 sm:w-24"
                 width={96}
                 height={96}
               />
               <div className="relative mt-4">
-                <h2 className="font-display text-xl font-semibold text-white">{c.name}</h2>
+                <h2 className="font-display text-base font-semibold text-white sm:text-xl">{c.name}</h2>
                 <span className="mt-1 inline-flex items-center gap-1 text-sm text-neon">
                   Explorer <IconArrowRight width={15} height={15} />
                 </span>
@@ -228,6 +230,18 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* SÉLECTION DU CATALOGUE — juste sous les catégories : sur mobile, les
+          produits arrivaient après ~7 écrans de textes d'information. */}
+      {bestSellers.length > 0 && (
+        <ProductRow
+          eyebrow="Catalogue"
+          title="Produits sélectionnés"
+          link="/boutique"
+          products={homeCatalogue}
+          itemListId="home_catalogue"
+        />
+      )}
 
       <section className="container-page py-10">
         <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -250,7 +264,8 @@ export default function Home() {
             <p className="eyebrow mb-3">Local</p>
             <h2 className="font-display text-2xl font-bold text-white">Boutique vape Marseille</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              THEKLOPE est associé à Marseille et sert les clients adultes en France via la boutique en ligne.
+              Boutique physique au 188 rue de Rome (Marseille 6e) : conseils sur place et retrait gratuit
+              de vos commandes en ligne. Livraison partout en France.
             </p>
             <Link to="/boutique-vape-marseille" className="btn-primary mt-5">
               Voir la page Marseille <IconArrowRight width={18} height={18} />
@@ -278,17 +293,6 @@ export default function Home() {
         </div>
         <p className="mt-6 text-center text-sm text-faint">Boutique réservée aux majeurs.</p>
       </section>
-
-      {/* SÉLECTION DU CATALOGUE */}
-      {bestSellers.length > 0 && (
-        <ProductRow
-          eyebrow="Catalogue"
-          title="Produits sélectionnés"
-          link="/boutique"
-          products={homeCatalogue}
-          itemListId="home_catalogue"
-        />
-      )}
 
       {/* BANNIÈRE CONFIGURATEUR PACK SUR MESURE */}
       <section className="container-page py-6">

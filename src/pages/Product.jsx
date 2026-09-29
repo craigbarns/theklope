@@ -509,10 +509,12 @@ export default function Product() {
           ]}
         />
 
-        <div className="mt-6 grid gap-10 lg:grid-cols-2">
-          {/* Galerie */}
+        <div className="mt-6 grid gap-6 lg:grid-cols-2 lg:gap-10">
+          {/* Galerie — sur mobile, hauteur bornée pour que le nom et le prix
+              apparaissent sans défiler : un visiteur qui ne voit pas le prix
+              à l'arrivée repart plus souvent. */}
           <div>
-            <div className="card relative overflow-hidden rounded-3xl p-2 aspect-square flex items-center justify-center">
+            <div className="card relative mx-auto overflow-hidden rounded-3xl p-2 aspect-square max-h-[42vh] lg:max-h-none flex items-center justify-center">
               <div className="absolute left-4 top-4 z-10 flex gap-2">
                 {product.badge && <Badge type={product.badge} />}
               </div>
@@ -526,8 +528,9 @@ export default function Product() {
                 height={600}
               />
             </div>
+            {(product.images || []).length > 1 && (
             <div className="mt-3 flex gap-3">
-              {(product.images || []).map((img, i) => (
+              {product.images.map((img, i) => (
                 <button
                   key={i}
                   onClick={() => setActiveImg(i)}
@@ -539,6 +542,7 @@ export default function Product() {
                 </button>
               ))}
             </div>
+            )}
             {product.nicotine?.length > 1 && (
               <p className="mt-3 text-xs leading-relaxed text-muted">
                 Le visuel du flacon peut présenter un autre dosage. Le taux sélectionné et repris dans votre panier
