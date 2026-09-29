@@ -1,4 +1,5 @@
 import { supportsFlavorVariants } from './productCategory.js'
+import { isVariantOptionOutOfStock, nicotineOutOfStockError } from './variantStock.js'
 
 // `supports` borne les dimensions propres aux produits parfumés (e-liquides,
 // DIY, cartouches pré-remplies, puffs). Le matériel reste exclu : ses saveurs
@@ -89,6 +90,9 @@ function normalizeProductVariant(product = {}, input = {}, { allowIncomplete = f
 
     if (!hasValue(provided)) {
       if (choice.options.length === 1) {
+        if (isVariantOptionOutOfStock(product, key, choice.options[0])) {
+          return { ok: false, variant: {}, outOfStock: key, error: nicotineOutOfStockError(product, choice.options[0]) }
+        }
         variant[key] = choice.options[0]
         continue
       }
@@ -108,6 +112,9 @@ function normalizeProductVariant(product = {}, input = {}, { allowIncomplete = f
         variant: {},
         error: `L'option « ${label} » choisie n'est plus disponible pour ${product.name || 'ce produit'}.`,
       }
+    }
+    if (isVariantOptionOutOfStock(product, key, selected)) {
+      return { ok: false, variant: {}, outOfStock: key, error: nicotineOutOfStockError(product, selected) }
     }
     variant[key] = selected
   }
@@ -137,7 +144,9 @@ export function reconcilePersistedProductVariant(product = {}, input = {}) {
   const sanitized = {}
   for (const { key, options } of getProductVariantChoices(product)) {
     const selected = options.find((option) => comparable(option) === comparable(source[key]))
-    if (selected !== undefined) sanitized[key] = selected
+    // Un taux passé en rupture depuis l'ajout au panier est retiré : le panier
+    // redemande le choix au lieu d'échouer seulement au paiement.
+    if (selected !== undefined && !isVariantOptionOutOfStock(product, key, selected)) sanitized[key] = selected
   }
   const result = resolvePartialProductVariant(product, sanitized)
   const variant = result.ok ? result.variant : {}

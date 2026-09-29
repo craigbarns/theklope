@@ -4,6 +4,13 @@
 // sans jamais faire confiance aux prix envoyés par le navigateur.
 import { supabaseAdmin, hasSupabaseAdmin } from './supabaseAdmin.js'
 import { resolveVolume } from '../../src/lib/pricing.js'
+import {
+  NICOTINE_OUT_OF_STOCK_COLUMN,
+  isMissingColumnError,
+  normalizeNicotineOutOfStock,
+} from '../../src/lib/variantStock.js'
+
+const PRODUCT_COLUMNS = 'id,name,price,image,stock,brand,volume,category,specs,nicotine,flavors,colors,ohm_options'
 
 export function canUseStaticCatalogFallback(env = process.env) {
   const production = env.VERCEL_ENV
@@ -17,10 +24,13 @@ export async function getProductsByIds(ids) {
   if (unique.length === 0) return new Map()
 
   if (hasSupabaseAdmin) {
-    const { data, error } = await supabaseAdmin
-      .from('products')
-      .select('id,name,price,image,stock,brand,volume,category,specs,nicotine,flavors,colors,ohm_options')
-      .in('id', unique)
+    const read = (columns) => supabaseAdmin.from('products').select(columns).in('id', unique)
+    let { data, error } = await read(`${PRODUCT_COLUMNS},${NICOTINE_OUT_OF_STOCK_COLUMN}`)
+    // Migration pas encore exécutée : le paiement ne doit jamais tomber pour
+    // cette colonne. Sans elle, aucun taux n'est simplement marqué en rupture.
+    if (error && isMissingColumnError(error)) {
+      ({ data, error } = await read(PRODUCT_COLUMNS))
+    }
     if (error) throw error
     // Volume dérivé de specs.Contenance si le champ volume est vide (sinon les
     // remises dégressives ne tomberaient jamais côté serveur).
@@ -28,6 +38,7 @@ export async function getProductsByIds(ids) {
       ...p,
       catalogVolume: p.volume ?? null,
       ohmOptions: p.ohm_options || [],
+      nicotineOutOfStock: normalizeNicotineOutOfStock(p.nicotine_out_of_stock, p.nicotine),
       volume: resolveVolume(p),
     }]))
   }
@@ -59,6 +70,7 @@ export async function getProductsByIds(ids) {
       flavors: p.flavors || [],
       colors: p.colors || [],
       ohmOptions: p.ohmOptions || [],
+      nicotineOutOfStock: normalizeNicotineOutOfStock(p.nicotineOutOfStock, p.nicotine),
     })
   }
   return map

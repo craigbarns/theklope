@@ -7,6 +7,7 @@ import ProductImage from './ProductImage.jsx'
 import { useDialogFocus } from '../lib/useDialogFocus.js'
 import { createShopSearchState } from '../lib/searchNavigation.js'
 import { trackSearch, trackSelectItem } from '../lib/analytics.js'
+import { isProductOrderable } from '../lib/variantStock.js'
 
 export default function SearchOverlay() {
   const { searchOpen, setSearchOpen, products, catalogSearchReady } = useStore()
@@ -125,7 +126,7 @@ export default function SearchOverlay() {
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-sm font-bold text-neon block">{formatPrice(p.price)}</span>
-                        {p.stock <= 0 && <span className="text-[10px] text-rose-400">Épuisé</span>}
+                        {!isProductOrderable(p) && <span className="text-[10px] text-rose-400">Épuisé</span>}
                       </div>
                     </button>
                   ))}

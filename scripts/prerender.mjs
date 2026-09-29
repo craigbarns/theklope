@@ -17,6 +17,7 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { loadProducts } from './load-catalog.mjs'
+import { isProductOrderable } from '../src/lib/variantStock.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
@@ -179,7 +180,7 @@ for (const p of PRODUCTS) {
           validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
           priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
           itemCondition: 'https://schema.org/NewCondition',
-          availability: (p.stock > 0) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          availability: isProductOrderable(p) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           seller: { '@type': 'Organization', name: 'THEKLOPE' },
           shippingDetails: {
             '@type': 'OfferShippingDetails',

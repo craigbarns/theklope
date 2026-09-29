@@ -4,6 +4,7 @@ import Badge from './Badge.jsx'
 import ProductImage from './ProductImage.jsx'
 import { IconHeart, IconCart } from './icons.jsx'
 import { productRequiresVariantSelection, resolveProductVariant } from '../lib/cart.js'
+import { isProductOrderable } from '../lib/variantStock.js'
 import { trackSelectItem } from '../lib/analytics.js'
 
 export default function ProductCard({
@@ -14,7 +15,7 @@ export default function ProductCard({
 }) {
   const { addToCart, toggleFavorite, isFavorite } = useStore()
   const fav = isFavorite(product.id)
-  const outOfStock = product.stock <= 0
+  const outOfStock = !isProductOrderable(product)
   const requiresChoice = productRequiresVariantSelection(product)
   const productUrl = `/produit/${product.id}`
   const handleSelect = () => trackSelectItem({

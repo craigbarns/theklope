@@ -20,6 +20,7 @@ import { getPaidOrders } from '../lib/dashboard.js'
 import { normalizeRelatedProductIds, removeProductAndReferences } from '../lib/relatedProducts.js'
 import { readCatalogBootstrap } from '../lib/catalogBootstrap.js'
 import { supportsFlavorVariants } from '../lib/productCategory.js'
+import { isMissingColumnError, NICOTINE_OUT_OF_STOCK_COLUMN, normalizeNicotineOutOfStock } from '../lib/variantStock.js'
 
 const StoreContext = createContext(null)
 const DEFAULT_PRODUCT_IMAGE = '/products/product-placeholder.svg'
@@ -126,6 +127,11 @@ const normalizeProduct = (product) => {
     normalized.nicotine = []
     normalized.flavors = []
   }
+  // Taux cochés « en rupture » dans l'admin, bornés aux taux encore proposés.
+  normalized.nicotineOutOfStock = normalizeNicotineOutOfStock(
+    normalizeArray(product.nicotineOutOfStock).map((n) => toNumber(n)),
+    normalized.nicotine,
+  )
   return enrichProductCopy(normalized)
 }
 
@@ -143,6 +149,7 @@ const productToRow = (product) => ({
   stock: product.stock,
   badge: product.badge,
   nicotine: product.nicotine,
+  nicotine_out_of_stock: product.nicotineOutOfStock || [],
   flavors: product.flavors,
   colors: product.colors,
   short: product.short,
@@ -152,6 +159,24 @@ const productToRow = (product) => ({
   image: product.image,
   related_product_ids: product.relatedProductIds || [],
 })
+
+// Écrit une fiche produit. Si la colonne des taux en rupture n'existe pas encore
+// en base (migration non exécutée), la fiche est réécrite sans elle : le reste
+// de l'admin continue de fonctionner. Seul le fait de cocher un taux en rupture
+// exige la migration, et le message le dit clairement.
+async function writeProductRow(product, write) {
+  const row = productToRow(product)
+  const result = await write(row)
+  if (!result.error || !isMissingColumnError(result.error)) return result
+  if (row[NICOTINE_OUT_OF_STOCK_COLUMN].length > 0) {
+    throw new Error(
+      'Base à mettre à jour avant de marquer un taux en rupture : exécutez '
+      + 'supabase/migrations/202609290001_nicotine_out_of_stock.sql dans Supabase (SQL Editor).',
+    )
+  }
+  const { [NICOTINE_OUT_OF_STOCK_COLUMN]: _omitted, ...legacyRow } = row
+  return write(legacyRow)
+}
 
 const productFromRow = (row) =>
   normalizeProduct({
@@ -168,6 +193,7 @@ const productFromRow = (row) =>
     stock: row.stock,
     badge: row.badge,
     nicotine: row.nicotine,
+    nicotineOutOfStock: row.nicotine_out_of_stock,
     flavors: row.flavors,
     colors: row.colors,
     short: row.short,
@@ -514,13 +540,13 @@ export function StoreProvider({ children }) {
           await refreshRemoteData()
           throw catalogConflictError('Version catalogue manquante. Les données ont été resynchronisées : rouvrez la fiche, vérifiez puis recommencez.')
         }
-        const { data, error } = await sb
+        const { data, error } = await writeProductRow(nextProduct, (row) => sb
           .from('products')
-          .update(productToRow(nextProduct))
+          .update(row)
           .eq('id', requestedId)
           .eq('updated_at', expectedUpdatedAt)
           .select('*')
-          .maybeSingle()
+          .maybeSingle())
         if (error) throw error
         if (!data) {
           await refreshRemoteData()
@@ -528,11 +554,11 @@ export function StoreProvider({ children }) {
         }
         savedRow = data
       } else {
-        const { data, error } = await sb
+        const { data, error } = await writeProductRow(nextProduct, (row) => sb
           .from('products')
-          .insert(productToRow(nextProduct))
+          .insert(row)
           .select('*')
-          .single()
+          .single())
         if (error) throw error
         savedRow = data
       }
