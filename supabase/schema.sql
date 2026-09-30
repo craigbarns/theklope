@@ -99,7 +99,8 @@ create table if not exists public.orders (
   checkout_review_required_at timestamptz,
   checkout_review_reason text,
   checkout_last_reconciled_at timestamptz,
-  google_review_email_sent_at timestamptz
+  google_review_email_sent_at timestamptz,
+  cart_reminder_sent_at timestamptz
 );
 
 -- Pour les bases déjà créées (migration) : ajoute la colonne si absente.
@@ -107,6 +108,7 @@ alter table public.orders add column if not exists payment_id text;
 create index if not exists orders_payment_id_idx on public.orders (payment_id);
 alter table public.orders add column if not exists customer_email text;
 alter table public.orders add column if not exists google_review_email_sent_at timestamptz;
+alter table public.orders add column if not exists cart_reminder_sent_at timestamptz;
 alter table public.orders add column if not exists acquisition jsonb not null default '{}'::jsonb;
 alter table public.orders add column if not exists checkout_idempotency_key text;
 alter table public.orders add column if not exists checkout_payload_hash text;

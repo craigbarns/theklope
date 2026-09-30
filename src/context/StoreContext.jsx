@@ -688,6 +688,23 @@ export function StoreProvider({ children }) {
     return true
   }, [cart, products])
 
+  // Relance de panier abandonné : remet chaque article encore disponible, un
+  // par un (un article épuisé n'empêche pas de retrouver les autres), sans
+  // ouvrir le tiroir panier.
+  const restoreCartItems = useCallback((entries = []) => {
+    let restored = 0
+    let next = cart
+    for (const entry of entries) {
+      const attempt = buildCartAddition({ cart: next, products, entries: [entry] })
+      if (attempt.ok) {
+        next = attempt.cart
+        restored += 1
+      }
+    }
+    if (restored) setCart(next)
+    return { restored, total: entries.length }
+  }, [cart, products])
+
   const addToCart = useCallback(
     (productId, qty = 1, variant = {}, analyticsContext = {}) => (
       addItemsToCart([{ productId, qty, variant }], analyticsContext)
@@ -998,6 +1015,7 @@ export function StoreProvider({ children }) {
     promo,
     applyPromo,
     applyVoucher,
+    restoreCartItems,
     removePromo,
     totals,
     orders,

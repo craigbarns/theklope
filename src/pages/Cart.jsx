@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
@@ -13,6 +13,7 @@ import {
   resolveProductVariant,
 } from '../lib/cart.js'
 import { isVariantOptionOutOfStock } from '../lib/variantStock.js'
+import { decodeCartRestore } from '../lib/cartRestore.js'
 import {
   toAnalyticsItem,
   trackEvent,
@@ -35,6 +36,29 @@ export default function Cart() {
     syncStatus,
     refreshRemoteData,
   } = useStore()
+  const { restoreCartItems, catalogReady: catalogIsReady } = useStore()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [restoreNotice, setRestoreNotice] = useState('')
+  const restoreParam = searchParams.get('reprise')
+  // Lien « Retrouver mon panier » de l'e-mail de relance.
+  useEffect(() => {
+    // Sans Supabase (développement), le catalogue embarqué fait foi.
+    if (!restoreParam || !(catalogIsReady || syncStatus === 'local')) return
+    const entries = decodeCartRestore(restoreParam)
+    const { restored, total } = restoreCartItems(entries)
+    setRestoreNotice(
+      restored === total && total > 0
+        ? 'Votre panier a été retrouvé.'
+        : restored > 0
+          ? `Panier retrouvé : ${restored} article${restored > 1 ? 's' : ''} sur ${total}. Les autres ne sont plus disponibles.`
+          : 'Ces articles ne sont plus disponibles.',
+    )
+    const next = new URLSearchParams(searchParams)
+    next.delete('reprise')
+    setSearchParams(next, { replace: true })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restoreParam, catalogIsReady, syncStatus])
+
   const cartViewTrackedRef = useRef(false)
 
   // Produits associés ou suggestions pertinentes, en stock et absents du panier.
@@ -121,6 +145,7 @@ export default function Cart() {
         <Seo title="Panier" noindex />
         <Breadcrumbs items={[{ label: 'Panier' }]} />
         <div className="mt-10 card grid place-items-center p-10 text-center">
+          {restoreNotice && <p role="status" className="mb-3 text-sm text-amber-200">{restoreNotice}</p>}
           <h1 className="font-display text-2xl font-bold text-white">Votre panier est vide</h1>
           <p className="mt-2 text-muted text-sm">Parcourez la boutique pour trouver votre prochain produit.</p>
           <Link to="/boutique" className="btn-primary mt-6 text-xs px-6 py-2.5">Découvrir la boutique</Link>
@@ -147,6 +172,9 @@ export default function Cart() {
       <Seo title="Panier" noindex />
       <Breadcrumbs items={[{ label: 'Panier' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Votre panier</h1>
+      {restoreNotice && (
+        <p role="status" className="mt-3 rounded-xl border border-neon/25 bg-neon/5 px-4 py-2.5 text-sm text-neon">{restoreNotice}</p>
+      )}
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         {/* Lignes */}
