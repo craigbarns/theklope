@@ -764,6 +764,26 @@ export function StoreProvider({ children }) {
   }, [cart, products])
   const removePromo = useCallback(() => setPromo(null), [])
 
+  // Bon nominatif « prochaine commande » : vérifié par le serveur avec
+  // l'e-mail du client. Le paiement le revérifie de toute façon.
+  const applyVoucher = useCallback(async (code, email) => {
+    const clean = String(code || '').trim().toUpperCase().replace(/\s+/g, '')
+    if (!clean) return { ok: false, message: 'Saisissez votre code.' }
+    try {
+      const response = await fetch('/api/create-payment?action=voucher', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: clean, email }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (!response.ok || !payload.ok) return { ok: false, message: payload.error || 'Code de réduction invalide.' }
+      setPromo({ code: payload.code, type: 'percent', value: payload.percent, kind: 'voucher' })
+      return { ok: true, message: `Code ${payload.code} appliqué : −${payload.percent} %.` }
+    } catch {
+      return { ok: false, message: 'Vérification impossible. Vérifiez votre connexion et réessayez.' }
+    }
+  }, [])
+
   // ----- Totaux -----
   const cartDetailed = useMemo(
     () =>
@@ -785,7 +805,11 @@ export function StoreProvider({ children }) {
       volume: resolveVolume(i.product),
       category: i.product.category,
     }))
-    const t = computeTotals({ lines, promoCode: promo?.code })
+    const t = computeTotals({
+      lines,
+      promoCode: promo?.code,
+      voucher: promo?.kind === 'voucher' ? { code: promo.code, percent: promo.value } : null,
+    })
     return {
       subtotal: t.subtotal,
       discount: t.discount,
@@ -973,6 +997,7 @@ export function StoreProvider({ children }) {
     isFavorite,
     promo,
     applyPromo,
+    applyVoucher,
     removePromo,
     totals,
     orders,

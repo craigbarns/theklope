@@ -11,6 +11,7 @@ import { randomBytes } from 'node:crypto'
 import { computeTotals } from '../src/lib/pricing.js'
 import { getProductsByIds } from './_lib/catalog.js'
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
+import { findUsableVoucher, isVoucherCode } from './_lib/vouchers.js'
 import {
   mollie,
   hasMollie,
@@ -266,6 +267,11 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end()
   if (req.method !== 'POST') return res.status(405).json({ error: 'Méthode non autorisée' })
 
+  // Vérification d'un bon « prochaine commande » avant paiement, pour afficher
+  // la remise au client. Hébergée ici : les 12 fonctions Vercel Hobby sont
+  // prises. Le paiement revérifie toujours le bon lui-même.
+  if (req.query?.action === 'voucher') return checkVoucher(req, res)
+
   if (!hasMollie) {
     return res.status(500).json({ error: `Paiement non configuré côté serveur (${mollieConfigurationError})` })
   }
@@ -442,12 +448,22 @@ export default async function handler(req, res) {
       })
     }
 
+    // Bon nominatif : vérifié en base avec l'e-mail du client, jamais sur la
+    // seule foi du navigateur.
+    let voucher = null
+    if (isVoucherCode(normalizedPromo)) {
+      const check = await findUsableVoucher(supabaseAdmin, normalizedPromo, normalizedCustomer.email)
+      if (!check.ok) return res.status(400).json({ error: check.error })
+      voucher = check.voucher
+    }
+
     // 2. Recalculer les totaux de façon déterministe. BIENVENUE est réservé
     // plus bas dans la même transaction SQL que le stock et la commande.
     const totals = computeTotals({
       lines: lines.map((l) => ({ price: l.price, qty: l.qty, brand: l.brand, volume: l.volume, category: l.category })),
       shippingMethodId,
       promoCode,
+      voucher,
     })
     if (normalizedPromo && !totals.promo) {
       const error = normalizedPromo === 'PACK15'
@@ -540,5 +556,34 @@ export default async function handler(req, res) {
     }
     console.error('create-payment error:', err)
     return res.status(500).json({ error: err.message || 'Erreur serveur paiement.' })
+  }
+}
+
+async function checkVoucher(req, res) {
+  if (!hasSupabaseAdmin) return res.status(503).json({ error: 'Vérification indisponible.' })
+  let body
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {}
+  } catch {
+    return res.status(400).json({ error: 'Corps JSON invalide.' })
+  }
+  const email = String(body.email || '').trim().toLowerCase().slice(0, 180)
+  if (!email.includes('@')) {
+    return res.status(400).json({ error: 'Renseignez d’abord votre adresse e-mail.' })
+  }
+  try {
+    const rateLimit = await enforceRequestRateLimits(req, [
+      { scope: 'voucher_check', limit: 15, windowSeconds: 900 },
+    ])
+    if (!rateLimit.allowed) {
+      res.setHeader('Retry-After', String(rateLimit.retryAfter))
+      return res.status(429).json({ error: 'Trop de tentatives. Réessayez dans quelques minutes.' })
+    }
+    const check = await findUsableVoucher(supabaseAdmin, body.code, email)
+    if (!check.ok) return res.status(400).json({ error: check.error })
+    return res.status(200).json({ ok: true, code: check.voucher.code, percent: check.voucher.percent, expiresAt: check.voucher.expiresAt })
+  } catch (error) {
+    console.error('voucher check error:', error?.message || error)
+    return res.status(503).json({ error: 'Vérification du code momentanément indisponible.' })
   }
 }

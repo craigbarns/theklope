@@ -453,6 +453,7 @@ export default function Checkout() {
             </summary>
             <div className="mt-4 border-t border-white/8 pt-4">
               <OrderSummaryContent
+                voucherEmail={customer.email}
                 cartDetailed={cartDetailed}
                 totals={totals}
                 shippingCost={shippingCost}
@@ -761,6 +762,7 @@ export default function Checkout() {
           <div className="card p-6">
             <h2 className="font-display text-lg font-bold text-white">Votre commande</h2>
             <OrderSummaryContent
+                voucherEmail={customer.email}
               cartDetailed={cartDetailed}
               totals={totals}
               shippingCost={shippingCost}
@@ -802,12 +804,84 @@ export default function Checkout() {
   )
 }
 
+// Code « prochaine commande » reçu dans l'e-mail de confirmation. Nominatif :
+// le serveur le vérifie avec l'e-mail saisi, puis le revérifie au paiement.
+function VoucherField({ email, totals }) {
+  const { promo, applyVoucher, removePromo } = useStore()
+  const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const [open, setOpen] = useState(false)
+  const active = promo?.kind === 'voucher' ? promo : null
+
+  if (active) {
+    const beaten = totals.discountSource === 'auto'
+    return (
+      <div className="mt-4 rounded-xl border border-neon/25 bg-neon/5 px-3 py-2.5 text-xs">
+        <div className="flex items-center justify-between gap-3">
+          <span className="font-semibold text-neon">Code {active.code} · −{active.value} %</span>
+          <button type="button" onClick={() => { removePromo(); setFeedback(null) }} className="text-muted underline hover:text-white">
+            Retirer
+          </button>
+        </div>
+        {beaten && (
+          <p className="mt-1 text-muted">Le tarif quantité est plus avantageux ici : il est appliqué et votre code reste utilisable pour une prochaine commande.</p>
+        )}
+      </div>
+    )
+  }
+
+  if (!open) {
+    return (
+      <button type="button" onClick={() => setOpen(true)} className="mt-4 text-xs text-muted underline hover:text-white">
+        J’ai un code de réduction
+      </button>
+    )
+  }
+
+  const submit = async (event) => {
+    event.preventDefault()
+    if (busy) return
+    if (!String(email || '').includes('@')) {
+      setFeedback({ ok: false, message: 'Renseignez d’abord votre e-mail : le code y est rattaché.' })
+      return
+    }
+    setBusy(true)
+    const result = await applyVoucher(code, email)
+    setFeedback(result)
+    setBusy(false)
+    if (result.ok) setCode('')
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-4">
+      <div className="flex gap-2">
+        <input
+          value={code}
+          onChange={(event) => setCode(event.target.value.toUpperCase())}
+          placeholder="MERCI-XXXXXX"
+          aria-label="Code de réduction"
+          autoComplete="off"
+          className="input min-w-0 flex-1 py-2 text-sm uppercase"
+        />
+        <button type="submit" disabled={busy || !code.trim()} className="btn-ghost shrink-0 px-4 py-2 text-xs disabled:opacity-50">
+          {busy ? '…' : 'Appliquer'}
+        </button>
+      </div>
+      {feedback && (
+        <p role={feedback.ok ? 'status' : 'alert'} className={`mt-1.5 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-300'}`}>{feedback.message}</p>
+      )}
+    </form>
+  )
+}
+
 function OrderSummaryContent({
   cartDetailed,
   totals,
   shippingCost,
   selectedShipping,
   grandTotal,
+  voucherEmail,
   className = '',
 }) {
   return (
@@ -827,12 +901,13 @@ function OrderSummaryContent({
           </div>
         ))}
       </div>
+      <VoucherField email={voucherEmail} totals={totals} />
       <dl className="mt-5 space-y-2.5 border-t border-white/8 pt-5 text-sm">
         <div className="flex justify-between"><dt className="text-muted">Sous-total</dt><dd className="text-white">{formatPrice(totals.subtotal)}</dd></div>
         {totals.discount > 0 && (
           <>
             <div className="flex justify-between">
-              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}</dt>
+              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : totals.appliedPromo?.kind === 'voucher' ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
               <dd className={totals.discountSource === 'auto' ? 'text-white' : 'text-neon'}>
                 - {formatPrice(totals.discount)}
               </dd>

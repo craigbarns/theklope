@@ -11,6 +11,7 @@ import {
 } from './checkout.js'
 import { formatOrderItemLabel } from './orderPresentation.js'
 import { createReviewToken } from './productReviews.js'
+import { consumeOrderVoucher, ensureOrderVoucher, voucherEmailHtml } from './vouchers.js'
 import {
   sendEmail,
   emailLayout,
@@ -43,7 +44,7 @@ export function orderConfirmationFulfillmentHtml(order) {
 export async function retryOrderConfirmationEmails(orderId, client = supabaseAdmin) {
   const { data: order, error: orderError } = await client
     .from('orders')
-    .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason, confirmation_email_sent_at, confirmation_customer_email_sent_at, confirmation_admin_email_sent_at, customer, address, shipping, subtotal, discount, shipping_cost, total, order_items(name, qty, price, variant, line_total)')
+    .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason, confirmation_email_sent_at, confirmation_customer_email_sent_at, confirmation_admin_email_sent_at, customer, customer_email, promo, address, shipping, subtotal, discount, shipping_cost, total, order_items(name, qty, price, variant, line_total)')
     .eq('id', orderId)
     .maybeSingle()
   if (orderError) throw orderError
@@ -80,6 +81,16 @@ export async function retryOrderConfirmationEmails(orderId, client = supabaseAdm
   const itemsTable = `<table style="width:100%;font-size:14px">${rows}</table>${totalsHtml}`
   const { fulfillmentHtml, deliveryInstructionsHtml } = orderConfirmationFulfillmentHtml(order)
 
+  // Bon « prochaine commande » : consommation du bon utilisé, puis génération
+  // du nouveau. Jamais bloquant pour la confirmation (table absente, etc.).
+  await consumeOrderVoucher(order, client).catch((error) => {
+    console.error(`voucher consume failed for ${order.id}:`, error?.message || error)
+  })
+  const voucher = await ensureOrderVoucher(order, client).catch((error) => {
+    console.error(`voucher creation failed for ${order.id}:`, error?.message || error)
+    return null
+  })
+
   const markRecipientSent = async (column) => {
     const { error } = await client
       .from('orders')
@@ -104,7 +115,7 @@ export async function retryOrderConfirmationEmails(orderId, client = supabaseAdm
         subject: `Confirmation de votre commande ${order.id} — THEKLOPE`,
         html: emailLayout({
           title: 'Merci pour votre commande !',
-          bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}${fulfillmentHtml}${deliveryInstructionsHtml}`,
+          bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}${fulfillmentHtml}${deliveryInstructionsHtml}${voucherEmailHtml(voucher)}`,
         }),
       })
       if (!result?.skipped) {
