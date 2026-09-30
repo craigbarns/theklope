@@ -20,6 +20,7 @@ const PAGE_SIZE = 24
 const SUB_CATEGORIES_MAP = {
   'e-liquides': [
     { slug: 'e-liquides', name: 'Tous les e-liquides' },
+    { slug: 'e-liquides-10ml', name: '10 ml' },
     { slug: 'e-liquides-50ml', name: '50 ml' },
     { slug: 'e-liquides-100ml', name: '100 ml' },
     { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },

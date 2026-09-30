@@ -129,6 +129,36 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  'e-liquides-10ml': {
+    seoTitle: 'E-liquides 10 ml prêts à vapoter',
+    metaDescription:
+      'E-liquides en flacon de 10 ml prêts à vapoter, du 0 au 16 mg/ml selon les références. Liquidarom, Alfaliquid, Pulp, Freaks. Vente réservée aux adultes.',
+    h1: 'E-liquides 10 ml prêts à vapoter',
+    intro:
+      'Le flacon de 10 ml est le seul format autorisé à contenir de la nicotine en France. Chaque e-liquide est proposé en plusieurs taux : vous choisissez le vôtre sur la fiche produit, il est repris tel quel dans votre commande.',
+    sections: [
+      {
+        title: 'Quel taux de nicotine choisir ?',
+        text:
+          'Le bon taux dépend de votre consommation, de votre matériel et de votre façon de tirer. Un tirage serré (MTL) sur un pod se vape généralement avec un taux plus élevé qu\'un tirage aérien (DTL). En cas de doute, la boutique du 188 rue de Rome vous conseille.',
+      },
+      {
+        title: '10 ml ou grand format ?',
+        text:
+          'Le 10 ml est prêt à l\'emploi, avec la nicotine déjà dosée. Les grands formats 50 ml et 100 ml sont vendus sans nicotine et se complètent avec des boosters.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Pourquoi les e-liquides nicotinés sont-ils vendus en 10 ml ?',
+        a: 'La réglementation européenne limite à 10 ml la contenance des flacons de recharge contenant de la nicotine.',
+      },
+      {
+        q: 'Le taux choisi est-il bien celui que je reçois ?',
+        a: 'Oui. Le visuel du flacon peut présenter un autre dosage, mais le taux sélectionné sur la fiche et repris dans votre panier fait foi.',
+      },
+    ],
+  },
   'e-liquides-50ml': {
     seoTitle: 'E-liquides 50 ml pas chers à booster',
     metaDescription:

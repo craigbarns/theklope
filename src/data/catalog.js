@@ -7,12 +7,14 @@
 // =============================================================================
 
 import { isEliquidProduct } from '../lib/productCategory.js'
+import { resolveVolume } from '../lib/pricing.js'
 
 export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
   { slug: 'e-liquides', key: 'eliquide', name: 'E-liquides', tagline: 'Saveurs sélectionnées, dosage maîtrisé' },
   { slug: 'e-liquides-sels-de-nicotine', key: 'sels-nicotine', name: 'E-liquides Sels de nicotine', tagline: 'Douceur en gorge et sevrage efficace' },
+  { slug: 'e-liquides-10ml', key: 'eliquide-10ml', name: 'E-liquides 10 ml', tagline: 'Flacons prêts à vapoter, nicotine au choix' },
   { slug: 'e-liquides-50ml', key: 'eliquide-50ml', name: 'E-liquides 50 ml', tagline: 'Grands formats économiques à booster' },
   { slug: 'e-liquides-100ml', key: 'eliquide-100ml', name: 'E-liquides 100 ml', tagline: 'Très grands formats XL' },
   { slug: 'e-liquides-tabac', key: 'eliquide-tabac', name: 'E-liquides Tabac & Classic', tagline: 'Saveurs blondes et riches' },
@@ -97,6 +99,9 @@ export const isClearoTanksProduct = (p = {}) => p.category === 'accessoires-clea
 export const isPyrexProduct = (p = {}) => p.category === 'accessoires-pyrex' || p.type === 'Pyrex' || ((p.category === 'accessoire' || p.type === 'Pyrex') && /\b(pyrex|verre|tube|bulb|remplacement)\b/i.test(normalizedProductText(p)))
 
 export const isAlternativePuffProduct = (p = {}) => {
+  // Un produit classé explicitement « Puffs rechargeables » y figure toujours
+  // (il en était exclu : seules les catégories matériel étaient testées).
+  if (p.category === 'alternative-puff') return true
   if (!['pod', 'ecig', 'pack'].includes(p.category)) return false
   return /\b(pod|rechargeable|kit|starter|xros|wenax|drag|target|dojo|jnr|tornado)\b/i.test(normalizedProductText(p))
 }
@@ -119,15 +124,20 @@ export const isSelsNicotine = (p = {}) => {
   return /\b(sel|sels)\s+de\s+nicotine\b/i.test(normalizedProductText(p)) || p.nicotine?.includes(20)
 }
 
-export const isEliquide50ml = (p = {}) => {
+// Contenance réelle d'abord (champ Volume de l'admin ou « Contenance » des
+// caractéristiques, via resolveVolume) ; le nom ne sert qu'en dernier recours.
+// Filtrer sur le seul nom laissait passer tout produit dont le titre ne cite
+// pas sa contenance.
+const eliquideVolumeMatches = (p, ml) => {
   if (!isEliquidProduct(p)) return false
-  return /\b50\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 50
+  const volume = resolveVolume(p)
+  if (/^\d+(?:\.\d+)?ml$/.test(volume)) return volume === `${ml}ml`
+  return new RegExp(`\\b${ml}\\s*ml\\b`, 'i').test(normalizedProductText(p)) || Number(p.volume) === ml
 }
 
-export const isEliquide100ml = (p = {}) => {
-  if (!isEliquidProduct(p)) return false
-  return /\b100\s*ml\b/i.test(normalizedProductText(p)) || p.volume === 100
-}
+export const isEliquide10ml = (p = {}) => eliquideVolumeMatches(p, 10)
+export const isEliquide50ml = (p = {}) => eliquideVolumeMatches(p, 50)
+export const isEliquide100ml = (p = {}) => eliquideVolumeMatches(p, 100)
 
 export const isEliquideTabac = (p = {}) => {
   if (!isEliquidProduct(p)) return false
@@ -180,6 +190,7 @@ export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'alternative-puff') return isAlternativePuffProduct(product)
   if (categoryKey === 'pack') return isPackProduct(product)
   if (categoryKey === 'sels-nicotine') return isSelsNicotine(product)
+  if (categoryKey === 'eliquide-10ml') return isEliquide10ml(product)
   if (categoryKey === 'eliquide-50ml') return isEliquide50ml(product)
   if (categoryKey === 'eliquide-100ml') return isEliquide100ml(product)
   if (categoryKey === 'eliquide-tabac') return isEliquideTabac(product)

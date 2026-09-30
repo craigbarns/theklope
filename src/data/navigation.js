@@ -5,7 +5,7 @@ export const MAIN_NAV = [
     to: '/categorie/e-liquides',
     label: 'E-liquides',
     children: [
-      { to: '/categorie/e-liquides', label: '10 ml' },
+      { to: '/categorie/e-liquides-10ml', label: '10 ml' },
       { to: '/categorie/e-liquides-50ml', label: '50 ml' },
       { to: '/categorie/e-liquides-100ml', label: '100 ml' },
     ],
