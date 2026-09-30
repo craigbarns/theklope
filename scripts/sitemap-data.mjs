@@ -1,6 +1,7 @@
 import { CATEGORIES } from '../src/data/catalog.js'
 import { BLOG_POSTS } from '../src/data/blog.js'
 import { STATIC_SEO_PAGES } from '../src/data/staticSeoPages.js'
+import { COIL_FAMILIES } from '../src/data/coilCompatibility.js'
 
 const STATIC_ROUTES = [
   { loc: '/', changefreq: 'weekly', priority: '1.0' },
@@ -17,6 +18,8 @@ const STATIC_ROUTES = [
   { loc: '/legal/confidentialite', changefreq: 'monthly', priority: '0.4' },
   { loc: '/legal/retour', changefreq: 'monthly', priority: '0.4' },
   ...Object.keys(STATIC_SEO_PAGES).map((slug) => ({ loc: `/${slug}`, changefreq: 'monthly', priority: '0.7' })),
+  { loc: '/compatibilite', changefreq: 'monthly', priority: '0.7' },
+  ...COIL_FAMILIES.map((family) => ({ loc: `/compatibilite/${family.slug}`, changefreq: 'monthly', priority: '0.7' })),
 ]
 
 const xmlEscape = (value) => String(value)

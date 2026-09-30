@@ -1174,15 +1174,15 @@ export const BLOG_POSTS = [
           'La valeur en ohm influence le tirage, la puissance et le e-liquide recommandé. Elle doit être cohérente avec votre usage et votre matériel.',
       },
       {
-        title: 'Utiliser les fiches produits',
+        title: 'Utiliser nos pages de compatibilité',
         text:
-          'Les fiches THEKLOPE précisent les informations de compatibilité quand elles sont disponibles. En cas de doute, demandez conseil avant commande.',
+          'La rubrique « Compatibilité résistances » (theklope.com/compatibilite) indique, appareil par appareil, la résistance ou la cartouche vérifiée auprès du fabricant : XROS, iTank, Drag S2 et Drag X2, Drag 3, Doric 20, Zeus, Digi Max, Zenith, Nautilus. Les fiches résistances affichent aussi « Compatible avec ». En cas de doute, demandez conseil avant commande.',
       },
     ],
     faq: [
       {
         q: 'Une cartouche XROS va-t-elle sur tous les pods Vaporesso ?',
-        a: 'Non. Il faut vérifier la compatibilité avec la série exacte du pod et la cartouche indiquée par le fabricant.',
+        a: 'Sur tous les pods de la gamme XROS, oui (XROS 2, 3, 4, 5, Mini, Nano, Pro…), selon Vaporesso. Exception : la cartouche 0,4 Ω ne fonctionne que sur les XROS Pro, XROS 4 et plus récents. Elle ne va pas sur les pods Vaporesso d’autres gammes (Luxe, GEN…).',
       },
       {
         q: 'Peut-on utiliser n’importe quelle résistance dans un clearomiseur ?',
