@@ -1,4 +1,5 @@
 import { isEliquidProduct } from '../lib/productCategory.js'
+import { coilFamilyForProduct } from './coilCompatibility.js'
 
 const GENERIC_MARKERS = [
   'un produit de qualite selectionne par theklope',
@@ -197,6 +198,16 @@ export function enrichProductCopy(product) {
   delete base.rating
   delete base.reviews
   base.specs = sanitizeProductSpecs(base.specs)
+  // Résistances et cartouches : à défaut d'une compatibilité saisie, on
+  // affiche celle vérifiée auprès du fabricant (src/data/coilCompatibility.js).
+  const hasCompatibility = Object.keys(base.specs).some((key) => normalize(key) === 'compatibilite')
+  const family = hasCompatibility ? null : coilFamilyForProduct(base)
+  if (family) {
+    // Modèles précis seulement : les mentions génériques (« Autres appareils… »,
+    // « Kits … livrés avec … ») restent sur la page de compatibilité.
+    const models = family.devices.filter((device) => !/^Autres\b|livrés avec/i.test(device))
+    base.specs = { ...base.specs, Compatibilité: models.join(', ') }
+  }
   let short = compact(base.short).replace(/\bPLa marque\b/g, 'La marque')
   let long = compact(base.long).replace(/\bPLa marque\b/g, 'La marque')
 
