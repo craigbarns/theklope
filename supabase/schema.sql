@@ -2043,3 +2043,19 @@ drop policy if exists "Authenticated admins can update orders" on public.orders;
 revoke update on table public.orders from authenticated;
 
 commit;
+
+-- Bons de réduction « prochaine commande » (voir migrations/202610010002_vouchers.sql).
+create table if not exists public.vouchers (
+  code text primary key check (code ~ '^MERCI-[A-HJ-KM-NP-Z2-9]{6}$'),
+  email text not null,
+  percent numeric(4,2) not null check (percent > 0 and percent <= 20),
+  source_order_id text not null unique references public.orders(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null,
+  used_at timestamptz,
+  used_order_id text
+);
+create index if not exists vouchers_email_idx on public.vouchers (lower(email));
+alter table public.vouchers enable row level security;
+revoke all on table public.vouchers from anon, authenticated;
+grant select, insert, update on table public.vouchers to service_role;

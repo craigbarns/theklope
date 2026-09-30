@@ -261,11 +261,22 @@ export function computeBundleProgress(lines = []) {
 //   lines: [{ price, qty, brand, volume, category }]
 //   shippingMethodId: 'relais' | 'poste' | 'coursier' | 'pickup' (optionnel)
 //   promoCode: chaîne (optionnel)
-export function computeTotals({ lines = [], shippingMethodId, promoCode } = {}) {
+// `voucher` : bon nominatif « prochaine commande » déjà vérifié (en base côté
+// serveur, via l'API côté navigateur). Il n'est retenu que s'il correspond au
+// code saisi ; il se comporte ensuite comme un code en pourcentage.
+export const voucherAsPromo = (promoCode, voucher) => {
+  const code = String(promoCode || '').trim().toUpperCase()
+  const percent = Number(voucher?.percent)
+  if (!code || String(voucher?.code || '').toUpperCase() !== code) return null
+  if (!Number.isFinite(percent) || percent <= 0 || percent > 20) return null
+  return { code, type: 'percent', value: percent, kind: 'voucher', label: `Code de réduction −${percent} %` }
+}
+
+export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher } = {}) {
   const subtotalCents = lines.reduce((sum, line) => sum + lineSubtotalCents(line), 0)
   const subtotal = fromCents(subtotalCents)
 
-  const requestedPromo = normalizePromo(promoCode)
+  const requestedPromo = normalizePromo(promoCode) || voucherAsPromo(promoCode, voucher)
   const promo = isPromoEligible(requestedPromo, lines) ? requestedPromo : null
   const method = getShippingMethod(shippingMethodId)
 
