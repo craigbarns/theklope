@@ -37,6 +37,7 @@ const CalculetteDiy = lazyWithRetry(() => import('./pages/CalculetteDiy.jsx'))
 const Blog = lazyWithRetry(() => import('./pages/Blog.jsx'))
 const BlogPost = lazyWithRetry(() => import('./pages/BlogPost.jsx'))
 const StaticSeoPage = lazyWithRetry(() => import('./pages/StaticSeoPage.jsx'))
+const CompatibilityPage = lazyWithRetry(() => import('./pages/CompatibilityPage.jsx'))
 
 function BlogRedirect() {
   const { slug } = useParams()
@@ -117,6 +118,8 @@ export default function App() {
             <Route path="/guides/:slug" element={<BlogPost />} />
             <Route path="/blog" element={<Navigate to="/guides" replace />} />
             <Route path="/blog/:slug" element={<BlogRedirect />} />
+            <Route path="/compatibilite" element={<CompatibilityPage />} />
+            <Route path="/compatibilite/:slug" element={<CompatibilityPage />} />
             <Route path="/boutique-vape-marseille" element={<StaticSeoPage />} />
             <Route path="/cigarette-electronique-marseille" element={<StaticSeoPage />} />
             <Route path="/conformite-vape" element={<StaticSeoPage />} />

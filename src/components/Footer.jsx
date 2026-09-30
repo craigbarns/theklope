@@ -24,6 +24,7 @@ const COLUMNS = [
     title: 'Aide',
     links: [
       { to: '/faq', label: 'FAQ' },
+      { to: '/compatibilite', label: 'Quelle résistance pour mon kit ?' },
       { to: '/contact', label: 'Contact' },
       { to: '/configurateur', label: 'Configurateur' },
       { to: '/calculette-diy', label: 'Calculette DIY & Booster' },

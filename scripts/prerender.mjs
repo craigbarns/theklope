@@ -43,6 +43,7 @@ const PRODUCTS = (await loadProducts()).map((product) => enrichProductCopy({
 const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
+const { COIL_FAMILIES, familyFaq, productsForFamily } = await import(resolve(root, 'src/data/coilCompatibility.js'))
 const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
 const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
 const { buildMerchantSku } = await import(resolve(root, 'src/lib/merchantSku.js'))
@@ -533,6 +534,77 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
     ${sections}
     <ul>${links}</ul>
     ${faq}`
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
+  count++
+}
+
+// ---- Compatibilité résistances / cartouches (/compatibilite) ----
+{
+  const path = '/compatibilite'
+  const title = 'Quelle résistance pour ma cigarette électronique ? Compatibilités | THEKLOPE'
+  const description = 'Trouvez la résistance ou la cartouche compatible avec votre appareil : XROS, iTank, Drag S2, Drag X2, Drag 3, Doric 20, Zeus, Digi Max, Zenith, Nautilus.'
+  const list = COIL_FAMILIES.map((f) => `<li><a href="/compatibilite/${esc(f.slug)}">${esc(f.brand)} ${esc(f.devices.slice(0, 3).join(', '))} : ${esc(f.family)}</a></li>`).join('')
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'WebPage', '@id': abs(path), url: abs(path), name: 'Quelle résistance pour ma cigarette électronique ?', description },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Compatibilité résistances', item: abs(path) },
+        ],
+      },
+    ],
+  }
+  const content = `
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <span>Compatibilité résistances</span></nav>
+    <h1>Quelle résistance pour ma cigarette électronique ?</h1>
+    <p>Choisissez votre appareil : chaque page indique la résistance ou la cartouche compatible, vérifiée auprès du fabricant.</p>
+    <ul>${list}</ul>`
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
+  count++
+}
+
+for (const family of COIL_FAMILIES) {
+  const path = `/compatibilite/${family.slug}`
+  const title = `${family.seoTitle} | THEKLOPE`
+  const description = `${family.answer} Disponibles chez THEKLOPE, retrait 1 h à Marseille.`.slice(0, 300)
+  const faq = familyFaq(family)
+  const items = productsForFamily(family, PRODUCTS)
+  const devices = family.devices.map((d) => `<li>${esc(d)}</li>`).join('')
+  const caveats = family.caveats.map((c) => `<p>${esc(c)}</p>`).join('')
+  const productLinks = items.map((p) => `<li><a href="/produit/${encodeURIComponent(p.id)}">${esc(p.name)}</a> — ${fmtPrice(p.price)}</li>`).join('')
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'WebPage', '@id': abs(path), url: abs(path), name: family.h1, description: family.answer },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Accueil', item: BASE_URL },
+          { '@type': 'ListItem', position: 2, name: 'Compatibilité résistances', item: abs('/compatibilite') },
+          { '@type': 'ListItem', position: 3, name: family.h1, item: abs(path) },
+        ],
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faq.map((item) => ({ '@type': 'Question', name: item.q, acceptedAnswer: { '@type': 'Answer', text: item.a } })),
+      },
+    ],
+  }
+  const content = `
+    <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/compatibilite">Compatibilité résistances</a> › <span>${esc(family.family)}</span></nav>
+    <h1>${esc(family.h1)}</h1>
+    <p>${esc(family.answer)}</p>
+    <h2>Appareils compatibles</h2>
+    <ul>${devices}</ul>
+    ${caveats}
+    <p>${esc(family.usage)}</p>
+    ${productLinks ? `<h2>Les ${esc(family.family)} disponibles</h2><ul>${productLinks}</ul>` : ''}
+    <p><a href="/categorie/${esc(family.categorySlug)}">Voir toutes les résistances et cartouches</a></p>
+    <h2>Questions fréquentes</h2>
+    ${faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}`
   writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
   count++
 }

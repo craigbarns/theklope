@@ -11,6 +11,7 @@ import Badge from '../components/Badge.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import DeliveryOptions from '../components/DeliveryOptions.jsx'
+import { coilFamilyForProduct, compatibilityPath } from '../data/coilCompatibility.js'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
@@ -363,6 +364,7 @@ export default function Product() {
   const productCategoryPath = productCategoryEntry ? `/categorie/${productCategoryEntry.slug}` : '/boutique'
   // Stock global épuisé, ou tous les taux de nicotine cochés « en rupture ».
   const outOfStock = !isProductOrderable(product)
+  const coilFamily = coilFamilyForProduct(product)
   const stockLimitReached = !outOfStock && remainingStock === 0
   const maxQty = remainingStock > 0 ? remainingStock : 1
   const hasNicotine = nicotineOptions.some((n) => Number(n) > 0)
@@ -607,6 +609,17 @@ export default function Product() {
             </p>
 
             <p className="mt-5 text-ash/70">{product.short}</p>
+
+            {coilFamily && (
+              <div className="mt-4 rounded-2xl border border-neon/20 bg-neon/5 p-4 text-sm">
+                <p className="font-semibold text-white">Compatible avec</p>
+                <p className="mt-1 text-ash">{coilFamily.devices.join(' · ')}</p>
+                {coilFamily.caveats[0] && <p className="mt-2 text-xs text-amber-200">{coilFamily.caveats[0]}</p>}
+                <Link to={compatibilityPath(coilFamily)} className="mt-2 inline-block text-xs text-neon hover:underline">
+                  Vérifier la compatibilité de mon appareil →
+                </Link>
+              </div>
+            )}
 
             {/* Variantes */}
             <div ref={variantsRef} className="mt-7 scroll-mt-28 space-y-5">
