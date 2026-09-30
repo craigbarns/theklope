@@ -10,6 +10,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import Badge from '../components/Badge.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
+import DeliveryOptions from '../components/DeliveryOptions.jsx'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
 import { getProductPageState, PRODUCT_PAGE_STATE } from '../lib/pageReadiness.js'
@@ -741,6 +742,8 @@ export default function Product() {
             </p>
 
             {addError && <p role="alert" className="mt-2 text-xs text-rose-300">{addError}</p>}
+
+            {!outOfStock && <DeliveryOptions className="mt-5" />}
 
             {/* Réassurance Premium */}
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
