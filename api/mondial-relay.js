@@ -11,6 +11,12 @@ import {
   searchRelayPoints,
   traceMondialRelayShipment,
 } from './_lib/mondialRelay.js'
+import {
+  ColissimoError,
+  createColissimoLabel,
+  getColissimoConfig,
+  publicColissimoStatus,
+} from './_lib/colissimo.js'
 import { hasSupabaseAdmin, supabaseAdmin } from './_lib/supabaseAdmin.js'
 
 const ACTION_METHODS = {
@@ -19,7 +25,14 @@ const ACTION_METHODS = {
   'relay-points-debug': 'POST',
   tracking: 'POST',
   'create-label': 'POST',
+  // Colissimo partage cette route d'expédition : le plan Vercel Hobby limite le
+  // projet à 12 fonctions et elles sont toutes utilisées.
+  'colissimo-label': 'POST',
 }
+// Bucket Supabase PRIVÉ : les étiquettes portent nom et adresse du client.
+// Seul le service role y accède ; l'admin reçoit un lien signé d'une heure.
+const LABEL_BUCKET = 'shipping-labels'
+const SIGNED_URL_SECONDS = 3600
 const LABEL_STATUSES = new Set(['processing'])
 
 // La recherche de Points Relais est la seule action ouverte au public : le
@@ -61,7 +74,9 @@ export default async function handler(req, res) {
   } else {
     const adminAuth = await authenticateAdminRequest(req)
     if (!adminAuth.ok) return res.status(adminAuth.status).json({ error: adminAuth.error })
-    if (action === 'status') return res.status(200).json(publicMondialRelayStatus())
+    if (action === 'status') {
+      return res.status(200).json({ ...publicMondialRelayStatus(), colissimo: publicColissimoStatus() })
+    }
   }
 
   let body
@@ -101,8 +116,14 @@ export default async function handler(req, res) {
       return res.status(200).json(tracking)
     }
 
+    if (action === 'colissimo-label') return await createColissimoLabelForOrder(body, res)
+
     return await createLabel(body, res)
   } catch (error) {
+    if (error instanceof ColissimoError) {
+      const status = error.code === 'not_configured' ? 503 : error.retryable ? 502 : 400
+      return res.status(status).json({ error: error.message, code: error.code })
+    }
     if (error instanceof MondialRelayError) {
       const status = ['api1_not_configured', 'api2_not_configured'].includes(error.code)
         ? 503
@@ -119,6 +140,7 @@ export default async function handler(req, res) {
       'relay-points-debug': 'Diagnostic Point Relais impossible.',
       tracking: 'Suivi Mondial Relay impossible.',
       'create-label': 'Création de l’étiquette Mondial Relay impossible.',
+      'colissimo-label': 'Création de l’étiquette Colissimo impossible.',
     }
     return res.status(500).json({ error: messages[action] })
   }
@@ -236,4 +258,92 @@ async function createLabel(body, res) {
     labelUrl: label.labelUrl,
     shipping,
   })
+}
+
+async function signedLabelUrl(path) {
+  const { data, error } = await supabaseAdmin.storage.from(LABEL_BUCKET).createSignedUrl(path, SIGNED_URL_SECONDS)
+  if (error) throw error
+  return data?.signedUrl || ''
+}
+
+async function createColissimoLabelForOrder(body, res) {
+  const orderId = String(body.orderId || '').trim()
+  const weightGrams = Math.round(Number(body.weightGrams))
+  if (!orderId) return res.status(400).json({ error: 'orderId manquant.' })
+
+  const { data: order, error: orderError } = await supabaseAdmin
+    .from('orders')
+    .select('id, status, payment_status, checkout_review_required_at, checkout_review_reason, customer, address, shipping')
+    .eq('id', orderId)
+    .maybeSingle()
+  if (orderError) throw orderError
+  if (!order) return res.status(404).json({ error: 'Commande introuvable.' })
+  if (order.payment_status !== 'paid') {
+    return res.status(409).json({ error: 'Seule une commande payée peut recevoir une étiquette.' })
+  }
+  if (order.checkout_review_required_at || order.checkout_review_reason) {
+    return res.status(409).json({ error: 'Cette commande exige une vérification Mollie avant expédition.' })
+  }
+  if (['pickup', 'relais'].includes(order.shipping?.id)) {
+    return res.status(409).json({ error: 'Cette commande n’est pas expédiée en Colissimo.' })
+  }
+
+  // Étiquette déjà créée : on renvoie un nouveau lien, sans recréer de colis.
+  const previous = order.shipping?.colissimo || {}
+  if (previous.parcelNumber) {
+    const labelUrl = previous.labelPath ? await signedLabelUrl(previous.labelPath).catch(() => '') : ''
+    return res.status(200).json({ ok: true, reused: true, parcelNumber: previous.parcelNumber, labelUrl })
+  }
+  if (!LABEL_STATUSES.has(order.status)) {
+    return res.status(409).json({
+      error: `L’étiquette doit être créée pendant la préparation, pas depuis le statut ${order.status}.`,
+    })
+  }
+
+  const label = await createColissimoLabel({ order, weightGrams }, { config: getColissimoConfig() })
+
+  // Le colis existe désormais chez Colissimo : chaque étape suivante doit
+  // préserver le numéro et le PDF, même si le stockage échoue.
+  const labelPath = `colissimo/${order.id}-${label.parcelNumber}.pdf`
+  let storedPath = ''
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(LABEL_BUCKET)
+    .upload(labelPath, label.pdf, { contentType: 'application/pdf', upsert: true })
+  if (uploadError) console.error('colissimo label upload error:', uploadError.message || uploadError)
+  else storedPath = labelPath
+
+  const shipping = {
+    ...(order.shipping || {}),
+    tracking: label.parcelNumber,
+    carrier: 'Colissimo',
+    colissimo: {
+      parcelNumber: label.parcelNumber,
+      labelPath: storedPath,
+      weightGrams,
+      productCode: label.productCode,
+      createdAt: new Date().toISOString(),
+    },
+  }
+  const { data: updated, error: updateError } = await supabaseAdmin
+    .from('orders')
+    .update({ shipping })
+    .eq('id', order.id)
+    .eq('status', order.status)
+    .eq('payment_status', 'paid')
+    .select('id')
+    .maybeSingle()
+
+  const labelUrl = storedPath ? await signedLabelUrl(storedPath).catch(() => '') : ''
+  // Sans lien de stockage, le PDF part directement dans la réponse.
+  const pdfBase64 = labelUrl ? undefined : label.pdf.toString('base64')
+  if (updateError || !updated) {
+    return res.status(409).json({
+      error: 'Étiquette créée, mais la commande n’a pas pu être mise à jour. Notez le numéro affiché et rechargez l’admin.',
+      recoveryRequired: true,
+      parcelNumber: label.parcelNumber,
+      labelUrl,
+      pdfBase64,
+    })
+  }
+  return res.status(200).json({ ok: true, parcelNumber: label.parcelNumber, labelUrl, pdfBase64, shipping })
 }

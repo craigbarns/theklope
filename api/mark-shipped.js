@@ -11,6 +11,7 @@ import { CHECKOUT_ORDER_ID_RE } from './_lib/checkout.js'
 import { sendEmail, emailLayout, escapeHtml, escapeHtmlWithLineBreaks, euro, FROM_CHECKOUT } from './_lib/email.js'
 import { configureSameOriginCors, setNoStore } from './_lib/httpSecurity.js'
 import { formatOrderItemLabel } from './_lib/orderPresentation.js'
+import { COLISSIMO_TRACKING_URL } from './_lib/colissimo.js'
 import { generateOrderReviewLink } from './_lib/orders.js'
 
 export default async function handler(req, res) {
@@ -110,6 +111,9 @@ export default async function handler(req, res) {
         ? `<div style="background:#0f2119;border:1px solid #35FF8A33;border-radius:12px;padding:16px;margin:16px 0">
              <p style="margin:0 0 4px;font-size:12px;color:#9aa0a6">Numéro de suivi${carrier ? ` (${escapeHtml(carrier)})` : ''}</p>
              <p style="margin:0;font-size:18px;font-weight:700;color:#35FF8A;letter-spacing:0.5px">${escapeHtml(tracking)}</p>
+             ${/colissimo|la poste/i.test(carrier)
+               ? `<p style="margin:10px 0 0"><a href="${escapeHtml(COLISSIMO_TRACKING_URL + encodeURIComponent(tracking))}" style="color:#35FF8A;font-size:13px;font-weight:600;text-decoration:none">Suivre mon colis sur laposte.fr →</a></p>`
+               : ''}
            </div>`
         : ''
       const deliveryInstructions = typeof address.deliveryInstructions === 'string' ? address.deliveryInstructions.trim() : ''

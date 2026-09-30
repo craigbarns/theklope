@@ -994,12 +994,21 @@ function OrdersPanel({
                 && order.shipping?.id !== 'pickup'
                 && !order.checkoutReviewRequiredAt
                 && ['processing', 'shipped'].includes(order.status) && (
-                <MondialRelayControl
-                  order={order}
-                  adminSession={adminSession}
-                  refreshRemoteData={refreshRemoteData}
-                  status={mondialRelayStatus}
-                />
+                order.shipping?.id === 'poste' ? (
+                  <ColissimoControl
+                    order={order}
+                    adminSession={adminSession}
+                    refreshRemoteData={refreshRemoteData}
+                    status={mondialRelayStatus?.colissimo}
+                  />
+                ) : (
+                  <MondialRelayControl
+                    order={order}
+                    adminSession={adminSession}
+                    refreshRemoteData={refreshRemoteData}
+                    status={mondialRelayStatus}
+                  />
+                )
               )}
 
               {order.paymentStatus === 'paid'
@@ -1112,6 +1121,129 @@ function CancelOrderControl({ order, cancelOrder }) {
         <p role="status" className={`mt-3 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-300'}`}>
           {feedback.message}
         </p>
+      )}
+    </div>
+  )
+}
+
+// Étiquette Colissimo (commandes « La Poste Colissimo ») : un clic crée le
+// colis chez Colissimo, enregistre le numéro de suivi et ouvre le PDF 10 × 15.
+function ColissimoControl({ order, adminSession, refreshRemoteData, status }) {
+  const saved = order.shipping?.colissimo || {}
+  const [weightGrams, setWeightGrams] = useState(saved.weightGrams || 250)
+  const [busy, setBusy] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const [labelUrl, setLabelUrl] = useState('')
+  const parcelNumber = saved.parcelNumber || ''
+  const configured = Boolean(status?.configured)
+
+  const openPdf = (payload) => {
+    if (payload.labelUrl) {
+      setLabelUrl(payload.labelUrl)
+      window.open(payload.labelUrl, '_blank', 'noopener')
+      return
+    }
+    if (payload.pdfBase64) {
+      const bytes = Uint8Array.from(atob(payload.pdfBase64), (char) => char.charCodeAt(0))
+      const url = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }))
+      setLabelUrl(url)
+      window.open(url, '_blank', 'noopener')
+    }
+  }
+
+  const call = async () => {
+    if (busy) return
+    if (!parcelNumber && !window.confirm(
+      `Créer un vrai colis Colissimo pour ${order.customer?.name || 'ce client'} (${weightGrams} g) ? Il sera facturé par La Poste une fois déposé.`,
+    )) return
+    setBusy(true)
+    setFeedback(null)
+    try {
+      const response = await fetch('/api/mondial-relay?action=colissimo-label', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminSession.access_token}` },
+        body: JSON.stringify({ orderId: order.id, weightGrams: Number(weightGrams) }),
+      })
+      const payload = await response.json().catch(() => ({}))
+      if (payload.parcelNumber) openPdf(payload)
+      if (!response.ok || payload.error) throw new Error(payload.error || 'Étiquette Colissimo impossible.')
+      setFeedback({
+        ok: true,
+        message: payload.reused
+          ? 'Étiquette existante rouverte, aucun nouveau colis créé.'
+          : `Colis ${payload.parcelNumber} créé. Le numéro de suivi est enregistré : passez la commande en « Expédiée » pour prévenir le client.`,
+      })
+      await refreshRemoteData()
+    } catch (error) {
+      setFeedback({ ok: false, message: error.message })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-xl border border-amber-300/25 bg-amber-400/5 p-4">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-white">Colissimo</p>
+          <p className="mt-1 text-xs text-muted">
+            {saved.productCode === 'DOS' || status?.productCode === 'DOS' ? 'Domicile avec signature' : 'Domicile sans signature'} · étiquette PDF 10 × 15
+          </p>
+        </div>
+        <span className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide ${configured ? 'border-neon/30 text-neon' : 'border-amber-300/30 text-amber-200'}`}>
+          {configured ? 'Connecté' : 'À configurer'}
+        </span>
+      </div>
+
+      {parcelNumber ? (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-neon/20 bg-neon/5 p-3">
+          <div>
+            <p className="text-sm font-semibold text-white">Colis {parcelNumber}</p>
+            <a
+              href={`https://www.laposte.fr/outils/suivre-vos-envois?code=${encodeURIComponent(parcelNumber)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="text-xs text-neon hover:underline"
+            >
+              Suivi laposte.fr
+            </a>
+          </div>
+          <button type="button" onClick={call} disabled={busy} className="btn-primary shrink-0 disabled:opacity-50">
+            {busy ? 'Ouverture…' : 'Télécharger l’étiquette'}
+          </button>
+        </div>
+      ) : order.status === 'processing' ? (
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <label className="block">
+            <span className="mb-1.5 block text-xs font-medium text-muted">Poids du colis (g)</span>
+            <input
+              type="number"
+              min="10"
+              max="30000"
+              step="10"
+              value={weightGrams}
+              onChange={(event) => setWeightGrams(event.target.value)}
+              className="input w-32"
+            />
+          </label>
+          <button type="button" onClick={call} disabled={busy || !configured} className="btn-primary disabled:opacity-50">
+            {busy ? 'Création…' : 'Créer l’étiquette Colissimo'}
+          </button>
+        </div>
+      ) : null}
+
+      {!configured && !parcelNumber && (
+        <p className="mt-2 text-xs text-amber-200">
+          Ajoutez COLISSIMO_CONTRACT_NUMBER et COLISSIMO_PASSWORD dans Vercel (Settings → Environment Variables), puis redéployez.
+        </p>
+      )}
+      {labelUrl && (
+        <p className="mt-2 text-xs text-muted">
+          Le PDF ne s’est pas ouvert ? <a href={labelUrl} target="_blank" rel="noreferrer" className="text-neon hover:underline">Ouvrir l’étiquette</a>
+        </p>
+      )}
+      {feedback && (
+        <p role={feedback.ok ? 'status' : 'alert'} className={`mt-2 text-xs ${feedback.ok ? 'text-neon' : 'text-rose-300'}`}>{feedback.message}</p>
       )}
     </div>
   )
