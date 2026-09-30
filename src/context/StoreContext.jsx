@@ -794,8 +794,19 @@ export function StoreProvider({ children }) {
       })
       const payload = await response.json().catch(() => ({}))
       if (!response.ok || !payload.ok) return { ok: false, message: payload.error || 'Code de réduction invalide.' }
-      setPromo({ code: payload.code, type: 'percent', value: payload.percent, kind: 'voucher' })
-      return { ok: true, message: `Code ${payload.code} appliqué : −${payload.percent} %.` }
+      const isAmount = payload.amount != null
+      setPromo({
+        code: payload.code,
+        type: isAmount ? 'amount' : 'percent',
+        value: isAmount ? payload.amount : payload.percent,
+        kind: payload.kind === 'referral' ? 'referral' : 'voucher',
+        minSubtotal: payload.minSubtotal || 0,
+      })
+      const value = isAmount ? `−${payload.amount} €` : `−${payload.percent} %`
+      return {
+        ok: true,
+        message: `Code ${payload.code} appliqué : ${value}${payload.minSubtotal ? ` (dès ${payload.minSubtotal} € d’achat)` : ''}.`,
+      }
     } catch {
       return { ok: false, message: 'Vérification impossible. Vérifiez votre connexion et réessayez.' }
     }
@@ -825,7 +836,14 @@ export function StoreProvider({ children }) {
     const t = computeTotals({
       lines,
       promoCode: promo?.code,
-      voucher: promo?.kind === 'voucher' ? { code: promo.code, percent: promo.value } : null,
+      voucher: ['voucher', 'referral'].includes(promo?.kind)
+        ? {
+          code: promo.code,
+          kind: promo.kind,
+          ...(promo.type === 'amount' ? { amount: promo.value } : { percent: promo.value }),
+          minSubtotal: promo.minSubtotal || 0,
+        }
+        : null,
     })
     return {
       subtotal: t.subtotal,
@@ -842,8 +860,10 @@ export function StoreProvider({ children }) {
   }, [cartDetailed, promo])
 
   useEffect(() => {
-    if (totals.promoRejected) setPromo(null)
-  }, [totals.promoRejected])
+    // Un bon ou un parrainage sous son minimum d'achat reste enregistré : il
+    // s'appliquera dès que le panier l'atteint.
+    if (totals.promoRejected && !['voucher', 'referral'].includes(promo?.kind)) setPromo(null)
+  }, [totals.promoRejected, promo?.kind])
 
   const cartCount = cart.reduce((s, i) => s + i.qty, 0)
 

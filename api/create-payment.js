@@ -11,7 +11,7 @@ import { randomBytes } from 'node:crypto'
 import { computeTotals } from '../src/lib/pricing.js'
 import { getProductsByIds } from './_lib/catalog.js'
 import { supabaseAdmin, hasSupabaseAdmin } from './_lib/supabaseAdmin.js'
-import { findUsableVoucher, isVoucherCode } from './_lib/vouchers.js'
+import { findUsableVoucher, isAnyDiscountCode } from './_lib/vouchers.js'
 import {
   mollie,
   hasMollie,
@@ -451,7 +451,7 @@ export default async function handler(req, res) {
     // Bon nominatif : vérifié en base avec l'e-mail du client, jamais sur la
     // seule foi du navigateur.
     let voucher = null
-    if (isVoucherCode(normalizedPromo)) {
+    if (isAnyDiscountCode(normalizedPromo)) {
       const check = await findUsableVoucher(supabaseAdmin, normalizedPromo, normalizedCustomer.email)
       if (!check.ok) return res.status(400).json({ error: check.error })
       voucher = check.voucher
@@ -468,7 +468,9 @@ export default async function handler(req, res) {
     if (normalizedPromo && !totals.promo) {
       const error = normalizedPromo === 'PACK15'
         ? 'Le code PACK15 nécessite un appareil, un accessoire et un e-liquide.'
-        : 'Code promo invalide.'
+        : voucher?.minSubtotal
+          ? `Ce code s’applique dès ${voucher.minSubtotal} € d’achat.`
+          : 'Code promo invalide.'
       return res.status(400).json({ error })
     }
     if (totals.total <= 0) return res.status(400).json({ error: 'Montant de commande invalide.' })
@@ -581,7 +583,7 @@ async function checkVoucher(req, res) {
     }
     const check = await findUsableVoucher(supabaseAdmin, body.code, email)
     if (!check.ok) return res.status(400).json({ error: check.error })
-    return res.status(200).json({ ok: true, code: check.voucher.code, percent: check.voucher.percent, expiresAt: check.voucher.expiresAt })
+    return res.status(200).json({ ok: true, ...check.voucher })
   } catch (error) {
     console.error('voucher check error:', error?.message || error)
     return res.status(503).json({ error: 'Vérification du code momentanément indisponible.' })

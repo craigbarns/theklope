@@ -290,7 +290,9 @@ export default function Checkout() {
           variant: item.variant,
         })),
         shippingMethodId: shipping,
-        promoCode: promo?.code || null,
+        // Un bon non appliqué (tarif quantité plus avantageux, minimum non
+        // atteint) n'est pas envoyé : il reste utilisable plus tard.
+        promoCode: ['voucher', 'referral'].includes(promo?.kind) ? (totals.appliedPromo?.code || null) : (promo?.code || null),
         customer: {
           name: `${customer.firstName} ${customer.lastName}`.trim(),
           email: customer.email,
@@ -812,18 +814,22 @@ function VoucherField({ email, totals }) {
   const [busy, setBusy] = useState(false)
   const [feedback, setFeedback] = useState(null)
   const [open, setOpen] = useState(false)
-  const active = promo?.kind === 'voucher' ? promo : null
+  const active = ['voucher', 'referral'].includes(promo?.kind) ? promo : null
 
   if (active) {
-    const beaten = totals.discountSource === 'auto'
+    const belowMinimum = active.minSubtotal && totals.subtotal < active.minSubtotal
+    const beaten = !belowMinimum && totals.discountSource === 'auto'
     return (
       <div className="mt-4 rounded-xl border border-neon/25 bg-neon/5 px-3 py-2.5 text-xs">
         <div className="flex items-center justify-between gap-3">
-          <span className="font-semibold text-neon">Code {active.code} · −{active.value} %</span>
+          <span className="font-semibold text-neon">Code {active.code} · −{active.value}{active.type === 'amount' ? ' €' : ' %'}</span>
           <button type="button" onClick={() => { removePromo(); setFeedback(null) }} className="text-muted underline hover:text-white">
             Retirer
           </button>
         </div>
+        {belowMinimum && (
+          <p className="mt-1 text-amber-200">Ce code s’applique dès {active.minSubtotal} € d’achat.</p>
+        )}
         {beaten && (
           <p className="mt-1 text-muted">Le tarif quantité est plus avantageux ici : il est appliqué et votre code reste utilisable pour une prochaine commande.</p>
         )}
@@ -859,7 +865,7 @@ function VoucherField({ email, totals }) {
         <input
           value={code}
           onChange={(event) => setCode(event.target.value.toUpperCase())}
-          placeholder="MERCI-XXXXXX"
+          placeholder="MERCI-, FIDEL-, AMI-…"
           aria-label="Code de réduction"
           autoComplete="off"
           className="input min-w-0 flex-1 py-2 text-sm uppercase"
@@ -907,7 +913,7 @@ function OrderSummaryContent({
         {totals.discount > 0 && (
           <>
             <div className="flex justify-between">
-              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : totals.appliedPromo?.kind === 'voucher' ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
+              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : ['voucher', 'referral'].includes(totals.appliedPromo?.kind) ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
               <dd className={totals.discountSource === 'auto' ? 'text-white' : 'text-neon'}>
                 - {formatPrice(totals.discount)}
               </dd>

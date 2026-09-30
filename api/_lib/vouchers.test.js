@@ -86,7 +86,7 @@ test('vérification : nominatif, usage unique, date limite', async () => {
     { code: 'MERCI-PASTXX', email: 'marie@exemple.fr', percent: 5, expires_at: '2026-09-30T10:00:00Z', used_at: null },
   ])
   const ok = await findUsableVoucher(client, ' merci-abcdef ', 'MARIE@exemple.fr', { now: NOW })
-  assert.deepEqual(ok, { ok: true, voucher: { code: 'MERCI-ABCDEF', percent: 5, expiresAt: '2026-11-30T10:00:00Z' } })
+  assert.deepEqual(ok, { ok: true, voucher: { code: 'MERCI-ABCDEF', kind: 'voucher', percent: 5, expiresAt: '2026-11-30T10:00:00Z' } })
   assert.match((await findUsableVoucher(client, 'MERCI-ABCDEF', 'autre@exemple.fr', { now: NOW })).error, /invalide/)
   assert.match((await findUsableVoucher(client, 'MERCI-USEDXX', 'marie@exemple.fr', { now: NOW })).error, /déjà été utilisé/)
   assert.match((await findUsableVoucher(client, 'MERCI-PASTXX', 'marie@exemple.fr', { now: NOW })).error, /expiré/)

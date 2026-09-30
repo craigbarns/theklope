@@ -11,7 +11,16 @@ import {
 } from './checkout.js'
 import { formatOrderItemLabel } from './orderPresentation.js'
 import { createReviewToken } from './productReviews.js'
-import { consumeOrderVoucher, ensureOrderVoucher, voucherEmailHtml } from './vouchers.js'
+import {
+  consumeOrderVoucher,
+  ensureLoyaltyVoucher,
+  ensureOrderVoucher,
+  ensureReferralCode,
+  ensureReferralReward,
+  loyaltyEmailHtml,
+  referralRewardEmailHtml,
+  voucherEmailHtml,
+} from './vouchers.js'
 import {
   sendEmail,
   emailLayout,
@@ -90,6 +99,30 @@ export async function retryOrderConfirmationEmails(orderId, client = supabaseAdm
     console.error(`voucher creation failed for ${order.id}:`, error?.message || error)
     return null
   })
+  // Carte fidélité (1 € = 1 point, 100 points = bon de 5 €) et code de
+  // parrainage personnel. Jamais bloquants.
+  const loyalty = await ensureLoyaltyVoucher(order, client).catch((error) => {
+    console.error(`loyalty failed for ${order.id}:`, error?.message || error)
+    return null
+  })
+  const referralCode = await ensureReferralCode(client, order.customer_email || customer.email).catch((error) => {
+    console.error(`referral code failed for ${order.id}:`, error?.message || error)
+    return null
+  })
+  // Filleul : sa commande payée récompense son parrain (e-mail séparé).
+  const reward = await ensureReferralReward(order, client).catch((error) => {
+    console.error(`referral reward failed for ${order.id}:`, error?.message || error)
+    return null
+  })
+  if (reward?.voucher?.code && reward.email) {
+    await sendEmail({
+      from: FROM_CHECKOUT,
+      to: reward.email,
+      idempotencyKey: `referral-reward/${order.id}`,
+      subject: 'Votre bon de parrainage THEKLOPE',
+      html: referralRewardEmailHtml(reward.voucher),
+    }).catch((error) => console.error(`referral reward email failed for ${order.id}:`, error?.message || error))
+  }
 
   const markRecipientSent = async (column) => {
     const { error } = await client
@@ -115,7 +148,7 @@ export async function retryOrderConfirmationEmails(orderId, client = supabaseAdm
         subject: `Confirmation de votre commande ${order.id} — THEKLOPE`,
         html: emailLayout({
           title: 'Merci pour votre commande !',
-          bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}${fulfillmentHtml}${deliveryInstructionsHtml}${voucherEmailHtml(voucher)}`,
+          bodyHtml: `<p style="font-size:14px;line-height:1.6;color:#cfcfcf">Bonjour ${escapeHtml(customer.name || '')},<br>Votre commande <strong style="color:#35FF8A">${escapeHtml(order.id)}</strong> a bien été payée et confirmée. Nous la préparons.</p>${itemsTable}${fulfillmentHtml}${deliveryInstructionsHtml}${voucherEmailHtml(voucher)}${loyaltyEmailHtml({ loyalty, referralCode })}`,
         }),
       })
       if (!result?.skipped) {
