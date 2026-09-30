@@ -145,3 +145,15 @@ test('la marque maison n’est jamais répétée dans le titre ni la description
   assert.equal(buildProductSeoTitle(product), 'Acheter MANGUE ABRICOT | THEKLOPE')
   assert.doesNotMatch(buildProductSeoDescription(product), /THEKLOPE/)
 })
+
+test('résistance sans compatibilité saisie : compatibilité vérifiée fabricant, modèles précis', () => {
+  const product = enrichProductCopy({
+    id: 'pnpx', name: 'Pnp X Voopoo Pack De 5', brand: 'Voopoo', category: 'accessoire',
+    specs: { Compatibilité: 'Standard universel' }, short: '', long: '',
+  })
+  assert.equal(product.specs.Compatibilité, 'Drag S2, Drag X2, Argus Pro 2')
+  assert.match(product.short, /compatible Drag S2, Drag X2, Argus Pro 2/)
+  // Une compatibilité saisie à la main n'est jamais écrasée.
+  const manual = enrichProductCopy({ id: 'x', name: 'Pnp X Voopoo', category: 'accessoire', specs: { Compatibilité: 'Drag S2' } })
+  assert.equal(manual.specs.Compatibilité, 'Drag S2')
+})
