@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { createPortal } from 'react-dom'
+import { useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
 import { CATEGORIES, BADGES, isResistanceProduct } from '../data/catalog.js'
 import { supportsFlavorVariants } from '../lib/productCategory.js'
@@ -23,7 +24,6 @@ import {
   IconClose,
   IconPlus,
   IconSearch,
-  IconShield,
   IconTrash,
   IconUser,
 } from '../components/icons.jsx'
@@ -154,6 +154,10 @@ export default function Admin() {
     return () => controller.abort()
   }, [adminSession?.access_token])
 
+  const ordersToPrepare = orders.filter((order) => (
+    order.checkoutReviewRequiredAt || ['processing', 'stock_issue', 'refund_failed'].includes(order.status)
+  )).length
+
   const filteredProducts = useMemo(() => {
     const term = query.trim().toLowerCase()
     if (!term) return products
@@ -184,64 +188,57 @@ export default function Admin() {
   }
 
   return (
-    <div className="container-page py-8">
+    <div className="container-page py-5">
       <Seo title="Admin" description="Dashboard THEKLOPE." noindex />
 
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon via-anthracite to-noir p-6 shadow-card sm:p-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <span className="chip border-neon/30 text-neon">
-              <IconShield width={14} height={14} /> Espace admin
-            </span>
-            <h1 className="mt-5 font-display text-3xl font-bold text-white sm:text-5xl">Pilotage THEKLOPE</h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
-              Gérez le catalogue, suivez les commandes, surveillez le stock et gardez une vision claire des ventes.
-            </p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <button onClick={refreshRemoteData} className="btn-ghost shrink-0">
-              Synchroniser
-            </button>
-            {supabaseEnabled && (
-              <button onClick={signOutAdmin} className="btn-ghost shrink-0">
-                Déconnexion
-              </button>
-            )}
-            <Link to="/boutique" className="btn-ghost shrink-0">
-              Voir la boutique <IconArrowRight width={18} height={18} />
-            </Link>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="font-display text-2xl font-bold text-white">Admin</h1>
+          <p className="truncate text-xs text-faint">
+            {supabaseEnabled ? 'Supabase' : 'Local'} · <span className={syncStatus === 'online' ? 'text-neon' : 'text-amber-200'}>{syncStatus}</span>
+            {adminUser ? ` · ${adminUser.email}` : ''}
+          </p>
         </div>
-
-        <div className="mt-6 flex flex-col gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between">
-          <span className="text-muted">
-            Source: <strong className="text-white">{supabaseEnabled ? 'Supabase' : 'Local'}</strong> · statut: <strong className="text-neon">{syncStatus}</strong>
-          </span>
-          {adminUser && <span className="text-faint">{adminUser.email}</span>}
-        </div>
-
-        {(syncError || actionError) && (
-          <div className="mt-3 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
-            {actionError || syncError}
-          </div>
-        )}
-
-        <div className="mt-8 flex gap-2 overflow-x-auto pb-1">
-          {TABS.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setTab(item.id)}
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition ${
-                tab === item.id
-                  ? 'border-neon bg-neon text-noir'
-                  : 'border-white/10 bg-white/[0.03] text-muted hover:border-white/30 hover:text-white'
-              }`}
-            >
-              {item.label}
+        <div className="flex gap-2">
+          <button onClick={refreshRemoteData} className="btn-ghost min-h-0 px-4 py-2 text-xs">
+            Synchroniser
+          </button>
+          {supabaseEnabled && (
+            <button onClick={signOutAdmin} className="btn-ghost min-h-0 px-4 py-2 text-xs">
+              Déconnexion
             </button>
-          ))}
+          )}
         </div>
       </div>
+
+      {(syncError || actionError) && (
+        <div role="alert" className="mt-3 rounded-2xl border border-rose-400/25 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {actionError || syncError}
+        </div>
+      )}
+
+      {/* Onglets toujours visibles sous l'en-tête. */}
+      <nav className="sticky top-14 z-30 -mx-4 mt-4 border-b border-white/10 bg-noir/95 px-4 py-2 backdrop-blur-xl sm:mx-0 sm:rounded-2xl sm:border">
+        <div className="flex gap-2 overflow-x-auto">
+          {TABS.map((item) => {
+            const badge = item.id === 'orders' ? ordersToPrepare : 0
+            return (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                  tab === item.id ? 'bg-neon text-noir' : 'text-muted hover:bg-white/5 hover:text-white'
+                }`}
+              >
+                {item.label}
+                {badge > 0 && (
+                  <span className={`rounded-full px-1.5 text-xs font-bold ${tab === item.id ? 'bg-noir/15' : 'bg-amber-400 text-noir'}`}>{badge}</span>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </nav>
 
       {tab === 'overview' && <Overview dashboard={dashboard} orders={orders} products={products} />}
       {tab === 'products' && (
@@ -503,130 +500,188 @@ function Overview({ dashboard, orders, products }) {
   )
 }
 
+const DESKTOP_QUERY = '(min-width: 1280px)'
+function useIsDesktop() {
+  const [matches, setMatches] = useState(() => (
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia(DESKTOP_QUERY).matches
+  ))
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined
+    const media = window.matchMedia(DESKTOP_QUERY)
+    const update = () => setMatches(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
+  return matches
+}
+
+const PRODUCTS_PAGE = 40
+const STOCK_FILTERS = [
+  { id: 'all', label: 'Tous' },
+  { id: 'low', label: 'Stock bas', match: (p) => p.stock > 0 && p.stock <= 10 },
+  { id: 'out', label: 'Rupture', match: (p) => p.stock <= 0 || (p.nicotineOutOfStock || []).length > 0 },
+]
+
 function ProductsPanel({ products, allProducts, catalogMeta, editing, query, setEditing, setQuery, onDelete, onSave }) {
+  const [category, setCategory] = useState('')
+  const [stockFilter, setStockFilter] = useState('all')
+  const [visible, setVisible] = useState(PRODUCTS_PAGE)
+  const stockRule = STOCK_FILTERS.find((entry) => entry.id === stockFilter)
+  const filtered = products.filter((product) => (
+    (!category || product.category === category) && (!stockRule?.match || stockRule.match(product))
+  ))
+  const shown = filtered.slice(0, visible)
+  const usedCategories = PRODUCT_CATEGORIES.filter((entry) => allProducts.some((product) => product.category === entry.key))
+  const resetPaging = () => setVisible(PRODUCTS_PAGE)
+  const isDesktop = useIsDesktop()
+  const editor = (
+    <ProductEditor
+      key={editing?.id || 'new-product'}
+      product={editing}
+      catalogMeta={catalogMeta}
+      products={allProducts}
+      onCancel={() => setEditing(null)}
+      onSave={onSave}
+    />
+  )
+
+  // Sur téléphone et tablette, la fiche s'ouvre en plein écran : elle
+  // s'affichait auparavant sous les 300 produits, hors de vue.
+  useEffect(() => {
+    if (!editing || isDesktop) return undefined
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = previous }
+  }, [editing, isDesktop])
+
   return (
-    <div className="mt-8 grid gap-6 xl:grid-cols-[1fr_440px]">
-      <section className="card min-w-0 p-5 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="eyebrow mb-2">Catalogue</p>
-            <h2 className="font-display text-xl font-bold text-white">{allProducts.length} produits</h2>
-          </div>
-          <div className="flex gap-3">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Rechercher..."
-              className="input min-w-0 sm:w-64"
-            />
-            <button onClick={() => setEditing(emptyProduct)} className="btn-primary shrink-0 px-5">
-              <IconPlus width={18} height={18} /> Nouveau
-            </button>
-          </div>
+    <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_440px]">
+      <section className="card min-w-0 p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-xl font-bold text-white">
+            Produits <span className="text-base font-medium text-muted">({filtered.length}{filtered.length !== allProducts.length ? ` / ${allProducts.length}` : ''})</span>
+          </h2>
+          <button onClick={() => setEditing(emptyProduct)} className="btn-primary shrink-0 px-5">
+            <IconPlus width={18} height={18} /> Nouveau
+          </button>
         </div>
 
-        <div className="mt-6 overflow-x-auto">
-          <table className="w-full min-w-[760px] text-left text-sm">
-            <thead className="border-b border-white/10 text-xs uppercase text-faint">
-              <tr>
-                <th className="py-3 pr-4">Produit</th>
-                <th className="px-4 py-3">Type</th>
-                <th className="px-4 py-3">Prix</th>
-                <th className="px-4 py-3">Stock</th>
-                <th className="px-4 py-3">Badge</th>
-                <th className="py-3 pl-4 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-white/8">
-              {products.map((product) => (
-                <tr key={product.id} className="align-middle">
-                  <td className="py-4 pr-4">
-                    <div className="flex items-center gap-3">
-                      <img src={product.image} alt="" className="h-12 w-12 rounded-xl object-cover" />
-                      <div className="min-w-0">
-                        <p className="truncate font-medium text-white">{product.name}</p>
-                        <p className="text-xs text-faint">{product.brand} · {product.id}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-muted">
-                    <div>
-                      <span>{product.type}</span>
-                      {(['resistance', 'cartouches', 'cartouches-xros'].includes(product.category) ||
-                        /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(product.name || '')) && (
-                        <div className="mt-1 flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => onSave({ ...toFormProduct(product), category: 'resistance', type: 'Résistance' })}
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
-                              product.category === 'resistance'
-                                ? 'bg-neon text-noir shadow-sm'
-                                : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
-                            }`}
-                            title="Classer en Résistance"
-                          >
-                            ⚡ Résistance
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => onSave({ ...toFormProduct(product), category: 'cartouches', type: 'Cartouche' })}
-                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
-                              ['cartouches', 'cartouches-xros'].includes(product.category)
-                                ? 'bg-neon text-noir shadow-sm'
-                                : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
-                            }`}
-                            title="Classer en Cartouche"
-                          >
-                            🧪 Cartouche
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 font-semibold text-white">{formatPrice(product.price)}</td>
-                  <td className="px-4 py-4">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${product.stock <= 10 ? 'bg-amber-400 text-noir' : 'bg-white/10 text-white'}`}>
-                      {product.stock}
-                    </span>
-                    {product.nicotine?.length > 1 && (
-                      <NicotineStockToggles
-                        compact
-                        rates={product.nicotine}
-                        outOfStock={product.nicotineOutOfStock}
-                        onToggle={(rate) => onSave({
-                          ...toFormProduct(product),
-                          nicotineOutOfStock: toggleNicotineRate(product.nicotineOutOfStock, rate),
-                        })}
-                      />
-                    )}
-                  </td>
-                  <td className="px-4 py-4 text-muted">{product.badge ? BADGES[product.badge]?.label || product.badge : '-'}</td>
-                  <td className="py-4 pl-4">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => setEditing(toFormProduct(product))} className="btn-ghost min-h-0 px-4 py-2 text-xs">
-                        Modifier
-                      </button>
-                      <button onClick={() => onDelete(product)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-faint hover:border-rose-400/40 hover:text-rose-400" aria-label="Supprimer">
-                        <IconTrash width={16} height={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {!products.length && <EmptyState title="Aucun produit trouvé" text="Ajustez la recherche ou créez un nouveau produit." />}
+        <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_220px]">
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => { setQuery(e.target.value); resetPaging() }}
+            placeholder="Nom, marque, type…"
+            aria-label="Rechercher un produit"
+            className="input min-w-0"
+          />
+          <select value={category} onChange={(e) => { setCategory(e.target.value); resetPaging() }} className="input" aria-label="Filtrer par catégorie">
+            <option value="">Toutes les catégories</option>
+            {usedCategories.map((entry) => <option key={entry.key} value={entry.key}>{entry.name}</option>)}
+          </select>
         </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {STOCK_FILTERS.map((entry) => {
+            const count = entry.match ? products.filter(entry.match).length : null
+            return (
+              <button
+                key={entry.id}
+                type="button"
+                onClick={() => { setStockFilter(entry.id); resetPaging() }}
+                aria-pressed={stockFilter === entry.id}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                  stockFilter === entry.id ? 'border-neon bg-neon text-noir' : 'border-white/10 text-ash hover:border-white/30'
+                }`}
+              >
+                {entry.label}{count != null ? ` · ${count}` : ''}
+              </button>
+            )
+          })}
+        </div>
+
+        <ul className="mt-4 divide-y divide-white/8">
+          {shown.map((product) => (
+            <li key={product.id} className={`flex flex-wrap items-center gap-3 py-3 sm:flex-nowrap ${editing?.id === product.id ? 'rounded-xl bg-neon/5' : ''}`}>
+              <img src={product.image} alt="" className="h-12 w-12 shrink-0 rounded-xl object-cover" />
+              <div className="min-w-0 flex-1 basis-40">
+                <p className="truncate font-medium text-white">{product.name}</p>
+                <p className="truncate text-xs text-faint">
+                  {product.brand} · {PRODUCT_CATEGORIES.find((entry) => entry.key === product.category)?.name || product.category}
+                  {product.badge ? ` · ${BADGES[product.badge]?.label || product.badge}` : ''}
+                </p>
+                {(['resistance', 'cartouches', 'cartouches-xros'].includes(product.category) ||
+                  /\b(r[eé]sistances?|cartouches?|coils?)\b/i.test(product.name || '')) && (
+                  <div className="mt-1 flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onSave({ ...toFormProduct(product), category: 'resistance', type: 'Résistance' })}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
+                        product.category === 'resistance' ? 'bg-neon text-noir shadow-sm' : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
+                      }`}
+                      title="Classer en Résistance"
+                    >
+                      ⚡ Résistance
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onSave({ ...toFormProduct(product), category: 'cartouches', type: 'Cartouche' })}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold transition ${
+                        ['cartouches', 'cartouches-xros'].includes(product.category) ? 'bg-neon text-noir shadow-sm' : 'bg-white/10 text-ash hover:bg-white/20 hover:text-white'
+                      }`}
+                      title="Classer en Cartouche"
+                    >
+                      🧪 Cartouche
+                    </button>
+                  </div>
+                )}
+                {product.nicotine?.length > 1 && (
+                  <NicotineStockToggles
+                    compact
+                    rates={product.nicotine}
+                    outOfStock={product.nicotineOutOfStock}
+                    onToggle={(rate) => onSave({
+                      ...toFormProduct(product),
+                      nicotineOutOfStock: toggleNicotineRate(product.nicotineOutOfStock, rate),
+                    })}
+                  />
+                )}
+              </div>
+              <div className="ml-auto flex items-center gap-3">
+                <div className="text-right">
+                  <p className="font-semibold text-white">{formatPrice(product.price)}</p>
+                  <span className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                    product.stock <= 0 ? 'bg-rose-500 text-white' : product.stock <= 10 ? 'bg-amber-400 text-noir' : 'bg-white/10 text-white'
+                  }`}
+                  >
+                    {product.stock <= 0 ? 'Rupture' : `Stock ${product.stock}`}
+                  </span>
+                </div>
+                <button onClick={() => setEditing(toFormProduct(product))} className="btn-ghost min-h-0 px-4 py-2 text-xs">
+                  Modifier
+                </button>
+                <button onClick={() => onDelete(product)} className="grid h-9 w-9 place-items-center rounded-full border border-white/10 text-faint hover:border-rose-400/40 hover:text-rose-400" aria-label={`Supprimer ${product.name}`}>
+                  <IconTrash width={16} height={16} />
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
+        {filtered.length > shown.length && (
+          <button type="button" onClick={() => setVisible((n) => n + PRODUCTS_PAGE)} className="btn-ghost mt-3 w-full">
+            Afficher {Math.min(PRODUCTS_PAGE, filtered.length - shown.length)} produits de plus ({filtered.length - shown.length} restants)
+          </button>
+        )}
+        {!filtered.length && <EmptyState title="Aucun produit trouvé" text="Ajustez la recherche ou les filtres, ou créez un nouveau produit." />}
       </section>
 
-      <ProductEditor
-        key={editing?.id || 'new-product'}
-        product={editing}
-        catalogMeta={catalogMeta}
-        products={allProducts}
-        onCancel={() => setEditing(null)}
-        onSave={onSave}
-      />
+      {editing && !isDesktop
+        // Portail vers <body> : sinon un contexte d'empilement du contenu de la
+        // page laissait l'en-tête passer par-dessus la fiche.
+        ? createPortal(
+          <div className="fixed inset-0 z-[70] overflow-y-auto bg-noir/95 p-3 backdrop-blur-sm">{editor}</div>,
+          document.body,
+        )
+        : <div className={editing ? '' : 'hidden xl:block'}>{editor}</div>}
     </div>
   )
 }
@@ -685,7 +740,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   }
 
   return (
-    <aside className="card min-w-0 sticky top-24 self-start p-5 sm:p-6">
+    <aside className="card min-w-0 self-start p-5 sm:p-6 xl:sticky xl:top-20">
       <form onSubmit={submit}>
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
@@ -697,7 +752,7 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
           </button>
         </div>
 
-        <div className="max-h-[calc(100vh-300px)] space-y-4 overflow-y-auto pr-1">
+        <div className="space-y-4 xl:max-h-[calc(100vh-300px)] xl:overflow-y-auto xl:pr-1">
           <Field label="Nom" value={form.name} onChange={update('name')} required />
           <Field
             label="Identifiant URL"
@@ -863,6 +918,46 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
   )
 }
 
+// Onglets de travail : l'admin ouvre sur ce qui reste à faire, pas sur
+// l'historique complet. Une commande en revue Mollie est toujours « à traiter ».
+const ORDER_TABS = [
+  { id: 'todo', label: 'À traiter', match: (o) => Boolean(o.checkoutReviewRequiredAt) || ['processing', 'stock_issue', 'refund_failed', 'refund_pending'].includes(o.status) },
+  { id: 'pickup', label: 'Retraits', match: (o) => o.status === 'ready_for_pickup' },
+  { id: 'shipped', label: 'Expédiées', match: (o) => o.status === 'shipped' },
+  { id: 'done', label: 'Terminées', match: (o) => ['delivered', 'refunded', 'cancelled'].includes(o.status) },
+  { id: 'all', label: 'Toutes', match: () => true },
+]
+const ORDERS_PAGE = 30
+
+const SHIPPING_BADGES = {
+  poste: { label: 'Colissimo', className: 'border-amber-300/30 bg-amber-400/10 text-amber-200' },
+  relais: { label: 'Mondial Relay', className: 'border-fuchsia-400/30 bg-fuchsia-500/10 text-fuchsia-200' },
+  coursier: { label: 'Coursier', className: 'border-sky-400/30 bg-sky-500/10 text-sky-200' },
+  pickup: { label: 'Retrait boutique', className: 'border-neon/30 bg-neon/10 text-neon' },
+}
+
+const STATUS_BADGE_CLASS = {
+  processing: 'bg-amber-400 text-noir',
+  stock_issue: 'bg-rose-500 text-white',
+  refund_failed: 'bg-rose-500 text-white',
+  refund_pending: 'bg-amber-300/20 text-amber-200',
+  ready_for_pickup: 'bg-neon text-noir',
+  shipped: 'bg-sky-500/20 text-sky-200',
+  delivered: 'bg-white/10 text-ash',
+  refunded: 'bg-white/10 text-ash',
+  cancelled: 'bg-white/10 text-faint',
+  pending_payment: 'bg-white/10 text-faint',
+}
+
+const orderSearchText = (order) => [
+  order.id,
+  order.customer?.name,
+  order.customer?.email,
+  String(order.customer?.phone || '').replace(/\s+/g, ''),
+  order.address?.city,
+  order.shipping?.tracking,
+].filter(Boolean).join(' ').toLowerCase()
+
 function OrdersPanel({
   orders,
   products = [],
@@ -873,42 +968,124 @@ function OrdersPanel({
   refreshRemoteData,
   mondialRelayStatus,
 }) {
+  const [tab, setTab] = useState('todo')
+  const [query, setQuery] = useState('')
+  const [visible, setVisible] = useState(ORDERS_PAGE)
+  const [openIds, setOpenIds] = useState(() => new Set())
   const reviewRequiredCount = orders.filter((order) => order.checkoutReviewRequiredAt).length
   const productsById = new Map(products.map((product) => [product.id, product]))
+  const counts = Object.fromEntries(ORDER_TABS.map((entry) => [entry.id, orders.filter(entry.match).length]))
+  const needle = query.trim().toLowerCase().replace(/\s+/g, ' ')
+  const activeTab = ORDER_TABS.find((entry) => entry.id === tab) || ORDER_TABS[0]
+  // Une recherche parcourt toutes les commandes, quel que soit l'onglet.
+  const filtered = orders.filter((order) => (
+    needle ? needle.split(' ').every((word) => orderSearchText(order).includes(word)) : activeTab.match(order)
+  ))
+  const shown = filtered.slice(0, visible)
+  // Les commandes à traiter s'ouvrent d'office : c'est là qu'on agit.
+  const isOpen = (order) => openIds.has(order.id) !== (tab === 'todo' && !needle)
+  const toggle = (id) => setOpenIds((prev) => {
+    const next = new Set(prev)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    return next
+  })
+
   return (
-    <section className="card mt-8 p-5 sm:p-6">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="eyebrow mb-2">Ventes</p>
-          <h2 className="font-display text-xl font-bold text-white">{orders.length} commande{orders.length > 1 ? 's' : ''}</h2>
-        </div>
+    <section className="card mt-6 p-4 sm:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="font-display text-xl font-bold text-white">Commandes</h2>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => { setQuery(event.target.value); setVisible(ORDERS_PAGE) }}
+          placeholder="N°, nom, e-mail, téléphone, suivi…"
+          aria-label="Rechercher une commande"
+          className="input sm:w-80"
+        />
       </div>
 
+      {!needle && (
+        <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1" role="tablist" aria-label="Filtrer les commandes">
+          {ORDER_TABS.map((entry) => (
+            <button
+              key={entry.id}
+              type="button"
+              role="tab"
+              aria-selected={tab === entry.id}
+              onClick={() => { setTab(entry.id); setVisible(ORDERS_PAGE); setOpenIds(new Set()) }}
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                tab === entry.id ? 'border-neon bg-neon text-noir' : 'border-white/10 text-ash hover:border-white/30'
+              }`}
+            >
+              {entry.label}
+              <span className={`rounded-full px-1.5 text-xs ${tab === entry.id ? 'bg-noir/15' : entry.id === 'todo' && counts.todo ? 'bg-amber-400 text-noir' : 'bg-white/10'}`}>
+                {counts[entry.id]}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {reviewRequiredCount > 0 && (
-        <p role="alert" className="mb-5 rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
+        <p role="alert" className="mt-4 rounded-xl border border-amber-300/25 bg-amber-300/10 px-4 py-3 text-sm text-amber-100">
           {reviewRequiredCount} commande{reviewRequiredCount > 1 ? 's nécessitent' : ' nécessite'} une vérification Mollie avant de libérer le stock.
         </p>
       )}
 
-      {orders.length ? (
-        <div className="space-y-4">
-          {orders.map((order) => (
-            <article key={order.id} className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="font-display text-lg font-bold text-white">{order.id}</h3>
-                    <span className="rounded-full bg-neon/10 px-3 py-1 text-xs font-semibold text-neon">
+      {shown.length ? (
+        <div className="mt-4 space-y-3">
+          {shown.map((order) => {
+            const open = isOpen(order)
+            const badge = SHIPPING_BADGES[order.shipping?.id]
+            const itemCount = order.items.reduce((sum, item) => sum + (Number(item.qty) || 0), 0)
+            return (
+            <article key={order.id} className={`rounded-2xl border bg-white/[0.03] ${open ? 'border-white/15' : 'border-white/8'}`}>
+              <button
+                type="button"
+                onClick={() => toggle(order.id)}
+                aria-expanded={open}
+                className="flex w-full items-start gap-3 p-4 text-left"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${STATUS_BADGE_CLASS[order.status] || 'bg-white/10 text-ash'}`}>
                       {statusLabel[order.status] || order.status}
                     </span>
+                    {badge && (
+                      <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${badge.className}`}>{badge.label}</span>
+                    )}
+                    {order.checkoutReviewRequiredAt && (
+                      <span className="rounded-full bg-rose-500 px-2.5 py-0.5 text-[11px] font-bold text-white">Vérif. Mollie</span>
+                    )}
                   </div>
-                  <p className="mt-1 text-sm text-muted">
-                    {order.customer?.name || 'Client'} · {order.customer?.email || 'email non renseigné'}
-                    {order.customer?.phone ? ` · ${order.customer.phone}` : ''} · {formatDate(order.createdAt)}
+                  <p className="mt-2 truncate font-semibold text-white">{order.customer?.name || 'Client'}</p>
+                  <p className="truncate text-xs text-muted">
+                    {order.id} · {formatDate(order.createdAt)} · {itemCount} article{itemCount > 1 ? 's' : ''}
                   </p>
-                  <p className="mt-1 text-xs text-faint">
-                    {formatOrderDelivery(order)}
-                  </p>
+                  {!open && (
+                    <p className="mt-1 truncate text-xs text-faint">
+                      {order.items.map((item) => `${item.qty}× ${item.name}${variantLabel(item.variant) !== 'Standard' ? ` (${variantLabel(item.variant)})` : ''}`).join(' · ')}
+                    </p>
+                  )}
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="font-display text-lg font-bold text-white">{formatPrice(order.total)}</p>
+                  <span className="text-xs text-neon">{open ? 'Réduire ▲' : 'Détails ▼'}</span>
+                </div>
+              </button>
+
+              {open && (
+              <div className="border-t border-white/8 px-4 pb-4 pt-3">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                    {order.customer?.phone && (
+                      <a href={`tel:${String(order.customer.phone).replace(/\s+/g, '')}`} className="text-neon hover:underline">📞 {order.customer.phone}</a>
+                    )}
+                    {order.customer?.email && (
+                      <a href={`mailto:${order.customer.email}`} className="truncate text-neon hover:underline">✉️ {order.customer.email}</a>
+                    )}
+                  </div>
+                  <p className="mt-2 text-sm text-ash">{formatOrderDelivery(order)}</p>
                   {order.refundStatus && (
                     <p className="mt-2 text-xs text-amber-200">
                       Remboursement Mollie : {refundStatusLabel[order.refundStatus] || order.refundStatus}
@@ -938,57 +1115,56 @@ function OrdersPanel({
                       </p>
                     </div>
                   )}
-                </div>
-                <div className="flex items-center gap-3">
-                  <select
-                    value={order.status}
-                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                    className="input w-48"
-                    disabled={
-                      !MANUAL_FULFILLMENT_STATUSES.has(order.status)
-                      || Boolean(order.checkoutReviewRequiredAt)
-                    }
-                    aria-label={`Statut de la commande ${order.id}`}
-                  >
-                    {MANUAL_FULFILLMENT_STATUSES.has(order.status) ? (
-                      ORDER_STATUSES.filter((status) => (
-                        status.value === order.status || status.value === 'delivered'
-                      )).map((status) => (
-                        <option key={status.value} value={status.value}>{status.label}</option>
-                      ))
-                    ) : (
-                      <option value={order.status}>{statusLabel[order.status] || order.status}</option>
-                    )}
-                  </select>
-                  <p className="font-display text-xl font-bold text-white">{formatPrice(order.total)}</p>
-                </div>
-              </div>
 
-              <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                {order.items.map((item) => (
-                  <div key={`${order.id}-${item.productId}-${JSON.stringify(item.variant)}`} className="flex items-center gap-3 rounded-xl border border-white/8 bg-noir/30 p-3">
-                    <img src={item.image} alt="" className="h-12 w-12 rounded-lg object-cover" />
+              {/* Liste de préparation : une ligne par article, lisible d'un coup d'œil. */}
+              <ul className="mt-3 divide-y divide-white/8 rounded-xl border border-white/8 bg-noir/30">
+                {order.items.map((item) => {
+                  const image = item.image || productsById.get(item.productId)?.image
+                  return (
+                  <li key={`${order.id}-${item.productId}-${JSON.stringify(item.variant)}`} className="flex items-center gap-3 p-3">
+                    <span className="grid h-9 min-w-9 place-items-center rounded-lg bg-white/10 px-1.5 text-sm font-bold text-white">{item.qty}×</span>
+                    {image && <img src={image} alt="" className="h-10 w-10 rounded-lg object-cover" />}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">{item.name}</p>
-                      <p className="text-xs text-faint">x{item.qty} · {variantLabel(item.variant)}</p>
+                      <p className="text-sm font-medium text-white">{item.name}</p>
+                      {variantLabel(item.variant) !== 'Standard' && (
+                        <p className="text-xs font-semibold text-neon">{variantLabel(item.variant)}</p>
+                      )}
                       {isMissingOhm(item, productsById) && (
                         <p className="mt-1 text-[11px] font-semibold text-amber-300">
                           Valeur Ω non enregistrée — à confirmer avec le client avant l’envoi
                         </p>
                       )}
                     </div>
-                    <span className="text-sm font-semibold text-white">{formatPrice(item.lineTotal)}</span>
-                  </div>
-                ))}
-              </div>
+                    <span className="text-sm text-ash">{formatPrice(item.lineTotal)}</span>
+                  </li>
+                  )
+                })}
+              </ul>
 
-              <dl className="mt-4 grid gap-2 border-t border-white/8 pt-4 text-sm sm:grid-cols-4">
-                <MiniTotal label="Sous-total" value={formatPrice(order.subtotal)} />
-                <MiniTotal label="Remise" value={order.discount ? `- ${formatPrice(order.discount)}` : '-'} accent={order.discount > 0} />
-                <MiniTotal label="Livraison" value={order.shippingCost === 0 ? 'Offerte' : formatPrice(order.shippingCost)} />
-                <MiniTotal label="Paiement" value={order.paymentStatus === 'paid' ? 'Payé' : order.paymentStatus} />
-              </dl>
+              <p className="mt-3 text-xs text-muted">
+                Sous-total {formatPrice(order.subtotal)}
+                {order.discount ? ` · Remise −${formatPrice(order.discount)}` : ''}
+                {' · '}Livraison {order.shippingCost === 0 ? 'offerte' : formatPrice(order.shippingCost)}
+                {' · '}{order.paymentStatus === 'paid' ? 'Payée' : `Paiement : ${order.paymentStatus}`}
+              </p>
 
+              {MANUAL_FULFILLMENT_STATUSES.has(order.status) && !order.checkoutReviewRequiredAt && (
+                <div className="mt-3 flex items-center gap-2">
+                  <span className="text-xs text-muted">Statut :</span>
+                  <select
+                    value={order.status}
+                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                    className="input w-48 py-2 text-sm"
+                    aria-label={`Statut de la commande ${order.id}`}
+                  >
+                    {ORDER_STATUSES.filter((status) => (
+                      status.value === order.status || status.value === 'delivered'
+                    )).map((status) => (
+                      <option key={status.value} value={status.value}>{status.label}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
               {adminSession
                 && order.paymentStatus === 'paid'
                 && order.shipping?.id !== 'pickup'
@@ -1022,11 +1198,22 @@ function OrdersPanel({
                 && ['pending_payment', 'processing', 'ready_for_pickup', 'stock_issue', 'refund_pending', 'refund_failed'].includes(order.status) && (
                 <CancelOrderControl order={order} cancelOrder={cancelOrder} />
               )}
+              </div>
+              )}
             </article>
-          ))}
+            )
+          })}
+          {filtered.length > shown.length && (
+            <button type="button" onClick={() => setVisible((n) => n + ORDERS_PAGE)} className="btn-ghost w-full">
+              Afficher {Math.min(ORDERS_PAGE, filtered.length - shown.length)} commandes de plus ({filtered.length - shown.length} restantes)
+            </button>
+          )}
         </div>
       ) : (
-        <EmptyState title="Aucune vente enregistrée" text="Passez une commande depuis le checkout pour alimenter ce tableau." />
+        <EmptyState
+          title={needle ? 'Aucune commande trouvée' : tab === 'todo' ? 'Rien à traiter' : 'Aucune commande ici'}
+          text={needle ? 'Essayez un numéro de commande, un nom ou un e-mail.' : tab === 'todo' ? 'Toutes les commandes payées sont traitées.' : 'Changez d’onglet pour voir les autres commandes.'}
+        />
       )}
     </section>
   )
@@ -1902,15 +2089,6 @@ function TextArea({ label, className = '', ...props }) {
       <span className="mb-1.5 block text-xs font-medium text-muted">{label}</span>
       <textarea className="input min-h-24 resize-y" {...props} />
     </label>
-  )
-}
-
-function MiniTotal({ label, value, accent }) {
-  return (
-    <div className="flex justify-between rounded-xl bg-white/[0.03] px-3 py-2">
-      <dt className="text-faint">{label}</dt>
-      <dd className={accent ? 'font-semibold text-neon' : 'font-semibold text-white'}>{value}</dd>
-    </div>
   )
 }
 
