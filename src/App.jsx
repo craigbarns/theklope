@@ -77,18 +77,33 @@ function CheckoutHeader() {
   )
 }
 
+// L'admin est un outil de travail : sans bandeau promo, menu boutique, panier,
+// pied de page ni bulle de conseil, qui mangeaient l'écran du téléphone.
+function AdminHeader() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-noir/95 backdrop-blur-xl">
+      <div className="container-page flex h-14 items-center justify-between gap-4">
+        <Logo />
+        <Link to="/" className="text-xs font-medium text-neon hover:underline">Voir la boutique →</Link>
+      </div>
+    </header>
+  )
+}
+
 export default function App() {
   const location = useLocation()
   const checkoutShell = location.pathname === '/checkout' || location.pathname.startsWith('/checkout/')
+  const adminShell = location.pathname === '/admin' || location.pathname.startsWith('/admin/')
+  const shopShell = !checkoutShell && !adminShell
 
   return (
     <div className="flex min-h-screen flex-col">
       <a href="#contenu" className="skip-link">Aller au contenu</a>
       <ScrollToTop />
-      <AgeGate />
-      {checkoutShell ? <CheckoutHeader /> : <Header />}
-      {!checkoutShell && <SearchOverlay />}
-      {!checkoutShell && <CartDrawer />}
+      {!adminShell && <AgeGate />}
+      {adminShell ? <AdminHeader /> : checkoutShell ? <CheckoutHeader /> : <Header />}
+      {shopShell && <SearchOverlay />}
+      {shopShell && <CartDrawer />}
 
       <main id="contenu" className="flex-1">
         <ErrorBoundary variant="page" resetKey={`${location.pathname}${location.search}`}>
@@ -124,9 +139,9 @@ export default function App() {
         </ErrorBoundary>
       </main>
 
-      {!checkoutShell && <Footer />}
-      <CookieBanner />
-      {!checkoutShell && <CoachVape />}
+      {shopShell && <Footer />}
+      {!adminShell && <CookieBanner />}
+      {shopShell && <CoachVape />}
       <ConsentManager />
       <PrivateAnalytics />
     </div>
