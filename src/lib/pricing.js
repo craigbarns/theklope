@@ -266,10 +266,17 @@ export function computeBundleProgress(lines = []) {
 // code saisi ; il se comporte ensuite comme un code en pourcentage.
 export const voucherAsPromo = (promoCode, voucher) => {
   const code = String(promoCode || '').trim().toUpperCase()
-  const percent = Number(voucher?.percent)
   if (!code || String(voucher?.code || '').toUpperCase() !== code) return null
+  const kind = voucher.kind === 'referral' ? 'referral' : 'voucher'
+  const minSubtotal = Number(voucher.minSubtotal) || 0
+  const amount = Number(voucher.amount)
+  if (voucher.amount != null) {
+    if (!Number.isFinite(amount) || amount <= 0 || amount > 50) return null
+    return { code, type: 'amount', value: amount, kind, minSubtotal, label: `Code ${code} −${amount} €` }
+  }
+  const percent = Number(voucher.percent)
   if (!Number.isFinite(percent) || percent <= 0 || percent > 20) return null
-  return { code, type: 'percent', value: percent, kind: 'voucher', label: `Code de réduction −${percent} %` }
+  return { code, type: 'percent', value: percent, kind, minSubtotal, label: `Code de réduction −${percent} %` }
 }
 
 export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher } = {}) {
@@ -277,7 +284,10 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher
   const subtotal = fromCents(subtotalCents)
 
   const requestedPromo = normalizePromo(promoCode) || voucherAsPromo(promoCode, voucher)
-  const promo = isPromoEligible(requestedPromo, lines) ? requestedPromo : null
+  const promo = isPromoEligible(requestedPromo, lines)
+    && subtotalCents >= toCents(requestedPromo?.minSubtotal || 0)
+    ? requestedPromo
+    : null
   const method = getShippingMethod(shippingMethodId)
 
   // Livraison : gratuite dès le seuil (sauf Click & Collect déjà à 0) ou via un
@@ -296,7 +306,9 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher
     : subtotalCents
   const promoPercentCents = promo?.type === 'percent'
     ? Math.round((promoBaseCents * promo.value) / 100)
-    : 0
+    : promo?.type === 'amount'
+      ? Math.min(subtotalCents, toCents(promo.value))
+      : 0
   const discountCents = Math.max(autoCents, promoPercentCents)
   const discountSource = discountCents > 0
     ? (autoCents >= promoPercentCents ? 'auto' : 'promo')
