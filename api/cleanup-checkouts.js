@@ -16,6 +16,7 @@ import {
   syncOrderFromMolliePayment,
 } from './_lib/orders.js'
 import { sendGoogleReviewRequests } from './_lib/googleReview.js'
+import { sendCartReminders } from './_lib/cartReminder.js'
 import { hasSupabaseAdmin, supabaseAdmin } from './_lib/supabaseAdmin.js'
 
 const BATCH_LIMIT = 50
@@ -285,6 +286,12 @@ export default async function handler(req, res) {
       console.error('Erreur demandes d’avis Google:', err)
       return { count: 0, sent: 0, error: err.message }
     })
+    // Relance unique des paniers abandonnés au paiement (après le nettoyage
+    // ci-dessus, qui annule les tentatives expirées).
+    const cartReminders = await sendCartReminders(supabaseAdmin).catch((err) => {
+      console.error('Erreur relances panier:', err)
+      return { count: 0, sent: 0, error: err.message }
+    })
     return res.status(200).json({
       ok: true,
       scanned: candidates.length,
@@ -295,6 +302,7 @@ export default async function handler(req, res) {
       refundEmailRetries,
       restockReminders,
       googleReviewRequests,
+      cartReminders,
     })
   } catch (error) {
     console.error('cleanup-checkouts error:', error)
