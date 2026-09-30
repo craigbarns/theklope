@@ -23,6 +23,12 @@ export const isCartoucheCategory = (category) => {
 
 export const isPuffCategory = (category) => normalizeCategory(category) === 'alternative-puff'
 
+// Catégorie proposée dans l'admin (« E-liquides Sels de nicotine ») mais qui ne
+// commence pas par « eliquide » : sans elle, saveurs et taux y étaient effacés
+// à l'enregistrement. Volontairement hors d'isEliquidCategory pour ne pas
+// modifier les tarifs par quantité existants.
+export const isSelsNicotineCategory = (category) => normalizeCategory(category) === 'sels-nicotine'
+
 // Catégories autorisées à porter une saveur et un taux de nicotine. Le matériel
 // (kits, box, pods vides) en reste exclu : ses valeurs héritées sont parasites.
 export const supportsFlavorVariants = (category) => (
@@ -30,6 +36,7 @@ export const supportsFlavorVariants = (category) => (
   || isDiyCategory(category)
   || isCartoucheCategory(category)
   || isPuffCategory(category)
+  || isSelsNicotineCategory(category)
 )
 
 export const isEliquidProduct = (product = {}) => isEliquidCategory(product?.category)

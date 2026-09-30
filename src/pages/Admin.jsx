@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
 import { CATEGORIES, BADGES, isResistanceProduct } from '../data/catalog.js'
+import { supportsFlavorVariants } from '../lib/productCategory.js'
 import { findCatalogIssues } from '../data/catalogQuality.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
@@ -807,6 +808,31 @@ function ProductEditor({ product, catalogMeta, products, onCancel, onSave }) {
             }))}
           />
           <Field label="Saveurs" value={form.flavors} onChange={update('flavors')} placeholder="Menthe, Classic, Fruits rouges" />
+          {!supportsFlavorVariants(form.category) && (String(form.flavors || '').trim() || String(form.nicotine || '').trim()) && (
+            <div role="alert" className="-mt-1 rounded-2xl border border-amber-400/40 bg-amber-400/10 p-3 text-xs text-amber-100">
+              <p>
+                <strong>Saveurs et taux de nicotine ne seront pas enregistrés</strong> dans la catégorie
+                « {PRODUCT_CATEGORIES.find((category) => category.key === form.category)?.name || form.category} » (matériel).
+                Pour une recharge, une puff ou une cartouche pré-remplie, choisissez une catégorie adaptée :
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {[
+                  ['alternative-puff', 'Puffs rechargeables'],
+                  ['cartouches', 'Cartouches'],
+                  ['eliquide', 'E-liquides'],
+                ].map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setForm((prev) => ({ ...prev, category: key }))}
+                    className="rounded-full bg-amber-300 px-3 py-1 font-bold text-noir hover:bg-amber-200"
+                  >
+                    Classer en {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           <Field label="Couleurs" value={form.colors} onChange={update('colors')} placeholder="Noir, Argent, Bleu" />
           <div className="grid grid-cols-2 gap-3">
             <Field label="Volume / contenance" value={form.volume || ''} onChange={update('volume')} list="volumes" placeholder="10ml, 200ml, 1L…" />
