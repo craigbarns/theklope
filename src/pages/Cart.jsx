@@ -252,19 +252,22 @@ export default function Cart() {
 
             <dl className="mt-5 space-y-3 border-t border-white/8 pt-5 text-sm">
               <Row label="Sous-total" value={formatPrice(totals.subtotal)} />
-              {totals.discount > 0 && (
-                <Row
-                  label={totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}
-                  value={`- ${formatPrice(totals.discount)}`}
-                  accent={totals.discountSource !== 'auto'}
-                />
+              {totals.autoDiscount?.total > 0 && (
+                <Row label="Tarif quantité appliqué" value={`- ${formatPrice(totals.autoDiscount.total)}`} />
               )}
-              {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
+              {totals.autoDiscount?.total > 0 && totals.autoDiscount.details?.map((d) => (
                 <div key={d.key} className="-mt-1 text-[11px] text-muted">
                   <dt className="sr-only">Condition tarifaire appliquée</dt>
                   <dd>{d.label}</dd>
                 </div>
               ))}
+              {totals.voucherDiscount > 0 && (
+                <Row
+                  label={totals.appliedPromo?.code ? `Code ${totals.appliedPromo.code}` : 'Remise'}
+                  value={`- ${formatPrice(totals.voucherDiscount)}`}
+                  accent
+                />
+              )}
               <Row label="Livraison" value="Calculée à l’étape suivante" />
               <div className="flex items-center justify-between border-t border-white/8 pt-4">
                 <dt className="font-semibold text-white">Total avant livraison</dt>

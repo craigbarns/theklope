@@ -849,6 +849,7 @@ export function StoreProvider({ children }) {
       subtotal: t.subtotal,
       discount: t.discount,
       discountSource: t.discountSource,
+      voucherDiscount: t.voucherDiscount,
       autoDiscount: t.autoDiscount,
       appliedPromo: t.appliedPromo,
       shipping: t.shipping,

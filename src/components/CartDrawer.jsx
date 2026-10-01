@@ -362,19 +362,25 @@ export default function CartDrawer() {
                   <dt className="text-muted">Sous-total</dt>
                   <dd className="font-semibold text-white">{formatPrice(totals.subtotal)}</dd>
                 </div>
-                {totals.discount > 0 && (
+                {totals.autoDiscount?.total > 0 && (
                   <>
-                    <div className={`flex items-center justify-between ${totals.discountSource === 'auto' ? 'text-ash/80' : 'text-neon'}`}>
-                      <dt>{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : 'Remise'}</dt>
-                      <dd className="font-semibold">- {formatPrice(totals.discount)}</dd>
+                    <div className="flex items-center justify-between text-ash/80">
+                      <dt>Tarif quantité appliqué</dt>
+                      <dd className="font-semibold">- {formatPrice(totals.autoDiscount.total)}</dd>
                     </div>
-                    {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((d) => (
+                    {totals.autoDiscount.details?.map((d) => (
                       <div key={d.key} className="-mt-1 text-[11px] text-muted">
                         <dt className="sr-only">Condition tarifaire appliquée</dt>
                         <dd>{d.label}</dd>
                       </div>
                     ))}
                   </>
+                )}
+                {totals.voucherDiscount > 0 && (
+                  <div className="flex items-center justify-between text-neon">
+                    <dt>{totals.appliedPromo?.code ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
+                    <dd className="font-semibold">- {formatPrice(totals.voucherDiscount)}</dd>
+                  </div>
                 )}
                 <div className="flex items-center justify-between">
                   <dt className="text-muted">Livraison</dt>

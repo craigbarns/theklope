@@ -136,3 +136,24 @@ test('totaux : 5 € fixes, minimum 20 € pour le parrainage, jamais cumulé', 
   const bulk = [{ price: 5.9, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' }]
   assert.equal(computeTotals({ lines: bulk, promoCode: 'FIDEL-ABCDEF', voucher: fidel }).discountSource, 'auto')
 })
+
+test('bon + tarif quantité : le bon s’applique aux seuls articles sans remise quantité', () => {
+  const pack = [
+    { price: 5.9, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' },
+    { price: 15, qty: 1, brand: 'Vaporesso', category: 'resistance' },
+  ]
+  const merci = computeTotals({ lines: pack, promoCode: 'MERCI-ABCDEF', voucher: { code: 'MERCI-ABCDEF', kind: 'voucher', percent: 5 } })
+  assert.equal(merci.autoDiscount.total, 59)
+  assert.equal(merci.voucherDiscount, 0.75, '5 % des 15 € de résistances seulement')
+  assert.equal(merci.discount, 59.75)
+  assert.equal(merci.discountSource, 'mixed')
+  assert.equal(merci.appliedPromo.code, 'MERCI-ABCDEF', 'le bon est consommé')
+
+  const fidel = computeTotals({ lines: pack, promoCode: 'FIDEL-ABCDEF', voucher: { code: 'FIDEL-ABCDEF', kind: 'voucher', amount: 5 } })
+  assert.equal(fidel.discount, 64)
+
+  // Pack seul : rien à réduire, le bon n'est pas consommé.
+  const packOnly = computeTotals({ lines: [pack[0]], promoCode: 'MERCI-ABCDEF', voucher: { code: 'MERCI-ABCDEF', kind: 'voucher', percent: 5 } })
+  assert.equal(packOnly.voucherDiscount, 0)
+  assert.equal(packOnly.appliedPromo, null)
+})
