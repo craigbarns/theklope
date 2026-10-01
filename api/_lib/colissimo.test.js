@@ -45,9 +45,9 @@ const fakeFetch = (body, { status = 200, contentType = 'multipart/mixed; boundar
 test('configuration : jamais configurée sans identifiants, code produit borné', () => {
   assert.equal(getColissimoConfig({}).configured, false)
   assert.equal(config.configured, true)
-  assert.equal(config.productCode, 'DOM')
-  assert.equal(getColissimoConfig({ COLISSIMO_CONTRACT_NUMBER: '1', COLISSIMO_PASSWORD: 'x', COLISSIMO_PRODUCT_CODE: 'dos' }).productCode, 'DOS')
-  assert.equal(getColissimoConfig({ COLISSIMO_CONTRACT_NUMBER: '1', COLISSIMO_PASSWORD: 'x', COLISSIMO_PRODUCT_CODE: 'XYZ' }).productCode, 'DOM')
+  assert.equal(config.productCode, 'DOS')
+  assert.equal(getColissimoConfig({ COLISSIMO_CONTRACT_NUMBER: '1', COLISSIMO_PASSWORD: 'x', COLISSIMO_PRODUCT_CODE: 'dom' }).productCode, 'DOM')
+  assert.equal(getColissimoConfig({ COLISSIMO_CONTRACT_NUMBER: '1', COLISSIMO_PASSWORD: 'x', COLISSIMO_PRODUCT_CODE: 'XYZ' }).productCode, 'DOS')
   assert.equal(config.sender.phoneNumber, '0491555555')
 })
 
@@ -62,7 +62,7 @@ test('téléphone : portable pour les SMS, fixe sinon, invalide ignoré', () => 
 test('requête : destinataire, expéditeur boutique, poids en kg, date de dépôt à Paris', () => {
   const request = buildColissimoLabelRequest({ order, weightGrams: 350, config, now: new Date('2026-10-01T22:30:00Z') })
   assert.equal(request.contractNumber, '123456')
-  assert.equal(request.letter.service.productCode, 'DOM')
+  assert.equal(request.letter.service.productCode, 'DOS')
   assert.equal(request.letter.service.depositDate, '2026-10-02')
   assert.equal(request.letter.parcel.weight, 0.35)
   assert.equal(request.letter.sender.address.line2, '188 rue de Rome')
