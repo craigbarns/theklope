@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom'
 import { useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
 import { CATEGORIES, BADGES, isResistanceProduct } from '../data/catalog.js'
-import { supportsFlavorVariants } from '../lib/productCategory.js'
+import { isEliquidProduct, supportsFlavorVariants } from '../lib/productCategory.js'
+import { getQuantityPricingRule, resolveVolume } from '../lib/pricing.js'
 import { findCatalogIssues } from '../data/catalogQuality.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
@@ -634,6 +635,7 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                     </button>
                   </div>
                 )}
+                <QuantityTierBadge product={product} />
                 {product.nicotine?.length > 1 && (
                   <NicotineStockToggles
                     compact
@@ -2222,6 +2224,22 @@ function toFormProduct(product) {
     relatedProductIds: normalizeRelatedProductIds(product.relatedProductIds, product.id),
     specsText: Object.entries(product.specs || {}).map(([key, value]) => `${key}: ${value}`).join('\n'),
   }
+}
+
+// Montre si un e-liquide entre dans un tarif quantité, et sinon pourquoi
+// (contenance lue). Évite les « la remise ne marche pas sur cette réf ».
+function QuantityTierBadge({ product }) {
+  if (!isEliquidProduct(product)) return null
+  const rule = getQuantityPricingRule(product)
+  const volume = resolveVolume(product) || 'non renseignée'
+  return rule ? (
+    <p className="mt-1 text-[11px] text-neon">Tarif quantité ✓ dès {rule.minQty} · contenance lue : {volume}</p>
+  ) : (
+    <p className="mt-1 text-[11px] text-amber-300">
+      Hors tarif quantité · contenance lue : {volume}
+      {/^(10|50|100)ml$/.test(volume) ? ' (marque hors palier 10 ml)' : ' — indiquez 10ml, 50ml ou 100ml dans « Volume »'}
+    </p>
+  )
 }
 
 function parseNicotineList(value) {

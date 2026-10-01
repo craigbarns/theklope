@@ -90,22 +90,48 @@ const lineSubtotalCents = (line) => (
   toCents(line.price) * (Number(line.qty) || 0)
 )
 
+// Contenances lues dans un texte (« 50 ml », « 50ml », « 0,5 L » non géré).
+const mlValues = (text) => [...new Set(
+  [...String(text || '').matchAll(/(\d+(?:[.,]\d+)?)\s*ml\b/gi)]
+    .map((match) => Number(match[1].replace(',', '.')))
+    .filter(Number.isFinite),
+)]
+
+// Flacons des « shortfill » : 50 ml de liquide vendus dans un flacon de 60 à
+// 75 ml (100 ml dans 120 à 150 ml) pour laisser la place aux boosters. L'admin
+// saisit souvent la taille du FLACON ; le format vendu est celui du nom.
+const SHORTFILL_BOTTLES = { 50: [60, 70, 75], 100: [120, 150] }
+
 // Volume effectif d'un produit pour les remises : champ `volume` s'il est
-// renseigné, sinon dérivé de `specs.Contenance` (ex. « 10 ml »). Indispensable :
-// le catalogue stocke souvent la contenance uniquement dans les specs, sans quoi
-// aucune remise dégressive ne se déclencherait. Utilisé CÔTÉ CLIENT ET SERVEUR.
+// renseigné, sinon dérivé de `specs.Contenance` (ex. « 10 ml »), et à défaut
+// le nom du produit. Indispensable : sans contenance reconnue, aucune remise
+// dégressive ne se déclencherait. Utilisé CÔTÉ CLIENT ET SERVEUR.
 export const resolveVolume = (p = {}) => {
   const raw = p?.volume || p?.specs?.Contenance || p?.specs?.contenance || ''
-  const detected = [...String(raw).matchAll(/(\d+(?:[.,]\d+)?)\s*ml\b/gi)]
-    .map((match) => Number(match[1].replace(',', '.')))
-    .filter(Number.isFinite)
-    .map((value) => `${value}ml`)
-  const unique = [...new Set(detected)]
+  const fromField = mlValues(raw)
+  const fromName = mlValues(p?.name)
+  const field = fromField.length === 1 ? fromField[0] : null
+  const name = fromName.length === 1 ? fromName[0] : null
 
+  // Le champ décrit le flacon d'un shortfill (« 60ml » pour « Tarte 50ml »,
+  // ou « 50 ml dans un flacon de 75 ml ») : le nom donne le format vendu.
+  if (name && (field === null || SHORTFILL_BOTTLES[name]?.includes(field))) {
+    if (field !== null || fromField.every((value) => value === name || SHORTFILL_BOTTLES[name]?.includes(value))) {
+      return `${name}ml`
+    }
+  }
   // Une seule contenance explicite peut piloter une remise. Une chaîne ambiguë
   // comme « 50ml / 100ml » reste non éligible plutôt que d'appliquer un palier
   // au hasard. Cela évite aussi de confondre 150ml ou 250ml avec 50ml.
-  return unique.length === 1 ? unique[0] : normVolume(raw)
+  if (field !== null) return `${field}ml`
+  // « 50 ml dans un flacon de 75 ml » sans contenance dans le nom.
+  if (fromField.length === 2) {
+    const [a, b] = fromField
+    if (SHORTFILL_BOTTLES[a]?.includes(b)) return `${a}ml`
+    if (SHORTFILL_BOTTLES[b]?.includes(a)) return `${b}ml`
+  }
+  if (!fromField.length && name) return `${name}ml`
+  return normVolume(raw)
 }
 
 export function getQuantityPricingRule(product = {}) {
