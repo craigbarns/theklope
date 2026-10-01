@@ -12,9 +12,9 @@
 //    filleul (première commande, dès 20 €) a 5 € de réduction ; une fois sa
 //    commande payée, le parrain reçoit un bon PARRAIN-XXXXXX de 5 €.
 //
-// Tous les bons sont nominatifs (e-mail du client), à usage unique, et ne se
-// cumulent pas avec le tarif quantité : la remise la plus avantageuse
-// s'applique (computeTotals). Un bon est consommé quand la commande qui
+// Tous les bons sont nominatifs (e-mail du client), à usage unique, et
+// s'appliquent en plus du tarif quantité, sur les seuls articles qui n'en
+// bénéficient pas (computeTotals, choix du gérant du 01/10/2026). Un bon est consommé quand la commande qui
 // l'utilise est payée.
 // =============================================================================
 import { randomInt } from 'node:crypto'
@@ -259,7 +259,7 @@ export function voucherEmailHtml(voucher) {
     'Pour votre prochaine commande sur theklope.com',
     voucher.code,
     `${valueLabel(voucher)}, valable une fois jusqu’au ${escapeHtml(formatExpiry(voucher.expires_at))},
-        avec cette adresse e-mail. Non cumulable avec le tarif quantité : la remise la plus avantageuse s’applique.`,
+        avec cette adresse e-mail. S’applique aux articles qui n’ont pas déjà le tarif quantité.`,
   )
 }
 

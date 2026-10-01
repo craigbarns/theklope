@@ -210,6 +210,9 @@ export const isPromoEligible = (promo, lines = []) => {
 export function computeAutoDiscount(lines = []) {
   let totalCents = 0
   const details = []
+  // Lignes qui bénéficient déjà d'un tarif quantité (index dans `lines`).
+  const covered = new Set()
+  const markCovered = (eligible) => eligible.forEach((line) => covered.add(lines.indexOf(line)))
 
   // Paliers 10ml : le groupe de marques est combinable et toutes les unités
   // éligibles passent au pourcentage prévu une fois le seuil atteint.
@@ -222,6 +225,7 @@ export function computeAutoDiscount(lines = []) {
     if (savedCents > 0) {
       totalCents += savedCents
       details.push({ key: tier.key, label: tier.label, amount: fromCents(savedCents) })
+      markCovered(eligible)
     }
   }
 
@@ -236,10 +240,11 @@ export function computeAutoDiscount(lines = []) {
     if (savedCents > 0) {
       totalCents += savedCents
       details.push({ key: tier.key, label: tier.label, amount: fromCents(savedCents) })
+      markCovered(eligible)
     }
   }
 
-  return { total: fromCents(totalCents), details }
+  return { total: fromCents(totalCents), details, coveredLineIndexes: [...covered] }
 }
 
 // Progression vers les paliers de remise NON encore atteints, pour inciter le
@@ -323,23 +328,44 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher
   if (freeByThreshold) shippingCents = 0
   if (promo?.type === 'shipping') shippingCents = 0
 
-  // Remises : automatique (marque/volume) vs code promo % — on applique la plus
-  // avantageuse pour le client (elles ne se cumulent PAS).
+  // Remises :
+  // - bon nominatif (fidélité, parrainage, « prochaine commande ») : il
+  //   s'applique en PLUS du tarif quantité, mais seulement sur les articles
+  //   qui n'ont pas déjà cette remise (choix du gérant, 01/10/2026) ;
+  // - autre code : la remise la plus avantageuse l'emporte, sans cumul.
   const auto = computeAutoDiscount(lines)
   const autoCents = toCents(auto.total)
+  const isPersonalCode = ['voucher', 'referral'].includes(promo?.kind)
+  const covered = new Set(auto.coveredLineIndexes)
+  const uncoveredCents = lines.reduce(
+    (sum, line, index) => sum + (covered.has(index) ? 0 : lineSubtotalCents(line)),
+    0,
+  )
   const promoBaseCents = promo?.code === 'PACK15'
     ? getCompletePackSubtotalCents(lines)
-    : subtotalCents
+    : isPersonalCode ? uncoveredCents : subtotalCents
   const promoPercentCents = promo?.type === 'percent'
     ? Math.round((promoBaseCents * promo.value) / 100)
     : promo?.type === 'amount'
-      ? Math.min(subtotalCents, toCents(promo.value))
+      ? Math.min(promoBaseCents, toCents(promo.value))
       : 0
-  const discountCents = Math.max(autoCents, promoPercentCents)
-  const discountSource = discountCents > 0
-    ? (autoCents >= promoPercentCents ? 'auto' : 'promo')
-    : null
-  const appliedPromo = promo && (promo.type === 'shipping' || discountSource === 'promo')
+  let discountCents
+  let discountSource
+  let voucherCents = 0
+  if (isPersonalCode) {
+    voucherCents = promoPercentCents
+    discountCents = autoCents + voucherCents
+    discountSource = autoCents > 0 && voucherCents > 0
+      ? 'mixed'
+      : voucherCents > 0 ? 'promo' : autoCents > 0 ? 'auto' : null
+  } else {
+    discountCents = Math.max(autoCents, promoPercentCents)
+    discountSource = discountCents > 0
+      ? (autoCents >= promoPercentCents ? 'auto' : 'promo')
+      : null
+    voucherCents = discountSource === 'promo' ? promoPercentCents : 0
+  }
+  const appliedPromo = promo && (promo.type === 'shipping' || voucherCents > 0)
     ? promo
     : null
 
@@ -348,7 +374,8 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher
   return {
     subtotal,
     discount: fromCents(discountCents),
-    discountSource, // 'auto' | 'promo' | null
+    discountSource, // 'auto' | 'promo' | 'mixed' (tarif quantité + bon) | null
+    voucherDiscount: fromCents(voucherCents),
     autoDiscount: auto,
     shipping: fromCents(shippingCents),
     total: fromCents(totalCents),

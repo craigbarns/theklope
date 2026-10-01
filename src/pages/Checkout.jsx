@@ -818,7 +818,8 @@ function VoucherField({ email, totals }) {
 
   if (active) {
     const belowMinimum = active.minSubtotal && totals.subtotal < active.minSubtotal
-    const beaten = !belowMinimum && totals.discountSource === 'auto'
+    // Tous les articles ont déjà le tarif quantité : le bon n'a rien à réduire.
+    const beaten = !belowMinimum && !(totals.voucherDiscount > 0)
     return (
       <div className="mt-4 rounded-xl border border-neon/25 bg-neon/5 px-3 py-2.5 text-xs">
         <div className="flex items-center justify-between gap-3">
@@ -830,8 +831,11 @@ function VoucherField({ email, totals }) {
         {belowMinimum && (
           <p className="mt-1 text-amber-200">Ce code s’applique dès {active.minSubtotal} € d’achat.</p>
         )}
+        {!belowMinimum && totals.voucherDiscount > 0 && totals.autoDiscount?.total > 0 && (
+          <p className="mt-1 text-muted">Appliqué aux articles sans tarif quantité.</p>
+        )}
         {beaten && (
-          <p className="mt-1 text-muted">Le tarif quantité est plus avantageux ici : il est appliqué et votre code reste utilisable pour une prochaine commande.</p>
+          <p className="mt-1 text-muted">Tous les articles du panier ont déjà le tarif quantité : votre code reste utilisable pour une prochaine commande.</p>
         )}
       </div>
     )
@@ -910,20 +914,24 @@ function OrderSummaryContent({
       <VoucherField email={voucherEmail} totals={totals} />
       <dl className="mt-5 space-y-2.5 border-t border-white/8 pt-5 text-sm">
         <div className="flex justify-between"><dt className="text-muted">Sous-total</dt><dd className="text-white">{formatPrice(totals.subtotal)}</dd></div>
-        {totals.discount > 0 && (
+        {totals.autoDiscount?.total > 0 && (
           <>
             <div className="flex justify-between">
-              <dt className="text-muted">{totals.discountSource === 'auto' ? 'Tarif quantité appliqué' : ['voucher', 'referral'].includes(totals.appliedPromo?.kind) ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
-              <dd className={totals.discountSource === 'auto' ? 'text-white' : 'text-neon'}>
-                - {formatPrice(totals.discount)}
-              </dd>
+              <dt className="text-muted">Tarif quantité appliqué</dt>
+              <dd className="text-white">- {formatPrice(totals.autoDiscount.total)}</dd>
             </div>
-            {totals.discountSource === 'auto' && totals.autoDiscount?.details?.map((detail) => (
+            {totals.autoDiscount.details?.map((detail) => (
               <div key={detail.key} className="flex justify-end text-[11px] text-muted">
                 {detail.label}
               </div>
             ))}
           </>
+        )}
+        {totals.voucherDiscount > 0 && (
+          <div className="flex justify-between">
+            <dt className="text-muted">{totals.appliedPromo?.code ? `Code ${totals.appliedPromo.code}` : 'Remise'}</dt>
+            <dd className="text-neon">- {formatPrice(totals.voucherDiscount)}</dd>
+          </div>
         )}
         <div className="flex justify-between gap-4">
           <dt className="text-muted">Livraison</dt>

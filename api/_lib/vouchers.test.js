@@ -103,7 +103,7 @@ test('le bon est consommé une seule fois quand la commande qui l’utilise est 
   assert.equal(await consumeOrderVoucher({ id: 'TK-4', promo: null }, client), false)
 })
 
-test('totaux : 5 % appliqués, jamais cumulés avec le tarif quantité', () => {
+test('totaux : 5 % appliqués, rien sur les articles déjà au tarif quantité', () => {
   const voucher = { code: 'MERCI-ABCDEF', percent: 5 }
   const kit = [{ price: 40, qty: 1, category: 'ecig' }]
   const withVoucher = computeTotals({ lines: kit, promoCode: 'MERCI-ABCDEF', voucher, shippingMethodId: 'pickup' })
@@ -121,11 +121,11 @@ test('totaux : 5 % appliqués, jamais cumulés avec le tarif quantité', () => {
   assert.equal(computeTotals({ lines: kit, promoCode: 'MERCI-ZZZZZZ', voucher }).discount, 0)
 })
 
-test('e-mail : code, pourcentage, date limite et règle de non-cumul', () => {
+test('e-mail : code, pourcentage, date limite et règle avec le tarif quantité', () => {
   const html = voucherEmailHtml({ code: 'MERCI-ABCDEF', percent: 5, expires_at: '2026-11-30T10:00:00Z' })
   assert.match(html, /MERCI-ABCDEF/)
   assert.match(html, /5 % de réduction/)
   assert.match(html, /30 novembre 2026/)
-  assert.match(html, /Non cumulable/)
+  assert.match(html, /pas déjà le tarif quantité/)
   assert.equal(voucherEmailHtml(null), '')
 })
