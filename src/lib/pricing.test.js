@@ -227,3 +227,19 @@ test('volume resolution recognizes 100ml without confusing larger or ambiguous s
   assert.equal(resolveVolume({ specs: { Contenance: '250 ml' } }), '250ml')
   assert.equal(resolveVolume({ specs: { Contenance: '50ml / 100ml' } }), '50ml/100ml')
 })
+
+test('shortfills : le format vendu (50/100 ml) compte, pas la taille du flacon', () => {
+  assert.equal(resolveVolume({ name: 'Tarte aux fraises 50ml', volume: '60ml' }), '50ml')
+  assert.equal(resolveVolume({ name: 'Canopée Cèdre', specs: { Contenance: '50 ml dans un flacon de 75 ml' } }), '50ml')
+  assert.equal(resolveVolume({ name: 'JNR Kiwi 50ml', specs: { Contenance: '50 ml (flacon 70 ml)' } }), '50ml')
+  assert.equal(resolveVolume({ name: 'XL 100ml', volume: '120ml' }), '100ml')
+  assert.equal(resolveVolume({ name: 'Mangue 50ml' }), '50ml')
+  // Inchangé : un vrai 60 ml, un 10 ml, une contenance ambiguë.
+  assert.equal(resolveVolume({ name: 'Petit Nuage 60ml', volume: '60ml' }), '60ml')
+  assert.equal(resolveVolume({ name: 'Booster pour 50ml', volume: '10ml' }), '10ml')
+  assert.notEqual(resolveVolume({ name: 'Duo', volume: '50ml / 100ml' }), '50ml')
+
+  const bottles = ['Tarte aux fraises 50ml', 'Canopée Cèdre 50ml', 'JNR Kiwi 50ml', 'Tarte aux fraises 50ml']
+    .map((name) => ({ name, price: 19.9, qty: 1, category: 'eliquide', volume: resolveVolume({ name, volume: '60ml' }) }))
+  assert.equal(computeTotals({ lines: bottles, shippingMethodId: 'pickup' }).discountSource, 'auto', '4 fioles suffisent')
+})
