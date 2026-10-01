@@ -4,8 +4,8 @@
 // Variables d'environnement (Vercel, jamais dans le code) :
 //   COLISSIMO_CONTRACT_NUMBER  numéro de contrat / identifiant Colissimo
 //   COLISSIMO_PASSWORD         mot de passe de l'espace Colissimo Entreprise
-//   COLISSIMO_PRODUCT_CODE     optionnel, « DOM » (domicile sans signature) par
-//                              défaut, « DOS » pour une remise contre signature
+//   COLISSIMO_PRODUCT_CODE     optionnel, « DOS » (remise contre signature) par
+//                              défaut, choix du gérant ; « DOM » pour sans signature
 //
 // L'API renvoie une réponse multipart : une partie JSON (numéro de colis,
 // messages) puis le PDF de l'étiquette en binaire.
@@ -29,12 +29,12 @@ export class ColissimoError extends Error {
 export function getColissimoConfig(env = process.env) {
   const contractNumber = String(env.COLISSIMO_CONTRACT_NUMBER || '').trim()
   const password = String(env.COLISSIMO_PASSWORD || '')
-  const productCode = String(env.COLISSIMO_PRODUCT_CODE || 'DOM').trim().toUpperCase()
+  const productCode = String(env.COLISSIMO_PRODUCT_CODE || 'DOS').trim().toUpperCase()
   return {
     configured: Boolean(contractNumber && password),
     contractNumber,
     password,
-    productCode: COLISSIMO_PRODUCT_CODES.has(productCode) ? productCode : 'DOM',
+    productCode: COLISSIMO_PRODUCT_CODES.has(productCode) ? productCode : 'DOS',
     sender: {
       companyName: 'THEKLOPE',
       line2: '188 rue de Rome',
