@@ -160,7 +160,7 @@ export const productsForFamily = (family, products = []) => (
 export function familyFaq(family) {
   return [
     { q: `Avec quels appareils les ${family.family} sont-elles compatibles ?`, a: `${family.answer} ${family.caveats.join(' ')}`.trim() },
-    { q: 'Quelle valeur de résistance choisir ?', a: family.usage },
+    { q: `Comment choisir et utiliser les ${family.family} ?`, a: `${family.usage} La valeur en ohms et la puissance conseillée sont indiquées sur chaque résistance : plus la valeur est basse, plus le tirage est aérien.` },
     { q: 'Je ne suis pas sûr de mon modèle, que faire ?', a: 'Regardez le nom inscrit sur votre appareil ou sur sa boîte, ou apportez-le au 188 rue de Rome à Marseille : nous vérifions la compatibilité sur place.' },
   ]
 }
