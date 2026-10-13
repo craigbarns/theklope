@@ -157,3 +157,36 @@ test('résistance sans compatibilité saisie : compatibilité vérifiée fabrica
   const manual = enrichProductCopy({ id: 'x', name: 'Pnp X Voopoo', category: 'accessoire', specs: { Compatibilité: 'Drag S2' } })
   assert.equal(manual.specs.Compatibilité, 'Drag S2')
 })
+
+test('matériel : titre « marque + modèle » avec puissance et batterie', () => {
+  const doric = {
+    name: 'Doric Pro 60 - Voopoo', brand: 'Voopoo', category: 'ecig', type: 'Cigarette électronique', stock: 10,
+    specs: { Charge: 'USB-C', Batterie: '2500 mah', 'Puissance max': '60 watts' },
+  }
+  assert.equal(buildProductSeoTitle(doric), 'Voopoo Doric Pro 60 : 60 W, 2500 mAh | THEKLOPE')
+  assert.equal(buildProductSeoTitle({ ...doric, name: 'Drag H40', specs: {} }), 'Voopoo Drag H40 | THEKLOPE')
+  assert.equal(buildProductSeoTitle({ ...doric, name: 'Voopoo Argus G2', specs: {} }), 'Voopoo Argus G2 | THEKLOPE')
+  // Les chiffres ne sont ajoutés que si le titre reste court.
+  const long = { ...doric, name: 'Argus P1s Kit Complet Edition Limitée Cuir - Voopoo' }
+  assert.equal(buildProductSeoTitle(long), 'Voopoo Argus P1s Kit Complet Edition Limitée Cuir | THEKLOPE')
+})
+
+test('description Google : 160 caractères au plus, chiffres clés en tête', () => {
+  const doric = {
+    name: 'Doric Pro 60 - Voopoo', brand: 'Voopoo', category: 'ecig', type: 'Cigarette électronique', stock: 10,
+    specs: { Batterie: '2500 mah', 'Puissance max': '60 watts' },
+    short: 'Le retour du pod cylindrique et iconique sera apprécié par celles et ceux qui veulent une e-cigarette simple à utiliser et versatile. La puissance est de 60W pour un pod puissant et intuitif. '.repeat(4),
+  }
+  const description = buildProductSeoDescription(doric)
+  assert.ok(description.length <= 160, `${description.length} caractères`)
+  assert.match(description, /^Voopoo Doric Pro 60 : cigarette électronique 60 W, batterie 2500 mAh\./)
+  assert.doesNotMatch(description, /…|cylindrique/, 'jamais de phrase coupée')
+  assert.match(description, /En stock/)
+
+  const liquid = buildProductSeoDescription({
+    name: 'Hawai 60 ml - Adalya', brand: 'Adalya', category: 'eliquide', type: 'E-liquide', nicotine: [0], stock: 5,
+    short: 'Un cocktail tropical rafraîchissant mêlant ananas, mangue et menthe.',
+  })
+  assert.ok(liquid.length <= 160)
+  assert.match(liquid, /ananas, mangue et menthe/)
+})

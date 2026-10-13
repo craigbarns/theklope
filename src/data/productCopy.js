@@ -242,6 +242,56 @@ const displayBrand = (product = {}) => {
   return String(product.name || '').toLowerCase().includes(brand.toLowerCase()) ? '' : brand
 }
 
+// Matériel : l'appareil se cherche par « marque + modèle » (« voopoo doric »,
+// « oxva xlim pro 3 »), et ce qui le distingue tient en deux chiffres. Le nom
+// catalogue mettait la marque en fin (« Doric Pro 60 - Voopoo ») et la
+// description reprenait le texte complet de la fiche (1 000 caractères, dont
+// Google n'affiche que les 155 premiers : jamais la puissance ni la batterie).
+const HARDWARE_CATEGORIES = new Set(['ecig', 'pod', 'pack', 'alternative-puff'])
+const isHardware = (product = {}) => HARDWARE_CATEGORIES.has(product.category)
+
+const specValue = (specs = {}, pattern) => {
+  const entry = Object.entries(specs || {}).find(([key, value]) => pattern.test(key) && compact(value))
+  return entry ? compact(entry[1]) : ''
+}
+
+const powerFact = (specs) => {
+  const match = /(\d+(?:[.,]\d+)?)\s*(?:w|watts?)\b/i.exec(specValue(specs, /puissance/i))
+  return match ? `${match[1].replace('.', ',')} W` : ''
+}
+
+const batteryFact = (specs) => {
+  const match = /(\d{3,5})\s*mah\b/i.exec(specValue(specs, /batterie|accu|autonomie/i))
+  return match ? `${match[1]} mAh` : ''
+}
+
+export const hardwareFacts = (product = {}) => (isHardware(product)
+  ? [powerFact(product.specs), batteryFact(product.specs)].filter(Boolean)
+  : [])
+
+const escapeRegExp = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+// « Doric Pro 60 - Voopoo » → « Voopoo Doric Pro 60 ». Un nom qui cite déjà la
+// marque ailleurs reste tel quel ; la marque maison n'est jamais ajoutée.
+export function brandFirstName(product = {}) {
+  const name = compact(product.name)
+  const brand = compact(product.brand)
+  if (!brand || brand.toLowerCase() === HOUSE_BRAND) return name
+  const suffix = new RegExp(`\\s*[-–—|]\\s*${escapeRegExp(brand)}\\s*$`, 'i')
+  if (suffix.test(name)) return `${brand} ${name.replace(suffix, '')}`
+  return normalize(name).includes(normalize(brand)) ? name : `${brand} ${name}`
+}
+
+// Première phrase d'un texte, si elle tient dans `max` caractères.
+const firstSentence = (text, max) => {
+  const value = compact(text)
+  const match = /^.+?[.!?](?=\s|$)/.exec(value)
+  const sentence = match ? match[0] : value
+  return sentence.length <= max ? sentence : ''
+}
+
+const SEO_DESCRIPTION_MAX = 160
+
 export function buildProductSeoDescription(product = {}) {
   const brand = displayBrand(product)
   const specs = product.specs || {}
@@ -255,16 +305,39 @@ export function buildProductSeoDescription(product = {}) {
     : ''
 
   const facts = [product.type, specs.Contenance, nicotine, specs.Ratio].filter(Boolean).join(' · ')
+  const [power, battery] = [powerFact(specs), batteryFact(specs)]
+  const hardwareDetails = [power, battery && `batterie ${battery}`].filter(Boolean).join(', ')
+  const lead = isHardware(product)
+    // « Voopoo Doric Pro 60 : cigarette électronique 60 W, batterie 2500 mAh. »
+    ? `${brandFirstName(product)} : ${[compact(product.type).toLowerCase(), hardwareDetails].filter(Boolean).join(' ')}.`
+    : `${product.name}${brand ? ` — ${brand}` : ''}${facts ? ` : ${facts}.` : '.'}`
 
-  return [
-    `${product.name}${brand ? ` — ${brand}` : ''}${facts ? ` : ${facts}.` : '.'}`,
-    isGenericProductCopy(product.short) ? '' : product.short,
+  // Le texte de la fiche n'entre que s'il tient en entier : une phrase coupée
+  // au milieu dans le résultat Google fait moins cliquer qu'une phrase absente.
+  const optional = [
+    isGenericProductCopy(product.short) ? '' : firstSentence(product.short, SEO_DESCRIPTION_MAX),
     product.stock > 0 ? 'En stock, expédié sous 24/48h.' : '',
-    'Livraison offerte dès 49 €, coursier le jour même à Marseille.',
-  ].filter(Boolean).join(' ')
+    'Livraison offerte dès 49 €.',
+    'Coursier le jour même à Marseille.',
+  ].filter(Boolean)
+
+  let description = lead
+  for (const part of optional) {
+    if (`${description} ${part}`.length <= SEO_DESCRIPTION_MAX) description = `${description} ${part}`
+  }
+  return description
 }
 
 export function buildProductSeoTitle(product = {}) {
+  if (isHardware(product)) {
+    const name = brandFirstName(product)
+    const facts = hardwareFacts(product).join(', ')
+    // Au-delà d'environ 60 caractères, Google coupe le titre : les chiffres
+    // ne sont ajoutés que s'ils tiennent.
+    return facts && `${name} : ${facts}`.length <= 50
+      ? `${name} : ${facts} | THEKLOPE`
+      : `${name} | THEKLOPE`
+  }
   const brand = displayBrand(product)
   return `Acheter ${product.name}${brand ? ` ${brand}` : ''} | THEKLOPE`
 }
