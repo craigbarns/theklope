@@ -47,6 +47,51 @@
       "permanent": true
     },
     {
+      "source": "/produit/lady-killer-60-ml-adalya",
+      "destination": "/categorie/marque-adalya",
+      "permanent": true
+    },
+    {
+      "source": "/produit/african-crush-60-ml-adalya",
+      "destination": "/categorie/marque-adalya",
+      "permanent": true
+    },
+    {
+      "source": "/produit/tropikoo-50ml-307",
+      "destination": "/categorie/e-liquides-50ml",
+      "permanent": true
+    },
+    {
+      "source": "/produit/mintoo-50ml-294",
+      "destination": "/categorie/e-liquides-50ml",
+      "permanent": true
+    },
+    {
+      "source": "/produit/friskoo-50ml-255",
+      "destination": "/categorie/e-liquides-50ml",
+      "permanent": true
+    },
+    {
+      "source": "/produit/kit-drag-x3",
+      "destination": "/produit/drag-x3-52",
+      "permanent": true
+    },
+    {
+      "source": "/produit/armour-s-100w-avec-itank-2-5ml-vaporesso-silver-270",
+      "destination": "/produit/armour-s-100w-avec-itank-2-5ml-vaporesso-noir-269",
+      "permanent": true
+    },
+    {
+      "source": "/nous-contacter",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/promotions",
+      "destination": "/boutique",
+      "permanent": true
+    },
+    {
       "source": "/connexion",
       "destination": "/",
       "permanent": true

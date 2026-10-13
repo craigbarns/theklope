@@ -42,3 +42,17 @@ test('product pages do not expose urgency countdowns or reference-price comparis
   assert.doesNotMatch(product, /product\.oldPrice/)
   assert.doesNotMatch(productCard, /product\.oldPrice/)
 })
+
+// Les produits du vapotage ne peuvent pas se présenter comme une aide à
+// l'arrêt du tabac : seul l'avertissement renvoyant vers un professionnel de
+// santé peut évoquer le sevrage.
+test('les textes SEO ne présentent pas la vape comme une méthode de sevrage', async () => {
+  const files = ['./data/categorySeo.js', './data/catalog.js', './data/staticSeoPages.js']
+  for (const file of files) {
+    const source = await readFile(new URL(file, import.meta.url), 'utf8')
+    for (const line of source.split('\n')) {
+      if (/professionnel de santé/.test(line)) continue
+      assert.doesNotMatch(line, /sevrage|arrêter de fumer|arreter de fumer/i, `${file} : ${line.trim().slice(0, 90)}`)
+    }
+  }
+})

@@ -698,7 +698,7 @@ export const BLOG_POSTS = [
       {
         title: 'Formats et compatibilité',
         text:
-          'Les grands formats sont souvent proposés en 0 mg/ml. Le ratio PG/VG reste essentiel pour éviter fuites ou mauvaise alimentation de la résistance.',
+          'Les grands formats sont souvent proposés en 0 mg/ml. Le ratio PG/VG reste essentiel pour éviter fuites ou mauvaise alimentation de la résistance. Retrouvez tous les <a href="/categorie/e-liquides-sans-nicotine" class="text-neon hover:underline">e-liquides disponibles sans nicotine</a> : 10 ml au taux 0 mg, <a href="/categorie/e-liquides-50ml" class="text-neon hover:underline">50 ml</a> et <a href="/categorie/e-liquides-100ml" class="text-neon hover:underline">100 ml</a>.',
       },
       {
         title: 'Saveurs disponibles',

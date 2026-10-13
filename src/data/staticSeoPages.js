@@ -117,8 +117,8 @@ export const STATIC_SEO_PAGES = {
         a: 'Chez THEKLOPE, situé au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Vous pouvez acheter sur place, ou commander en ligne avec livraison par coursier le jour même dans Marseille.',
       },
       {
-        q: 'Quelle cigarette électronique est recommandée pour arrêter de fumer ?',
-        a: 'Un pod compact à tirage serré (MTL) comme le Vaporesso XROS ou le Voopoo Argus est le choix le plus efficace : simple d’usage, discret et parfait avec des e-liquides aux sels de nicotine.',
+        q: 'Quelle cigarette électronique choisir quand on fume des cigarettes ?',
+        a: 'Un pod compact à tirage serré (MTL) comme le Vaporesso XROS ou le Voopoo Argus : simple d’usage, discret et adapté aux e-liquides aux sels de nicotine. Pour un objectif d’arrêt du tabac, demandez conseil à un professionnel de santé.',
       },
       {
         q: 'La livraison est-elle offerte à Marseille ?',

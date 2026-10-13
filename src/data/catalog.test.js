@@ -143,3 +143,25 @@ test('merchandising order uses explicit badges and never synthetic review counts
     ['editorial-best', 'new', 'many-fake-reviews', 'out'],
   )
 })
+
+test('la page « sans nicotine » réunit les e-liquides disponibles en 0 mg', () => {
+  const tenWithZero = { id: 'a', name: 'Cerise Fraise 10 ml', category: 'eliquide', brand: 'Liquidarom', volume: '10ml', nicotine: [0, 3, 6] }
+  const tenWithoutZero = { id: 'b', name: 'Sel 10 ml', category: 'eliquide', brand: 'X', volume: '10ml', nicotine: [3, 6] }
+  const shortfill = { id: 'c', name: 'Tarte aux fraises 50ml', category: 'eliquide-fruite', brand: 'JNR', volume: '60ml', nicotine: [] }
+  const hundred = { id: 'd', name: 'Harry 100 ml', category: 'eliquide', brand: 'Replay', volume: '100ml' }
+  const kit = { id: 'e', name: 'Drag H40', category: 'ecig', brand: 'Voopoo', nicotine: [0] }
+  assert.equal(productMatchesCategory(tenWithZero, 'eliquide-sans-nicotine'), true)
+  assert.equal(productMatchesCategory(tenWithoutZero, 'eliquide-sans-nicotine'), false)
+  assert.equal(productMatchesCategory(shortfill, 'eliquide-sans-nicotine'), true)
+  assert.equal(productMatchesCategory(hundred, 'eliquide-sans-nicotine'), true)
+  assert.equal(productMatchesCategory(kit, 'eliquide-sans-nicotine'), false)
+  assert.ok(CATEGORIES.some((c) => c.slug === 'e-liquides-sans-nicotine' && c.key === 'eliquide-sans-nicotine'))
+})
+
+test('la page marque Adalya liste les e-liquides Adalya', () => {
+  const adalya = CATEGORIES.find((c) => c.slug === 'marque-adalya')
+  assert.ok(adalya)
+  assert.equal(productMatchesCategory({ name: 'Love 66 60 ml - Adalya', brand: 'Adalya', category: 'eliquide' }, adalya.key), true)
+  assert.equal(productMatchesCategory({ name: 'Hawai 60 ml', brand: 'ADALYA', category: 'eliquide' }, adalya.key), true)
+  assert.equal(productMatchesCategory({ name: 'Drag H40', brand: 'Voopoo', category: 'ecig' }, adalya.key), false)
+})

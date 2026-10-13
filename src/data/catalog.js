@@ -13,10 +13,11 @@ export const CATEGORIES = [
   { slug: 'cigarettes-electroniques', key: 'ecig', name: 'Cigarettes électroniques', tagline: 'Kits & mods nouvelle génération' },
   { slug: 'pods', key: 'pod', name: 'Pods', tagline: 'Systèmes rechargeables compacts' },
   { slug: 'e-liquides', key: 'eliquide', name: 'E-liquides', tagline: 'Saveurs sélectionnées, dosage maîtrisé' },
-  { slug: 'e-liquides-sels-de-nicotine', key: 'sels-nicotine', name: 'E-liquides Sels de nicotine', tagline: 'Douceur en gorge et sevrage efficace' },
+  { slug: 'e-liquides-sels-de-nicotine', key: 'sels-nicotine', name: 'E-liquides Sels de nicotine', tagline: 'Hit doux, adaptés aux pods et aux taux élevés' },
   { slug: 'e-liquides-10ml', key: 'eliquide-10ml', name: 'E-liquides 10 ml', tagline: 'Flacons prêts à vapoter, nicotine au choix' },
   { slug: 'e-liquides-50ml', key: 'eliquide-50ml', name: 'E-liquides 50 ml', tagline: 'Grands formats économiques à booster' },
   { slug: 'e-liquides-100ml', key: 'eliquide-100ml', name: 'E-liquides 100 ml', tagline: 'Très grands formats XL' },
+  { slug: 'e-liquides-sans-nicotine', key: 'eliquide-sans-nicotine', name: 'E-liquides sans nicotine', tagline: 'Disponibles en 0 mg : 10 ml, 50 ml et 100 ml' },
   { slug: 'e-liquides-tabac', key: 'eliquide-tabac', name: 'E-liquides Tabac & Classic', tagline: 'Saveurs blondes et riches' },
   { slug: 'e-liquides-fruites', key: 'eliquide-fruite', name: 'E-liquides Fruités', tagline: 'Fruits rouges, mangue, fraise' },
   { slug: 'e-liquides-menthe', key: 'eliquide-menthe', name: 'E-liquides Menthe & Frais', tagline: 'Sensations intenses et fraîches' },
@@ -56,6 +57,7 @@ export const CATEGORIES = [
   { slug: 'marque-petit-nuage', key: 'brand-petitnuage', name: 'Petit Nuage', tagline: 'Saveurs douces et gourmandes en 60ml' },
   { slug: 'marque-fruizee', key: 'brand-fruizee', name: 'Fruizee', tagline: 'E-liquides ultra-frais et fruités de Eliquid France' },
   { slug: 'marque-jnr', key: 'brand-jnr', name: 'JNR Vape', tagline: 'E-liquides et rechargeables au goût de puff' },
+  { slug: 'marque-adalya', key: 'brand-adalya', name: 'Adalya', tagline: 'E-liquides fruités et mentholés en 50 ml' },
 
   { slug: 'nouveautes', key: 'new', name: 'Nouveautés', tagline: 'Les dernières arrivées' },
   { slug: 'meilleures-ventes', key: 'best', name: 'Sélection du catalogue', tagline: 'Références disponibles sélectionnées par la boutique' },
@@ -138,6 +140,13 @@ const eliquideVolumeMatches = (p, ml) => {
 export const isEliquide10ml = (p = {}) => eliquideVolumeMatches(p, 10)
 export const isEliquide50ml = (p = {}) => eliquideVolumeMatches(p, 50)
 export const isEliquide100ml = (p = {}) => eliquideVolumeMatches(p, 100)
+// Disponible en 0 mg : taux 0 proposé au choix, ou grand format 50/100 ml
+// (vendu sans nicotine par la loi, à booster soi-même).
+export const isEliquideSansNicotine = (p = {}) => {
+  if (!isEliquidProduct(p)) return false
+  if (Array.isArray(p.nicotine) && p.nicotine.some((rate) => Number(rate) === 0)) return true
+  return isEliquide50ml(p) || isEliquide100ml(p)
+}
 
 export const isEliquideTabac = (p = {}) => {
   if (!isEliquidProduct(p)) return false
@@ -193,6 +202,7 @@ export const productMatchesCategory = (product, categoryKey) => {
   if (categoryKey === 'eliquide-10ml') return isEliquide10ml(product)
   if (categoryKey === 'eliquide-50ml') return isEliquide50ml(product)
   if (categoryKey === 'eliquide-100ml') return isEliquide100ml(product)
+  if (categoryKey === 'eliquide-sans-nicotine') return isEliquideSansNicotine(product)
   if (categoryKey === 'eliquide-tabac') return isEliquideTabac(product)
   if (categoryKey === 'eliquide-fruite') return isEliquideFruite(product)
   if (categoryKey === 'eliquide-menthe') return isEliquideMenthe(product)
