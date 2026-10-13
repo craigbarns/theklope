@@ -60,8 +60,8 @@ export const CATEGORY_SEO = {
         a: 'La durée de vie d\'une cartouche ou d\'une résistance de pod est généralement d\'une à deux semaines, selon votre consommation. Un goût de brûlé ou une baisse de vapeur sont les signes qu\'il faut la remplacer.',
       },
       {
-        q: 'Un pod est-il suffisant pour arrêter de fumer ?',
-        a: 'Associé au bon taux de nicotine (ou aux sels de nicotine), un pod rechargeable est souvent le matériel le plus efficace pour réussir son sevrage tabagique grâce à son tirage adapté.',
+        q: 'Un pod convient-il à un ancien fumeur ?',
+        a: 'Associé au bon taux de nicotine (ou aux sels de nicotine), un pod rechargeable offre un tirage serré, proche de celui d’une cigarette. Pour un objectif d’arrêt du tabac, demandez conseil à un professionnel de santé.',
       },
     ],
   },
@@ -121,7 +121,7 @@ export const CATEGORY_SEO = {
       },
       {
         q: 'Quel taux de sel de nicotine choisir ?',
-        a: 'Les sels de nicotine sont généralement proposés en 10 mg/ml (pour les fumeurs moyens ou vapoteurs réguliers) et en 20 mg/ml (pour les gros fumeurs en phase de sevrage ou les utilisateurs de puffs).',
+        a: 'Les sels de nicotine sont généralement proposés en 10 mg/ml (pour les fumeurs moyens ou vapoteurs réguliers) et en 20 mg/ml (pour les anciens gros fumeurs ou les habitués des puffs).',
       },
       {
         q: 'Puis-je utiliser du sel de nicotine sur une grosse cigarette électronique ?',
@@ -186,6 +186,48 @@ export const CATEGORY_SEO = {
       {
         q: 'Faut-il laisser reposer un e-liquide 50 ml après ajout du booster ?',
         a: 'Un bon mélange de 30 secondes suffit généralement. Vous pouvez vapoter immédiatement votre liquide boosté.',
+      },
+    ],
+  },
+  // Requêtes « e liquide sans nicotine » et variantes : ~1 700 impressions en
+  // 3 mois (Search Console, juillet–octobre 2026), position 10 à 18, servies
+  // uniquement par un guide. Page d'achat dédiée.
+  'e-liquides-sans-nicotine': {
+    seoTitle: 'E-liquide sans nicotine : 10 ml, 50 ml et 100 ml en 0 mg',
+    metaDescription:
+      'E-liquides sans nicotine (0 mg) : flacons 10 ml au taux 0 et grands formats 50 ml et 100 ml. Fruités, frais, gourmands, classics. Vente réservée aux adultes.',
+    h1: 'E-liquides sans nicotine (0 mg)',
+    intro:
+      'Tous les e-liquides de cette sélection existent en 0 mg de nicotine. Les flacons de 10 ml se commandent au taux « 0 mg » ; les grands formats 50 ml et 100 ml sont vendus sans nicotine, comme le prévoit la réglementation française, et s’utilisent tels quels.',
+    sections: [
+      {
+        title: 'Quel format choisir en 0 mg ?',
+        text:
+          'Le 10 ml permet de découvrir une saveur. Le 50 ml (flacon de 60 ml) et le 100 ml (flacon de 120 ml) conviennent à un usage quotidien : le prix au millilitre est plus bas et le flacon garde de la place pour un booster si vous changez d’avis.',
+      },
+      {
+        title: 'Ratio PG/VG et matériel',
+        text:
+          'Un e-liquide 50/50 convient à la plupart des pods et kits. Les ratios plus riches en glycérine végétale (VG), comme 30/70, sont faits pour les résistances sub-ohm et produisent davantage de vapeur. Le ratio est indiqué sur chaque fiche.',
+      },
+      {
+        title: 'Toutes les familles de saveurs',
+        text:
+          'Fruités, menthe et frais, gourmands ou classics : ce sont les mêmes recettes que les versions nicotinées, chez Liquidarom, Freaks, Alfaliquid, Pulp, JNR, Adalya et d’autres marques.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Que contient un e-liquide sans nicotine ?',
+        a: 'Généralement du propylène glycol (PG), de la glycérine végétale (VG) et des arômes, sans nicotine. La composition exacte figure sur l’étiquette de chaque flacon.',
+      },
+      {
+        q: 'Peut-on ajouter de la nicotine plus tard ?',
+        a: 'Oui pour les grands formats : 50 ml d’e-liquide sont livrés dans un flacon de 60 ml, ce qui permet d’ajouter un booster de 10 ml à 20 mg/ml pour obtenir environ 3 mg/ml. Les produits contenant de la nicotine sont réservés aux adultes.',
+      },
+      {
+        q: 'Le 0 mg est-il disponible pour tous les 10 ml ?',
+        a: 'La plupart des e-liquides 10 ml sont proposés en 0 mg : choisissez « 0 mg » dans le taux de nicotine sur la fiche produit. Un taux en rupture est signalé avant l’ajout au panier.',
       },
     ],
   },
@@ -381,7 +423,7 @@ export const CATEGORY_SEO = {
       },
       {
         q: 'Quel taux de nicotine utiliser avec les résistances Voopoo PnP ?',
-        a: 'Pour les résistances sub-ohm (0.15Ω et 0.2Ω), ne dépassez pas 3 à 6 mg/ml de nicotine. Pour un sevrage avec 10 ou 20 mg/ml (ou sels de nicotine), optez pour les versions 0.6Ω, 0.8Ω ou 1.2Ω.',
+        a: 'Pour les résistances sub-ohm (0.15Ω et 0.2Ω), ne dépassez pas 3 à 6 mg/ml de nicotine. Pour 10 ou 20 mg/ml (ou sels de nicotine), optez pour les versions 0.6Ω, 0.8Ω ou 1.2Ω.',
       },
       {
         q: 'Pourquoi ma résistance Voopoo fuit-elle ?',
@@ -400,7 +442,7 @@ export const CATEGORY_SEO = {
       {
         title: 'Quelle résistance Z-Coil choisir pour votre clearomiseur ?',
         text:
-          'La Z-Coil 1.6 Ω (10-14W) en Kanthal est la reine du sevrage tabagique, parfaite pour les forts taux de nicotine et les sels de nicotine. La Z-Coil 1.2 Ω (10-14W) offre un tirage doux et silencieux. La Z-Coil 0.8 Ω (15-18W) délivre une vapeur plus tiède et dense. La Z-Coil 0.3 Ω (30-40W) permet une vape semi-directe (RDL) savoureuse sur Zenith Pro et Zenith II.',
+          'La Z-Coil 1.6 Ω (10-14W) en Kanthal est la plus adaptée aux forts taux de nicotine et aux sels de nicotine. La Z-Coil 1.2 Ω (10-14W) offre un tirage doux et silencieux. La Z-Coil 0.8 Ω (15-18W) délivre une vapeur plus tiède et dense. La Z-Coil 0.3 Ω (30-40W) permet une vape semi-directe (RDL) savoureuse sur Zenith Pro et Zenith II.',
       },
       {
         title: 'Compatibilité totale avec la gamme Zenith et Zlide',
@@ -611,7 +653,7 @@ export const CATEGORY_SEO = {
       },
       {
         q: 'Quel e-liquide utiliser avec un pod Vaporesso XROS ?',
-        a: 'Les pods XROS fonctionnent idéalement avec des e-liquides au ratio 50/50 PG/VG ou avec des e-liquides aux sels de nicotine pour un sevrage en douceur.',
+        a: 'Les pods XROS fonctionnent idéalement avec des e-liquides au ratio 50/50 PG/VG ou avec des e-liquides aux sels de nicotine pour un hit doux.',
       },
     ],
   },
@@ -675,18 +717,59 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  // Marque Adalya : ~2 600 impressions et 2 clics en 3 mois (« lady killer
+  // goût », « adalya hawaii », « love 66 »…), sans page de marque. Les goûts
+  // ci-dessous reprennent les descriptions des fiches du catalogue.
+  'marque-adalya': {
+    seoTitle: 'E-liquides Adalya : Love 66, Hawai, Mi Amor en 50 ml',
+    metaDescription:
+      'E-liquides Adalya en 50 ml : Love 66 (pastèque, melon, passion), Hawai (ananas, mangue), Mi Amor (ananas, banane), Strawberry Splash (fraise).',
+    h1: 'E-liquides Adalya',
+    intro:
+      'Adalya décline en e-liquides ses mélanges les plus connus : des fruits mûrs associés à une note de menthe fraîche. Chez THEKLOPE, ils sont proposés en 50 ml dans un flacon de 60 ml, en 50 PG / 50 VG et sans nicotine.',
+    sections: [
+      {
+        title: 'Quel goût pour chaque Adalya ?',
+        text:
+          'Love 66 : pastèque, melon, fruit de la passion et menthe fraîche. Hawai : ananas, mangue et menthe. Mi Amor : ananas, banane et menthe fraîche. Strawberry Splash : fraise fraîche.',
+      },
+      {
+        title: 'Format et utilisation',
+        text:
+          'Flacon de 60 ml rempli de 50 ml d’e-liquide en 50/50 PG/VG : il convient à la plupart des pods et kits, et laisse la place pour un booster de nicotine de 10 ml si vous le souhaitez.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel goût a le Love 66 d’Adalya ?',
+        a: 'Un mélange de pastèque, de melon et de fruit de la passion, avec une finale de menthe fraîche.',
+      },
+      {
+        q: 'Quel goût a le Hawai d’Adalya ?',
+        a: 'Un cocktail tropical d’ananas et de mangue, rafraîchi par une note de menthe.',
+      },
+      {
+        q: 'Quel goût a le Mi Amor d’Adalya ?',
+        a: 'Un mélange doux d’ananas et de banane, avec de la menthe fraîche.',
+      },
+      {
+        q: 'Proposez-vous Lady Killer ou African Crush ?',
+        a: 'Ces deux recettes ne sont plus au catalogue en ligne pour le moment. Demandez les arrivages à la boutique du 188 rue de Rome, ou essayez Hawai et Love 66, qui associent eux aussi fruits exotiques et menthe.',
+      },
+    ],
+  },
   'marque-aspire': {
     seoTitle: 'Aspire : Kits Zelos 3, PockeX, Nautilus & Résistances BVC',
     metaDescription:
       'Boutique Aspire officielle : kits Zelos 3, PockeX, clearomiseurs Nautilus et résistances BVC / Nautilus Mesh garanties d\'origine. Expédition rapide 24h.',
     h1: 'Cigarettes Électroniques, Kits Zelos & Résistances Aspire',
     intro:
-      'Pionnier historique de la vape MTL (inhalation indirecte), Aspire est la marque de référence pour arrêter de fumer sereinement grâce à la précision de ses clearomiseurs Nautilus et la simplicité de ses kits Zelos.',
+      'Pionnier historique de la vape MTL (inhalation indirecte), Aspire est une référence du tirage serré grâce à la précision de ses clearomiseurs Nautilus et la simplicité de ses kits Zelos.',
     sections: [
       {
-        title: 'Le tirage parfait pour le sevrage tabagique',
+        title: 'Un tirage serré proche de la cigarette',
         text:
-          'Avec le kit Zelos 3 ou le mythique clearomiseur Nautilus 3, Aspire propose le tirage serré le plus proche de la cigarette traditionnelle, favorisant une absorption efficace de la nicotine sans irritation.',
+          'Avec le kit Zelos 3 ou le mythique clearomiseur Nautilus 3, Aspire propose le tirage serré le plus proche de la cigarette traditionnelle, pour un hit doux et régulier.',
       },
       {
         title: 'Résistances Nautilus BVC et Mesh d’origine',

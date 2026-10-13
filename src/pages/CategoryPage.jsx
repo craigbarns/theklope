@@ -23,6 +23,7 @@ const SUB_CATEGORIES_MAP = {
     { slug: 'e-liquides-10ml', name: '10 ml' },
     { slug: 'e-liquides-50ml', name: '50 ml' },
     { slug: 'e-liquides-100ml', name: '100 ml' },
+    { slug: 'e-liquides-sans-nicotine', name: 'Sans nicotine' },
     { slug: 'e-liquides-sels-de-nicotine', name: 'Sels de nicotine' },
     { slug: 'e-liquides-fruites', name: 'Fruités' },
     { slug: 'e-liquides-menthe', name: 'Menthe & Frais' },
