@@ -133,27 +133,22 @@ test('totaux : 5 € fixes, minimum 20 € pour le parrainage, jamais cumulé', 
   assert.equal(below.promoRejected, true)
   const fidel = { code: 'FIDEL-ABCDEF', kind: 'voucher', amount: 5 }
   assert.equal(computeTotals({ lines: kit(3), promoCode: 'FIDEL-ABCDEF', voucher: fidel }).discount, 3, 'jamais plus que le panier')
-  const bulk = [{ price: 5.9, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' }]
-  assert.equal(computeTotals({ lines: bulk, promoCode: 'FIDEL-ABCDEF', voucher: fidel }).discountSource, 'auto')
+  const bulk = [{ price: 2.95, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' }]
+  assert.equal(computeTotals({ lines: bulk, promoCode: 'FIDEL-ABCDEF', voucher: fidel }).discount, 5)
 })
 
-test('bon + tarif quantité : le bon s’applique aux seuls articles sans remise quantité', () => {
+test('bon sur un panier e-liquides + matériel : appliqué à tout le panier', () => {
   const pack = [
-    { price: 5.9, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' },
+    { price: 2.95, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' },
     { price: 15, qty: 1, brand: 'Vaporesso', category: 'resistance' },
   ]
   const merci = computeTotals({ lines: pack, promoCode: 'MERCI-ABCDEF', voucher: { code: 'MERCI-ABCDEF', kind: 'voucher', percent: 5 } })
-  assert.equal(merci.autoDiscount.total, 59)
-  assert.equal(merci.voucherDiscount, 0.75, '5 % des 15 € de résistances seulement')
-  assert.equal(merci.discount, 59.75)
-  assert.equal(merci.discountSource, 'mixed')
+  assert.equal(merci.autoDiscount.total, 0)
+  assert.equal(merci.voucherDiscount, 3.7, '5 % de 74 €')
+  assert.equal(merci.discount, 3.7)
+  assert.equal(merci.discountSource, 'promo')
   assert.equal(merci.appliedPromo.code, 'MERCI-ABCDEF', 'le bon est consommé')
 
   const fidel = computeTotals({ lines: pack, promoCode: 'FIDEL-ABCDEF', voucher: { code: 'FIDEL-ABCDEF', kind: 'voucher', amount: 5 } })
-  assert.equal(fidel.discount, 64)
-
-  // Pack seul : rien à réduire, le bon n'est pas consommé.
-  const packOnly = computeTotals({ lines: [pack[0]], promoCode: 'MERCI-ABCDEF', voucher: { code: 'MERCI-ABCDEF', kind: 'voucher', percent: 5 } })
-  assert.equal(packOnly.voucherDiscount, 0)
-  assert.equal(packOnly.appliedPromo, null)
+  assert.equal(fidel.discount, 5)
 })

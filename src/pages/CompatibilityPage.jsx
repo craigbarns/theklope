@@ -102,7 +102,7 @@ function FamilyPage({ slug }) {
 
   return (
     <div className="container-page py-8">
-      <Seo title={family.seoTitle} description={`${family.answer} Disponibles chez THEKLOPE, retrait 1 h à Marseille.`} canonical={`${BASE}${path}`} schema={schema} />
+      <Seo title={family.seoTitle} description={`${family.answer} Disponibles chez THEKLOPE, coursier le jour même à Marseille.`} canonical={`${BASE}${path}`} schema={schema} />
       <Breadcrumbs items={[{ label: 'Compatibilité résistances', to: '/compatibilite' }, { label: family.family }]} />
 
       <h1 className="mt-6 font-display text-3xl font-bold text-white sm:text-4xl">{family.h1}</h1>
@@ -127,7 +127,7 @@ function FamilyPage({ slug }) {
         </section>
         <aside className="card p-5 text-sm">
           <p className="font-semibold text-white">Un doute sur votre modèle ?</p>
-          <p className="mt-2 text-muted">Apportez votre appareil au 188 rue de Rome (Marseille 6e) : nous vérifions sur place. Retrait gratuit en 1 h.</p>
+          <p className="mt-2 text-muted">Apportez votre appareil au 188 rue de Rome (Marseille 6e) : nous vérifions sur place. Coursier le jour même dans Marseille.</p>
           <Link to="/compatibilite" className="mt-3 inline-block text-neon hover:underline">Autres appareils →</Link>
         </aside>
       </div>

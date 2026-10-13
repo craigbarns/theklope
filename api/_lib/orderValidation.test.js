@@ -101,12 +101,12 @@ test('quantities are strict and aggregate across variant lines', () => {
   assert.equal(totals.get('p2'), 1)
 })
 
-test('pickup works without an address and uses the store address', () => {
-  const result = validateFulfillment('pickup', { deliveryInstructions: { malicious: true } })
-  assert.equal(result.ok, true)
-  assert.equal(result.address.zip, '13006')
-  assert.equal('deliveryInstructions' in result.address, false)
-  assert.equal(validateFulfillment('pickup', null).ok, true)
+test('le Click & Collect (pickup) est refusé depuis son arrêt', () => {
+  const result = validateFulfillment('pickup', null)
+  assert.equal(result.ok, false)
+  assert.equal(result.error, 'Mode de livraison invalide.')
+  const marseille = { street: '1 rue Test', zip: '13006', city: 'Marseille', country: 'France' }
+  assert.equal(validateFulfillment('pickup', marseille).ok, false)
 })
 
 test('courier is restricted to Marseille and postal shipping to France', () => {
@@ -226,7 +226,7 @@ test('un Point Relais sans adresse exploitable est refusé plutôt que non étiq
 })
 
 test('les autres modes de livraison ne réclament aucun Point Relais', () => {
-  for (const id of ['poste', 'pickup']) {
+  for (const id of ['poste', 'coursier']) {
     const result = validateFulfillment(id, RELAY_ADDRESS, null)
     assert.equal(result.ok, true, `attendu accepté pour ${id}`)
     assert.equal(result.relayPoint, undefined)

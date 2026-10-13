@@ -7,20 +7,21 @@ import { categoryMatches, isEliquidCategory } from './productCategory.js'
 // Ne jamais faire confiance à un montant envoyé par le navigateur.
 // =============================================================================
 
-export const FREE_SHIPPING_THRESHOLD = 29
+export const FREE_SHIPPING_THRESHOLD = 49
 export const DEFAULT_SHIPPING_COST = 7.5
 
-// Modes de livraison. Click & Collect (retrait boutique) = gratuit ; Mondial
-// Relay = 3,90 € ; La Poste et Coursier Marseille = 7,50 €. Tous offerts dès
-// 29 € via le seuil ci-dessus.
+// Modes de livraison. Mondial Relay = 3,90 € ; La Poste et Coursier Marseille
+// = 7,50 €. Tous offerts dès 49 € via le seuil ci-dessus. Le Click & Collect
+// (retrait en boutique) est arrêté depuis le 13/10/2026 : le serveur refuse
+// désormais l'identifiant `pickup` (absent de cette liste). Les anciennes
+// commandes en retrait restent gérées dans l'admin.
 //
 // `relais` exige que le client ait choisi un Point Relais : le serveur refuse
 // la commande sans (voir validateFulfillment dans api/_lib/orderValidation.js).
 export const SHIPPING_METHODS = [
-  { id: 'relais', label: 'Mondial Relay', detail: 'Point Relais au choix, 3–5 j (offerte dès 29 €)', price: 3.9, requiresRelayPoint: true },
-  { id: 'poste', label: 'La Poste Colissimo', detail: 'Livraison 2–4 j (offerte dès 29 €)', price: 7.5 },
-  { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 29 €)', price: 7.5 },
-  { id: 'pickup', label: 'Click & Collect', detail: 'Retrait gratuit en boutique — 188 rue de Rome', price: 0 },
+  { id: 'relais', label: 'Mondial Relay', detail: 'Point Relais au choix, 3–5 j (offerte dès 49 €)', price: 3.9, requiresRelayPoint: true },
+  { id: 'poste', label: 'La Poste Colissimo', detail: 'Livraison 2–4 j avec signature (offerte dès 49 €)', price: 7.5 },
+  { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 49 €)', price: 7.5 },
 ]
 
 // CONFORMITÉ — article L3513-4 du code de la santé publique : toute publicité,
@@ -34,44 +35,24 @@ export const PROMO_CODES = {}
 const PACK_CONSUMABLE_CATEGORIES = ['accessoire', 'resistance']
 
 // -----------------------------------------------------------------------------
-// Tarifs automatiques par marque / volume (e-liquides uniquement).
-//   - 10ml : à partir de 20 unités dans un même groupe de marques.
-//   - 50ml / 100ml : à partir de 4 unités, formats et marques combinables.
-// Le pourcentage couvre toutes les unités éligibles dès que le seuil est atteint.
+// Tarifs par quantité (remises par lot) : SUPPRIMÉS le 13/10/2026 à la demande
+// du gérant. Les prix unitaires reprennent directement les anciens prix « par
+// lot » (voir ELIQUID_PRICE_GRID ci-dessous). Les listes restent vides pour que
+// computeAutoDiscount / computeBundleProgress ne renvoient plus rien sans
+// toucher au reste du calcul.
 // -----------------------------------------------------------------------------
-export const BUNDLE_TIERS_10ML = [
-  {
-    key: '10ml-liquidarom-freaks-secret-garden',
-    brands: ['liquidarom', 'freaks', 'secret garden', 'secrets garden'],
-    minQty: 20,
-    rate: 0.5,
-    label: 'Tarif quantité 10ml · Liquidarom / Freaks / Secret Garden',
-    conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Liquidarom, Freaks et Secret Garden',
-    progressLabel: 'Liquidarom / Freaks / Secret Garden',
-    promoLabel: 'tarif quantité',
-  },
-  {
-    key: '10ml-alfaliquid-pulp',
-    brands: ['alfaliquid', 'pulp'],
-    minQty: 20,
-    rate: 0.25,
-    label: 'Tarif quantité 10ml · Alfaliquid / Pulp',
-    conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Alfaliquid et Pulp',
-    progressLabel: 'Alfaliquid / Pulp',
-    promoLabel: 'tarif quantité',
-  },
+export const BUNDLE_TIERS_10ML = []
+export const BUNDLE_VOLUME_TIERS = []
+
+// Grille de prix unitaires des e-liquides (13/10/2026). Appliquée au catalogue
+// depuis l'admin (onglet Produits → « Grille de prix e-liquides »), qui montre
+// chaque produit concerné avant la mise à jour.
+export const ELIQUID_PRICE_GRID = [
+  { key: '10ml-liquidarom-freaks-secret-garden', label: '10 ml Liquidarom, Freaks, Secret Garden', price: 2.95, volume: '10ml', brands: ['liquidarom', 'freaks', 'secret garden', 'secrets garden'] },
+  { key: '10ml-alfaliquid-pulp', label: '10 ml Alfaliquid, Pulp', price: 4.4, volume: '10ml', brands: ['alfaliquid', 'pulp'] },
+  { key: '50ml', label: 'Tous les 50 ml', price: 14.9, volume: '50ml' },
+  { key: '100ml', label: 'Tous les 100 ml', price: 18.6, volume: '100ml' },
 ]
-export const BUNDLE_50_100ML = {
-  key: '50-100ml',
-  volumes: ['50ml', '100ml'],
-  minQty: 4,
-  rate: 0.25,
-  label: 'Tarif quantité · 4 e-liquides 50/100ml ou +',
-  conditionLabel: 'À partir de 4 flacons 50ml ou 100ml combinables, toutes marques',
-  progressLabel: 'en 50/100ml (formats et marques combinables)',
-  promoLabel: 'tarif quantité',
-}
-export const BUNDLE_VOLUME_TIERS = [BUNDLE_50_100ML]
 
 const toCents = (n) => Math.round((Number(n) || 0) * 100)
 const fromCents = (n) => (Number(n) || 0) / 100
@@ -132,6 +113,16 @@ export const resolveVolume = (p = {}) => {
   }
   if (!fromField.length && name) return `${name}ml`
   return normVolume(raw)
+}
+
+// Ligne de grille d'un produit, ou null s'il n'est pas concerné.
+export function priceGridRuleFor(product = {}) {
+  if (!isEliquid(product) || !product?.category) return null
+  const volume = resolveVolume(product)
+  const brand = normBrand(product.brand)
+  return ELIQUID_PRICE_GRID.find((rule) => (
+    rule.volume === volume && (!rule.brands || rule.brands.includes(brand))
+  )) || null
 }
 
 export function getQuantityPricingRule(product = {}) {
@@ -321,7 +312,7 @@ export function computeTotals({ lines = [], shippingMethodId, promoCode, voucher
     : null
   const method = getShippingMethod(shippingMethodId)
 
-  // Livraison : gratuite dès le seuil (sauf Click & Collect déjà à 0) ou via un
+  // Livraison : gratuite dès le seuil ou via un
   // code promo « livraison offerte ».
   const freeByThreshold = subtotalCents === 0 || subtotalCents >= toCents(FREE_SHIPPING_THRESHOLD)
   let shippingCents = toCents(method.price)

@@ -648,7 +648,7 @@ export const CATEGORY_SEO = {
   'marque-voopoo': {
     seoTitle: 'Voopoo : Pods Drag S2, H40, Argus & Résistances PnP-X',
     metaDescription:
-      'Matériel officiel Voopoo : pods Drag S2, Drag X2, H40, Argus et Doric. Résistances PnP et PnP-X en stock, 100% certifiées. Livraison offerte dès 29€.',
+      'Matériel officiel Voopoo : pods Drag S2, Drag X2, H40, Argus et Doric. Résistances PnP et PnP-X en stock, 100% certifiées. Livraison offerte dès 49 €.',
     h1: 'Pods, Kits Drag & Résistances PnP / PnP-X Voopoo',
     intro:
       'Plébiscitée pour sa gamme emblématique Drag et son chipset Gene ultra-réactif, Voopoo allie finition cuir élégante et simplicité d’utilisation grâce à son système de cartouches aimantées et de résistances PnP.',

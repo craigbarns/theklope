@@ -2,11 +2,11 @@ export const STATIC_SEO_PAGES = {
   'boutique-vape-marseille': {
     title: 'Magasin Vape & E-Cigarette Marseille 13006 — 188 Rue de Rome | THEKLOPE',
     metaDescription:
-      'Boutique vape Marseille Castellane / Rue de Rome : e-liquides, puffs rechargeables, kits et résistances. Retrait Click & Collect gratuit en 1h au 188 rue de Rome.',
+      'Boutique vape Marseille Castellane / Rue de Rome : e-liquides, puffs rechargeables, kits et résistances. Conseils en boutique au 188 rue de Rome, coursier le jour même dans Marseille.',
     h1: 'Boutique vape à Marseille et vente en ligne',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Profitez du Click & Collect gratuit en 1h ou de la livraison rapide partout en France.',
+      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Achetez sur place, faites-vous livrer le jour même par coursier dans Marseille, ou partout en France avec livraison offerte dès 49 €.',
     localBusiness: true,
     sections: [
       {
@@ -15,9 +15,9 @@ export const STATIC_SEO_PAGES = {
           'Notre boutique physique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement). Accès immédiat via les transports RTM : Tramway T3 (stations Place de Rome ou Dragon juste devant le magasin), Métro M1 et M2 (station Castellane à 3 minutes à pied) et Métro M1 (station Estrangin). Parkings Indigo Castellane et Préfecture à proximité.',
       },
       {
-        title: 'Retrait Click & Collect 1h gratuit',
+        title: 'Coursier le jour même dans Marseille',
         text:
-          'Commandez en ligne sur theklope.com et retirez vos articles gratuitement en boutique 1 heure plus tard selon le stock disponible. Vous économisez les frais de port, vous évitez les délais de livraison et vous bénéficiez des conseils de notre équipe pour la mise en route.',
+          'Commandez en ligne sur theklope.com avant 14 h (jours ouvrés) : un coursier vous livre le jour même dans les 16 arrondissements de Marseille. La livraison est offerte dès 49 € d’achat, et notre équipe reste joignable pour la mise en route de votre matériel.',
       },
       {
         title: 'Bar à saveurs, diagnostic et compatibilité',
@@ -27,7 +27,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Quartiers desservis et expédition France entière',
         text:
-          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h, avec livraison offerte dès 29€.',
+          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 49 €.',
       },
     ],
     links: [
@@ -45,8 +45,8 @@ export const STATIC_SEO_PAGES = {
         a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement), entre la Place Castellane et la Préfecture. Elle est directement desservie par le Tramway T3 (stations Place de Rome ou Dragon).',
       },
       {
-        q: 'Comment fonctionne le retrait Click & Collect en boutique à Marseille ?',
-        a: 'Le retrait en boutique est 100% gratuit : passez commande sur theklope.com, cochez l’option « Retrait boutique » lors du paiement, et récupérez votre commande préparée au 188 rue de Rome sans frais ni attente.',
+        q: 'Peut-on être livré le jour même à Marseille ?',
+        a: 'Oui : choisissez « Coursier Marseille » au paiement. Toute commande validée avant 14 h un jour ouvré est livrée le jour même dans les 16 arrondissements. La livraison est offerte dès 49 € d’achat.',
       },
       {
         q: 'Quels sont les transports en commun pour venir chez THEKLOPE Marseille ?',
@@ -61,11 +61,11 @@ export const STATIC_SEO_PAGES = {
   'cigarette-electronique-marseille': {
     title: 'Magasin Cigarette Électronique Marseille — Rue de Rome / Castellane | THEKLOPE',
     metaDescription:
-      'Achat cigarette électronique Marseille 6e : kits débutants, pods et e-liquides au 188 rue de Rome. Conseil personnalisé en boutique et Click & Collect 1h.',
-    h1: 'Cigarette électronique à Marseille — Vente & Retrait Boutique',
+      'Achat cigarette électronique Marseille 6e : kits débutants, pods et e-liquides au 188 rue de Rome. Conseil personnalisé en boutique et coursier le jour même.',
+    h1: 'Cigarette électronique à Marseille — Boutique & Livraison Express',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'Vous cherchez une cigarette électronique fiable à Marseille ? THEKLOPE vous propose une sélection de kits débutants, pods rechargeables et box au 188 rue de Rome (Castellane), à commander en ligne avec retrait gratuit Click & Collect en 1 heure.',
+      'Vous cherchez une cigarette électronique fiable à Marseille ? THEKLOPE vous propose une sélection de kits débutants, pods rechargeables et box au 188 rue de Rome (Castellane), à acheter sur place ou en ligne, avec livraison par coursier le jour même dans Marseille.',
     localBusiness: true,
     sections: [
       {
@@ -74,9 +74,9 @@ export const STATIC_SEO_PAGES = {
           'Pour débuter sans risque d’échec, le choix du matériel est primordial. Un pod compact à tirage automatique reproduit la gestuelle de la cigarette sans complication technique. Pour les vapoteurs plus expérimentés, nos box électroniques offrent une autonomie renforcée et des réglages de puissance sur-mesure.',
       },
       {
-        title: 'Retrait gratuit en boutique au 188 rue de Rome (13006)',
+        title: 'Conseils et mise en route au 188 rue de Rome (13006)',
         text:
-          'Commandez en ligne sur theklope.com et venez récupérer votre cigarette électronique au 188 rue de Rome. Nos spécialistes préparent votre commande et peuvent vous montrer la mise en service, le remplissage du réservoir et l’amorçage de votre première résistance.',
+          'Passez à la boutique du 188 rue de Rome : nos spécialistes vous montrent la mise en service, le remplissage du réservoir et l’amorçage de votre première résistance, et vérifient la compatibilité de vos consommables.',
       },
       {
         title: 'Toutes les marques officielles réunies à Marseille',
@@ -86,7 +86,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Livraison express à Marseille et en France métropolitaine',
         text:
-          'Vous ne pouvez pas vous déplacer au magasin ? Toutes nos cigarettes électroniques sont expédiées sous 24h avec livraison offerte dès 29€ d’achat. Le paiement est entièrement sécurisé par la passerelle Mollie.',
+          'Vous ne pouvez pas vous déplacer au magasin ? Toutes nos cigarettes électroniques sont expédiées sous 24h avec livraison offerte dès 49 € d’achat, ou livrées le jour même par coursier dans Marseille. Le paiement est entièrement sécurisé par la passerelle Mollie.',
       },
     ],
     links: [
@@ -99,15 +99,15 @@ export const STATIC_SEO_PAGES = {
     faq: [
       {
         q: 'Où acheter une cigarette électronique à Marseille 13006 ?',
-        a: 'Chez THEKLOPE, situé au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Vous pouvez acheter sur place ou commander en ligne avec retrait Click & Collect immédiat.',
+        a: 'Chez THEKLOPE, situé au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Vous pouvez acheter sur place, ou commander en ligne avec livraison par coursier le jour même dans Marseille.',
       },
       {
         q: 'Quelle cigarette électronique est recommandée pour arrêter de fumer ?',
         a: 'Un pod compact à tirage serré (MTL) comme le Vaporesso XROS ou le Voopoo Argus est le choix le plus efficace : simple d’usage, discret et parfait avec des e-liquides aux sels de nicotine.',
       },
       {
-        q: 'Le retrait boutique à Marseille est-il payant ?',
-        a: 'Non, le retrait en boutique est totalement gratuit, quel que soit le montant de votre commande sur theklope.com.',
+        q: 'La livraison est-elle offerte à Marseille ?',
+        a: 'Oui, dès 49 € d’achat, quel que soit le mode : coursier le jour même à Marseille, Mondial Relay ou Colissimo.',
       },
     ],
   },
@@ -118,7 +118,7 @@ export const STATIC_SEO_PAGES = {
   'puff-marseille': {
     title: 'Puff Marseille — Puffs Rechargeables au 188 rue de Rome | THEKLOPE',
     metaDescription:
-      'Puffs rechargeables à Marseille : alternatives conformes aux puffs jetables, disponibles au 188 rue de Rome (13006) et en ligne. Retrait gratuit en 1h.',
+      'Puffs rechargeables à Marseille : alternatives conformes aux puffs jetables, disponibles au 188 rue de Rome (13006) et en ligne, livrées le jour même à Marseille.',
     h1: 'Puff à Marseille : les modèles rechargeables',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
@@ -155,7 +155,7 @@ export const STATIC_SEO_PAGES = {
     faq: [
       {
         q: 'Où acheter une puff à Marseille ?',
-        a: 'Chez THEKLOPE, au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Les puffs jetables n’étant plus commercialisées en France, nous proposons les modèles rechargeables, sur place ou en commande en ligne avec retrait gratuit en 1h.',
+        a: 'Chez THEKLOPE, au 188 rue de Rome, 13006 Marseille (entre Castellane et Préfecture). Les puffs jetables n’étant plus commercialisées en France, nous proposons les modèles rechargeables, sur place ou en ligne avec livraison par coursier le jour même dans Marseille.',
       },
       {
         q: 'Quelle différence entre une puff jetable et une puff rechargeable ?',
@@ -231,6 +231,11 @@ export const STATIC_SEO_PAGES = {
         title: 'Préparation des commandes',
         text:
           'Les commandes sont préparées selon le stock disponible. Les délais indiqués sur le site restent indicatifs et peuvent dépendre du transporteur.',
+      },
+      {
+        title: 'Modes et tarifs de livraison',
+        text:
+          'Mondial Relay en Point Relais : 3,90 €. La Poste Colissimo à domicile, remis contre signature : 7,50 €. Coursier le jour même dans les 16 arrondissements de Marseille pour toute commande validée avant 14 h un jour ouvré : 7,50 €. La livraison est offerte dès 49 € d’achat, quel que soit le mode. Le retrait en boutique des commandes passées en ligne n’est plus proposé.',
       },
       {
         title: 'Paiement sécurisé avec Mollie',

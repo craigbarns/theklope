@@ -2,12 +2,15 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 
 import {
+  FREE_SHIPPING_THRESHOLD,
   PROMO_CODES,
+  SHIPPING_METHODS,
   computeBundleProgress,
   computeTotals,
   getCompletePackSubtotal,
   getQuantityPricingRule,
   isCompletePack,
+  priceGridRuleFor,
   resolveVolume,
 } from './pricing.js'
 
@@ -16,23 +19,6 @@ const accessory = { category: 'accessoire', price: 20, qty: 1 }
 const resistance = { category: 'resistance', price: 30, qty: 1 }
 const liquid = { category: 'eliquide', price: 10, qty: 1, volume: '10ml', brand: 'Other' }
 
-test('editorial e-liquid subcategories receive the advertised quantity price', () => {
-  const product = {
-    category: 'eliquide-fruite',
-    brand: 'Liquidarom',
-    volume: '10ml',
-    price: 5.9,
-  }
-  const rule = getQuantityPricingRule(product)
-  assert.equal(rule.minQty, 20)
-  assert.equal(rule.discountPercent, 50)
-  assert.equal(rule.discountedUnitPrice, 2.95)
-
-  const totals = computeTotals({ lines: [{ ...product, qty: 20 }], shippingMethodId: 'pickup' })
-  assert.equal(totals.discount, 59)
-  assert.equal(totals.total, 59)
-})
-
 test('aucun code de remise ne subsiste (conformite L3513-4)', () => {
   // Article L3513-4 du code de la sante publique : toute publicite, directe ou
   // indirecte, en faveur des produits du vapotage est interdite. Ce test empeche
@@ -40,172 +26,57 @@ test('aucun code de remise ne subsiste (conformite L3513-4)', () => {
   assert.deepEqual(Object.keys(PROMO_CODES), [])
 
   for (const code of ['THEKLOPE10', 'BIENVENUE', 'BIENVENUE15', 'PACK15', 'LIVRAISON']) {
-    const totals = computeTotals({ lines: [device], shippingMethodId: 'pickup', promoCode: code })
+    const totals = computeTotals({ lines: [device], shippingMethodId: 'relais', promoCode: code })
     assert.equal(totals.promo, null, `${code} ne doit plus etre reconnu`)
     assert.equal(totals.appliedPromo, null, `${code} ne doit plus s'appliquer`)
     assert.equal(totals.discount, 0, `${code} ne doit accorder aucune remise`)
   }
 })
 
-test('le tarif quantite automatique reste applique sans aucun code', () => {
-  // Le prix de lot subsiste (« Pack 20 e-liquides »), seule sa mise en avant
-  // publicitaire a ete retiree des pages.
-  const totals = computeTotals({
-    lines: [{ category: 'eliquide', price: 5.9, qty: 20, volume: '10ml', brand: 'Pulp' }],
-    shippingMethodId: 'pickup',
+test('plus aucune remise par lot depuis le 13/10/2026 (prix unitaires de la grille)', () => {
+  const twentyTen = computeTotals({
+    lines: [{ category: 'eliquide', price: 2.95, qty: 20, volume: '10ml', brand: 'Liquidarom' }],
+    shippingMethodId: 'relais',
   })
-  assert.equal(totals.discountSource, 'auto')
-  assert.equal(totals.total, 88.5)
-})
+  assert.equal(twentyTen.discount, 0)
+  assert.equal(twentyTen.discountSource, null)
+  assert.equal(twentyTen.subtotal, 59)
+  assert.equal(twentyTen.total, 59, 'livraison offerte dès 49 €')
 
-test('50ml and 100ml receive the same automatic discount from four units', () => {
-  for (const volume of ['50ml', '100ml']) {
-    const totals = computeTotals({
-      lines: [{ category: 'eliquide', price: 20, qty: 4, volume, brand: 'Other' }],
-    })
-
-    assert.equal(totals.subtotal, 80)
-    assert.equal(totals.discount, 20)
-    assert.equal(totals.discountSource, 'auto')
-    assert.equal(totals.total, 60)
-    assert.deepEqual(totals.autoDiscount.details, [{
-      key: '50-100ml',
-      label: 'Tarif quantité · 4 e-liquides 50/100ml ou +',
-      amount: 20,
-    }])
-  }
-})
-
-test('50ml and 100ml formats and brands combine toward the four-unit threshold', () => {
-  const lines = [
-    { category: 'eliquide', price: 19.9, qty: 2, volume: '50ml', brand: 'Freaks' },
-    { category: 'eliquide', price: 24.9, qty: 2, volume: '100ml', brand: 'Other' },
-  ]
-  const totals = computeTotals({ lines })
-
-  assert.equal(totals.subtotal, 89.6)
-  assert.equal(totals.discount, 22.4)
-  assert.equal(totals.total, 67.2)
-  assert.deepEqual(computeBundleProgress(lines), [])
-})
-
-test('large-format progress combines 50ml and 100ml before the threshold', () => {
-  const lines = [
-    { category: 'eliquide', price: 19.9, qty: 1, volume: '50ml' },
-    { category: 'eliquide', price: 24.9, qty: 2, volume: '100ml' },
-  ]
-
-  assert.deepEqual(computeBundleProgress(lines), [{
-    key: '50-100ml',
-    progressLabel: 'en 50/100ml (formats et marques combinables)',
-    promoLabel: 'tarif quantité',
-    current: 3,
-    target: 4,
-    remaining: 1,
-  }])
-})
-
-test('Liquidarom, Freaks and Secret Garden 10ml combine at 20 units with 50% on every unit', () => {
-  const lines = [
-    { category: 'eliquide', price: 5.9, qty: 7, volume: '10ml', brand: 'Liquidarom' },
-    { category: 'eliquide', price: 5.9, qty: 7, volume: '10 ml', brand: 'Freaks' },
-    { category: 'eliquide', price: 5.9, qty: 7, volume: '10ml', brand: "Secret's Garden" },
-  ]
-  const totals = computeTotals({ lines })
-
-  assert.equal(totals.subtotal, 123.9)
-  assert.equal(totals.discount, 61.95)
-  assert.equal(totals.total, 61.95)
-  assert.deepEqual(totals.autoDiscount.details, [{
-    key: '10ml-liquidarom-freaks-secret-garden',
-    label: 'Tarif quantité 10ml · Liquidarom / Freaks / Secret Garden',
-    amount: 61.95,
-  }])
-})
-
-test('Alfaliquid and Pulp 10ml combine at 20 units with an exact 25% total', () => {
-  const totals = computeTotals({
-    lines: [
-      { category: 'eliquide', price: 5.9, qty: 10, volume: '10ml', brand: 'Alfaliquid' },
-      { category: 'eliquide', price: 5.9, qty: 10, volume: '10ml', brand: 'Pulp' },
-    ],
+  const fourFifty = computeTotals({
+    lines: [{ category: 'eliquide', price: 14.9, qty: 4, volume: '50ml', brand: 'JNR' }],
   })
-
-  assert.equal(totals.subtotal, 118)
-  assert.equal(totals.discount, 29.5)
-  assert.equal(totals.total, 88.5)
+  assert.equal(fourFifty.discount, 0)
+  assert.deepEqual(computeBundleProgress([{ category: 'eliquide', price: 14.9, qty: 3, volume: '50ml' }]), [])
+  assert.equal(getQuantityPricingRule({ category: 'eliquide', brand: 'Liquidarom', volume: '10ml', price: 2.95 }), null)
 })
 
-test('quantity pricing only starts at 20 units and includes every later eligible unit', () => {
-  const makeTotals = (qty) => computeTotals({
-    lines: [{ category: 'eliquide', price: 5.9, qty, volume: '10ml', brand: 'Liquidarom' }],
-  })
-
-  assert.equal(makeTotals(19).discount, 0)
-  assert.equal(makeTotals(20).discount, 59)
-  assert.equal(makeTotals(21).discount, 61.95)
+test('grille de prix : 2,95 / 4,40 / 14,90 / 18,60 selon marque et contenance', () => {
+  const price = (product) => priceGridRuleFor(product)?.price ?? null
+  assert.equal(price({ category: 'eliquide-fruite', brand: 'Liquidarom', volume: '10ml' }), 2.95)
+  assert.equal(price({ category: 'eliquide', brand: 'Freaks', volume: '10 ml' }), 2.95)
+  assert.equal(price({ category: 'eliquide', brand: "Secret's Garden", name: 'The Fox 10 ml' }), 2.95)
+  assert.equal(price({ category: 'eliquide', brand: 'Alfaliquid', volume: '10ml' }), 4.4)
+  assert.equal(price({ category: 'eliquide', brand: 'Pulp', specs: { Contenance: 'Flacon de 10 ml' } }), 4.4)
+  assert.equal(price({ category: 'eliquide', brand: 'JNR', name: 'Tarte aux fraises 50ml', volume: '60ml' }), 14.9)
+  assert.equal(price({ category: 'eliquide', brand: 'Liquidarom', volume: '50ml' }), 14.9)
+  assert.equal(price({ category: 'eliquide', brand: 'Other', specs: { Contenance: '100 ml' } }), 18.6)
+  // Hors grille : autres marques en 10 ml, 60 ml, matériel.
+  assert.equal(price({ category: 'eliquide', brand: 'JNR', volume: '10ml' }), null)
+  assert.equal(price({ category: 'eliquide', brand: 'Petit Nuage', volume: '60ml' }), null)
+  assert.equal(price({ category: 'accessoire', volume: '50ml' }), null)
 })
 
-test('10ml brand groups stay independent below their respective thresholds', () => {
-  const totals = computeTotals({
-    lines: [
-      { category: 'eliquide', price: 5.9, qty: 10, volume: '10ml', brand: 'Liquidarom' },
-      { category: 'eliquide', price: 5.9, qty: 10, volume: '10ml', brand: 'Pulp' },
-    ],
-  })
-
-  assert.equal(totals.discount, 0)
-})
-
-test('automatic quantity pricing rounds once per eligible group in integer cents', () => {
-  const totals = computeTotals({
-    lines: [
-      { category: 'eliquide', price: 5.71, qty: 21, volume: '10ml', brand: 'Liquidarom' },
-    ],
-  })
-
-  assert.equal(totals.subtotal, 119.91)
-  assert.equal(totals.discount, 59.96)
-  assert.equal(totals.total, 59.95)
-  assert.equal(
-    totals.autoDiscount.details.reduce((sum, detail) => sum + detail.amount, 0),
-    totals.autoDiscount.total,
-  )
-})
-
-test('product quantity information uses resolved volume and exact cart arithmetic', () => {
-  assert.deepEqual(getQuantityPricingRule({
-    category: 'eliquide',
-    brand: 'Pulp',
-    price: 5.9,
-    specs: { Contenance: 'Flacon de 10 ml' },
-  }), {
-    key: '10ml-alfaliquid-pulp',
-    minQty: 20,
-    rate: 0.25,
-    discountPercent: 25,
-    unitPrice: 5.9,
-    discountedUnitPrice: 4.42,
-    conditionLabel: 'À partir de 20 flacons 10ml combinables parmi Alfaliquid et Pulp',
-    exampleTotal: 88.5,
-  })
-
-  assert.deepEqual(getQuantityPricingRule({
-    category: 'eliquide',
-    brand: 'Other',
-    price: 19.9,
-    specs: { Contenance: '50 ml' },
-  }), {
-    key: '50-100ml',
-    minQty: 4,
-    rate: 0.25,
-    discountPercent: 25,
-    unitPrice: 19.9,
-    discountedUnitPrice: 14.92,
-    conditionLabel: 'À partir de 4 flacons 50ml ou 100ml combinables, toutes marques',
-    exampleTotal: 59.7,
-  })
-  assert.equal(getQuantityPricingRule({ category: 'accessoire', volume: '50ml', price: 19.9 }), null)
+test('livraison offerte dès 49 € et Click & Collect arrêté', () => {
+  assert.equal(FREE_SHIPPING_THRESHOLD, 49)
+  assert.deepEqual(SHIPPING_METHODS.map((m) => m.id), ['relais', 'poste', 'coursier'])
+  const at = (price, shippingMethodId) => computeTotals({ lines: [{ category: 'ecig', price, qty: 1 }], shippingMethodId })
+  assert.equal(at(48.99, 'relais').shipping, 3.9)
+  assert.equal(at(48.99, 'poste').shipping, 7.5)
+  assert.equal(at(48.99, 'coursier').shipping, 7.5)
+  for (const id of ['relais', 'poste', 'coursier']) assert.equal(at(49, id).shipping, 0)
+  // Un ancien identifiant « pickup » n'est plus gratuit.
+  assert.notEqual(at(20, 'pickup').shipping, 0)
 })
 
 test('volume discount excludes other categories and other bottle sizes', () => {
@@ -239,7 +110,5 @@ test('shortfills : le format vendu (50/100 ml) compte, pas la taille du flacon',
   assert.equal(resolveVolume({ name: 'Booster pour 50ml', volume: '10ml' }), '10ml')
   assert.notEqual(resolveVolume({ name: 'Duo', volume: '50ml / 100ml' }), '50ml')
 
-  const bottles = ['Tarte aux fraises 50ml', 'Canopée Cèdre 50ml', 'JNR Kiwi 50ml', 'Tarte aux fraises 50ml']
-    .map((name) => ({ name, price: 19.9, qty: 1, category: 'eliquide', volume: resolveVolume({ name, volume: '60ml' }) }))
-  assert.equal(computeTotals({ lines: bottles, shippingMethodId: 'pickup' }).discountSource, 'auto', '4 fioles suffisent')
+  assert.equal(priceGridRuleFor({ name: 'Canopée Cèdre 50ml', volume: '60ml', category: 'eliquide', brand: 'X' }).price, 14.9)
 })

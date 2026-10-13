@@ -182,9 +182,9 @@ export default function Cart() {
           <div className="rounded-2xl border border-neon/20 bg-neon/5 px-4 py-3 text-sm text-ash/80">
             <p className="flex items-center gap-3">
               <IconTruck width={18} height={18} className="text-neon" />
-              <span>Livraison standard : 7,50 €, gratuite à partir de {formatPrice(totals.freeShippingThreshold)}.</span>
+              <span>Livraison offerte dès {formatPrice(totals.freeShippingThreshold)} : Mondial Relay, Colissimo ou coursier.</span>
             </p>
-            <p className="mt-1 pl-[30px] text-xs text-muted">Retrait gratuit en boutique à Marseille, disponible à l’étape suivante.</p>
+            <p className="mt-1 pl-[30px] text-xs text-muted">En dessous : Mondial Relay 3,90 €, Colissimo ou coursier Marseille 7,50 €.</p>
           </div>
 
           {cartHasVariantIssue && (
@@ -276,7 +276,7 @@ export default function Cart() {
             </dl>
 
             <p className="mt-3 text-xs leading-relaxed text-faint">
-              Retrait boutique gratuit disponible. Le tarif exact dépendra du mode de livraison choisi.
+              Livraison offerte dès 49 €. Le tarif exact dépend du mode de livraison choisi.
             </p>
 
             {cartHasVariantIssue ? (

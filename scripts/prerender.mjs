@@ -47,6 +47,7 @@ const { COIL_FAMILIES, familyFaq, productsForFamily } = await import(resolve(roo
 const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
 const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
 const { buildMerchantSku } = await import(resolve(root, 'src/lib/merchantSku.js'))
+const { FREE_SHIPPING_THRESHOLD } = await import(resolve(root, 'src/lib/pricing.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -186,7 +187,7 @@ for (const p of PRODUCTS) {
           shippingDetails: {
             '@type': 'OfferShippingDetails',
             shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
-            shippingRate: { '@type': 'MonetaryAmount', value: (Number(p.price) || 0) >= 29 ? '0.00' : '7.50', currency: 'EUR' },
+            shippingRate: { '@type': 'MonetaryAmount', value: (Number(p.price) || 0) >= FREE_SHIPPING_THRESHOLD ? '0.00' : '7.50', currency: 'EUR' },
             deliveryTime: {
               '@type': 'ShippingDeliveryTime',
               handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
@@ -416,8 +417,8 @@ function buildStaticPageJsonLd(s) {
         },
         {
           '@type': 'Question',
-          name: 'Puis-je retirer ma commande gratuitement en boutique ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'Oui, le retrait en boutique Click & Collect au 188 rue de Rome à Marseille est 100% gratuit.' },
+          name: 'À partir de quel montant la livraison est-elle offerte ?',
+          acceptedAnswer: { '@type': 'Answer', text: 'La livraison est offerte dès 49 € d’achat en Mondial Relay, Colissimo ou coursier à Marseille.' },
         },
       ],
     })
@@ -569,7 +570,7 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
 for (const family of COIL_FAMILIES) {
   const path = `/compatibilite/${family.slug}`
   const title = `${family.seoTitle} | THEKLOPE`
-  const description = `${family.answer} Disponibles chez THEKLOPE, retrait 1 h à Marseille.`.slice(0, 300)
+  const description = `${family.answer} Disponibles chez THEKLOPE, coursier le jour même à Marseille.`.slice(0, 300)
   const faq = familyFaq(family)
   const items = productsForFamily(family, PRODUCTS)
   const devices = family.devices.map((d) => `<li>${esc(d)}</li>`).join('')
@@ -615,7 +616,7 @@ for (const family of COIL_FAMILIES) {
 // ceux de src/pages/Home.jsx, sous peine d'annoncer deux choses différentes
 // selon que le visiteur est un robot ou un navigateur.
 const homeTitle = 'Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE'
-const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit en 1h, livraison offerte dès 29 €.'
+const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Coursier le jour même à Marseille, livraison offerte dès 49 €.'
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -671,7 +672,7 @@ const homeContent = `
   <h2>Nos Engagements & Services</h2>
   <ul>
     <li><strong>Produits testés et sélectionnés :</strong> Chaque référence est choisie pour sa fiabilité et sa qualité.</li>
-    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 29€.</li>
+    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 49 €.</li>
     <li><strong>Paiement 100% sécurisé :</strong> Transactions chiffrées avec Mollie, vos données sont protégées.</li>
     <li><strong>Service client réactif :</strong> Une équipe disponible pour vous accompagner.</li>
   </ul>
