@@ -11,7 +11,7 @@ import Badge from '../components/Badge.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import DeliveryOptions from '../components/DeliveryOptions.jsx'
-import { FREE_SHIPPING_THRESHOLD } from '../lib/pricing.js'
+import { FREE_SHIPPING_THRESHOLD, LOWEST_SHIPPING_COST } from '../lib/pricing.js'
 import { coilFamilyForProduct, compatibilityPath } from '../data/coilCompatibility.js'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
@@ -196,7 +196,7 @@ export default function Product() {
               },
               "shippingRate": {
                 "@type": "MonetaryAmount",
-                "value": isFreeShipping ? "0.00" : "7.50",
+                "value": isFreeShipping ? "0.00" : LOWEST_SHIPPING_COST.toFixed(2),
                 "currency": "EUR"
               },
               "deliveryTime": {
@@ -209,8 +209,8 @@ export default function Product() {
                 },
                 "transitTime": {
                   "@type": "QuantitativeValue",
-                  "minValue": 1,
-                  "maxValue": 3,
+                  "minValue": 0,
+                  "maxValue": 5,
                   "unitCode": "DAY"
                 }
               }

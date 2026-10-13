@@ -24,6 +24,9 @@ export const SHIPPING_METHODS = [
   { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 49 €)', price: 7.5 },
 ]
 
+// Tarif annoncé à Google dans les données produit (le mode le moins cher).
+export const LOWEST_SHIPPING_COST = Math.min(...SHIPPING_METHODS.map((method) => method.price))
+
 // CONFORMITÉ — article L3513-4 du code de la santé publique : toute publicité,
 // directe ou indirecte, en faveur des produits du vapotage est interdite. Les
 // codes de remise en pourcentage (bienvenue, pack, remise générale) ont donc été

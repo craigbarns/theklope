@@ -47,7 +47,8 @@ const { COIL_FAMILIES, familyFaq, productsForFamily } = await import(resolve(roo
 const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
 const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
 const { buildMerchantSku } = await import(resolve(root, 'src/lib/merchantSku.js'))
-const { FREE_SHIPPING_THRESHOLD } = await import(resolve(root, 'src/lib/pricing.js'))
+const { FREE_SHIPPING_THRESHOLD, LOWEST_SHIPPING_COST } = await import(resolve(root, 'src/lib/pricing.js'))
+const { optimizedImageAttrs } = await import(resolve(root, 'src/lib/imageUrl.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 
@@ -60,6 +61,16 @@ const esc = (s) =>
 
 const fmtPrice = (n) => new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(Number(n) || 0)
 const abs = (path) => `${BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+
+// Image principale du HTML pré-rendu : même URL optimisée que ProductImage,
+// donc réutilisée par l'appli sans second téléchargement. Si l'optimiseur
+// échoue (quota mensuel), le navigateur repasse sur l'original.
+const heroImgAttrs = (src, width) => {
+  const optimized = optimizedImageAttrs(src, width)
+  if (!optimized) return `src="${esc(src)}"`
+  return `src="${esc(optimized.src)}"${optimized.srcSet ? ` srcset="${esc(optimized.srcSet)}"` : ''}`
+    + ` onerror="this.onerror=null;this.removeAttribute('srcset');this.src=${esc(JSON.stringify(src))}"`
+}
 const absImg = (img) => encodeURI(!img ? DEFAULT_OG : /^https?:/.test(img) ? img : abs(img))
 
 // Remplace le contenu d'une balise meta/link/title dans le template HTML.
@@ -187,11 +198,13 @@ for (const p of PRODUCTS) {
           shippingDetails: {
             '@type': 'OfferShippingDetails',
             shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
-            shippingRate: { '@type': 'MonetaryAmount', value: (Number(p.price) || 0) >= FREE_SHIPPING_THRESHOLD ? '0.00' : '7.50', currency: 'EUR' },
+            shippingRate: { '@type': 'MonetaryAmount', value: (Number(p.price) || 0) >= FREE_SHIPPING_THRESHOLD ? '0.00' : LOWEST_SHIPPING_COST.toFixed(2), currency: 'EUR' },
             deliveryTime: {
               '@type': 'ShippingDeliveryTime',
               handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-              transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 3, unitCode: 'DAY' },
+              // Coursier le jour même à Mondial Relay 3–5 j : la fourchette couvre
+              // le tarif annoncé (Point Relais, le moins cher).
+              transitTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 5, unitCode: 'DAY' },
             },
           },
           hasMerchantReturnPolicy: {
@@ -219,7 +232,7 @@ for (const p of PRODUCTS) {
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <a href="/boutique">Boutique</a> › <a href="${esc(catPath)}">${esc(catLabel)}</a></nav>
     <div class="mt-6 grid gap-10 lg:grid-cols-2">
       <div><div class="card relative flex aspect-square items-center justify-center overflow-hidden rounded-3xl p-2">
-        <img src="${esc(p.image || '/products/product-placeholder.svg')}" alt="${esc(catLabel)} ${esc(p.name)} par ${esc(brandName)}" width="600" height="600" class="h-full w-full rounded-2xl object-cover">
+        <img ${heroImgAttrs(p.image || '/products/product-placeholder.svg', 600)} alt="${esc(catLabel)} ${esc(p.name)} par ${esc(brandName)}" width="600" height="600" fetchpriority="high" class="h-full w-full rounded-2xl object-cover">
       </div></div>
       <div>
         <p class="text-xs uppercase tracking-wider text-faint">${brandCategory
@@ -500,6 +513,12 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
   const sections = page.sections.map((s) => `<h2>${esc(s.title)}</h2><p>${esc(s.text)}</p>`).join('')
   const faq = page.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')
   const links = page.links.map((l) => `<li><a href="${esc(l.to)}">${esc(l.label)}</a></li>`).join('')
+  const featured = (page.featuredProductIds || [])
+    .map((id) => PRODUCTS.find((product) => product.id === id))
+    .filter(Boolean)
+  const featuredHtml = featured.length
+    ? `<h2>${esc(page.featuredProductsTitle)}</h2><ul>${featured.map((p) => `<li><a href="/produit/${encodeURIComponent(p.id)}">${esc(p.name)}</a> — ${esc(fmtPrice(p.price))}</li>`).join('')}</ul>`
+    : ''
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -534,8 +553,9 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
     <p>${esc(page.intro)}</p>
     ${sections}
     <ul>${links}</ul>
+    ${featuredHtml}
     ${faq}`
-  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content }))
+  writePage(path, buildPage({ title, description, canonicalPath: path, jsonLd, content, catalogBootstrap: featured }))
   count++
 }
 
@@ -660,7 +680,7 @@ const homeContent = `
         <p class="mt-6 max-w-lg text-base leading-relaxed sm:text-lg">Cigarettes électroniques, e-liquides, produits DIY, résistances et accessoires sélectionnés pour adultes.</p>
         <p class="mt-8"><a href="/boutique">Découvrir la boutique</a></p>
       </div>
-      ${homeHero ? `<div class="mx-auto w-full max-w-md"><img src="${esc(homeHero.image)}" alt="${esc(homeHero.name)}" width="448" height="448" class="aspect-square h-full w-full rounded-3xl object-cover"></div>` : ''}
+      ${homeHero ? `<div class="mx-auto w-full max-w-md"><img ${heroImgAttrs(homeHero.image, 448)} alt="${esc(homeHero.name)}" width="448" height="448" fetchpriority="high" class="aspect-square h-full w-full rounded-3xl object-cover"></div>` : ''}
     </div>
   </section>
   

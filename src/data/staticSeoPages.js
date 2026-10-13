@@ -22,7 +22,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Bar à saveurs, diagnostic et compatibilité',
         text:
-          'Avant d’acheter une résistance, une cartouche ou un e-liquide, venez valider la compatibilité avec votre matériel directement en boutique. Notre équipe vous oriente vers le bon ratio PG/VG et le taux de nicotine ou de sels de nicotine adapté à votre profil de sevrage.',
+          'Avant d’acheter une résistance, une cartouche ou un e-liquide, venez valider la compatibilité avec votre matériel directement en boutique. Notre équipe vous oriente vers le bon ratio PG/VG et le taux de nicotine ou de sels de nicotine adapté à votre consommation.',
       },
       {
         title: 'Quartiers desservis et expédition France entière',
@@ -64,6 +64,21 @@ export const STATIC_SEO_PAGES = {
       'Achat cigarette électronique Marseille 6e : kits débutants, pods et e-liquides au 188 rue de Rome. Conseil personnalisé en boutique et coursier le jour même.',
     h1: 'Cigarette électronique à Marseille — Boutique & Livraison Express',
     eyebrow: 'Marseille 13006 — Castellane',
+    // Fiches qui reçoivent déjà le plus d'impressions Google (Search Console,
+    // 90 jours) mais restent en 2e page, positions 7 à 30. Un lien depuis cette
+    // page locale leur transmet de l'autorité interne. Une fiche supprimée du
+    // catalogue est simplement ignorée : jamais de lien mort.
+    featuredProductsTitle: 'Les modèles les plus demandés',
+    featuredProductIds: [
+      'h40-voopoo',
+      'luxe-xr-max-2800mah-vaporesso-283',
+      'drag-s2-avec-pnp-x-voopoo-new-colors-280',
+      'drag-x3-52',
+      'doric-pro-60-voopoo',
+      'kit-aegis-max-2-max-100-geekvape-84',
+      'xlim-pro-3-oxva',
+      'nexi-pro-aspire',
+    ],
     intro:
       'Vous cherchez une cigarette électronique fiable à Marseille ? THEKLOPE vous propose une sélection de kits débutants, pods rechargeables et box au 188 rue de Rome (Castellane), à acheter sur place ou en ligne, avec livraison par coursier le jour même dans Marseille.',
     localBusiness: true,
