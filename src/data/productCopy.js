@@ -260,7 +260,7 @@ export function buildProductSeoDescription(product = {}) {
     `${product.name}${brand ? ` — ${brand}` : ''}${facts ? ` : ${facts}.` : '.'}`,
     isGenericProductCopy(product.short) ? '' : product.short,
     product.stock > 0 ? 'En stock, expédié sous 24/48h.' : '',
-    'Livraison offerte dès 29 €, retrait à Marseille.',
+    'Livraison offerte dès 49 €, coursier le jour même à Marseille.',
   ].filter(Boolean).join(' ')
 }
 

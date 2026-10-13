@@ -11,6 +11,7 @@ import Badge from '../components/Badge.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
 import DeliveryOptions from '../components/DeliveryOptions.jsx'
+import { FREE_SHIPPING_THRESHOLD } from '../lib/pricing.js'
 import { coilFamilyForProduct, compatibilityPath } from '../data/coilCompatibility.js'
 import NotFound from './NotFound.jsx'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
@@ -153,7 +154,7 @@ export default function Product() {
     })
 
     const priceNum = Number(product.price) || 0
-    const isFreeShipping = priceNum >= 29
+    const isFreeShipping = priceNum >= FREE_SHIPPING_THRESHOLD
 
     const productCategoryKey = getProductCategoryKey(product)
     const productCategoryEntry = CATEGORIES.find((c) => c.key === productCategoryKey)
@@ -601,9 +602,9 @@ export default function Product() {
                   <span className="inline-block h-2 w-2 rounded-full bg-neon"></span>
                   <span className="text-neon/90">En stock — Expédié sous 24h</span>
                   <span className="text-white/30">·</span>
-                  <span className="text-ash/90">Livraison offerte dès 29 €</span>
+                  <span className="text-ash/90">Livraison offerte dès 49 €</span>
                   <span className="text-white/30">·</span>
-                  <span className="text-ash/60">Retrait gratuit Marseille 188 rue de Rome</span>
+                  <span className="text-ash/60">Coursier le jour même à Marseille</span>
                 </>
               )}
             </p>
@@ -762,7 +763,7 @@ export default function Product() {
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
               <Reassure icon={IconTruck} title="Expédition 24h" text="Commandé avant 14h, expédié le jour même" />
               <Reassure icon={IconLock} title="Paiement Sécurisé" text="Cryptage bancaire SSL / Mollie" />
-              <Reassure icon={IconShield} title="Boutique 188 Rue de Rome" text="Conseil & retrait Marseille" />
+              <Reassure icon={IconShield} title="Boutique 188 Rue de Rome" text="Conseils et compatibilité sur place" />
               <Reassure icon={IconCheck} title="Garantie & TPD" text="Vente réservée aux +18 ans" />
             </div>
 

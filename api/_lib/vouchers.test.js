@@ -103,29 +103,30 @@ test('le bon est consommé une seule fois quand la commande qui l’utilise est 
   assert.equal(await consumeOrderVoucher({ id: 'TK-4', promo: null }, client), false)
 })
 
-test('totaux : 5 % appliqués, rien sur les articles déjà au tarif quantité', () => {
+test('totaux : 5 % appliqués sur tout le panier (plus de remise par lot)', () => {
   const voucher = { code: 'MERCI-ABCDEF', percent: 5 }
   const kit = [{ price: 40, qty: 1, category: 'ecig' }]
-  const withVoucher = computeTotals({ lines: kit, promoCode: 'MERCI-ABCDEF', voucher, shippingMethodId: 'pickup' })
+  const withVoucher = computeTotals({ lines: kit, promoCode: 'MERCI-ABCDEF', voucher, shippingMethodId: 'relais' })
   assert.equal(withVoucher.discount, 2)
   assert.equal(withVoucher.appliedPromo.kind, 'voucher')
 
-  // 20 fioles Liquidarom : le tarif quantité (−50 %) l'emporte, le bon n'est pas consommé.
-  const bulk = [{ price: 5.9, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' }]
-  const beaten = computeTotals({ lines: bulk, promoCode: 'MERCI-ABCDEF', voucher, shippingMethodId: 'pickup' })
-  assert.equal(beaten.discountSource, 'auto')
-  assert.equal(beaten.appliedPromo, null)
+  // 20 fioles Liquidarom au prix grille : le bon s'applique à toutes.
+  const bulk = [{ price: 2.95, qty: 20, brand: 'Liquidarom', volume: '10ml', category: 'eliquide' }]
+  const all = computeTotals({ lines: bulk, promoCode: 'MERCI-ABCDEF', voucher, shippingMethodId: 'relais' })
+  assert.equal(all.discountSource, 'promo')
+  assert.equal(all.discount, 2.95)
+  assert.equal(all.appliedPromo.code, 'MERCI-ABCDEF')
 
   // Sans bon vérifié, le code seul ne donne rien.
   assert.equal(computeTotals({ lines: kit, promoCode: 'MERCI-ABCDEF' }).discount, 0)
   assert.equal(computeTotals({ lines: kit, promoCode: 'MERCI-ZZZZZZ', voucher }).discount, 0)
 })
 
-test('e-mail : code, pourcentage, date limite et règle avec le tarif quantité', () => {
+test('e-mail : code, pourcentage et date limite', () => {
   const html = voucherEmailHtml({ code: 'MERCI-ABCDEF', percent: 5, expires_at: '2026-11-30T10:00:00Z' })
   assert.match(html, /MERCI-ABCDEF/)
   assert.match(html, /5 % de réduction/)
   assert.match(html, /30 novembre 2026/)
-  assert.match(html, /pas déjà le tarif quantité/)
+  assert.doesNotMatch(html, /tarif quantité/)
   assert.equal(voucherEmailHtml(null), '')
 })

@@ -238,7 +238,7 @@ export default function CartDrawer() {
                 <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-neon transition-all duration-500 shadow-glow" style={{ width: `${freeShippingPct}%` }} />
               </div>
               <p className="mt-2 text-[11px] text-faint flex justify-between items-center">
-                <span>Retrait gratuit en boutique à Marseille · Coursier jour même disponible</span>
+                <span>Mondial Relay, Colissimo ou coursier Marseille le jour même</span>
                 {remainingForFreeShipping > 0 && remainingForFreeShipping <= 10 && nicotineBooster && (
                   <span className="text-[10px] font-bold text-neon bg-neon/10 px-2 py-0.5 rounded-full border border-neon/20">
                     Presque atteint !
@@ -317,7 +317,7 @@ export default function CartDrawer() {
                 <div className="mt-8 border-t border-white/8 pt-6">
                   <p className="text-xs font-bold uppercase tracking-wider text-white mb-3 flex items-center justify-between">
                     <span>{remainingForFreeShipping > 0 ? 'Complétez pour la livraison offerte' : 'Produits recommandés'}</span>
-                    {remainingForFreeShipping > 0 && <span className="text-[10px] text-neon font-normal">Offerte dès 29€</span>}
+                    {remainingForFreeShipping > 0 && <span className="text-[10px] text-neon font-normal">Offerte dès 49€</span>}
                   </p>
                   <div className="space-y-3">
                     {crossSellSuggestions.map((p) => (
@@ -391,7 +391,7 @@ export default function CartDrawer() {
                   <dd className="font-display text-lg font-bold text-white">{formatPrice(itemsTotal)}</dd>
                 </div>
               </dl>
-              <p className="mb-3 text-center text-[11px] text-faint">Retrait boutique gratuit disponible.</p>
+              <p className="mb-3 text-center text-[11px] text-faint">Livraison offerte dès 49 €.</p>
               <Link to="/panier" className="btn-ghost mb-2 w-full" onClick={() => setCartOpen(false)}>
                 Voir le panier
               </Link>

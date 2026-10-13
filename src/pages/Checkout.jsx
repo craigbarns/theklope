@@ -30,7 +30,7 @@ import {
 
 // Méthodes de livraison : prix/labels viennent du module partagé (source de
 // vérité, identique au serveur), on n'ajoute ici que l'icône d'affichage.
-const SHIPPING_ICONS = { relais: IconTruck, poste: IconTruck, coursier: IconBolt, pickup: IconTruck }
+const SHIPPING_ICONS = { relais: IconTruck, poste: IconTruck, coursier: IconBolt }
 const SHIPPING_METHODS = SHARED_SHIPPING_METHODS.map((m) => ({ ...m, icon: SHIPPING_ICONS[m.id] || IconTruck }))
 const FRENCH_POSTCODE = /^\d{5}$/
 const MARSEILLE_POSTCODE = /^130(?:0[1-9]|1[0-6])$/
@@ -220,7 +220,7 @@ export default function Checkout() {
     if (step === 2) {
       if (!selectedShipping) {
         reportCheckoutError(
-          'Choisissez un mode de livraison ou le retrait gratuit en boutique.',
+          'Choisissez un mode de livraison.',
           'shipping_missing',
         )
         return
@@ -298,14 +298,12 @@ export default function Checkout() {
           email: customer.email,
           phone: customer.phone,
         },
-        // Retrait boutique et Point Relais : l'adresse de livraison est déduite
-        // côté serveur du lieu choisi. On n'envoie que les instructions, jamais
-        // une adresse personnelle que la commande n'utilise pas.
-        address: shipping === 'pickup'
-          ? {}
-          : selectedShipping?.requiresRelayPoint
-            ? { deliveryInstructions: address.deliveryInstructions }
-            : address,
+        // Point Relais : l'adresse de livraison est déduite côté serveur du
+        // point choisi. On n'envoie que les instructions, jamais une adresse
+        // personnelle que la commande n'utilise pas.
+        address: selectedShipping?.requiresRelayPoint
+          ? { deliveryInstructions: address.deliveryInstructions }
+          : address,
         relayPoint: selectedShipping?.requiresRelayPoint ? relayPoint : null,
         acquisition: getStoredAcquisition(),
       }
@@ -523,7 +521,7 @@ export default function Checkout() {
                             </p>
                           </div>
                           <span className="shrink-0 text-sm font-semibold text-white">
-                            {m.id === 'pickup' ? 'Gratuit' : shippingIsFree ? 'Offerte' : formatPrice(m.price)}
+                            {shippingIsFree ? 'Offerte' : formatPrice(m.price)}
                           </span>
                         </label>
                       )
@@ -619,7 +617,7 @@ export default function Checkout() {
                   </Section>
                 )}
 
-                {shipping && shipping !== 'pickup' && !selectedShipping?.requiresRelayPoint ? (
+                {shipping && !selectedShipping?.requiresRelayPoint ? (
                   <Section title="Adresse de livraison">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <Field label="Adresse" name="street" value={address.street} onChange={updateAddress('street')} required className="sm:col-span-2" autoComplete="address-line1" />
@@ -655,17 +653,13 @@ export default function Checkout() {
                       </p>
                     )}
                   </Section>
-                ) : shipping === 'pickup' ? (
-                  <div className="mb-5 rounded-lg border border-neon/20 bg-neon/5 px-4 py-4 text-sm text-ash/80">
-                    Retrait gratuit au 188 rue de Rome, 13006 Marseille. Aucune adresse de livraison n'est nécessaire.
-                  </div>
                 ) : selectedShipping?.requiresRelayPoint ? (
                   <div className="mb-5 rounded-lg border border-neon/20 bg-neon/5 px-4 py-4 text-sm text-ash/80">
                     Votre colis est livré au Point Relais choisi ci-dessus. Aucune adresse de livraison n'est nécessaire.
                   </div>
                 ) : (
                   <div className="mb-5 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-4 text-sm text-muted">
-                    Choisissez d’abord un mode de livraison. Le retrait en boutique à Marseille est gratuit.
+                    Choisissez d’abord un mode de livraison. Elle est offerte dès 49 € d’achat.
                   </div>
                 )}
               </>
@@ -818,7 +812,7 @@ function VoucherField({ email, totals }) {
 
   if (active) {
     const belowMinimum = active.minSubtotal && totals.subtotal < active.minSubtotal
-    // Tous les articles ont déjà le tarif quantité : le bon n'a rien à réduire.
+    // Aucun article réductible dans ce panier : le bon n'est pas consommé.
     const beaten = !belowMinimum && !(totals.voucherDiscount > 0)
     return (
       <div className="mt-4 rounded-xl border border-neon/25 bg-neon/5 px-3 py-2.5 text-xs">
@@ -835,7 +829,7 @@ function VoucherField({ email, totals }) {
           <p className="mt-1 text-muted">Appliqué aux articles sans tarif quantité.</p>
         )}
         {beaten && (
-          <p className="mt-1 text-muted">Tous les articles du panier ont déjà le tarif quantité : votre code reste utilisable pour une prochaine commande.</p>
+          <p className="mt-1 text-muted">Ce code ne réduit aucun article de ce panier : il reste utilisable pour une prochaine commande.</p>
         )}
       </div>
     )
@@ -938,11 +932,9 @@ function OrderSummaryContent({
           <dd className="text-right text-white">
             {!selectedShipping
               ? 'À choisir'
-              : selectedShipping.id === 'pickup'
-                ? 'Gratuit'
-                : shippingCost === 0
-                  ? 'Offerte'
-                  : formatPrice(shippingCost)}
+              : shippingCost === 0
+                ? 'Offerte'
+                : formatPrice(shippingCost)}
           </dd>
         </div>
         <div className="flex justify-between border-t border-white/8 pt-3">
@@ -952,7 +944,7 @@ function OrderSummaryContent({
       </dl>
       {!selectedShipping && (
         <p className="mt-3 text-xs leading-relaxed text-faint">
-          Retrait boutique gratuit disponible. Choisissez votre livraison à l’étape suivante.
+          Livraison offerte dès 49 €. Choisissez votre mode de livraison à l’étape suivante.
         </p>
       )}
     </div>

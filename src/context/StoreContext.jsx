@@ -653,6 +653,38 @@ export function StoreProvider({ children }) {
     setProducts(defaults)
   }, [adminSession, products, refreshRemoteData])
 
+  // Mise à jour des seuls prix (grille de prix e-liquides de l'admin). Chaque
+  // ligne n'est modifiée que si le produit n'a pas changé depuis l'affichage
+  // (updated_at) : une modification concurrente n'est jamais écrasée.
+  const updateProductPrices = useCallback(async (updates = []) => {
+    const clean = updates.filter((u) => u?.id && Number.isFinite(Number(u.price)) && Number(u.price) > 0)
+    if (!clean.length) return { updated: 0, skipped: [] }
+    if (!isSupabaseConfigured) {
+      const byId = new Map(clean.map((u) => [u.id, Number(u.price)]))
+      setProducts((prev) => prev.map((p) => (byId.has(p.id) ? { ...p, price: byId.get(p.id) } : p)))
+      return { updated: clean.length, skipped: [] }
+    }
+    if (!adminSession) throw new Error('Connexion admin requise pour modifier Supabase.')
+    const sb = await getSupabase()
+    let updated = 0
+    const skipped = []
+    for (let index = 0; index < clean.length; index += 12) {
+      const batch = clean.slice(index, index + 12)
+      const results = await Promise.all(batch.map((u) => {
+        let query = sb.from('products').update({ price: Number(u.price) }).eq('id', u.id)
+        if (u.updatedAt) query = query.eq('updated_at', u.updatedAt)
+        return query.select('id')
+      }))
+      results.forEach((result, offset) => {
+        if (result.error) throw result.error
+        if (result.data?.length) updated += 1
+        else skipped.push(batch[offset].id)
+      })
+    }
+    await refreshRemoteData()
+    return { updated, skipped }
+  }, [adminSession, refreshRemoteData])
+
   const clearAllProducts = useCallback(async () => {
     if (isSupabaseConfigured) {
       throw new Error('La suppression globale est désactivée sur le catalogue live.')
@@ -1018,6 +1050,7 @@ export function StoreProvider({ children }) {
     catalogMeta,
     getProduct,
     upsertProduct,
+    updateProductPrices,
     deleteProduct,
     resetProducts,
     clearAllProducts,

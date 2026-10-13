@@ -20,7 +20,7 @@ import {
 } from '../components/icons.jsx'
 
 const FEATURES = [
-  { icon: IconTruck, title: 'Livraison Offerte dès 29 €', text: 'Expédition ultra-rapide 24/48h partout en France et coursier Marseille le jour même.' },
+  { icon: IconTruck, title: 'Livraison Offerte dès 49 €', text: 'Expédition ultra-rapide 24/48h partout en France et coursier Marseille le jour même.' },
   { icon: IconShield, title: 'Boutique Physique & Conseils', text: 'Une équipe d’experts passionnés à votre service au 188 rue de Rome, Marseille.' },
   { icon: IconLock, title: 'Paiement 100% Sécurisé', text: 'Transaction chiffrée SSL & paiement sécurisé par Carte Bancaire et Mollie.' },
   { icon: IconHeadset, title: 'Service Client Réactif', text: 'Accompagnement personnalisé pour vous guider dans le choix de votre matériel.' },
@@ -107,7 +107,7 @@ export default function Home() {
       */}
       <Seo
         title="Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE"
-        description="Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit en 1h, livraison offerte dès 29 €."
+        description="Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Coursier le jour même à Marseille, livraison offerte dès 49 €."
         schema={homeSchema}
       />
 
@@ -149,7 +149,7 @@ export default function Home() {
               </a>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-muted">
-              <span className="flex items-center gap-2"><IconTruck width={18} height={18} className="text-neon" /> Offerte dès 29 € (24/48h)</span>
+              <span className="flex items-center gap-2"><IconTruck width={18} height={18} className="text-neon" /> Offerte dès 49 € (24/48h)</span>
               <span className="flex items-center gap-2"><IconShield width={18} height={18} className="text-neon" /> Paiement 100% sécurisé</span>
               <span className="flex items-center gap-2"><IconCheck width={18} height={18} className="text-neon" /> Boutique Physique 188 rue de Rome</span>
             </div>
@@ -264,8 +264,8 @@ export default function Home() {
             <p className="eyebrow mb-3">Local</p>
             <h2 className="font-display text-2xl font-bold text-white">Boutique vape Marseille</h2>
             <p className="mt-3 text-sm leading-relaxed text-muted">
-              Boutique physique au 188 rue de Rome (Marseille 6e) : conseils sur place et retrait gratuit
-              de vos commandes en ligne. Livraison partout en France.
+              Boutique physique au 188 rue de Rome (Marseille 6e) : conseils sur place. En ligne, coursier
+              le jour même dans Marseille et livraison partout en France, offerte dès 49 €.
             </p>
             <Link to="/boutique-vape-marseille" className="btn-primary mt-5">
               Voir la page Marseille <IconArrowRight width={18} height={18} />

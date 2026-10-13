@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice, ORDER_STATUSES } from '../context/StoreContext.jsx'
 import { CATEGORIES, BADGES, isResistanceProduct } from '../data/catalog.js'
 import { isEliquidProduct, supportsFlavorVariants } from '../lib/productCategory.js'
-import { getQuantityPricingRule, resolveVolume } from '../lib/pricing.js'
+import { ELIQUID_PRICE_GRID, priceGridRuleFor, resolveVolume } from '../lib/pricing.js'
 import { findCatalogIssues } from '../data/catalogQuality.js'
 import Seo from '../components/Seo.jsx'
 import ImageUploader from '../components/ImageUploader.jsx'
@@ -600,6 +600,8 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
           })}
         </div>
 
+        <PriceGridPanel products={allProducts} />
+
         <ul className="mt-4 divide-y divide-white/8">
           {shown.map((product) => (
             <li key={product.id} className={`flex flex-wrap items-center gap-3 py-3 sm:flex-nowrap ${editing?.id === product.id ? 'rounded-xl bg-neon/5' : ''}`}>
@@ -635,7 +637,7 @@ function ProductsPanel({ products, allProducts, catalogMeta, editing, query, set
                     </button>
                   </div>
                 )}
-                <QuantityTierBadge product={product} />
+                <PriceGridBadge product={product} />
                 {product.nicotine?.length > 1 && (
                   <NicotineStockToggles
                     compact
@@ -2226,19 +2228,128 @@ function toFormProduct(product) {
   }
 }
 
-// Montre si un e-liquide entre dans un tarif quantité, et sinon pourquoi
-// (contenance lue). Évite les « la remise ne marche pas sur cette réf ».
-function QuantityTierBadge({ product }) {
+// Position d'un e-liquide dans la grille de prix : prix conforme, à mettre à
+// jour, ou hors grille (avec la contenance lue, pour repérer une fiche mal
+// remplie).
+function PriceGridBadge({ product }) {
   if (!isEliquidProduct(product)) return null
-  const rule = getQuantityPricingRule(product)
+  const rule = priceGridRuleFor(product)
   const volume = resolveVolume(product) || 'non renseignée'
-  return rule ? (
-    <p className="mt-1 text-[11px] text-neon">Tarif quantité ✓ dès {rule.minQty} · contenance lue : {volume}</p>
+  if (!rule) {
+    return <p className="mt-1 text-[11px] text-faint">Hors grille de prix · contenance lue : {volume}</p>
+  }
+  const same = Math.abs(Number(product.price) - rule.price) < 0.005
+  return same ? (
+    <p className="mt-1 text-[11px] text-neon">Prix grille ✓ {formatPrice(rule.price)} · {rule.label}</p>
   ) : (
-    <p className="mt-1 text-[11px] text-amber-300">
-      Hors tarif quantité · contenance lue : {volume}
-      {/^(10|50|100)ml$/.test(volume) ? ' (marque hors palier 10 ml)' : ' — indiquez 10ml, 50ml ou 100ml dans « Volume »'}
-    </p>
+    <p className="mt-1 text-[11px] text-amber-300">À passer à {formatPrice(rule.price)} ({rule.label})</p>
+  )
+}
+
+// Applique la grille de prix e-liquides : liste chaque produit concerné avec
+// son prix actuel et son nouveau prix, décochable, puis met à jour les prix.
+function PriceGridPanel({ products }) {
+  const { updateProductPrices } = useStore()
+  const changes = useMemo(() => products.flatMap((product) => {
+    const rule = priceGridRuleFor(product)
+    if (!rule || Math.abs(Number(product.price) - rule.price) < 0.005) return []
+    return [{ product, rule }]
+  }), [products])
+  const [excluded, setExcluded] = useState(() => new Set())
+  const [open, setOpen] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+  const [busy, setBusy] = useState(false)
+  const [feedback, setFeedback] = useState(null)
+  const selected = changes.filter(({ product }) => !excluded.has(product.id))
+  const counts = ELIQUID_PRICE_GRID.map((rule) => ({
+    rule,
+    total: products.filter((product) => priceGridRuleFor(product)?.key === rule.key).length,
+    pending: changes.filter((change) => change.rule.key === rule.key).length,
+  }))
+
+  const apply = async () => {
+    setBusy(true)
+    setFeedback(null)
+    try {
+      const result = await updateProductPrices(selected.map(({ product, rule }) => ({
+        id: product.id, price: rule.price, updatedAt: product.updatedAt,
+      })))
+      setFeedback({
+        ok: !result.skipped.length,
+        message: `${result.updated} prix mis à jour.${result.skipped.length ? ` ${result.skipped.length} produit(s) modifié(s) entre-temps, non touché(s) : relancez.` : ''} Pensez à redéployer le site pour que Google voie les nouveaux prix.`,
+      })
+      setConfirming(false)
+      setExcluded(new Set())
+    } catch (error) {
+      setFeedback({ ok: false, message: error.message || 'Mise à jour des prix impossible.' })
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return (
+    <section className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 className="font-display text-base font-bold text-white">Grille de prix e-liquides</h3>
+          <p className="text-xs text-muted">
+            {counts.map(({ rule, total }) => `${rule.label} : ${formatPrice(rule.price)} (${total})`).join(' · ')}
+          </p>
+        </div>
+        {changes.length ? (
+          <button type="button" onClick={() => setOpen((v) => !v)} className="rounded-full bg-amber-400 px-4 py-2 text-xs font-bold text-noir">
+            {changes.length} prix à mettre à jour {open ? '▲' : '▼'}
+          </button>
+        ) : (
+          <span className="rounded-full border border-neon/30 px-3 py-1 text-xs font-semibold text-neon">Tous les prix sont à jour</span>
+        )}
+      </div>
+
+      {open && changes.length > 0 && (
+        <div className="mt-4">
+          <ul className="max-h-80 divide-y divide-white/8 overflow-y-auto rounded-xl border border-white/8">
+            {changes.map(({ product, rule }) => (
+              <li key={product.id} className="flex items-center gap-3 px-3 py-2 text-sm">
+                <input
+                  type="checkbox"
+                  id={`grid-${product.id}`}
+                  checked={!excluded.has(product.id)}
+                  onChange={() => setExcluded((prev) => {
+                    const next = new Set(prev)
+                    if (next.has(product.id)) next.delete(product.id)
+                    else next.add(product.id)
+                    return next
+                  })}
+                  className="accent-emerald-400"
+                />
+                <label htmlFor={`grid-${product.id}`} className="min-w-0 flex-1 truncate text-white">
+                  {product.name} <span className="text-xs text-faint">· {product.brand} · {resolveVolume(product)}</span>
+                </label>
+                <span className="shrink-0 tabular-nums text-faint line-through">{formatPrice(product.price)}</span>
+                <span className="shrink-0 tabular-nums font-semibold text-neon">{formatPrice(rule.price)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-muted">Décochez un produit pour ne pas changer son prix.</p>
+          {!confirming ? (
+            <button type="button" disabled={!selected.length} onClick={() => setConfirming(true)} className="btn-primary mt-3 disabled:opacity-50">
+              Appliquer les nouveaux prix ({selected.length})
+            </button>
+          ) : (
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-amber-300/30 bg-amber-300/10 p-3 text-sm text-amber-100">
+              <span>Changer le prix de {selected.length} produit{selected.length > 1 ? 's' : ''} sur le site en ligne ?</span>
+              <button type="button" disabled={busy} onClick={apply} className="btn-primary min-h-0 px-4 py-2 text-xs disabled:opacity-50">
+                {busy ? 'Mise à jour…' : 'Oui, appliquer'}
+              </button>
+              <button type="button" disabled={busy} onClick={() => setConfirming(false)} className="btn-ghost min-h-0 px-4 py-2 text-xs">Annuler</button>
+            </div>
+          )}
+        </div>
+      )}
+      {feedback && (
+        <p role={feedback.ok ? 'status' : 'alert'} className={`mt-3 text-xs ${feedback.ok ? 'text-neon' : 'text-amber-200'}`}>{feedback.message}</p>
+      )}
+    </section>
   )
 }
 
@@ -2387,14 +2498,14 @@ const EMAIL_TEMPLATE_PREVIEW = `<!DOCTYPE html>
 
           <div style="background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:16px;margin-bottom:12px;text-align:left;">
             <p style="color:#35FF8A;margin:0;font-size:11px;font-weight:bold;">FORMAT 10 ML</p>
-            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 10 ml dès <span style="color:#35FF8A;">2.95 €*</span></p>
-            <p style="color:#888;margin:4px 0 0;font-size:11px;">* Dès 20 e-liquides achetés (Liquidarom ou Freaks).</p>
+            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 10 ml : <span style="color:#35FF8A;">2,95 €</span></p>
+            <p style="color:#888;margin:4px 0 0;font-size:11px;">Liquidarom, Freaks et Secret Garden. Alfaliquid et Pulp : 4,40 €.</p>
           </div>
 
           <div style="background:#1a1a1a;border:1px solid #2e2e2e;border-radius:12px;padding:16px;margin-bottom:20px;text-align:left;">
             <p style="color:#35FF8A;margin:0;font-size:11px;font-weight:bold;">GRAND FORMAT 50 ML</p>
-            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 50 ml dès <span style="color:#35FF8A;">14.92 €*</span></p>
-            <p style="color:#888;margin:4px 0 0;font-size:11px;">* Dès 4 e-liquides 50 ml achetés (toutes marques confondues).</p>
+            <p style="color:#fff;margin:4px 0 0;font-size:16px;font-weight:bold;">E-liquide 50 ml : <span style="color:#35FF8A;">14,90 €</span></p>
+            <p style="color:#888;margin:4px 0 0;font-size:11px;">Toutes marques. 100 ml : 18,60 €.</p>
           </div>
 
           <a href="https://www.theklope.com/boutique" target="_blank" style="display:inline-block;background:#35FF8A;color:#0a0a0a;font-weight:bold;padding:14px 28px;border-radius:10px;text-decoration:none;">VOIR LA BOUTIQUE EN LIGNE →</a>

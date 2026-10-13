@@ -48,10 +48,9 @@ ${phoneLine}- **E-mail de support** : contact@theklope.com
 - **Absence de promesse médicale** : THEKLOPE ne présente pas la vape comme solution thérapeutique de sevrage tabagique. En cas d'objectif de sevrage, consulter un professionnel de santé.
 
 ## 3. Tarifs et Livraison
-- **Livraison gratuite** : Offerte dès 29€ d'achat en France métropolitaine.
+- **Livraison gratuite** : Offerte dès 49 € d'achat en France métropolitaine.
 - **Délais** : expédition sous 24 à 48 heures en France métropolitaine.
-- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille, retrait en boutique.
-- **Retrait en boutique (Click & Collect)** : gratuit, généralement disponible en 1 heure selon le stock.
+- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille (livraison le jour même).
 - **Paiement** : checkout sécurisé Mollie.
 - **Retours** : 14 jours, conditions détaillées sur la page Livraison et retours.
 - **Calculateur DIY** : Outil en ligne disponible sur ${BASE_URL}/calculette-diy pour formuler les proportions (base, booster, arômes).

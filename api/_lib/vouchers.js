@@ -259,7 +259,7 @@ export function voucherEmailHtml(voucher) {
     'Pour votre prochaine commande sur theklope.com',
     voucher.code,
     `${valueLabel(voucher)}, valable une fois jusqu’au ${escapeHtml(formatExpiry(voucher.expires_at))},
-        avec cette adresse e-mail. S’applique aux articles qui n’ont pas déjà le tarif quantité.`,
+        avec cette adresse e-mail.`,
   )
 }
 
