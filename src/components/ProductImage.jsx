@@ -1,12 +1,21 @@
-// Image produit optimisée : sert une version WebP (beaucoup plus légère) pour les
-// visuels locaux /products/*, avec repli automatique sur le JPG/PNG d'origine si
-// le navigateur ne gère pas WebP. Les URLs distantes (Supabase, http) et le SVG
-// placeholder sont servis tels quels.
+// Image produit optimisée :
+// - visuels locaux /products/* : version WebP, repli sur le JPG/PNG d'origine ;
+// - visuels du catalogue Supabase : redimensionnés et convertis en WebP par
+//   l'optimiseur Vercel (src/lib/imageUrl.js), repli sur l'original si
+//   l'optimiseur échoue (quota mensuel atteint, environnement local) ;
+// - le reste (http, placeholder SVG) est servi tel quel.
 //
 // `display:contents` sur <picture> évite qu'il crée une boîte : le <img> se
 // comporte comme s'il était l'enfant direct du conteneur (les classes de layout
 // type h-full/object-cover restent valables).
+import { optimizedImageAttrs } from '../lib/imageUrl.js'
+
 const FALLBACK_IMAGE = '/products/product-placeholder.svg'
+
+// /_vercel/image n'existe qu'une fois déployé : en local (vite dev / preview),
+// on sert directement l'original plutôt qu'une requête vouée à l'échec.
+const OPTIMIZER_AVAILABLE = typeof window === 'undefined'
+  || !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(window.location.hostname)
 
 export default function ProductImage({ src, alt = '', className = '', onError, ...props }) {
   const isLocalRaster = typeof src === 'string' && src.startsWith('/products/') && /\.(jpe?g|png)$/i.test(src)
@@ -16,6 +25,15 @@ export default function ProductImage({ src, alt = '', className = '', onError, .
     if (event.defaultPrevented) return
 
     const image = event.currentTarget
+
+    // Optimiseur indisponible : on retente l'image d'origine, sans srcset.
+    if (image.dataset.optimized === 'true' && image.dataset.optimizedRetried !== 'true') {
+      image.dataset.optimizedRetried = 'true'
+      image.removeAttribute('srcset')
+      image.src = src
+      return
+    }
+
     const source = image.parentElement?.tagName === 'PICTURE'
       ? image.parentElement.querySelector('source')
       : null
@@ -41,6 +59,21 @@ export default function ProductImage({ src, alt = '', className = '', onError, .
   }
 
   if (!isLocalRaster) {
+    const optimized = OPTIMIZER_AVAILABLE ? optimizedImageAttrs(src, props.width) : null
+    if (optimized) {
+      return (
+        <img
+          key={optimized.src}
+          src={optimized.src}
+          srcSet={optimized.srcSet}
+          data-optimized="true"
+          alt={alt}
+          className={className}
+          onError={handleError}
+          {...props}
+        />
+      )
+    }
     return <img src={src || FALLBACK_IMAGE} alt={alt} className={className} onError={handleError} {...props} />
   }
 

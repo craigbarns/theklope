@@ -8,6 +8,20 @@
     }
   ],
   "trailingSlash": false,
+  "images": {
+    "sizes": [256, 384, 828],
+    "qualities": [70],
+    "formats": ["image/webp"],
+    "minimumCacheTTL": 2678400,
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "xbfpgyhtpreijgttjidr.supabase.co",
+        "pathname": "^/storage/v1/object/public/.*$"
+      }
+    ],
+    "dangerouslyAllowSVG": false
+  },
   "redirects": [
     {
       "source": "/:path*",

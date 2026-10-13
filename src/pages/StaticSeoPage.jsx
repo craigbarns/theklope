@@ -2,6 +2,8 @@ import { useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
+import ProductCard from '../components/ProductCard.jsx'
+import { useStore } from '../context/StoreContext.jsx'
 import { STATIC_SEO_PAGES } from '../data/staticSeoPages.js'
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
@@ -11,6 +13,10 @@ export default function StaticSeoPage() {
   const location = useLocation()
   const slug = location.pathname.replace(/^\/+|\/+$/g, '')
   const page = STATIC_SEO_PAGES[slug]
+  const { products } = useStore()
+  const featuredProducts = useMemo(() => (page?.featuredProductIds || [])
+    .map((id) => products.find((product) => product.id === id))
+    .filter(Boolean), [page, products])
 
   const schema = useMemo(() => {
     if (!page) return null
@@ -101,6 +107,24 @@ export default function StaticSeoPage() {
           </article>
         ))}
       </section>
+
+      {featuredProducts.length > 0 && (
+        <section className="mt-14">
+          <h2 className="font-display text-2xl font-bold text-white">{page.featuredProductsTitle}</h2>
+          <div className="mt-5 grid grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4">
+            {featuredProducts.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                itemListId={`seo_${slug}`}
+                itemListName={page.featuredProductsTitle}
+                index={index}
+                aboveFold={false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mt-14">
         <p className="eyebrow mb-2">FAQ</p>

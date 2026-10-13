@@ -12,6 +12,10 @@ export default function ProductCard({
   itemListId = 'catalogue',
   itemListName = 'Catalogue',
   index,
+  // Les premières cartes d'une grille sont visibles dès l'arrivée (2 colonnes
+  // sur mobile) : chargées tout de suite, elles font le LCP des pages catégorie
+  // au lieu d'attendre le chargement différé.
+  aboveFold = index < 4,
 }) {
   const { addToCart, toggleFavorite, isFavorite } = useStore()
   const fav = isFavorite(product.id)
@@ -46,7 +50,8 @@ export default function ProductCard({
           <ProductImage
             src={product.image}
             alt={`${product.name} — ${product.type} ${product.brand}`}
-            loading="lazy"
+            loading={aboveFold ? 'eager' : 'lazy'}
+            fetchpriority={aboveFold && index < 2 ? 'high' : undefined}
             className="h-full w-full object-cover transition-transform duration-700 ease-premium group-hover:scale-[1.07]"
             width={400}
             height={400}
