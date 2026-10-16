@@ -25,13 +25,20 @@ export const STATIC_SEO_PAGES = {
           'Avant d’acheter une résistance, une cartouche ou un e-liquide, venez valider la compatibilité avec votre matériel directement en boutique. Notre équipe vous oriente vers le bon ratio PG/VG et le taux de nicotine ou de sels de nicotine adapté à votre consommation.',
       },
       {
+        title: 'Une deuxième boutique au 49 rue de Rome (13001)',
+        text:
+          'Côté Noailles, notre boutique Clope and Clope vous accueille au 49 rue de Rome, 13001 Marseille, du lundi au vendredi de 9 h à 19 h (09 83 74 14 61) : cigarettes électroniques, e-liquides et accessoires. Une troisième boutique Clope and Clope est installée au 36 cours Carnot à Salon-de-Provence.',
+      },
+      {
         title: 'Quartiers desservis et expédition France entière',
         text:
           'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 49 €.',
       },
     ],
+    stores: ['theklope', 'clope-and-clope-marseille'],
     links: [
       { to: '/boutique', label: 'Voir toute la boutique' },
+      { to: '/nos-boutiques', label: 'Nos 3 boutiques' },
       { to: '/cigarette-electronique-marseille', label: 'Cigarette électronique à Marseille' },
       { to: '/categorie/puffs-rechargeables', label: 'Puffs rechargeables & alternatives' },
       { to: '/categorie/e-liquides', label: 'E-liquides' },
@@ -289,4 +296,90 @@ export const STATIC_SEO_PAGES = {
       },
     ],
   },
+  'nos-boutiques': {
+    title: 'Nos boutiques vape à Marseille et Salon-de-Provence | THEKLOPE',
+    metaDescription:
+      'THEKLOPE (188 rue de Rome) et Clope and Clope (49 rue de Rome) à Marseille, Clope and Clope (36 cours Carnot) à Salon-de-Provence : adresses, horaires, téléphones.',
+    h1: 'Nos boutiques à Marseille et Salon-de-Provence',
+    eyebrow: 'Marseille 1er · Marseille 6e · Salon-de-Provence',
+    intro:
+      'Trois boutiques pour voir le matériel, demander conseil et acheter sur place : THEKLOPE et Clope and Clope rue de Rome à Marseille, et Clope and Clope cours Carnot à Salon-de-Provence. Le catalogue complet est aussi en ligne sur theklope.com, livré partout en France.',
+    stores: ['theklope', 'clope-and-clope-marseille', 'clope-and-clope-salon'],
+    sections: [
+      {
+        title: 'Commander en ligne',
+        text:
+          'Sur theklope.com : Mondial Relay en Point Relais (3,90 €), Colissimo avec signature (7,50 €) ou coursier le jour même dans Marseille (7,50 €). La livraison est offerte dès 49 € d’achat.',
+      },
+      {
+        title: 'Vente réservée aux adultes',
+        text:
+          'Dans nos boutiques comme en ligne, la vente de produits du vapotage est réservée aux personnes majeures. Une pièce d’identité peut être demandée.',
+      },
+    ],
+    links: [
+      { to: '/boutique-vape-marseille', label: 'Boutique THEKLOPE, 188 rue de Rome' },
+      { to: '/cigarette-electronique-salon-de-provence', label: 'Boutique de Salon-de-Provence' },
+      { to: '/boutique', label: 'Commander en ligne' },
+    ],
+    faq: [
+      {
+        q: 'Combien de boutiques de cigarettes électroniques avez-vous ?',
+        a: 'Trois : THEKLOPE au 188 rue de Rome (13006 Marseille), Clope and Clope au 49 rue de Rome (13001 Marseille) et Clope and Clope au 36 cours Carnot (13300 Salon-de-Provence).',
+      },
+      {
+        q: 'Quelles boutiques sont ouvertes le samedi ?',
+        a: 'La boutique de Salon-de-Provence est ouverte du lundi au samedi de 9 h à 19 h. Les deux boutiques de Marseille sont ouvertes du lundi au vendredi de 9 h à 19 h.',
+      },
+    ],
+  },
+  'cigarette-electronique-salon-de-provence': {
+    title: 'Cigarette électronique Salon-de-Provence — 36 cours Carnot | THEKLOPE',
+    metaDescription:
+      'Boutique de cigarettes électroniques à Salon-de-Provence : Clope and Clope, 36 cours Carnot. E-liquides, pods, kits et accessoires. Ouvert du lundi au samedi, 9 h–19 h.',
+    h1: 'Cigarette électronique à Salon-de-Provence',
+    eyebrow: 'Salon-de-Provence 13300 — Cours Carnot',
+    intro:
+      'Notre boutique Clope and Clope vous accueille au 36 cours Carnot, en centre-ville de Salon-de-Provence, du lundi au samedi de 9 h à 19 h : cigarettes électroniques, e-liquides et accessoires, avec des conseils sur place. Le catalogue complet est aussi en ligne sur theklope.com.',
+    stores: ['clope-and-clope-salon'],
+    sections: [
+      {
+        title: 'La boutique du cours Carnot',
+        text:
+          'Clope and Clope, 36 cours Carnot, 13300 Salon-de-Provence. Ouvert du lundi au samedi de 9 h à 19 h, fermé le dimanche. Téléphone : 04 90 56 00 80.',
+      },
+      {
+        title: 'Commander en ligne depuis Salon-de-Provence',
+        text:
+          'Sur theklope.com, faites-vous livrer en Point Relais Mondial Relay (3,90 €) ou à domicile en Colissimo avec signature (7,50 €). La livraison est offerte dès 49 € d’achat, avec une expédition sous 24 à 48 h depuis Marseille.',
+      },
+      {
+        title: 'Choisir son matériel et son e-liquide',
+        text:
+          'En boutique, l’équipe vous aide à choisir un pod ou un kit, la résistance compatible et le taux de nicotine adapté à votre consommation. La vente est réservée aux personnes majeures.',
+      },
+    ],
+    links: [
+      { to: '/nos-boutiques', label: 'Nos 3 boutiques' },
+      { to: '/categorie/pods', label: 'Pods' },
+      { to: '/categorie/e-liquides', label: 'E-liquides' },
+      { to: '/compatibilite', label: 'Quelle résistance pour mon kit ?' },
+      { to: '/livraison-retours', label: 'Livraison et retours' },
+    ],
+    faq: [
+      {
+        q: 'Où acheter une cigarette électronique à Salon-de-Provence ?',
+        a: 'Chez Clope and Clope, 36 cours Carnot, 13300 Salon-de-Provence, du lundi au samedi de 9 h à 19 h, ou en ligne sur theklope.com.',
+      },
+      {
+        q: 'Quel est le numéro de la boutique de Salon-de-Provence ?',
+        a: 'Le 04 90 56 00 80, aux heures d’ouverture : du lundi au samedi de 9 h à 19 h.',
+      },
+      {
+        q: 'Peut-on se faire livrer à Salon-de-Provence ?',
+        a: 'Oui : en Point Relais Mondial Relay ou à domicile en Colissimo avec signature, livraison offerte dès 49 € d’achat. Le coursier le jour même est réservé à Marseille.',
+      },
+    ],
+  },
+
 }

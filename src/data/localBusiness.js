@@ -92,3 +92,95 @@ export function buildLocalBusinessSchema() {
 
   return schema
 }
+
+// -----------------------------------------------------------------------------
+// Les trois boutiques du gérant (confirmées par l'exploitant le 16/10/2026,
+// identiques à leurs fiches Google). Chaque fiche Google pointe déjà vers
+// theklope.com : le site doit présenter les mêmes nom, adresse, téléphone et
+// horaires, sans quoi Google ne relie pas les fiches à la même enseigne.
+// -----------------------------------------------------------------------------
+const formatPhone = (international) => `0${international.replace('+33', '')}`.replace(/(\d{2})(?=\d)/g, '$1 ').trim()
+const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+export const STORES = [
+  {
+    id: 'theklope',
+    name: 'THEKLOPE',
+    streetAddress: STORE.address.streetAddress,
+    postalCode: STORE.address.postalCode,
+    addressLocality: STORE.address.addressLocality,
+    district: 'Marseille 6e — Castellane',
+    telephone: STORE_PHONE,
+    hours: STORE_HOURS,
+    hoursLabel: 'Du lundi au vendredi, 9 h – 19 h',
+    googleUrl: STORE_SAME_AS[0],
+    page: '/boutique-vape-marseille',
+  },
+  {
+    id: 'clope-and-clope-marseille',
+    name: 'Clope and Clope',
+    streetAddress: '49 rue de Rome',
+    postalCode: '13001',
+    addressLocality: 'Marseille',
+    district: 'Marseille 1er — Noailles',
+    telephone: '+33983741461',
+    hours: [{ days: WEEKDAYS, opens: '09:00', closes: '19:00' }],
+    hoursLabel: 'Du lundi au vendredi, 9 h – 19 h',
+    googleUrl: 'https://maps.google.com/?cid=13522653804705001384',
+    page: '/nos-boutiques',
+  },
+  {
+    id: 'clope-and-clope-salon',
+    name: 'Clope and Clope',
+    streetAddress: '36 cours Carnot',
+    postalCode: '13300',
+    addressLocality: 'Salon-de-Provence',
+    district: 'Salon-de-Provence — centre-ville',
+    telephone: '+33490560080',
+    hours: [{ days: [...WEEKDAYS, 'Saturday'], opens: '09:00', closes: '19:00' }],
+    hoursLabel: 'Du lundi au samedi, 9 h – 19 h',
+    googleUrl: null,
+    page: '/cigarette-electronique-salon-de-provence',
+  },
+].map((store) => ({
+  ...store,
+  phoneDisplay: formatPhone(store.telephone),
+  mapUrl: store.googleUrl || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${store.name}, ${store.streetAddress}, ${store.postalCode} ${store.addressLocality}`,
+  )}`,
+}))
+
+export const findStore = (id) => STORES.find((store) => store.id === id) || null
+
+// Schéma d'une boutique. La boutique principale garde le schéma détaillé
+// (géolocalisation, zone desservie) ; les autres sont rattachées à la même
+// organisation, ce qui relie les trois fiches Google à l'enseigne.
+export function buildStoreSchema(id) {
+  if (id === 'theklope') return buildLocalBusinessSchema()
+  const store = findStore(id)
+  if (!store) return null
+  return {
+    '@type': 'Store',
+    '@id': `${STORE.url}/nos-boutiques#${store.id}`,
+    name: store.name,
+    url: `${STORE.url}${store.page}`,
+    image: STORE.image,
+    telephone: store.telephone,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: store.streetAddress,
+      addressLocality: store.addressLocality,
+      postalCode: store.postalCode,
+      addressCountry: 'FR',
+    },
+    hasMap: store.mapUrl,
+    openingHoursSpecification: store.hours.map((slot) => ({
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: slot.days.map((d) => `https://schema.org/${d}`),
+      opens: slot.opens,
+      closes: slot.closes,
+    })),
+    parentOrganization: { '@id': `${STORE.url}/#organization` },
+    ...(store.googleUrl ? { sameAs: [store.googleUrl] } : {}),
+  }
+}
