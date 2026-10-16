@@ -260,13 +260,77 @@ export const sortProductsByMerchandising = (products = []) => products
   })
   .map(({ product }) => product)
 
-export const featuredProducts = (products = []) => {
-  const merchandising = sortProductsByMerchandising(products)
-  return {
-    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), merchandising, 8),
-    newArrivals: padList(products.filter((p) => p.badge === 'nouveau'), merchandising.filter((p) => p.oldPrice == null), 8),
-    starterPacks: padList(products.filter((p) => p.category === 'pack'), products.filter((p) => p.category === 'ecig'), 6),
+// Familles de la vitrine : sans mélange, les nouveautés e-liquides (badge
+// « nouveau », classées en tête) formaient un mur de flacons d'une même marque
+// dès l'arrivée sur /boutique et sur l'accueil.
+const HARDWARE_CATEGORY_KEYS = new Set(['ecig', 'pod', 'pack', 'alternative-puff'])
+const productFamily = (product = {}) => {
+  if (isEliquidProduct(product) || product.category === 'sels-nicotine') return 'liquide'
+  if (HARDWARE_CATEGORY_KEYS.has(product.category)) return 'materiel'
+  return 'consommable'
+}
+const brandOf = (product = {}) => String(product.brand || '').trim().toLowerCase()
+
+// Évite deux produits consécutifs de la même marque quand un autre produit,
+// parmi les quelques suivants, permet de varier. L'ordre reste sinon inchangé.
+const spreadBrands = (products = [], lookahead = 6) => {
+  const pool = [...products]
+  const out = []
+  while (pool.length) {
+    const last = out.length ? brandOf(out[out.length - 1]) : null
+    const index = pool.slice(0, lookahead).findIndex((product) => brandOf(product) !== last)
+    out.push(pool.splice(index > 0 ? index : 0, 1)[0])
   }
+  return out
+}
+
+// Intercale matériel, e-liquides et consommables en gardant l'ordre propre à
+// chaque famille. Les produits en stock restent avant les ruptures.
+export const diversifyProducts = (products = []) => {
+  const interleave = (list) => {
+    const queues = ['materiel', 'liquide', 'consommable']
+      .map((family) => spreadBrands(list.filter((product) => productFamily(product) === family)))
+      .filter((queue) => queue.length)
+    const out = []
+    while (queues.some((queue) => queue.length)) {
+      for (const queue of queues) if (queue.length) out.push(queue.shift())
+    }
+    return out
+  }
+  return [
+    ...interleave(products.filter((product) => product.stock > 0)),
+    ...interleave(products.filter((product) => !(product.stock > 0))),
+  ]
+}
+
+export const featuredProducts = (products = []) => {
+  const merchandising = diversifyProducts(sortProductsByMerchandising(products))
+  const inStock = (product) => product.stock > 0
+  return {
+    // Les nouveautés ont leur propre bloc : elles ne servent plus à compléter
+    // la sélection, qui répétait sinon les mêmes produits.
+    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), merchandising.filter((p) => p.badge !== 'nouveau'), 8),
+    newArrivals: spreadBrands(padList(products.filter((p) => p.badge === 'nouveau' && inStock(p)), merchandising.filter((p) => p.oldPrice == null), 8)),
+    // Débutants : packs, puis pods (tirage automatique, batterie intégrée).
+    // Les kits « cigarette électronique » en complément mettaient en avant des
+    // box 220 W à accus non fournis.
+    starterPacks: padList(products.filter((p) => p.category === 'pack' && inStock(p)), merchandising.filter((p) => p.category === 'pod' && inStock(p)), 6),
+  }
+}
+
+// Vignette d'une catégorie de l'accueil : un produit de la catégorie, sinon le
+// visuel neutre (jamais le premier produit venu : la vignette « Résistances »
+// montrait un flacon d'e-liquide).
+const CATEGORY_THUMB_MATCHERS = {
+  ecig: (p) => p.category === 'ecig',
+  eliquide: (p) => isEliquidProduct(p),
+  resistance: (p) => isResistanceProduct(p),
+  accessoire: (p) => p.category === 'accessoire' && !isResistanceProduct(p),
+  'alternative-puff': (p) => p.category === 'alternative-puff' || p.category === 'pod',
+}
+export const categoryThumbnailProduct = (key, products = []) => {
+  const matches = CATEGORY_THUMB_MATCHERS[key]
+  return matches ? products.find((p) => matches(p) && p.image) || null : null
 }
 
 const createdAtTime = (product = {}) => {

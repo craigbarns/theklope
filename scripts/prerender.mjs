@@ -30,6 +30,7 @@ const {
   CATEGORIES,
   categoryName,
   findBrandCategory,
+  categoryThumbnailProduct,
   featuredProducts,
   getProductCategoryKey,
   productMatchesCategory,
@@ -669,6 +670,9 @@ const homeBootstrap = [...new Map([
   ...homeFeatured.bestSellers,
   ...homeFeatured.newArrivals,
   ...homeFeatured.starterPacks,
+  // Vignettes des catégories : sans ces produits, l'accueil n'avait que les
+  // produits mis en avant et la vignette « Résistances » montrait un e-liquide.
+  ...['ecig', 'eliquide', 'resistance', 'accessoire', 'alternative-puff'].map((key) => categoryThumbnailProduct(key, PRODUCTS)),
 ].filter(Boolean).map((product) => [product.id, product])).values()]
 
 const homeContent = `

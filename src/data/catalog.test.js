@@ -4,6 +4,9 @@ import test from 'node:test'
 import {
   BADGES,
   CATEGORIES,
+  categoryThumbnailProduct,
+  diversifyProducts,
+  featuredProducts,
   getProductCategoryKey,
   isDiyProduct,
   isResistanceProduct,
@@ -164,4 +167,42 @@ test('la page marque Adalya liste les e-liquides Adalya', () => {
   assert.equal(productMatchesCategory({ name: 'Love 66 60 ml - Adalya', brand: 'Adalya', category: 'eliquide' }, adalya.key), true)
   assert.equal(productMatchesCategory({ name: 'Hawai 60 ml', brand: 'ADALYA', category: 'eliquide' }, adalya.key), true)
   assert.equal(productMatchesCategory({ name: 'Drag H40', brand: 'Voopoo', category: 'ecig' }, adalya.key), false)
+})
+
+test('la vitrine alterne matériel, e-liquides et consommables, sans aligner une marque', () => {
+  const liquid = (id, brand) => ({ id, brand, category: 'eliquide', stock: 5, badge: 'nouveau' })
+  const products = [
+    liquid('f1', 'Fruizee'), liquid('f2', 'Fruizee'), liquid('f3', 'Fruizee'), liquid('j1', 'JNR'),
+    { id: 'pod', brand: 'Aspire', category: 'pod', stock: 3 },
+    { id: 'coil', brand: 'Voopoo', category: 'resistance', stock: 9 },
+    { id: 'out', brand: 'Voopoo', category: 'ecig', stock: 0 },
+  ]
+  const ids = diversifyProducts(products).map((p) => p.id)
+  assert.deepEqual(ids.slice(0, 3), ['pod', 'f1', 'coil'], 'une famille après l’autre')
+  assert.equal(ids[3], 'j1', 'une autre marque avant de revenir à Fruizee')
+  assert.equal(ids.at(-1), 'out', 'les ruptures restent en fin de liste')
+  assert.equal(new Set(ids).size, products.length)
+})
+
+test('débutants : packs puis pods, jamais une box à accus ; accueil sans doublon', () => {
+  const products = [
+    { id: 'octa', category: 'ecig', name: 'Armour Octa 220W', stock: 4, badge: 'nouveau' },
+    { id: 'pixo', category: 'pod', name: 'Pixo Aura 2', stock: 4 },
+    { id: 'xlim', category: 'pod', name: 'Xlim Pro 3', stock: 2 },
+    { id: 'pod-out', category: 'pod', name: 'Ancien pod', stock: 0 },
+    { id: 'liq', category: 'eliquide', name: 'Fraise 50 ml', stock: 9, badge: 'nouveau' },
+  ]
+  const { starterPacks, bestSellers } = featuredProducts(products)
+  assert.deepEqual(starterPacks.map((p) => p.id), ['pixo', 'xlim'])
+  assert.ok(!bestSellers.some((p) => p.badge === 'nouveau'), 'les nouveautés ont leur propre bloc')
+})
+
+test('vignettes de catégorie : un produit de la catégorie, sinon aucun', () => {
+  const products = [
+    { id: 'liq', category: 'eliquide', image: '/a.jpg' },
+    { id: 'coil', category: 'resistance', image: '/b.jpg' },
+  ]
+  assert.equal(categoryThumbnailProduct('resistance', products)?.id, 'coil')
+  assert.equal(categoryThumbnailProduct('accessoire', products), null, 'jamais un e-liquide pour les accessoires')
+  assert.equal(categoryThumbnailProduct('eliquide', products)?.id, 'liq')
 })
