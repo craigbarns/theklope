@@ -45,7 +45,7 @@ const { CATEGORY_SEO } = await import(resolve(root, 'src/data/categorySeo.js'))
 const { BLOG_POSTS } = await import(resolve(root, 'src/data/blog.js'))
 const { STATIC_SEO_PAGES } = await import(resolve(root, 'src/data/staticSeoPages.js'))
 const { COIL_FAMILIES, familyFaq, productsForFamily } = await import(resolve(root, 'src/data/coilCompatibility.js'))
-const { buildLocalBusinessSchema } = await import(resolve(root, 'src/data/localBusiness.js'))
+const { buildLocalBusinessSchema, buildStoreSchema, findStore } = await import(resolve(root, 'src/data/localBusiness.js'))
 const { relatedGuidesForProduct } = await import(resolve(root, 'src/data/productGuides.js'))
 const { buildMerchantSku } = await import(resolve(root, 'src/lib/merchantSku.js'))
 const { FREE_SHIPPING_THRESHOLD, LOWEST_SHIPPING_COST } = await import(resolve(root, 'src/lib/pricing.js'))
@@ -514,6 +514,9 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
   const sections = page.sections.map((s) => `<h2>${esc(s.title)}</h2><p>${esc(s.text)}</p>`).join('')
   const faq = page.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')
   const links = page.links.map((l) => `<li><a href="${esc(l.to)}">${esc(l.label)}</a></li>`).join('')
+  const storesHtml = (page.stores || []).map(findStore).filter(Boolean)
+    .map((store) => `<section id="${esc(store.id)}"><h2>${esc(store.name)} — ${esc(store.district)}</h2><address>${esc(store.streetAddress)}, ${esc(store.postalCode)} ${esc(store.addressLocality)}</address><p>${esc(store.hoursLabel)} · <a href="tel:${esc(store.telephone)}">${esc(store.phoneDisplay)}</a> · <a href="${esc(store.mapUrl)}">Itinéraire</a></p></section>`)
+    .join('')
   const featured = (page.featuredProductIds || [])
     .map((id) => PRODUCTS.find((product) => product.id === id))
     .filter(Boolean)
@@ -546,12 +549,17 @@ for (const [slug, page] of Object.entries(STATIC_SEO_PAGES)) {
         })),
       },
       ...(page.localBusiness ? [buildLocalBusinessSchema()] : []),
+      ...(page.stores || [])
+        .filter((id) => !(page.localBusiness && id === 'theklope'))
+        .map(buildStoreSchema)
+        .filter(Boolean),
     ],
   }
   const content = `
     <nav aria-label="Fil d'Ariane"><a href="/">Accueil</a> › <span>${esc(page.h1)}</span></nav>
     <h1>${esc(page.h1)}</h1>
     <p>${esc(page.intro)}</p>
+    ${storesHtml}
     ${sections}
     <ul>${links}</ul>
     ${featuredHtml}

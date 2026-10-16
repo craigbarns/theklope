@@ -122,6 +122,9 @@ export default function App() {
             <Route path="/compatibilite/:slug" element={<CompatibilityPage />} />
             <Route path="/boutique-vape-marseille" element={<StaticSeoPage />} />
             <Route path="/cigarette-electronique-marseille" element={<StaticSeoPage />} />
+            <Route path="/puff-marseille" element={<StaticSeoPage />} />
+            <Route path="/nos-boutiques" element={<StaticSeoPage />} />
+            <Route path="/cigarette-electronique-salon-de-provence" element={<StaticSeoPage />} />
             <Route path="/conformite-vape" element={<StaticSeoPage />} />
             <Route path="/livraison-retours" element={<StaticSeoPage />} />
             <Route path="/produit/:id" element={<Product />} />

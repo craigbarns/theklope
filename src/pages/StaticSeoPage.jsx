@@ -5,7 +5,7 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import { useStore } from '../context/StoreContext.jsx'
 import { STATIC_SEO_PAGES } from '../data/staticSeoPages.js'
-import { buildLocalBusinessSchema } from '../data/localBusiness.js'
+import { buildLocalBusinessSchema, buildStoreSchema, findStore } from '../data/localBusiness.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import NotFound from './NotFound.jsx'
 
@@ -53,6 +53,12 @@ export default function StaticSeoPage() {
     if (page.localBusiness) {
       graph.push(buildLocalBusinessSchema())
     }
+    for (const id of page.stores || []) {
+      // La boutique principale est déjà décrite par localBusiness.
+      if (page.localBusiness && id === 'theklope') continue
+      const storeSchema = buildStoreSchema(id)
+      if (storeSchema) graph.push(storeSchema)
+    }
 
     return {
       '@context': 'https://schema.org',
@@ -98,6 +104,29 @@ export default function StaticSeoPage() {
           ))}
         </div>
       </section>
+
+      {(page.stores || []).length > 0 && (
+        <section className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3" aria-label="Nos boutiques">
+          {page.stores.map(findStore).filter(Boolean).map((store) => (
+            <article key={store.id} id={store.id} className="rounded-2xl border border-neon/20 bg-neon/[0.04] p-5">
+              <p className="text-xs uppercase tracking-wider text-neon">{store.district}</p>
+              <h2 className="mt-1 font-display text-lg font-semibold text-white">{store.name}</h2>
+              <address className="mt-2 not-italic text-sm leading-relaxed text-ash">
+                {store.streetAddress}<br />
+                {store.postalCode} {store.addressLocality}
+              </address>
+              <p className="mt-2 text-sm text-muted">{store.hoursLabel}</p>
+              <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm">
+                <a href={`tel:${store.telephone}`} className="font-semibold text-white hover:text-neon">{store.phoneDisplay}</a>
+                <a href={store.mapUrl} target="_blank" rel="noopener noreferrer" className="text-neon hover:underline">Itinéraire</a>
+                {store.page !== `/${slug}` && store.page !== '/nos-boutiques' && (
+                  <Link to={store.page} className="text-neon hover:underline">La boutique</Link>
+                )}
+              </p>
+            </article>
+          ))}
+        </section>
+      )}
 
       <section className="mt-8 grid gap-4 md:grid-cols-2">
         {page.sections.map((section) => (
