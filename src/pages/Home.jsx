@@ -4,10 +4,9 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import ProductCard from '../components/ProductCard.jsx'
 import ProductImage from '../components/ProductImage.jsx'
-import { featuredProducts, isResistanceProduct, selectHomeHeroProduct } from '../data/catalog.js'
+import { categoryThumbnailProduct, featuredProducts, selectHomeHeroProduct } from '../data/catalog.js'
 import { buildLocalBusinessSchema } from '../data/localBusiness.js'
 import { toAnalyticsItem, trackEvent } from '../lib/analytics.js'
-import { isEliquidProduct } from '../lib/productCategory.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import {
   IconArrowRight,
@@ -46,9 +45,27 @@ export default function Home() {
   const { bestSellers, newArrivals, starterPacks } = useMemo(() => featuredProducts(products), [products])
   const heroProduct = useMemo(() => selectHomeHeroProduct(products), [products])
   const featuredProduct = starterPacks[0] || bestSellers[1] || products[1] || heroProduct
-  const homeCatalogue = bestSellers.slice(0, 4)
-  const homeStarterPacks = starterPacks.slice(0, 2)
-  const homeNewArrivals = (newArrivals.length ? newArrivals : products.slice(-4)).slice(0, 4)
+  // Un produit n'apparaît qu'une fois sur l'accueil : le même kit revenait
+  // dans le hero, la sélection, les packs et les nouveautés.
+  const { homeCatalogue, homeStarterPacks, homeNewArrivals } = useMemo(() => {
+    const shown = new Set(heroProduct ? [heroProduct.id] : [])
+    const take = (list, count) => {
+      const picked = []
+      for (const product of list) {
+        if (picked.length >= count) break
+        if (shown.has(product.id)) continue
+        shown.add(product.id)
+        picked.push(product)
+      }
+      return picked
+    }
+    return {
+      homeCatalogue: take(bestSellers, 4),
+      homeStarterPacks: take(starterPacks, 2),
+      homeNewArrivals: take(newArrivals.length ? newArrivals : products.slice(-4), 4),
+    }
+  }, [heroProduct, bestSellers, starterPacks, newArrivals, products])
+  const starterHasPacks = homeStarterPacks.some((product) => product.category === 'pack')
 
   useProductListView({
     cookiesChoice,
@@ -312,20 +329,35 @@ export default function Home() {
       </section>
 
       {/* PACKS DÉBUTANTS */}
-      {starterPacks.length > 0 && (
+      {homeStarterPacks.length > 0 && (
         <section className="container-page py-8">
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-carbon to-anthracite">
             <div className="grid items-center gap-8 p-8 lg:grid-cols-2 lg:p-12">
               <div>
                 <p className="eyebrow mb-3">Bien démarrer</p>
-                <h2 className="font-display text-3xl font-bold text-white">Packs débutants</h2>
-                <p className="mt-3 max-w-md text-muted">
-                  Tout ce qu'il faut pour commencer sereinement : kit, e-liquides et accessoires réunis dans une
-                  sélection regroupée, avec le détail de chaque produit.
-                </p>
-                <Link to="/categorie/packs-debutants" className="btn-primary mt-6">
-                  Voir les packs <IconArrowRight width={18} height={18} />
-                </Link>
+                {starterHasPacks ? (
+                  <>
+                    <h2 className="font-display text-3xl font-bold text-white">Packs débutants</h2>
+                    <p className="mt-3 max-w-md text-muted">
+                      Tout ce qu'il faut pour commencer sereinement : kit, e-liquides et accessoires réunis dans une
+                      sélection regroupée, avec le détail de chaque produit.
+                    </p>
+                    <Link to="/categorie/packs-debutants" className="btn-primary mt-6">
+                      Voir les packs <IconArrowRight width={18} height={18} />
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="font-display text-3xl font-bold text-white">Des pods simples pour commencer</h2>
+                    <p className="mt-3 max-w-md text-muted">
+                      Batterie intégrée, cartouche à remplir et tirage automatique : rien à régler pour démarrer.
+                      Conseils et mise en route à la boutique du 188 rue de Rome.
+                    </p>
+                    <Link to="/categorie/pods" className="btn-primary mt-6">
+                      Voir les pods <IconArrowRight width={18} height={18} />
+                    </Link>
+                  </>
+                )}
               </div>
               <div className="grid gap-5 sm:grid-cols-2">
                 {homeStarterPacks.map((p, index) => (
@@ -333,7 +365,7 @@ export default function Home() {
                     key={p.id}
                     product={p}
                     itemListId="home_starter_packs"
-                    itemListName="Packs débutants"
+                    itemListName={starterHasPacks ? 'Packs débutants' : 'Pods pour commencer'}
                     index={index}
                   />
                 ))}
@@ -421,12 +453,5 @@ function ProductRow({ eyebrow, title, link, products, itemListId }) {
 }
 
 function catThumb(key, products = []) {
-  const map = {
-    ecig: products.find((p) => p.category === 'ecig'),
-    eliquide: products.find((p) => isEliquidProduct(p)),
-    resistance: products.find(isResistanceProduct),
-    accessoire: products.find((p) => p.category === 'accessoire'),
-    'alternative-puff': products.find((p) => p.category === 'pod') || products.find((p) => p.category === 'ecig'),
-  }
-  return (map[key] || products[0])?.image || '/products/product-placeholder.svg'
+  return categoryThumbnailProduct(key, products)?.image || '/products/product-placeholder.svg'
 }

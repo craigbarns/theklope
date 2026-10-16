@@ -4,7 +4,7 @@ import { useStore } from '../context/StoreContext.jsx'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import ProductCard from '../components/ProductCard.jsx'
-import { CATEGORIES, productMatchesCategory, sortProductsByMerchandising } from '../data/catalog.js'
+import { CATEGORIES, diversifyProducts, productMatchesCategory, sortProductsByMerchandising } from '../data/catalog.js'
 import { IconFilter, IconClose, IconChevronDown, IconSearch } from '../components/icons.jsx'
 import { toAnalyticsItem, trackEvent, trackSearch } from '../lib/analytics.js'
 import { normalizeSearchText, rankProductsBySearch } from '../lib/productSearch.js'
@@ -144,7 +144,7 @@ export default function Shop() {
         list = [...list].sort((a, b) => (b.badge === 'nouveau' ? 1 : 0) - (a.badge === 'nouveau' ? 1 : 0))
         break
       default:
-        if (!hasSearch) list = sortProductsByMerchandising(list)
+        if (!hasSearch) list = diversifyProducts(sortProductsByMerchandising(list))
     }
     return list
   }, [searchResults, cats, brands, types, nicotine, flavors, maxPrice, sort, hasSearch])
