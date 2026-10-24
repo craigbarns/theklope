@@ -52,6 +52,12 @@ export const STATIC_SEO_PAGES = {
         a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement), entre la Place Castellane et la Préfecture. Elle est directement desservie par le Tramway T3 (stations Place de Rome ou Dragon).',
       },
       {
+        // Search Console (juil.–oct. 2026) : ~170 impressions en position 11
+        // à 14 sur « magasin / boutique cigarette electronique marseille prado ».
+        q: 'Votre boutique est-elle proche du Prado ?',
+        a: 'Oui : THEKLOPE est au 188 rue de Rome, à deux pas de la place Castellane, où commence l’avenue du Prado. Métro M1 et M2 station Castellane, à 3 minutes à pied.',
+      },
+      {
         q: 'Peut-on être livré le jour même à Marseille ?',
         a: 'Oui : choisissez « Coursier Marseille » au paiement. Toute commande validée avant 14 h un jour ouvré est livrée le jour même dans les 16 arrondissements. La livraison est offerte dès 29 € d’achat.',
       },
