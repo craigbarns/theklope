@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import Badge from './Badge.jsx'
+import { displayBadge } from '../data/catalog.js'
 import ProductImage from './ProductImage.jsx'
 import { IconHeart, IconCart } from './icons.jsx'
 import { productRequiresVariantSelection, resolveProductVariant } from '../lib/cart.js'
@@ -59,7 +60,7 @@ export default function ProductCard({
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-noir/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         </Link>
         <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5">
-          {product.badge && <Badge type={product.badge} />}
+          {displayBadge(product) && <Badge type={displayBadge(product)} />}
         </div>
         <button
           type="button"

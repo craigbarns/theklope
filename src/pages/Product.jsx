@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useMemo } from 'react'
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore, formatPrice } from '../context/StoreContext.jsx'
 import { buildProductSeoTitle, buildProductSeoDescription } from '../data/productCopy.js'
-import { CATEGORIES, categoryName, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct, findAvailableNicotineBooster, findBrandCategory } from '../data/catalog.js'
+import { CATEGORIES, categoryName, displayBadge, getProductCategoryKey, isEliquide50ml, isEliquide100ml, isResistanceProduct, isCartoucheProduct, findAvailableNicotineBooster, findBrandCategory } from '../data/catalog.js'
 import { isEliquidProduct } from '../lib/productCategory.js'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
 import Seo from '../components/Seo.jsx'
@@ -520,7 +520,7 @@ export default function Product() {
           <div>
             <div className="card relative mx-auto overflow-hidden rounded-3xl p-2 aspect-square max-h-[42vh] lg:max-h-none flex items-center justify-center">
               <div className="absolute left-4 top-4 z-10 flex gap-2">
-                {product.badge && <Badge type={product.badge} />}
+                {displayBadge(product) && <Badge type={displayBadge(product)} />}
               </div>
               <ProductImage
                 src={product.images?.[activeImg] || product.image || '/products/product-placeholder.svg'}
@@ -602,7 +602,7 @@ export default function Product() {
                   <span className="inline-block h-2 w-2 rounded-full bg-neon"></span>
                   <span className="text-neon/90">En stock — Expédié sous 24h</span>
                   <span className="text-white/30">·</span>
-                  <span className="text-ash/90">Livraison offerte dès 49 €</span>
+                  <span className="text-ash/90">Livraison offerte dès 29 €</span>
                   <span className="text-white/30">·</span>
                   <span className="text-ash/60">Coursier le jour même à Marseille</span>
                 </>

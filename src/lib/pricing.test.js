@@ -3,6 +3,7 @@ import test from 'node:test'
 
 import {
   FREE_SHIPPING_THRESHOLD,
+  LOWEST_SHIPPING_COST,
   PROMO_CODES,
   SHIPPING_METHODS,
   computeBundleProgress,
@@ -41,7 +42,7 @@ test('plus aucune remise par lot depuis le 13/10/2026 (prix unitaires de la gril
   assert.equal(twentyTen.discount, 0)
   assert.equal(twentyTen.discountSource, null)
   assert.equal(twentyTen.subtotal, 59)
-  assert.equal(twentyTen.total, 59, 'livraison offerte dès 49 €')
+  assert.equal(twentyTen.total, 59, 'livraison offerte dès 29 €')
 
   const fourFifty = computeTotals({
     lines: [{ category: 'eliquide', price: 14.9, qty: 4, volume: '50ml', brand: 'JNR' }],
@@ -67,16 +68,16 @@ test('grille de prix : 2,95 / 4,40 / 14,90 / 18,60 selon marque et contenance', 
   assert.equal(price({ category: 'accessoire', volume: '50ml' }), null)
 })
 
-test('livraison offerte dès 49 € et Click & Collect arrêté', () => {
-  assert.equal(FREE_SHIPPING_THRESHOLD, 49)
-  assert.deepEqual(SHIPPING_METHODS.map((m) => m.id), ['relais', 'poste', 'coursier'])
+test('livraison offerte dès 29 € et retrait en boutique gratuit (24/10/2026)', () => {
+  assert.equal(FREE_SHIPPING_THRESHOLD, 29)
+  assert.deepEqual(SHIPPING_METHODS.map((m) => m.id), ['relais', 'poste', 'coursier', 'pickup'])
   const at = (price, shippingMethodId) => computeTotals({ lines: [{ category: 'ecig', price, qty: 1 }], shippingMethodId })
-  assert.equal(at(48.99, 'relais').shipping, 3.9)
-  assert.equal(at(48.99, 'poste').shipping, 7.5)
-  assert.equal(at(48.99, 'coursier').shipping, 7.5)
-  for (const id of ['relais', 'poste', 'coursier']) assert.equal(at(49, id).shipping, 0)
-  // Un ancien identifiant « pickup » n'est plus gratuit.
-  assert.notEqual(at(20, 'pickup').shipping, 0)
+  assert.equal(at(28.99, 'relais').shipping, 3.9)
+  assert.equal(at(28.99, 'poste').shipping, 7.5)
+  assert.equal(at(28.99, 'coursier').shipping, 7.5)
+  for (const id of ['relais', 'poste', 'coursier']) assert.equal(at(29, id).shipping, 0)
+  assert.equal(at(2.95, 'pickup').shipping, 0, 'retrait gratuit quel que soit le montant')
+  assert.equal(LOWEST_SHIPPING_COST, 3.9, 'le retrait n’est pas une livraison')
 })
 
 test('volume discount excludes other categories and other bottle sizes', () => {

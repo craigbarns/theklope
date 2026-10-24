@@ -5,6 +5,7 @@ import {
   BADGES,
   CATEGORIES,
   categoryThumbnailProduct,
+  displayBadge,
   diversifyProducts,
   featuredProducts,
   getProductCategoryKey,
@@ -114,7 +115,7 @@ test('the newest explicitly new product drives the home hero', () => {
     { id: 'latest-new', badge: 'nouveau', createdAt: '2026-07-20T10:00:00.000Z' },
   ]
 
-  assert.equal(selectHomeHeroProduct(products)?.id, 'latest-new')
+  assert.equal(selectHomeHeroProduct(products, Date.parse('2026-07-22T00:00:00Z'))?.id, 'latest-new')
 })
 
 test('home hero selection ignores stock update timestamps and has stable fallbacks', () => {
@@ -127,7 +128,7 @@ test('home hero selection ignores stock update timestamps and has stable fallbac
     { id: 'best', badge: 'best-seller' },
   ]
 
-  assert.equal(selectHomeHeroProduct(newProducts)?.id, 'created-latest')
+  assert.equal(selectHomeHeroProduct(newProducts, Date.parse('2026-07-22T00:00:00Z'))?.id, 'created-latest')
   assert.equal(selectHomeHeroProduct(fallbackProducts)?.id, 'best')
   assert.equal(selectHomeHeroProduct([{ id: 'first' }, { id: 'second' }])?.id, 'first')
   assert.equal(selectHomeHeroProduct([]), undefined)
@@ -205,4 +206,13 @@ test('vignettes de catégorie : un produit de la catégorie, sinon aucun', () =>
   assert.equal(categoryThumbnailProduct('resistance', products)?.id, 'coil')
   assert.equal(categoryThumbnailProduct('accessoire', products), null, 'jamais un e-liquide pour les accessoires')
   assert.equal(categoryThumbnailProduct('eliquide', products)?.id, 'liq')
+})
+
+test('le badge « Nouveau » s’efface 45 jours après la mise en ligne', () => {
+  const now = Date.parse('2026-10-24T12:00:00Z')
+  assert.equal(displayBadge({ badge: 'nouveau', createdAt: '2026-10-01T00:00:00Z' }, now), 'nouveau')
+  assert.equal(displayBadge({ badge: 'nouveau', createdAt: '2026-08-01T00:00:00Z' }, now), null)
+  assert.equal(displayBadge({ badge: 'nouveau' }, now), 'nouveau', 'sans date, le badge saisi reste')
+  assert.equal(displayBadge({ badge: 'best-seller', createdAt: '2020-01-01T00:00:00Z' }, now), 'best-seller')
+  assert.equal(displayBadge({}, now), null)
 })
