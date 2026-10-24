@@ -46,7 +46,8 @@ test('pickup confirmation uses the shop address and suppresses delivery instruct
     shipping: { id: 'pickup' },
     address: { deliveryInstructions: '<ne pas afficher>' },
   })
-  assert.match(content.fulfillmentHtml, /Retrait boutique :<br>188 rue de Rome, 13006 Marseille/)
+  assert.match(content.fulfillmentHtml, /Retrait gratuit en boutique :<br>188 rue de Rome, 13006 Marseille/)
+  assert.match(content.fulfillmentHtml, /prévenons par e-mail/)
   assert.equal(content.deliveryInstructionsHtml, '')
   assert.doesNotMatch(content.fulfillmentHtml, /Livraison à/)
 })

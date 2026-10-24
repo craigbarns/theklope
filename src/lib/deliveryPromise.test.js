@@ -17,13 +17,14 @@ test('jeudi 10 h : coursier et expédition aujourd’hui', () => {
   assert.equal(p.remaining, '4 h')
   assert.equal(p.courier.text, 'Livré aujourd’hui par coursier')
   assert.equal(p.shipping.text, 'Expédié aujourd’hui, reçu en 24–48 h')
-  assert.equal(p.pickup, undefined, 'Click & Collect arrêté')
+  assert.equal(p.pickup.text, 'Prêt aujourd’hui au 188 rue de Rome')
 })
 
 test('jeudi 15 h : départ demain', () => {
   const p = at('2026-10-01T13:00:00Z')
   assert.equal(p.beforeCutoff, false)
   assert.equal(p.courier.text, 'Livré demain par coursier')
+  assert.equal(p.pickup.text, 'Prêt demain au 188 rue de Rome')
 })
 
 test('vendredi 18 h 30 : expédition lundi', () => {

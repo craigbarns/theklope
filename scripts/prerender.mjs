@@ -432,7 +432,7 @@ function buildStaticPageJsonLd(s) {
         {
           '@type': 'Question',
           name: 'À partir de quel montant la livraison est-elle offerte ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'La livraison est offerte dès 49 € d’achat en Mondial Relay, Colissimo ou coursier à Marseille.' },
+          acceptedAnswer: { '@type': 'Answer', text: 'La livraison est offerte dès 29 € d’achat en Mondial Relay, Colissimo ou coursier à Marseille. Le retrait au 188 rue de Rome est gratuit.' },
         },
       ],
     })
@@ -645,7 +645,7 @@ for (const family of COIL_FAMILIES) {
 // ceux de src/pages/Home.jsx, sous peine d'annoncer deux choses différentes
 // selon que le visiteur est un robot ou un navigateur.
 const homeTitle = 'Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE'
-const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Coursier le jour même à Marseille, livraison offerte dès 49 €.'
+const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit et coursier le jour même, livraison offerte dès 29 €.'
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [
@@ -704,7 +704,7 @@ const homeContent = `
   <h2>Nos Engagements & Services</h2>
   <ul>
     <li><strong>Produits testés et sélectionnés :</strong> Chaque référence est choisie pour sa fiabilité et sa qualité.</li>
-    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 49 €.</li>
+    <li><strong>Livraison rapide en France :</strong> Expédition sous 24/48h, livraison offerte dès 29 €.</li>
     <li><strong>Paiement 100% sécurisé :</strong> Transactions chiffrées avec Mollie, vos données sont protégées.</li>
     <li><strong>Service client réactif :</strong> Une équipe disponible pour vous accompagner.</li>
   </ul>

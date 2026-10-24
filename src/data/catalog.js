@@ -239,6 +239,18 @@ function padList(base, extra, n) {
   return out
 }
 
+// « Nouveau » n'a de sens que quelques semaines : posé à la création et jamais
+// retiré, il finissait sur une grande partie du catalogue. Il s'efface seul
+// 45 jours après la mise en ligne (date de création Supabase) ; sans date
+// connue, le badge saisi est conservé.
+export const NEW_BADGE_DAYS = 45
+export const displayBadge = (product = {}, now = Date.now()) => {
+  if (product.badge !== 'nouveau') return product.badge || null
+  const created = Date.parse(product.createdAt || product.created_at || '')
+  if (!Number.isFinite(created)) return 'nouveau'
+  return now - created <= NEW_BADGE_DAYS * 24 * 3600 * 1000 ? 'nouveau' : null
+}
+
 const MERCHANDISING_BADGE_RANK = Object.freeze({
   'best-seller': 4,
   nouveau: 3,
@@ -254,8 +266,8 @@ export const sortProductsByMerchandising = (products = []) => products
   .sort((a, b) => {
     const stockDelta = Number(b.product.stock > 0) - Number(a.product.stock > 0)
     if (stockDelta) return stockDelta
-    const badgeDelta = (MERCHANDISING_BADGE_RANK[b.product.badge] || 0)
-      - (MERCHANDISING_BADGE_RANK[a.product.badge] || 0)
+    const badgeDelta = (MERCHANDISING_BADGE_RANK[displayBadge(b.product)] || 0)
+      - (MERCHANDISING_BADGE_RANK[displayBadge(a.product)] || 0)
     return badgeDelta || a.index - b.index
   })
   .map(({ product }) => product)
@@ -309,8 +321,8 @@ export const featuredProducts = (products = []) => {
   return {
     // Les nouveautés ont leur propre bloc : elles ne servent plus à compléter
     // la sélection, qui répétait sinon les mêmes produits.
-    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), merchandising.filter((p) => p.badge !== 'nouveau'), 8),
-    newArrivals: spreadBrands(padList(products.filter((p) => p.badge === 'nouveau' && inStock(p)), merchandising.filter((p) => p.oldPrice == null), 8)),
+    bestSellers: padList(products.filter((p) => p.badge === 'best-seller'), merchandising.filter((p) => displayBadge(p) !== 'nouveau'), 8),
+    newArrivals: spreadBrands(padList(products.filter((p) => displayBadge(p) === 'nouveau' && inStock(p)), merchandising.filter((p) => p.oldPrice == null), 8)),
     // Débutants : packs, puis pods (tirage automatique, batterie intégrée).
     // Les kits « cigarette électronique » en complément mettaient en avant des
     // box 220 W à accus non fournis.
@@ -338,8 +350,8 @@ const createdAtTime = (product = {}) => {
   return Number.isFinite(timestamp) ? timestamp : 0
 }
 
-export const selectHomeHeroProduct = (products = []) => {
-  const newProducts = products.filter((product) => product.badge === 'nouveau')
+export const selectHomeHeroProduct = (products = [], now = Date.now()) => {
+  const newProducts = products.filter((product) => displayBadge(product, now) === 'nouveau')
   const latestNewProduct = newProducts.reduce((selected, product) => {
     if (!selected) return product
     return createdAtTime(product) > createdAtTime(selected) ? product : selected

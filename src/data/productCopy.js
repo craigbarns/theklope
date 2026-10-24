@@ -317,7 +317,7 @@ export function buildProductSeoDescription(product = {}) {
   const optional = [
     isGenericProductCopy(product.short) ? '' : firstSentence(product.short, SEO_DESCRIPTION_MAX),
     product.stock > 0 ? 'En stock, expédié sous 24/48h.' : '',
-    'Livraison offerte dès 49 €.',
+    'Livraison offerte dès 29 €.',
     'Coursier le jour même à Marseille.',
   ].filter(Boolean)
 

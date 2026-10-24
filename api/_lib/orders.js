@@ -43,7 +43,7 @@ export function orderConfirmationFulfillmentHtml(order) {
     ? `<p style="font-size:13px;line-height:1.6;color:#e5e5e5;margin-top:16px"><strong style="color:#fff">Instructions de livraison :</strong><br>${escapeHtmlWithLineBreaks(deliveryInstructions)}</p>`
     : ''
   const fulfillmentHtml = isPickup
-    ? '<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Retrait boutique :<br>188 rue de Rome, 13006 Marseille</p>'
+    ? '<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Retrait gratuit en boutique :<br>188 rue de Rome, 13006 Marseille — du lundi au vendredi, 9 h – 19 h.<br>Nous vous prévenons par e-mail dès que votre commande est prête.</p>'
     : `<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${addressHtml}</p>`
   return { fulfillmentHtml, deliveryInstructionsHtml }
 }
@@ -785,7 +785,7 @@ export function restockReminderEmailHtml(customerName) {
       <p style="margin:0 0 12px;font-size:13px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.5px">Vos avantages fidélité :</p>
       <ul style="margin:0;padding-left:20px;font-size:14px;color:#e5e5e5;line-height:1.8">
         <li>Livraison rapide sous 24/48h partout en France</li>
-        <li>Livraison offerte dès 49€ d'achat</li>
+        <li>Livraison offerte dès 29€ d'achat</li>
       </ul>
     </div>
     <div style="text-align:center;margin:28px 0 12px">

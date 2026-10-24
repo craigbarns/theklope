@@ -163,8 +163,20 @@ export function validateFulfillment(shippingMethodId, address = {}, relayPoint =
   const method = SHIPPING_METHODS.find((entry) => entry.id === shippingMethodId)
   if (!method) return { ok: false, error: 'Mode de livraison invalide.' }
 
-  // Le Click & Collect est arrêté : `pickup` n'est plus dans SHIPPING_METHODS
-  // et tombe donc sur « Mode de livraison invalide » ci-dessus.
+  // Retrait en boutique : l'adresse est celle de la boutique, rien à saisir.
+  if (method.id === 'pickup') {
+    return {
+      ok: true,
+      method,
+      address: {
+        street: '188 rue de Rome',
+        extra: 'Retrait en boutique',
+        zip: '13006',
+        city: 'Marseille',
+        country: 'France',
+      },
+    }
+  }
 
   // Mondial Relay : le colis est livré AU Point Relais, pas chez le client.
   // L'adresse de livraison est donc celle du point choisi. Réclamer en plus l'adresse personnelle
