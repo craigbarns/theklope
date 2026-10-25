@@ -34,3 +34,24 @@ test('sitemap includes the DIY and accessories category pages', () => {
   assert.ok(locations.includes('/categorie/diy'))
   assert.ok(locations.includes('/categorie/accessoires'))
 })
+
+test('sitemap does not invent modification dates for undated pages', () => {
+  const entries = buildSitemapEntries([{ id: 'sans-date' }])
+  for (const loc of ['/', '/faq', '/guides', '/categorie/pods', '/produit/sans-date']) {
+    const entry = entries.find((candidate) => candidate.loc === loc)
+    assert.ok(entry, `page attendue : ${loc}`)
+    assert.equal(entry.lastmod, undefined, `${loc} ne doit pas annoncer une fausse date`)
+  }
+  const xml = renderSitemapXml(entries.filter((entry) => !entry.lastmod), 'https://www.theklope.com')
+  assert.doesNotMatch(xml, /<lastmod>|undefined|null/)
+})
+
+test('sitemap retains actual publication dates and update dates', () => {
+  const entries = buildSitemapEntries([
+    { id: 'date-creation', createdAt: '2026-06-01T09:30:00Z' },
+    { id: 'date-modification', created_at: '2026-06-01T09:30:00Z', updated_at: '2026-10-24T12:00:00Z' },
+  ])
+  assert.equal(entries.find((entry) => entry.loc === '/produit/date-creation').lastmod, '2026-06-01')
+  assert.equal(entries.find((entry) => entry.loc === '/produit/date-modification').lastmod, '2026-10-24')
+  assert.ok(entries.filter((entry) => entry.loc.startsWith('/guides/')).every((entry) => /^\d{4}-\d{2}-\d{2}$/.test(entry.lastmod)))
+})

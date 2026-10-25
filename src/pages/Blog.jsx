@@ -6,6 +6,23 @@ import Breadcrumbs from '../components/Breadcrumbs.jsx'
 
 const CATEGORIES = ['Tous', 'Guides responsables', 'Matériel', 'E-liquides', 'Entretien', 'Réglementation']
 
+export const PAGE_META = {
+  title: 'Guides vape responsables | THEKLOPE',
+  description: 'Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes.',
+}
+
+export const PAGE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Guides vape responsables THEKLOPE',
+  itemListElement: BLOG_POSTS.map((post, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    url: `https://www.theklope.com/guides/${post.slug}`,
+    name: post.title,
+  })),
+}
+
 export default function Blog() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('Tous')
@@ -20,25 +37,12 @@ export default function Blog() {
     })
   }, [searchQuery, selectedCategory])
 
-  const schema = useMemo(() => ({
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Guides vape responsables THEKLOPE',
-    itemListElement: BLOG_POSTS.map((post, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      url: `https://www.theklope.com/guides/${post.slug}`,
-      name: post.title,
-    })),
-  }), [])
-
   return (
     <div className="container-page py-8">
       <Seo
-        title="Guides vape responsables | THEKLOPE"
-        description="Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes."
+        {...PAGE_META}
         canonical="https://www.theklope.com/guides"
-        schema={schema}
+        schema={PAGE_SCHEMA}
       />
       <Breadcrumbs items={[{ label: 'Guides' }]} />
 
@@ -62,6 +66,8 @@ export default function Blog() {
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
+              type="button"
+              aria-pressed={selectedCategory === cat}
               onClick={() => setSelectedCategory(cat)}
               className={`rounded-full px-4 py-2 text-xs font-semibold transition ${
                 selectedCategory === cat
@@ -75,14 +81,22 @@ export default function Blog() {
         </div>
 
         {/* Input recherche */}
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Rechercher un guide..."
-          className="input max-w-xs bg-white/[0.03] text-xs py-2 px-3"
-        />
+        <label className="w-full max-w-xs">
+          <span className="sr-only">Rechercher un guide</span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Rechercher un guide..."
+            aria-describedby="guide-results"
+            className="input bg-white/[0.03] text-xs py-2 px-3"
+          />
+        </label>
       </div>
+
+      <p id="guide-results" role="status" aria-atomic="true" className="mt-4 text-sm text-muted">
+        {filteredPosts.length} guide{filteredPosts.length === 1 ? '' : 's'} disponible{filteredPosts.length === 1 ? '' : 's'}
+      </p>
 
       {/* Liste des articles */}
       {filteredPosts.length === 0 ? (
@@ -91,7 +105,7 @@ export default function Blog() {
         </div>
       ) : (
         <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-          {filteredPosts.map((post) => (
+          {filteredPosts.map((post, index) => (
             <article
               key={post.slug}
               className="card-interactive flex flex-col md:flex-row overflow-hidden group h-full"
@@ -101,6 +115,10 @@ export default function Blog() {
                 <img
                   src={post.image}
                   alt=""
+                  width={640}
+                  height={360}
+                  loading={index < 2 ? 'eager' : 'lazy'}
+                  decoding="async"
                   className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                 />
               </div>

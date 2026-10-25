@@ -29,14 +29,14 @@ const xmlEscape = (value) => String(value)
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&apos;')
 
-const asDate = (value, fallback) => {
-  if (!value) return fallback
+const asDate = (value) => {
+  if (!value) return undefined
   const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) throw new Error(`Date de sitemap invalide : ${value}`)
   return parsed.toISOString().slice(0, 10)
 }
 
-export function buildSitemapEntries(products, today = new Date().toISOString().slice(0, 10)) {
+export function buildSitemapEntries(products) {
   const candidateUrls = [
     ...STATIC_ROUTES,
     ...CATEGORIES.map((category) => ({
@@ -46,13 +46,13 @@ export function buildSitemapEntries(products, today = new Date().toISOString().s
     })),
     ...products.map((product) => ({
       loc: `/produit/${encodeURIComponent(product.id)}`,
-      lastmod: asDate(product.updatedAt || product.updated_at || product.createdAt || product.created_at, today),
+      lastmod: asDate(product.updatedAt || product.updated_at || product.createdAt || product.created_at),
       changefreq: 'weekly',
       priority: '0.6',
     })),
     ...BLOG_POSTS.map((post) => ({
       loc: `/guides/${post.slug}`,
-      lastmod: asDate(post.isoDate, today),
+      lastmod: asDate(post.isoDate),
       changefreq: 'monthly',
       priority: '0.5',
     })),
@@ -63,7 +63,9 @@ export function buildSitemapEntries(products, today = new Date().toISOString().s
     if (!url.loc || url.loc.includes('undefined') || url.loc.includes('null')) {
       throw new Error(`URL de sitemap invalide : ${url.loc}`)
     }
-    urlsByLocation.set(url.loc, { ...url, lastmod: url.lastmod || today })
+    // Sans date éditoriale connue, omettre lastmod plutôt que dater la page
+    // du jour de la requête ou du build.
+    urlsByLocation.set(url.loc, url)
   }
   return [...urlsByLocation.values()]
 }
@@ -74,7 +76,7 @@ export function renderSitemapXml(entries, baseUrl) {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${entries.map((entry) => `  <url>
     <loc>${xmlEscape(`${base}${entry.loc}`)}</loc>
-    <lastmod>${entry.lastmod}</lastmod>
+    ${entry.lastmod ? `<lastmod>${xmlEscape(entry.lastmod)}</lastmod>` : ''}
     <changefreq>${entry.changefreq}</changefreq>
     <priority>${entry.priority}</priority>
   </url>`).join('\n')}

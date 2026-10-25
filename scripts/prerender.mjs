@@ -18,6 +18,8 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { loadProducts } from './load-catalog.mjs'
 import { isProductOrderable } from '../src/lib/variantStock.js'
+import { renderInformationPages } from './render-information.mjs'
+import { verifyInformationHtml } from './verify-information.mjs'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const root = resolve(__dirname, '..')
@@ -52,6 +54,7 @@ const { FREE_SHIPPING_THRESHOLD, LOWEST_SHIPPING_COST } = await import(resolve(r
 const { optimizedImageAttrs } = await import(resolve(root, 'src/lib/imageUrl.js'))
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
+const informationPages = await renderInformationPages()
 
 const esc = (s) =>
   String(s ?? '')
@@ -88,6 +91,7 @@ function buildPage({
   noindex = false,
   catalogBootstrap = [],
   prerenderPaddingTop = '8rem',
+  informationPage = false,
 }) {
   const fullTitle = title
   const canonical = canonicalPath ? abs(canonicalPath) : null
@@ -141,9 +145,24 @@ function buildPage({
   }
   if (content) {
     // Contenu injecté dans #root : lu par les crawlers, remplacé par React au chargement.
+    const renderedContent = informationPage
+      ? `<div class="flex min-h-screen flex-col">
+          <a href="#contenu" class="skip-link">Aller au contenu</a>
+          <div class="border-b border-white/10 bg-anthracite"><p class="container-page py-2 text-center text-[11px] font-bold sm:text-xs">Site réservé aux adultes (+18)</p></div>
+          <header class="border-b border-white/10"><nav aria-label="Informations" class="container-page flex min-h-16 flex-wrap items-center gap-5">
+            <a href="/" class="inline-flex min-h-11 items-center font-display font-bold text-white">THEKLOPE</a>
+            <a href="/guides" class="inline-flex min-h-11 items-center">Guides</a><a href="/faq" class="inline-flex min-h-11 items-center">FAQ</a><a href="/contact" class="inline-flex min-h-11 items-center">Contact</a>
+          </nav></header>
+          <main id="contenu" tabindex="-1" class="flex-1"><div data-prerender="seo" data-prerender-kind="component" data-prerender-path="${esc(canonicalPath || '')}">${content}</div></main>
+          <footer class="mt-10 border-t border-white/10"><div class="container-page py-8 text-sm text-muted">
+            <nav aria-label="Informations légales" class="flex flex-wrap gap-4"><a href="/legal/mentions-legales" class="inline-flex min-h-6 items-center">Mentions légales</a><a href="/legal/cgv" class="inline-flex min-h-6 items-center">CGV</a><a href="/legal/confidentialite" class="inline-flex min-h-6 items-center">Confidentialité</a><a href="/legal/retour" class="inline-flex min-h-6 items-center">Retours</a></nav>
+            <p class="mt-4">La vente de produits de vapotage est interdite aux mineurs. Les produits contenant de la nicotine créent une forte dépendance. Leur utilisation est déconseillée aux non-fumeurs.</p>
+          </div></footer>
+        </div>`
+      : `<div data-prerender="seo" data-prerender-path="${esc(canonicalPath || '')}" class="container-page prerender-seo py-8" style="min-height:100vh;padding-top:${esc(prerenderPaddingTop)}">${content}</div>`
     html = html.replace(
       '<div id="root"></div>',
-      () => `<div id="root"><div data-prerender="seo" data-prerender-path="${esc(canonicalPath || '')}" class="container-page prerender-seo py-8" style="min-height:100vh;padding-top:${esc(prerenderPaddingTop)}">${content}</div></div>`,
+      () => `<div id="root">${renderedContent}</div>`,
     )
   }
   return html
@@ -354,10 +373,8 @@ for (const b of BLOG_POSTS) {
           { '@type': 'ListItem', position: 3, name: b.title, item: abs(path) },
         ],
       },
-      // La FAQ du guide est affichée dans la page mais n'était pas déclarée à
-      // Google : sans FAQPage, pas de questions dépliables dans les résultats,
-      // donc moins de surface affichée et un taux de clic plus faible. Même
-      // motif que les pages de catégorie et les pages locales.
+      // Décrit uniquement les questions réellement présentes dans le guide.
+      // Ce balisage ne garantit aucun résultat enrichi dans un moteur.
       ...(b.faq?.length
         ? [{
           '@type': 'FAQPage',
@@ -410,32 +427,10 @@ function buildStaticPageJsonLd(s) {
     },
   ]
 
-  if (path === '/faq') {
-    graph.unshift({
-      '@type': 'FAQPage',
-      mainEntity: [
-        {
-          '@type': 'Question',
-          name: 'Quels sont les délais de livraison THEKLOPE ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'Les commandes sont préparées selon le stock disponible et expédiées sous 24/48h en France.' },
-        },
-        {
-          '@type': 'Question',
-          name: 'Les produits THEKLOPE sont-ils vendus aux mineurs ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'Non. La vente de produits de vapotage est strictement réservée aux personnes majeures de 18 ans et plus.' },
-        },
-        {
-          '@type': 'Question',
-          name: 'Où se trouve la boutique physique THEKLOPE ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'Notre boutique physique est située au 188 rue de Rome, 13006 Marseille.' },
-        },
-        {
-          '@type': 'Question',
-          name: 'À partir de quel montant la livraison est-elle offerte ?',
-          acceptedAnswer: { '@type': 'Answer', text: 'La livraison est offerte dès 29 € d’achat en Mondial Relay, Colissimo ou coursier à Marseille. Le retrait au 188 rue de Rome est gratuit.' },
-        },
-      ],
-    })
+  const informationSchema = informationPages.get(path)?.schema
+  if (informationSchema) {
+    const { '@context': _context, '@graph': nodes, ...node } = informationSchema
+    graph.unshift(...(nodes || [node]))
   } else if (path === '/calculette-diy') {
     graph.unshift({
       '@type': 'WebApplication',
@@ -487,12 +482,19 @@ function buildStaticPageJsonLd(s) {
   return { '@context': 'https://schema.org', '@graph': graph }
 }
 
-for (const s of STATIC_PAGES) {
+for (const page of STATIC_PAGES) {
+  const information = informationPages.get(page.path)
+  const s = information ? {
+    ...page,
+    title: information.metadata.title.endsWith('THEKLOPE')
+      ? information.metadata.title : `${information.metadata.title} — THEKLOPE`,
+    description: information.metadata.description,
+  } : page
   // /boutique : exposer tous les liens produits aux crawlers sans JS.
   const shopNav = s.path === '/boutique'
     ? allProductsNav(PRODUCTS, 'Tout le catalogue THEKLOPE', 'Tous les produits de la boutique')
     : ''
-  const content = `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
+  const content = information?.html || `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
   const jsonLd = buildStaticPageJsonLd(s)
   writePage(s.path, buildPage({
     title: s.title,
@@ -503,6 +505,7 @@ for (const s of STATIC_PAGES) {
     noindex: s.noindex,
     catalogBootstrap: s.catalogBootstrap,
     prerenderPaddingTop: s.path.startsWith('/checkout') ? '6rem' : undefined,
+    informationPage: Boolean(information),
   }))
   count++
 }
@@ -745,5 +748,8 @@ const notFoundHtml = buildPage({
     <p><a href="/">Retour à l'accueil</a> · <a href="/boutique">Voir la boutique</a></p>`,
 })
 writeFileSync(resolve(dist, '404.html'), notFoundHtml)
+
+await verifyInformationHtml(informationPages, dist)
+console.log(`✓ HTML initial vérifié : ${informationPages.size} pages d'information.`)
 
 console.log(`✓ Pré-rendu SEO : ${count} pages générées (${PRODUCTS.length} produits, ${CATEGORIES.length} catégories, ${BLOG_POSTS.length} articles, ${STATIC_PAGES.length + Object.keys(STATIC_SEO_PAGES).length + 1} pages statiques).`)

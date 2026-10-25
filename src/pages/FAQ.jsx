@@ -1,4 +1,3 @@
-import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
@@ -143,29 +142,30 @@ const SECTIONS = [
   },
 ]
 
-export default function FAQ() {
-  const faqSchema = useMemo(() => {
-    const questions = SECTIONS.flatMap((s) => s.items).map((item) => ({
-      '@type': 'Question',
-      name: item.q,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: item.a,
-      },
-    }))
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'FAQPage',
-      mainEntity: questions,
-    }
-  }, [])
+export const PAGE_META = {
+  title: 'FAQ vape, livraison, nicotine et conformité | THEKLOPE',
+  description: 'Questions fréquentes THEKLOPE : livraison, retours, paiement Mollie, produits vape réservés aux adultes, nicotine, résistances, e-liquides et alternatives aux puffs.',
+}
 
+export const PAGE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: SECTIONS.flatMap((s) => s.items).map((item) => ({
+    '@type': 'Question',
+    name: item.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: item.a,
+    },
+  })),
+}
+
+export default function FAQ() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="FAQ vape, livraison, nicotine et conformité | THEKLOPE"
-        description="Questions fréquentes THEKLOPE : livraison, retours, paiement Mollie, produits vape réservés aux adultes, nicotine, résistances, e-liquides et alternatives aux puffs."
-        schema={faqSchema}
+        {...PAGE_META}
+        schema={PAGE_SCHEMA}
       />
       <Breadcrumbs items={[{ label: 'FAQ' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Foire aux questions THEKLOPE</h1>
@@ -196,21 +196,20 @@ export default function FAQ() {
 }
 
 function Accordion({ q, a }) {
-  const [open, setOpen] = useState(false)
   return (
-    <div className="card overflow-hidden">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+    <details className="card group overflow-hidden">
+      <summary
+        className="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-left [&::-webkit-details-marker]:hidden"
       >
         <span className="text-sm font-medium text-white">{q}</span>
         <IconChevronDown
           width={18}
           height={18}
-          className={`shrink-0 text-faint transition-transform ${open ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+          className="shrink-0 text-faint transition-transform group-open:rotate-180"
         />
-      </button>
-      {open && <p className="px-5 pb-5 text-sm leading-relaxed text-muted">{a}</p>}
-    </div>
+      </summary>
+      <p className="px-5 pb-5 text-sm leading-relaxed text-muted">{a}</p>
+    </details>
   )
 }

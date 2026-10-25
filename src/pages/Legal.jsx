@@ -66,6 +66,22 @@ const PAGES = {
   },
 }
 
+export function getPageMeta(slug) {
+  const page = PAGES[slug]
+  return page ? { title: page.title, description: page.intro } : null
+}
+
+export function getPageSchema(slug) {
+  const metadata = getPageMeta(slug)
+  return metadata ? {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name: metadata.title,
+    description: metadata.description,
+    url: `https://www.theklope.com/legal/${slug}`,
+  } : null
+}
+
 export default function Legal() {
   const { slug } = useParams()
   const page = PAGES[slug]
@@ -73,7 +89,7 @@ export default function Legal() {
 
   return (
     <div className="container-page py-8">
-      <Seo title={page.title} description={page.intro} />
+      <Seo {...getPageMeta(slug)} schema={getPageSchema(slug)} />
       <Breadcrumbs items={[{ label: page.title }]} />
 
       <div className="mt-6 max-w-3xl">

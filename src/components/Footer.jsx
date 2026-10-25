@@ -71,15 +71,15 @@ export default function Footer() {
             </p>
             <address className="mt-4 not-italic text-sm leading-relaxed text-muted">
               Boutique THEKLOPE — 188 Rue de Rome, 13006 Marseille<br />
-              <a href="tel:+33491555555" className="hover:text-neon">04 91 55 55 55</a> ·{' '}
-              <a href="mailto:contact@theklope.com" className="hover:text-neon">contact@theklope.com</a>
+              <a href="tel:+33491555555" className="inline-flex min-h-6 items-center hover:text-neon">04 91 55 55 55</a> ·{' '}
+              <a href="mailto:contact@theklope.com" className="inline-flex min-h-6 items-center hover:text-neon">contact@theklope.com</a>
             </address>
             <p className="mt-3 text-xs leading-relaxed text-muted">
               Clope and Clope — 49 rue de Rome, 13001 Marseille ·{' '}
-              <a href="tel:+33983741461" className="hover:text-neon">09 83 74 14 61</a><br />
+              <a href="tel:+33983741461" className="inline-flex min-h-6 items-center hover:text-neon">09 83 74 14 61</a><br />
               Clope and Clope — 36 cours Carnot, 13300 Salon-de-Provence ·{' '}
-              <a href="tel:+33490560080" className="hover:text-neon">04 90 56 00 80</a><br />
-              <Link to="/nos-boutiques" className="text-neon hover:underline">Nos 3 boutiques</Link>
+              <a href="tel:+33490560080" className="inline-flex min-h-6 items-center hover:text-neon">04 90 56 00 80</a><br />
+              <Link to="/nos-boutiques" className="inline-flex min-h-6 items-center text-neon hover:underline">Nos 3 boutiques</Link>
             </p>
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="chip">Boutique à Marseille</span>

@@ -13,7 +13,7 @@ import ConsentManager from './components/ConsentManager.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import Logo from './components/Logo.jsx'
 import { IconLock } from './components/icons.jsx'
-import { getPrerenderSnapshot } from './lib/prerenderSnapshot.js'
+import { getPrerenderSnapshot, getPrerenderSnapshotKind } from './lib/prerenderSnapshot.js'
 import { lazyWithRetry } from './lib/lazyWithRetry.js'
 
 // Pages chargées à la demande (code-splitting) pour alléger le bundle initial.
@@ -50,7 +50,8 @@ function PageFallback() {
   if (snapshot) {
     return (
       <div
-        className={`container-page prerender-seo ${location.pathname === '/' ? '' : 'py-8'}`}
+        className={getPrerenderSnapshotKind(location.pathname) === 'component'
+          ? undefined : `container-page prerender-seo ${location.pathname === '/' ? '' : 'py-8'}`}
         aria-busy="true"
         dangerouslySetInnerHTML={{ __html: snapshot }}
       />

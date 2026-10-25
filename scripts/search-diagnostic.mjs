@@ -1,3 +1,4 @@
+// Diagnostic réseau manuel : ne doit pas être découvert par node --test.
 import https from 'https';
 const req = https.get('https://html.duckduckgo.com/html/?q=blog+vape+france', {
   headers: {

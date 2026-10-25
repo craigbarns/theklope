@@ -1,9 +1,28 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo.jsx'
 import Breadcrumbs from '../components/Breadcrumbs.jsx'
 import { IconMail, IconPhone, IconHeadset, IconCheck, IconPin, IconStar } from '../components/icons.jsx'
 import { STORE_REVIEW_SUMMARY } from '../data/reviews.js'
+import { buildLocalBusinessSchema } from '../data/localBusiness.js'
+
+export const PAGE_META = {
+  title: 'Contact | THEKLOPE',
+  description: 'Contactez l’équipe THEKLOPE : formulaire, e-mail et boutique à Marseille. Service client réactif.',
+}
+
+export const PAGE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'ContactPage',
+      name: 'Contact THEKLOPE',
+      url: 'https://www.theklope.com/contact',
+      description: PAGE_META.description,
+    },
+    buildLocalBusinessSchema(),
+  ],
+}
 
 const MINI_FAQ = [
   { q: 'Quels sont les délais de livraison ?', a: 'Expédition sous 24/48h, réception sous 2 à 4 jours ouvrés en France.' },
@@ -12,10 +31,15 @@ const MINI_FAQ = [
 ]
 
 export default function Contact() {
+  const [interactive, setInteractive] = useState(false)
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
+
+  // Le formulaire est aussi pré-rendu. Sans gestionnaire JS, un formulaire
+  // natif en GET pourrait exposer le message et l'e-mail dans l'URL.
+  useEffect(() => setInteractive(true), [])
 
   const update = (key) => (e) => setForm((prev) => ({ ...prev, [key]: e.target.value }))
 
@@ -43,7 +67,7 @@ export default function Contact() {
 
   return (
     <div className="container-page py-8">
-      <Seo title="Contact | THEKLOPE" description="Contactez l’équipe THEKLOPE : formulaire, e-mail et boutique à Marseille. Service client réactif." />
+      <Seo {...PAGE_META} schema={PAGE_SCHEMA} />
       <Breadcrumbs items={[{ label: 'Contact' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Contact</h1>
       <p className="mt-2 max-w-xl text-muted">
@@ -53,6 +77,12 @@ export default function Contact() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
         {/* Formulaire */}
         <div className="card p-6 sm:p-8">
+          <p role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+            {loading ? 'Envoi du message en cours.' : sent ? 'Message envoyé. Nous vous répondrons sous 24h ouvrées.' : ''}
+          </p>
+          <noscript>
+            <p className="mb-4 text-sm text-muted">Le formulaire nécessite JavaScript. Vous pouvez nous écrire à <a href="mailto:contact@theklope.com" className="text-neon">contact@theklope.com</a> ou utiliser les coordonnées ci-dessous.</p>
+          </noscript>
           {sent ? (
             <div className="grid place-items-center py-12 text-center">
               <div className="mb-4 grid h-14 w-14 place-items-center rounded-full border border-neon/30 bg-neon/10 text-neon">
@@ -63,24 +93,27 @@ export default function Contact() {
               <button onClick={() => setSent(false)} className="btn-ghost mt-6">Envoyer un autre message</button>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Nom" name="name" autoComplete="name" required value={form.name} onChange={update('name')} />
-                <Field label="E-mail" name="email" autoComplete="email" type="email" required value={form.email} onChange={update('email')} />
-              </div>
-              <Field label="Sujet" name="subject" required value={form.subject} onChange={update('subject')} />
-              <label className="block">
-                <span className="mb-1.5 block text-xs font-medium text-muted">Message</span>
-                <textarea name="message" rows={5} required value={form.message} onChange={update('message')} className="input resize-none" />
-              </label>
-              <label className="flex items-start gap-2.5 text-xs text-muted">
-                <input name="privacyConsent" type="checkbox" required className="mt-0.5 accent-neon" />
-                J'accepte que mes données soient utilisées pour traiter ma demande.
-              </label>
-              {error && <p role="alert" className="text-xs text-rose-300">{error}</p>}
-              <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
-                {loading ? 'Envoi…' : 'Envoyer le message'}
-              </button>
+            <form onSubmit={handleSubmit} method="post" action="/api/contact" aria-busy={loading} aria-describedby={error ? 'contact-error' : undefined}>
+              <fieldset disabled={!interactive || loading} className="space-y-4">
+                <legend className="sr-only">Votre message au service client</legend>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Nom" name="name" autoComplete="name" required value={form.name} onChange={update('name')} />
+                  <Field label="E-mail" name="email" autoComplete="email" type="email" required value={form.email} onChange={update('email')} />
+                </div>
+                <Field label="Sujet" name="subject" required value={form.subject} onChange={update('subject')} />
+                <label className="block">
+                  <span className="mb-1.5 block text-xs font-medium text-muted">Message</span>
+                  <textarea name="message" rows={5} required value={form.message} onChange={update('message')} className="input resize-none" />
+                </label>
+                <label className="flex items-start gap-2.5 text-xs text-muted">
+                  <input name="privacyConsent" type="checkbox" required className="mt-0.5 accent-neon" />
+                  J'accepte que mes données soient utilisées pour traiter ma demande.
+                </label>
+                {error && <p id="contact-error" role="alert" className="text-xs text-rose-300">{error}</p>}
+                <button type="submit" disabled={loading} className="btn-primary w-full disabled:opacity-60">
+                  {loading ? 'Envoi…' : 'Envoyer le message'}
+                </button>
+              </fieldset>
             </form>
           )}
         </div>

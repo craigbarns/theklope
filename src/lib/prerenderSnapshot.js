@@ -17,7 +17,11 @@ export function capturePrerenderSnapshot() {
   const block = document.querySelector('#root [data-prerender="seo"]')
   const renderedPath = block?.getAttribute('data-prerender-path')
   if (block && (!renderedPath || renderedPath === window.location.pathname)) {
-    snapshot = { pathname: window.location.pathname, html: block.innerHTML }
+    snapshot = {
+      pathname: window.location.pathname,
+      html: block.innerHTML,
+      kind: block.getAttribute('data-prerender-kind') || 'seo',
+    }
   }
 }
 
@@ -25,4 +29,8 @@ export function capturePrerenderSnapshot() {
 // SPA, il décrirait une autre page.
 export function getPrerenderSnapshot(pathname) {
   return snapshot && snapshot.pathname === pathname ? snapshot.html : null
+}
+
+export function getPrerenderSnapshotKind(pathname) {
+  return snapshot && snapshot.pathname === pathname ? snapshot.kind : null
 }

@@ -73,7 +73,7 @@ console.error = (...args) => {
 }
 
 const vite = await createServer({
-  server: { middlewareMode: true },
+  server: { middlewareMode: true, hmr: false, ws: false },
   appType: 'custom',
   logLevel: 'error',
 })

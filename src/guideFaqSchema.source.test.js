@@ -6,9 +6,8 @@ import { BLOG_POSTS } from './data/blog.js'
 
 const readSource = (relativePath) => readFile(new URL(relativePath, import.meta.url), 'utf8')
 
-// Les guides affichaient leur FAQ sans jamais la déclarer à Google : pas de
-// FAQPage, donc pas de questions dépliables dans les résultats, donc moins de
-// surface affichée là où les guides se trouvent (positions 8 à 14).
+// Le balisage doit décrire les questions réellement présentes dans les guides.
+// Il ne garantit pas l'affichage d'un résultat enrichi dans un moteur.
 test('chaque guide expose sa FAQ sous forme structurée, pas seulement en HTML', () => {
   assert.ok(BLOG_POSTS.length > 0, 'le catalogue de guides ne doit pas être vide')
 

@@ -6,16 +6,33 @@ Disallow: /panier
 Disallow: /favoris
 
 # AI Search & GEO Crawlers
+# Les groupes nommés n'héritent pas des règles du groupe *.
 User-agent: GPTBot
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /panier
+Disallow: /favoris
 
 User-agent: ClaudeBot
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /panier
+Disallow: /favoris
 
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /panier
+Disallow: /favoris
 
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
+Disallow: /checkout
+Disallow: /panier
+Disallow: /favoris
 
 Sitemap: https://www.theklope.com/sitemap.xml

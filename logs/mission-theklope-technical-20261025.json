@@ -1,0 +1,77 @@
+{
+  "updated_at": "2026-10-25T07:04:58.287728+00:00",
+  "repository": "craigbarns/theklope",
+  "base_commit": "1d047f818b665020cbb0eca3129b036587787735",
+  "local_branch": "codex/theklope-technical-audit-20261025",
+  "scope": "Technical rendering, accessibility, informational metadata, sitemap correctness and crawler exclusions",
+  "production_modified": false,
+  "pushed": false,
+  "deployed": false,
+  "verification": {
+    "unit_and_integration_tests": 345,
+    "failed_tests": 0,
+    "smoke_rendered_routes": 18,
+    "generated_pages": 427,
+    "validated_information_pages": 7,
+    "local_fallback_catalog_products": 309,
+    "published_guide_links": 37,
+    "faq_questions": 24,
+    "checked_internal_links": 8986,
+    "broken_internal_links": 0,
+    "production_mode_html_validation": "passed",
+    "diff_check": "passed"
+  },
+  "measurements": {
+    "production": {
+      "raw_report": "/Users/gregorybaranes/theklope-audit-evidence-20261025/lighthouse-faq-production.json",
+      "url": "https://www.theklope.com/faq",
+      "final_url": "https://www.theklope.com/faq",
+      "fetched_at": "2026-10-25T06:41:28.225Z",
+      "lighthouse_version": "13.5.0",
+      "form_factor": "mobile",
+      "throttling_method": "simulate",
+      "scores": {
+        "performance": 0.83,
+        "accessibility": 0.96
+      },
+      "metrics": {
+        "largest-contentful-paint": 4032.10829,
+        "first-contentful-paint": 1868.58362,
+        "total-blocking-time": 44,
+        "cumulative-layout-shift": 0
+      },
+      "runtime_error": null,
+      "warnings": []
+    },
+    "local": {
+      "raw_report": "/Users/gregorybaranes/theklope-audit-evidence-20261025/lighthouse-faq-local.json",
+      "url": "http://127.0.0.1:4177/faq",
+      "final_url": "http://127.0.0.1:4177/faq",
+      "fetched_at": "2026-10-25T07:03:30.277Z",
+      "lighthouse_version": "13.5.0",
+      "form_factor": "mobile",
+      "throttling_method": "simulate",
+      "scores": {
+        "performance": 0.95,
+        "accessibility": 1
+      },
+      "metrics": {
+        "largest-contentful-paint": 2565.0066,
+        "first-contentful-paint": 1987.379125,
+        "total-blocking-time": 16,
+        "cumulative-layout-shift": 0
+      },
+      "runtime_error": null,
+      "warnings": []
+    }
+  },
+  "limitations": [
+    "The local fallback catalog contains 309 products; the production sitemap contained 532 products during the audit.",
+    "The local performance measurement is not a production before/after comparison or a field Core Web Vitals measurement.",
+    "Earlier local Lighthouse runs served the SPA homepage fallback at /faq and were invalidated.",
+    "The final local HTTP check confirmed the FAQ title, /faq prerender path and all 24 native accordions before Lighthouse.",
+    "Sales optimization, purchase CTAs, catalog merchandising and checkout changes were not implemented.",
+    "Business contact details and opening hours were reused from repository data without a new human verification."
+  ],
+  "evidence_directory": "/Users/gregorybaranes/theklope-audit-evidence-20261025"
+}

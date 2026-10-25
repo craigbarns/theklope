@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { prerenderPreview } from './scripts/preview-prerender.mjs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), prerenderPreview()],
   build: {
     rollupOptions: {
       output: {
