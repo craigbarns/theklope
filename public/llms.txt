@@ -24,7 +24,7 @@
 ## Conditions de vente et de livraison
 - **Âge minimum** : 18 ans. La vente aux mineurs est interdite.
 - **Livraison** : expédition sous 24 à 48 heures en France métropolitaine ; frais de port offerts à partir de 49 € d'achat.
-- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille (livraison le jour même), retrait gratuit au 188 rue de Rome (commande avant 14 h un jour ouvré : prête le jour même).
+- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille (livraison le jour même). Pas de retrait en boutique des commandes en ligne.
 - **Paiement** : checkout sécurisé Mollie (carte bancaire notamment).
 - **Retours** : 14 jours, conditions détaillées sur la page Livraison et retours.
 

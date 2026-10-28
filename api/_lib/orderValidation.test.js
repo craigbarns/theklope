@@ -101,13 +101,12 @@ test('quantities are strict and aggregate across variant lines', () => {
   assert.equal(totals.get('p2'), 1)
 })
 
-test('retrait en boutique : sans adresse, à l’adresse de la boutique', () => {
-  const result = validateFulfillment('pickup', { deliveryInstructions: { malicious: true } })
-  assert.equal(result.ok, true)
-  assert.equal(result.address.street, '188 rue de Rome')
-  assert.equal(result.address.zip, '13006')
-  assert.equal('deliveryInstructions' in result.address, false)
-  assert.equal(validateFulfillment('pickup', null).ok, true)
+test('le Click & Collect (pickup) est refusé depuis son arrêt', () => {
+  const result = validateFulfillment('pickup', null)
+  assert.equal(result.ok, false)
+  assert.equal(result.error, 'Mode de livraison invalide.')
+  const marseille = { street: '1 rue Test', zip: '13006', city: 'Marseille', country: 'France' }
+  assert.equal(validateFulfillment('pickup', marseille).ok, false)
 })
 
 test('courier is restricted to Marseille and postal shipping to France', () => {

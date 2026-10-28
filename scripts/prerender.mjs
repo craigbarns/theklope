@@ -648,7 +648,7 @@ for (const family of COIL_FAMILIES) {
 // ceux de src/pages/Home.jsx, sous peine d'annoncer deux choses différentes
 // selon que le visiteur est un robot ou un navigateur.
 const homeTitle = 'Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE'
-const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit et coursier le jour même, livraison offerte dès 49 €.'
+const homeDescription = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Coursier le jour même à Marseille, livraison offerte dès 49 €.'
 const homeSchema = {
   '@context': 'https://schema.org',
   '@graph': [

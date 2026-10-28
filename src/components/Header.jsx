@@ -66,7 +66,7 @@ export default function Header() {
           <span className="hidden sm:inline">·</span>
           <span className="hidden sm:inline">⚡ Coursier Marseille</span>
           <span className="hidden md:inline">·</span>
-          <span className="hidden md:inline">🏬 Retrait gratuit 188 rue de Rome</span>
+          <span className="hidden md:inline">🏬 Boutique 188 Rue de Rome</span>
         </div>
       </div>
 

@@ -6,7 +6,7 @@ export const STATIC_SEO_PAGES = {
     h1: 'Boutique vape à Marseille et vente en ligne',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Achetez sur place, commandez en ligne et retirez gratuitement en boutique le jour même, faites-vous livrer par coursier dans Marseille, ou partout en France avec livraison offerte dès 49 €.',
+      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Achetez sur place, faites-vous livrer par coursier dans Marseille le jour même, ou partout en France avec livraison offerte dès 49 €.',
     localBusiness: true,
     sections: [
       {
@@ -263,7 +263,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Modes et tarifs de livraison',
         text:
-          'Mondial Relay en Point Relais : 3,90 €. La Poste Colissimo à domicile, remis contre signature : 7,50 €. Coursier le jour même dans les 16 arrondissements de Marseille pour toute commande validée avant 14 h un jour ouvré : 7,50 €. La livraison est offerte dès 49 € d’achat, quel que soit le mode. Retrait gratuit au 188 rue de Rome (13006 Marseille) : commandée avant 14 h un jour ouvré, votre commande est prête le jour même.',
+          'Mondial Relay en Point Relais : 3,90 €. La Poste Colissimo à domicile, remis contre signature : 7,50 €. Coursier le jour même dans les 16 arrondissements de Marseille pour toute commande validée avant 14 h un jour ouvré : 7,50 €. La livraison est offerte dès 49 € d’achat, quel que soit le mode. Le retrait en boutique des commandes passées en ligne n’est plus proposé.',
       },
       {
         title: 'Paiement sécurisé avec Mollie',
@@ -315,7 +315,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Commander en ligne',
         text:
-          'Sur theklope.com : retrait gratuit au 188 rue de Rome le jour même, Mondial Relay en Point Relais (3,90 €), Colissimo avec signature (7,50 €) ou coursier le jour même dans Marseille (7,50 €). La livraison est offerte dès 49 € d’achat.',
+          'Sur theklope.com : Mondial Relay en Point Relais (3,90 €), Colissimo avec signature (7,50 €) ou coursier le jour même dans Marseille (7,50 €). La livraison est offerte dès 49 € d’achat.',
       },
       {
         title: 'Vente réservée aux adultes',

@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { deliveryPromise } from '../lib/deliveryPromise.js'
 
 // Les façons de recevoir sa commande, avec une promesse calculée à l'heure de
-// Paris. Le coursier et le retrait le jour même sont ce qu'un site national ne
-// peut pas offrir : on les montre au moment d'acheter.
+// Paris. Le coursier le jour même est ce qu'un site national ne peut pas
+// offrir : on le montre au moment d'acheter.
 export default function DeliveryOptions({ className = '' }) {
   const [promise, setPromise] = useState(() => deliveryPromise())
 
@@ -14,7 +14,6 @@ export default function DeliveryOptions({ className = '' }) {
 
   const rows = [
     { icon: '🛵', title: 'Marseille', ...promise.courier, detail: 'Coursier dans les 16 arrondissements' },
-    { icon: '🏬', title: 'Retrait gratuit', ...promise.pickup, detail: 'Boutique THEKLOPE, Marseille 6e' },
     { icon: '📦', title: 'France', ...promise.shipping, detail: 'Mondial Relay ou Colissimo · offerte dès 49 €' },
   ]
 

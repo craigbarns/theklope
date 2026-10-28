@@ -11,9 +11,11 @@ export const FREE_SHIPPING_THRESHOLD = 49
 export const DEFAULT_SHIPPING_COST = 7.5
 
 // Modes de livraison. Mondial Relay = 3,90 € ; La Poste et Coursier Marseille
-// = 7,50 € ; tous offerts dès 49 € via le seuil ci-dessus (passé à 29 € le
-// 24/10/2026, remis à 49 € le 28/10/2026 à la demande du gérant). Retrait en
-// boutique (188 rue de Rome) gratuit : arrêté le 13/10/2026, rétabli le 24/10/2026.
+// = 7,50 €. Tous offerts dès 49 € via le seuil ci-dessus. Le Click & Collect
+// (retrait en boutique) est arrêté depuis le 13/10/2026 (brièvement rétabli du
+// 24 au 28/10/2026, avec un seuil à 29 €, puis retiré à la demande du gérant) : le serveur refuse
+// désormais l'identifiant `pickup` (absent de cette liste). Les anciennes
+// commandes en retrait restent gérées dans l'admin.
 //
 // `relais` exige que le client ait choisi un Point Relais : le serveur refuse
 // la commande sans (voir validateFulfillment dans api/_lib/orderValidation.js).
@@ -21,12 +23,10 @@ export const SHIPPING_METHODS = [
   { id: 'relais', label: 'Mondial Relay', detail: 'Point Relais au choix, 3–5 j (offerte dès 49 €)', price: 3.9, requiresRelayPoint: true },
   { id: 'poste', label: 'La Poste Colissimo', detail: 'Livraison 2–4 j avec signature (offerte dès 49 €)', price: 7.5 },
   { id: 'coursier', label: 'Coursier Marseille', detail: 'Livraison le jour même sur Marseille (offerte dès 49 €)', price: 7.5 },
-  { id: 'pickup', label: 'Retrait en boutique', detail: 'Gratuit au 188 rue de Rome : commandé avant 14 h, prêt le jour même (lun–ven)', price: 0 },
 ]
 
-// Tarif annoncé à Google dans les données produit : la livraison la moins
-// chère (le retrait en boutique, gratuit, n'est pas une livraison).
-export const LOWEST_SHIPPING_COST = Math.min(...SHIPPING_METHODS.filter((method) => method.id !== 'pickup').map((method) => method.price))
+// Tarif annoncé à Google dans les données produit (le mode le moins cher).
+export const LOWEST_SHIPPING_COST = Math.min(...SHIPPING_METHODS.map((method) => method.price))
 
 // CONFORMITÉ — article L3513-4 du code de la santé publique : toute publicité,
 // directe ou indirecte, en faveur des produits du vapotage est interdite. Les

@@ -3,7 +3,6 @@ import test from 'node:test'
 
 import {
   FREE_SHIPPING_THRESHOLD,
-  LOWEST_SHIPPING_COST,
   PROMO_CODES,
   SHIPPING_METHODS,
   computeBundleProgress,
@@ -68,16 +67,16 @@ test('grille de prix : 2,95 / 4,40 / 14,90 / 18,60 selon marque et contenance', 
   assert.equal(price({ category: 'accessoire', volume: '50ml' }), null)
 })
 
-test('livraison offerte dès 49 € et retrait en boutique gratuit (24/10/2026)', () => {
+test('livraison offerte dès 49 € et Click & Collect arrêté', () => {
   assert.equal(FREE_SHIPPING_THRESHOLD, 49)
-  assert.deepEqual(SHIPPING_METHODS.map((m) => m.id), ['relais', 'poste', 'coursier', 'pickup'])
+  assert.deepEqual(SHIPPING_METHODS.map((m) => m.id), ['relais', 'poste', 'coursier'])
   const at = (price, shippingMethodId) => computeTotals({ lines: [{ category: 'ecig', price, qty: 1 }], shippingMethodId })
   assert.equal(at(48.99, 'relais').shipping, 3.9)
   assert.equal(at(48.99, 'poste').shipping, 7.5)
   assert.equal(at(48.99, 'coursier').shipping, 7.5)
   for (const id of ['relais', 'poste', 'coursier']) assert.equal(at(49, id).shipping, 0)
-  assert.equal(at(2.95, 'pickup').shipping, 0, 'retrait gratuit quel que soit le montant')
-  assert.equal(LOWEST_SHIPPING_COST, 3.9, 'le retrait n’est pas une livraison')
+  // Un ancien identifiant « pickup » n'est plus gratuit.
+  assert.notEqual(at(20, 'pickup').shipping, 0)
 })
 
 test('volume discount excludes other categories and other bottle sizes', () => {

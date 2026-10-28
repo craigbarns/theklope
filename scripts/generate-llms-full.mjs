@@ -50,7 +50,7 @@ ${phoneLine}- **E-mail de support** : contact@theklope.com
 ## 3. Tarifs et Livraison
 - **Livraison gratuite** : Offerte dès 49 € d'achat en France métropolitaine.
 - **Délais** : expédition sous 24 à 48 heures en France métropolitaine.
-- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille (livraison le jour même), retrait gratuit au 188 rue de Rome (prêt le jour même si commandé avant 14 h).
+- **Modes de livraison** : Mondial Relay (Point Relais), La Poste Colissimo, coursier sur Marseille (livraison le jour même). Pas de retrait en boutique des commandes en ligne.
 - **Paiement** : checkout sécurisé Mollie.
 - **Retours** : 14 jours, conditions détaillées sur la page Livraison et retours.
 - **Calculateur DIY** : Outil en ligne disponible sur ${BASE_URL}/calculette-diy pour formuler les proportions (base, booster, arômes).

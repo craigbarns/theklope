@@ -43,7 +43,7 @@ export function orderConfirmationFulfillmentHtml(order) {
     ? `<p style="font-size:13px;line-height:1.6;color:#e5e5e5;margin-top:16px"><strong style="color:#fff">Instructions de livraison :</strong><br>${escapeHtmlWithLineBreaks(deliveryInstructions)}</p>`
     : ''
   const fulfillmentHtml = isPickup
-    ? '<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Retrait gratuit en boutique :<br>188 rue de Rome, 13006 Marseille — du lundi au vendredi, 9 h – 19 h.<br>Nous vous prévenons par e-mail dès que votre commande est prête.</p>'
+    ? '<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Retrait boutique :<br>188 rue de Rome, 13006 Marseille</p>'
     : `<p style="font-size:13px;color:#9aa0a6;margin-top:20px">Livraison à :<br>${addressHtml}</p>`
   return { fulfillmentHtml, deliveryInstructionsHtml }
 }

@@ -4,8 +4,7 @@
 // Sources :
 // - « Commandé avant 14 h, expédié le jour même » : engagement déjà affiché
 //   sur les fiches et dans la FAQ (jours ouvrés) ;
-// - coursier Marseille « le jour même » (SHIPPING_METHODS) : même heure limite ;
-// - retrait gratuit au 188 rue de Rome : prêt le jour même, même heure limite.
+// - coursier Marseille « le jour même » (SHIPPING_METHODS) : même heure limite.
 // Les jours fériés ne sont pas gérés : la promesse est prudente mais pas
 // infaillible ces jours-là.
 
@@ -53,9 +52,5 @@ export function deliveryPromise(now = new Date()) {
     shipping: beforeCutoff
       ? { today: true, text: 'Expédié aujourd’hui, reçu en 24–48 h' }
       : { today: false, text: `Expédié ${nextShipDay}, reçu en 24–48 h` },
-    // Retrait gratuit : même heure limite que l'expédition (jours ouvrés).
-    pickup: beforeCutoff
-      ? { today: true, text: 'Prêt aujourd’hui au 188 rue de Rome' }
-      : { today: false, text: `Prêt ${nextShipDay} au 188 rue de Rome` },
   }
 }
