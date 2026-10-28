@@ -38,7 +38,7 @@ ${phoneLine}- **E-mail de support** : contact@theklope.com
 - **TVA** : FR58 815 155 973
 - **Type d'établissement** : magasin de cigarettes électroniques (vente en boutique et en ligne)
 - **Quartier** : 6e arrondissement, entre la Place Castellane et la Préfecture
-- **Accès** : tramway T3 (arrêts Place de Rome, Dragon) ; métro M1/M2 (station Castellane)
+- **Accès** : station Castellane (métro M1/M2 et tramway T3), à 3 minutes à pied
 - **Horaires** : du lundi au vendredi, 09h00–19h00 ; fermé le samedi et le dimanche
 - **Zone de vente en ligne** : France métropolitaine
 

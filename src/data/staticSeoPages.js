@@ -12,7 +12,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Boutique au 188 rue de Rome (13006 Marseille)',
         text:
-          'Notre boutique physique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement). Accès immédiat via les transports RTM : Tramway T3 (stations Place de Rome ou Dragon juste devant le magasin), Métro M1 et M2 (station Castellane à 3 minutes à pied) et Métro M1 (station Estrangin). Parkings Indigo Castellane et Préfecture à proximité.',
+          'Notre boutique physique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement). Accès immédiat via les transports RTM : descendez à la station Castellane (Métro M1 et M2, Tramway T3), la boutique est à 3 minutes à pied. Métro M1 également à la station Estrangin. Parkings Indigo Castellane et Préfecture à proximité.',
       },
       {
         title: 'Coursier le jour même dans Marseille',
@@ -49,7 +49,7 @@ export const STATIC_SEO_PAGES = {
     faq: [
       {
         q: 'Où se trouve la boutique vape THEKLOPE à Marseille ?',
-        a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement), entre la Place Castellane et la Préfecture. Elle est directement desservie par le Tramway T3 (stations Place de Rome ou Dragon).',
+        a: 'La boutique THEKLOPE est située au 188 rue de Rome, 13006 Marseille (6e arrondissement), entre la Place Castellane et la Préfecture. Descendez à la station Castellane (Métro M1 / M2 ou Tramway T3) : la boutique est à 3 minutes à pied.',
       },
       {
         // Search Console (juil.–oct. 2026) : ~170 impressions en position 11
@@ -63,7 +63,7 @@ export const STATIC_SEO_PAGES = {
       },
       {
         q: 'Quels sont les transports en commun pour venir chez THEKLOPE Marseille ?',
-        a: 'Prenez le Tramway T3 (arrêt Place de Rome ou Dragon devant la boutique), ou le Métro M1 / M2 (station Castellane à 300 mètres). Les bus RTM 54 et 81 s’arrêtent également à proximité.',
+        a: 'Descendez à la station Castellane (Métro M1 / M2 ou Tramway T3) : la boutique est à 300 mètres, soit 3 minutes à pied. Les bus RTM 54 et 81 s’arrêtent également à proximité.',
       },
       {
         q: 'Peut-on tester les produits ou demander conseil sur place ?',
@@ -161,7 +161,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Essayer et se faire conseiller au 188 rue de Rome',
         text:
-          'La boutique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement), accessible en tramway T3 (arrêts Place de Rome ou Dragon) et en métro M1/M2 (station Castellane). Notre équipe vous montre la mise en route, le remplissage et l’entretien de la cartouche avant l’achat.',
+          'La boutique est installée au 188 rue de Rome, entre la Place Castellane et la Préfecture (6e arrondissement), accessible depuis la station Castellane (métro M1/M2 et tramway T3), à 3 minutes à pied. Notre équipe vous montre la mise en route, le remplissage et l’entretien de la cartouche avant l’achat.',
       },
       {
         title: 'Choisir son taux de nicotine',

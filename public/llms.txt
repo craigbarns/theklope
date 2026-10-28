@@ -8,7 +8,7 @@
 - **Type** : magasin de cigarettes électroniques (vente en boutique et en ligne)
 - **Adresse** : 188 rue de Rome, 13006 Marseille, France
 - **Quartier** : 6e arrondissement, entre la Place Castellane et la Préfecture
-- **Accès** : tramway T3 (arrêts Place de Rome, Dragon) ; métro M1/M2 (station Castellane)
+- **Accès** : station Castellane (métro M1/M2 et tramway T3), à 3 minutes à pied
 - **Téléphone** : +33 4 91 55 55 55
 - **E-mail** : contact@theklope.com
 - **Horaires** : du lundi au vendredi, 09h00–19h00 ; fermé le samedi et le dimanche
