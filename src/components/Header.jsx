@@ -53,7 +53,7 @@ export default function Header() {
       {/* Informations transactionnelles et restriction d'âge */}
       <div className="border-b border-white/10 bg-anthracite text-ash">
         <div className="container-page flex flex-wrap items-center justify-center gap-x-4 gap-y-1 py-2 text-center text-[11px] font-bold tracking-wide sm:text-xs">
-          <span className="text-neon">🚚 Livraison OFFERTE dès 29 €</span>
+          <span className="text-neon">🚚 Livraison OFFERTE dès 49 €</span>
           <span>·</span>
           <a
             href={STORE_REVIEW_SUMMARY.googleUrl}

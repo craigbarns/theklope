@@ -311,7 +311,7 @@ export default function CoachVape() {
     } else if (/(livraison|envoi|delai|frais de port|frais d'envoi|expédition)/i.test(clean)) {
       addMessage({
         isBot: true,
-        content: 'En France métropolitaine, le délai indicatif est de 2 à 4 jours. Mondial Relay coûte 3,90 €, Colissimo et le coursier Marseille 7,50 €. La livraison est offerte dès 29 € d’achat. Le retrait au 188 rue de Rome est gratuit : commandé avant 14 h, prêt le jour même.'
+        content: 'En France métropolitaine, le délai indicatif est de 2 à 4 jours. Mondial Relay coûte 3,90 €, Colissimo et le coursier Marseille 7,50 €. La livraison est offerte dès 49 € d’achat. Le retrait au 188 rue de Rome est gratuit : commandé avant 14 h, prêt le jour même.'
       })
     } else if (/(nicotine|taux|dosage|mg)/i.test(clean)) {
       addMessage({

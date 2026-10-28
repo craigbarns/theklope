@@ -15,7 +15,7 @@ export default function DeliveryOptions({ className = '' }) {
   const rows = [
     { icon: '🛵', title: 'Marseille', ...promise.courier, detail: 'Coursier dans les 16 arrondissements' },
     { icon: '🏬', title: 'Retrait gratuit', ...promise.pickup, detail: 'Boutique THEKLOPE, Marseille 6e' },
-    { icon: '📦', title: 'France', ...promise.shipping, detail: 'Mondial Relay ou Colissimo · offerte dès 29 €' },
+    { icon: '📦', title: 'France', ...promise.shipping, detail: 'Mondial Relay ou Colissimo · offerte dès 49 €' },
   ]
 
   return (

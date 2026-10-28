@@ -317,7 +317,7 @@ export default function CartDrawer() {
                 <div className="mt-8 border-t border-white/8 pt-6">
                   <p className="text-xs font-bold uppercase tracking-wider text-white mb-3 flex items-center justify-between">
                     <span>{remainingForFreeShipping > 0 ? 'Complétez pour la livraison offerte' : 'Produits recommandés'}</span>
-                    {remainingForFreeShipping > 0 && <span className="text-[10px] text-neon font-normal">Offerte dès 29€</span>}
+                    {remainingForFreeShipping > 0 && <span className="text-[10px] text-neon font-normal">Offerte dès 49€</span>}
                   </p>
                   <div className="space-y-3">
                     {crossSellSuggestions.map((p) => (
@@ -391,7 +391,7 @@ export default function CartDrawer() {
                   <dd className="font-display text-lg font-bold text-white">{formatPrice(itemsTotal)}</dd>
                 </div>
               </dl>
-              <p className="mb-3 text-center text-[11px] text-faint">Livraison offerte dès 29 €.</p>
+              <p className="mb-3 text-center text-[11px] text-faint">Livraison offerte dès 49 €.</p>
               <Link to="/panier" className="btn-ghost mb-2 w-full" onClick={() => setCartOpen(false)}>
                 Voir le panier
               </Link>

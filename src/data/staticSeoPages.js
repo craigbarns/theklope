@@ -6,7 +6,7 @@ export const STATIC_SEO_PAGES = {
     h1: 'Boutique vape à Marseille et vente en ligne',
     eyebrow: 'Marseille 13006 — Castellane',
     intro:
-      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Achetez sur place, commandez en ligne et retirez gratuitement en boutique le jour même, faites-vous livrer par coursier dans Marseille, ou partout en France avec livraison offerte dès 29 €.',
+      'THEKLOPE vous accueille au cœur de Marseille au 188 rue de Rome (13006) pour vous conseiller sur le matériel de vape, les e-liquides certifiés et les consommables. Achetez sur place, commandez en ligne et retirez gratuitement en boutique le jour même, faites-vous livrer par coursier dans Marseille, ou partout en France avec livraison offerte dès 49 €.',
     localBusiness: true,
     sections: [
       {
@@ -17,7 +17,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Coursier le jour même dans Marseille',
         text:
-          'Commandez en ligne sur theklope.com avant 14 h (jours ouvrés) : un coursier vous livre le jour même dans les 16 arrondissements de Marseille. La livraison est offerte dès 29 € d’achat, et notre équipe reste joignable pour la mise en route de votre matériel.',
+          'Commandez en ligne sur theklope.com avant 14 h (jours ouvrés) : un coursier vous livre le jour même dans les 16 arrondissements de Marseille. La livraison est offerte dès 49 € d’achat, et notre équipe reste joignable pour la mise en route de votre matériel.',
       },
       {
         title: 'Bar à saveurs, diagnostic et compatibilité',
@@ -32,7 +32,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Quartiers desservis et expédition France entière',
         text:
-          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 29 €.',
+          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 49 €.',
       },
     ],
     stores: ['theklope', 'clope-and-clope-marseille'],
@@ -59,7 +59,7 @@ export const STATIC_SEO_PAGES = {
       },
       {
         q: 'Peut-on être livré le jour même à Marseille ?',
-        a: 'Oui : choisissez « Coursier Marseille » au paiement. Toute commande validée avant 14 h un jour ouvré est livrée le jour même dans les 16 arrondissements. La livraison est offerte dès 29 € d’achat.',
+        a: 'Oui : choisissez « Coursier Marseille » au paiement. Toute commande validée avant 14 h un jour ouvré est livrée le jour même dans les 16 arrondissements. La livraison est offerte dès 49 € d’achat.',
       },
       {
         q: 'Quels sont les transports en commun pour venir chez THEKLOPE Marseille ?',
@@ -114,7 +114,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Livraison express à Marseille et en France métropolitaine',
         text:
-          'Vous ne pouvez pas vous déplacer au magasin ? Toutes nos cigarettes électroniques sont expédiées sous 24h avec livraison offerte dès 29 € d’achat, ou livrées le jour même par coursier dans Marseille. Le paiement est entièrement sécurisé par la passerelle Mollie.',
+          'Vous ne pouvez pas vous déplacer au magasin ? Toutes nos cigarettes électroniques sont expédiées sous 24h avec livraison offerte dès 49 € d’achat, ou livrées le jour même par coursier dans Marseille. Le paiement est entièrement sécurisé par la passerelle Mollie.',
       },
     ],
     links: [
@@ -135,7 +135,7 @@ export const STATIC_SEO_PAGES = {
       },
       {
         q: 'La livraison est-elle offerte à Marseille ?',
-        a: 'Oui, dès 29 € d’achat, quel que soit le mode : coursier le jour même à Marseille, Mondial Relay ou Colissimo.',
+        a: 'Oui, dès 49 € d’achat, quel que soit le mode : coursier le jour même à Marseille, Mondial Relay ou Colissimo.',
       },
     ],
   },
@@ -263,7 +263,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Modes et tarifs de livraison',
         text:
-          'Mondial Relay en Point Relais : 3,90 €. La Poste Colissimo à domicile, remis contre signature : 7,50 €. Coursier le jour même dans les 16 arrondissements de Marseille pour toute commande validée avant 14 h un jour ouvré : 7,50 €. La livraison est offerte dès 29 € d’achat, quel que soit le mode. Retrait gratuit au 188 rue de Rome (13006 Marseille) : commandée avant 14 h un jour ouvré, votre commande est prête le jour même.',
+          'Mondial Relay en Point Relais : 3,90 €. La Poste Colissimo à domicile, remis contre signature : 7,50 €. Coursier le jour même dans les 16 arrondissements de Marseille pour toute commande validée avant 14 h un jour ouvré : 7,50 €. La livraison est offerte dès 49 € d’achat, quel que soit le mode. Retrait gratuit au 188 rue de Rome (13006 Marseille) : commandée avant 14 h un jour ouvré, votre commande est prête le jour même.',
       },
       {
         title: 'Paiement sécurisé avec Mollie',
@@ -315,7 +315,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Commander en ligne',
         text:
-          'Sur theklope.com : retrait gratuit au 188 rue de Rome le jour même, Mondial Relay en Point Relais (3,90 €), Colissimo avec signature (7,50 €) ou coursier le jour même dans Marseille (7,50 €). La livraison est offerte dès 29 € d’achat.',
+          'Sur theklope.com : retrait gratuit au 188 rue de Rome le jour même, Mondial Relay en Point Relais (3,90 €), Colissimo avec signature (7,50 €) ou coursier le jour même dans Marseille (7,50 €). La livraison est offerte dès 49 € d’achat.',
       },
       {
         title: 'Vente réservée aux adultes',
@@ -357,7 +357,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Commander en ligne depuis Salon-de-Provence',
         text:
-          'Sur theklope.com, faites-vous livrer en Point Relais Mondial Relay (3,90 €) ou à domicile en Colissimo avec signature (7,50 €). La livraison est offerte dès 29 € d’achat, avec une expédition sous 24 à 48 h depuis Marseille.',
+          'Sur theklope.com, faites-vous livrer en Point Relais Mondial Relay (3,90 €) ou à domicile en Colissimo avec signature (7,50 €). La livraison est offerte dès 49 € d’achat, avec une expédition sous 24 à 48 h depuis Marseille.',
       },
       {
         title: 'Choisir son matériel et son e-liquide',
@@ -383,7 +383,7 @@ export const STATIC_SEO_PAGES = {
       },
       {
         q: 'Peut-on se faire livrer à Salon-de-Provence ?',
-        a: 'Oui : en Point Relais Mondial Relay ou à domicile en Colissimo avec signature, livraison offerte dès 29 € d’achat. Le coursier le jour même est réservé à Marseille.',
+        a: 'Oui : en Point Relais Mondial Relay ou à domicile en Colissimo avec signature, livraison offerte dès 49 € d’achat. Le coursier le jour même est réservé à Marseille.',
       },
     ],
   },

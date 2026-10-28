@@ -602,7 +602,7 @@ export default function Product() {
                   <span className="inline-block h-2 w-2 rounded-full bg-neon"></span>
                   <span className="text-neon/90">En stock — Expédié sous 24h</span>
                   <span className="text-white/30">·</span>
-                  <span className="text-ash/90">Livraison offerte dès 29 €</span>
+                  <span className="text-ash/90">Livraison offerte dès 49 €</span>
                   <span className="text-white/30">·</span>
                   <span className="text-ash/60">Coursier le jour même à Marseille</span>
                 </>

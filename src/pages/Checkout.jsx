@@ -666,7 +666,7 @@ export default function Checkout() {
                   </div>
                 ) : (
                   <div className="mb-5 rounded-lg border border-white/10 bg-white/[0.02] px-4 py-4 text-sm text-muted">
-                    Choisissez d’abord un mode de livraison. Elle est offerte dès 29 € d’achat, et le retrait au 188 rue de Rome est gratuit.
+                    Choisissez d’abord un mode de livraison. Elle est offerte dès 49 € d’achat, et le retrait au 188 rue de Rome est gratuit.
                   </div>
                 )}
               </>
@@ -953,7 +953,7 @@ function OrderSummaryContent({
       </dl>
       {!selectedShipping && (
         <p className="mt-3 text-xs leading-relaxed text-faint">
-          Livraison offerte dès 29 €, retrait gratuit au 188 rue de Rome. Choisissez à l’étape suivante.
+          Livraison offerte dès 49 €, retrait gratuit au 188 rue de Rome. Choisissez à l’étape suivante.
         </p>
       )}
     </div>

@@ -5,7 +5,7 @@ import test from 'node:test'
 const readSource = (relativePath) => readFile(new URL(relativePath, import.meta.url), 'utf8')
 
 const HOME_TITLE = 'Cigarette Électronique Marseille — Magasin 188 rue de Rome | THEKLOPE'
-const HOME_DESCRIPTION = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit et coursier le jour même, livraison offerte dès 29 €.'
+const HOME_DESCRIPTION = 'Magasin de cigarettes électroniques au 188 rue de Rome, Marseille 6e (Castellane). E-liquides, pods, résistances et puffs. Retrait gratuit et coursier le jour même, livraison offerte dès 49 €.'
 
 // Trois fichiers décrivent l'accueil : le pré-rendu (ce que voit Google), le
 // composant React (ce que voit le navigateur) et le squelette index.html. Ils

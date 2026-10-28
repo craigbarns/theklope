@@ -276,7 +276,7 @@ export default function Cart() {
             </dl>
 
             <p className="mt-3 text-xs leading-relaxed text-faint">
-              Livraison offerte dès 29 €. Le tarif exact dépend du mode de livraison choisi.
+              Livraison offerte dès 49 €. Le tarif exact dépend du mode de livraison choisi.
             </p>
 
             {cartHasVariantIssue ? (
