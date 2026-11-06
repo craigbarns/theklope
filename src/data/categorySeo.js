@@ -788,6 +788,276 @@ export const CATEGORY_SEO = {
       },
     ],
   },
+  'marque-oxva': {
+    seoTitle: 'Oxva : Pods Xlim Pro 3, Xlim 3 Ultra & Cartouches Xlim',
+    metaDescription:
+      'Toute la gamme Oxva : pods Xlim Pro 3, Xlim 3 Ultra et Xlim Go, cartouches Xlim officielles. Stock en France, expédition 24/48h, conseils d’experts.',
+    h1: 'Pods et cartouches Oxva (gamme Xlim)',
+    intro:
+      'Oxva s’est imposée en quelques années comme la référence des pods compactes avec sa gamme Xlim : tirage serré, batteries généreuses et écran de réglage sur les versions Pro. Une marque idéale pour passer des puffs jetables à la vape rechargeable sans se compliquer la vie.',
+    sections: [
+      {
+        title: 'La gamme Xlim : simplicité et autonomie',
+        text:
+          'Les Xlim Pro 3 et Xlim 3 Ultra acceptent des cartouches de 3 ml à résistance intégrée et remplaçable, avec réglage d’airflow et batterie rechargeable en USB-C. Un seul appareil couvre le MTL serré comme le RDL souple.',
+      },
+      {
+        title: 'Cartouches Xlim officielles',
+        text:
+          'Les cartouches Xlim (0.6, 0.8 et 1.2 ohm) se remplissent par le haut et durent en moyenne une à deux semaines. Privilégiez les e-liquides 50/50 ou les sels de nicotine pour préserver la résistance.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelle est la différence entre Xlim Pro 3 et Xlim 3 Ultra ?',
+        a: 'Les deux partagent le format de cartouche 3 ml et la même charte de tirage. L’Ultra ajoute un écran plus complet et une autonomie supérieure ; le Pro 3 reste le meilleur rapport qualité-prix pour un premier pod Oxva.',
+      },
+      {
+        q: 'Quelle résistance choisir pour les cartouches Xlim ?',
+        a: 'Le 0.8 ohm convient à la plupart des e-liquides 50/50 en tirage serré. Le 0.6 ohm donne plus de vapeur pour les liquides plus VG, et le 1.2 ohm s’adresse aux sels de nicotine en faible puissance.',
+      },
+    ],
+  },
+  'marque-tjuice': {
+    seoTitle: 'T-Juice : Red Astaire, Pink Astaire & e-liquides 50 ml',
+    metaDescription:
+      'E-liquides T-Juice fabriqués au Royaume-Uni : Red Astaire, Pink Astaire, Black Astaire et Blue Astaire en 50 ml boostés. Originaux, expédition 24/48h.',
+    h1: 'E-liquides T-Juice (Red Astaire & collections)',
+    intro:
+      'T-Juice est une maison anglaise connue pour ses recettes de niche : Red Astaire (anis, fruits rouges et menthol), Pink Astaire et leurs déclinaisons Blue et Black. Des e-liquides au caractère marqué, en flacons 50 ml boostés et 10 ml nicotinés.',
+    sections: [
+      {
+        title: 'Red Astaire : la recette culte',
+        text:
+          'Un anis épicé sur un lit de fruits rouges avec une pointe de menthol : une saveur unique et reconnaissable entre toutes, disponible en 50 ml 0 mg à booster ou en 10 ml dosés.',
+      },
+      {
+        title: 'Rush Cola et les autres recettes',
+        text:
+          'Au-delà des Astaire, T-Juice propose des classiques gourmands comme Rush Cola (cola frais) en 50 ml. Ces liquides riches en arômes s’expriment pleinement après un steep de quelques jours.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel ratio pour les e-liquides T-Juice 50 ml ?',
+        a: 'Les flacons 50 ml T-Juice sont en 50/50 PG/VG une fois boostés, adaptés à la plupart des pods et clearomiseurs MTL avec résistances de 0.6 à 1.2 ohm.',
+      },
+      {
+        q: 'Pourquoi attendre avant de vapoter un Red Astaire fraîchement boosté ?',
+        a: 'Comme tout liquide boosté riche en arômes, un steep de 24 à 72 h après ajout du booster permet aux saveurs de s’harmoniser et d’évacuer le côté « alcool » du concentré.',
+      },
+    ],
+  },
+  'marque-alfaliquid': {
+    seoTitle: 'Alfaliquid : Menthe Fraîche, FR5, USA Mix & grands classiques',
+    metaDescription:
+      'E-liquides Alfaliquid fabriqués en France : Menthe Fraîche, FR-K, USA Mix, Vanille Custard et toute la gamme 10 ml. Saveurs originales, expédition 24/48h.',
+    h1: 'E-liquides Alfaliquid 10 ml',
+    intro:
+      'Fabricant historique français, Alfaliquid couvre tous les goûts classiques : menthes, tabacs blonds et bruns, fruits et gourmands, en flacons 10 ml dosés de 0 à 19,9 mg. Un choix sûr pour un premier e-liquide comme pour un utilisateur confirmé.',
+    sections: [
+      {
+        title: 'Les menthes Alfaliquid : Menthe Fraîche et Menthe Glaciale',
+        text:
+          'Menthe Fraîche reste l’un des e-liquides les plus vendus en France : une menthe douce et sucrée, sans effet « froid extrême ». Menthe Glaciale répond à ceux qui cherchent une sensation plus fraîche et intense.',
+      },
+      {
+        title: 'Les tabacs : FR-K, USA Mix et blonds torréfiés',
+        text:
+          'La gamme tabac d’Alfaliquid (FR-K, USA Mix, blonds torréfiés) accompagne la transition des fumeurs vers la vape, avec des restitutions fidèles en tirage serré MTL.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel taux de nicotine choisir chez Alfaliquid ?',
+        a: 'Un fumeur de moins de 10 cigarettes par jour démarre généralement à 3 ou 6 mg, 12 mg pour une consommation moyenne et 16 à 19,9 mg pour un gros fumeur. La calculette DIY du site aide aussi à doser soi-même.',
+      },
+      {
+        q: 'Les e-liquides Alfaliquid conviennent-ils aux pods ?',
+        a: 'Oui : la plupart des références sont en 50/50 ou 60/40 PG/VG, compatibles avec les résistances de faible puissance des pods comme les XROS, PnP-X ou Ito.',
+      },
+    ],
+  },
+  'marque-liquidarom': {
+    seoTitle: 'Liquidarom : Ice Cool X, 50/50 et saveurs fruitées 10 & 50 ml',
+    metaDescription:
+      'E-liquides Liquidarom : gammes Ice Cool X fruitées, classiques 50/50 et grands formats. Fabriqués en France, stock réel, expédition sous 24/48h.',
+    h1: 'E-liquides Liquidarom',
+    intro:
+      'Marque française complète, Liquidarom couvre les fruits givrés (gamme Ice Cool X), les gourmands et les classiques 50/50, en 10 ml nicotinés comme en 50 ml à booster. Un excellent rapport saveur/prix pour vapoter tous les jours.',
+    sections: [
+      {
+        title: 'La gamme Ice Cool X : fruits rouges et fraîcheur',
+        text:
+          'Fruits rouges givrés, fraise framboise basilic, cassis framboise raisin : des assemblages fruités avec une touche de fraîcheur maîtrisée, disponibles du 10 ml au 100 ml.',
+      },
+      {
+        title: 'Silver Blend, M Blend et les classiques 50/50',
+        text:
+          'Pour les amateurs de tabacs et de blends équilibrés, les recettes 50/50 de Liquidarom offrent un hit net et une restitution fidèle en tirage serré, idéales sur pods MTL.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Que signifie la gamme « Ice Cool X » ?',
+        a: 'Ce sont des recettes fruitées avec une note de fraîcheur (menthol ou WS-23 léger). Elles se vapotent très bien toute l’année, notamment sur des résistances de 0.6 à 1 ohm.',
+      },
+      {
+        q: 'Liquidarom 10 ml ou 50 ml : que choisir ?',
+        a: 'Le 10 ml dosé (0 à 20 mg) est pratique et précis pour les pods. Le 50 ml 0 mg à booster est plus économique si vous vapotez un même goût régulièrement.',
+      },
+    ],
+  },
+  'marque-liquideo': {
+    seoTitle: 'Liquideo : Fruit du Serpent, Raisin Glacé & gourmands 50 ml',
+    metaDescription:
+      'E-liquides Liquideo fabriqués en France : Fruit du Serpent, Freeze Dragon, Raisin Glacé, Canaille et collections 50 ml boostés. Expédition 24/48h.',
+    h1: 'E-liquides Liquideo',
+    intro:
+      'Liquideo est une des marques françaises les plus anciennes de la vape, avec des collections variées : fruits exotiques givrés (Fruit du Serpent, Freeze Dragon), gourmands (Canaille, Mashmallow) et blends plus complexes.',
+    sections: [
+      {
+        title: 'Fruit du Serpent et la collection freeze',
+        text:
+          'Des fruits intenses portés par une fraîcheur franche, en flacons 50 ml à booster : parfaits pour les amateurs de sensations froides qui cherchent un goût bien marqué.',
+      },
+      {
+        title: 'Les gourmands : Canaille et Mashmallow',
+        text:
+          'Côté gourmand, Canaille (multi-freeze) et Mashmallow offrent des recettes sucrées équilibrées, conçues pour ne pas encrasser rapidement les résistances en usage quotidien.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les e-liquides Liquideo sont-ils fabriqués en France ?',
+        a: 'Oui, Liquideo produit en France et ses liquides respectent les normes AFNOR applicables aux e-liquides. Chaque flacon est traçable.',
+      },
+      {
+        q: 'Quel clearomiseur pour les 50 ml Liquideo ?',
+        a: 'Une fois boostés, ces liquides s’équilibrent en 50/50 : ils passent aussi bien sur un pod MTL (0.8 ohm et plus) que sur un clearomiseur polyvalent en 0.3 ohm pour plus de vapeur.',
+      },
+    ],
+  },
+  'marque-innokin': {
+    seoTitle: 'Innokin : Kits Coolfire Z60/Z80, Zenith & résistances Z-Coil',
+    metaDescription:
+      'Matériel Innokin : kits Coolfire Z60 et Z80 Nex, clearomiseurs Zenith, résistances Zenith et BVC officielles. Marque fiable depuis 1996, expédition 24/48h.',
+    h1: 'Cigarettes électroniques et clearomiseurs Innokin',
+    intro:
+      'Innokin construit du matériel réputé pour sa fiabilité et sa sobriété depuis 1996 : kits Coolfire, clearomiseurs Zenith pensés pour le tirage serré et des résistances durables. Une valeur sûre pour un usage MTL quotidien.',
+    sections: [
+      {
+        title: 'Coolfire Z60 et Z80 Nex : les kits polyvalents',
+        text:
+          'Batteries 2500-3000 mAh, réglage de puissance simple et clearomiseurs compatibles Z-Coil : les Coolfire accompagnent aussi bien un e-liquide 50/50 qu’un liquide plus VG selon la résistance choisie.',
+      },
+      {
+        title: 'Zenith et résistances associées',
+        text:
+          'Les Zenith Pro (R 1.0 ohm) et autres résistances Zenith/Zlide offrent une restitution de saveur constante, parfaite pour les e-liquides tabac et menthe en tirage serré.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Innokin convient-il aux débutants ?',
+        a: 'Oui, c’est même l’une des marques les plus simples : pas de réglages obligatoires, remplissage par le haut et résistances faciles à identifier. Le Coolfire Z60 est un choix classique de premier kit.',
+      },
+      {
+        q: 'Quelle résistance pour quel e-liquide chez Innokin ?',
+        a: 'Les résistances de 1 ohm et plus (Zenith Pro R 1.0, BVC) acceptent les 50/50 et sels de nicotine ; les valeurs plus basses (0.5 ohm et moins) préfèrent des liquides à 70 % de VG.',
+      },
+    ],
+  },
+  'marque-pulp': {
+    seoTitle: 'Pulp : Fraise Sauvage, Boston Menthol, Myrtille Givrée & 10 ml',
+    metaDescription:
+      'E-liquides Pulp fabriqués en France : Fraise Sauvage, Boston Menthol, Myrtille Givrée, Café du Saint Amour en 10 ml et packs 50 ml. Expédition 24/48h.',
+    h1: 'E-liquides Pulp',
+    intro:
+      'Pulp est une autre légende française des e-liquides : des classiques qui traversent les années (Fraise Sauvage, Boston Menthol, Myrtille Givrée) et des formats malins comme les packs 50 ml + 10 ml pour doser exactement son taux de nicotine.',
+    sections: [
+      {
+        title: 'Les best-sellers : Fraise Sauvage et Boston Menthol',
+        text:
+          'Fraise Sauvage reste une référence fruitée avec une note mentholée subtile ; Boston Menthol est le tabac mentholé de référence pour ceux qui quittent la cigarette traditionnelle.',
+      },
+      {
+        title: 'Les packs 50 ml + 10 ml : le dosage sur mesure',
+        text:
+          'Le format « pack » permet d’ajouter un booster dosé (3, 6 mg…) au flacon 50 ml pour ajuster précisément le taux de nicotine tout en économisant sur le prix au millilitre.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Comment utiliser un pack 50 ml + 10 ml Pulp ?',
+        a: 'Versez le flacon 10 ml dans le 50 ml, secouez et laissez reposer quelques heures. Le taux de nicotine final est indiqué sur le pack (0, 3 ou 6 mg selon la référence).',
+      },
+      {
+        q: 'Les e-liquides Pulp vont-ils dans tous les pods ?',
+        a: 'La majorité des références est en 50/50 PG/VG, donc compatible avec les résistances de 0.8 à 1.2 ohm des pods classiques et les sels de nicotine en faible puissance.',
+      },
+    ],
+  },
+  'marque-jnr': {
+    seoTitle: 'JNR : puffs rechargeables, e-liquides et Slim Bar',
+    metaDescription:
+      'Univers JNR : puffs rechargeables (JPuff, Slim Bar, Glide Pen) et e-liquides 50 ml. Alternatives légales aux puffs jetables, expédition 24/48h.',
+    h1: 'Puffs rechargeables et e-liquides JNR',
+    intro:
+      'JNR s’est fait connaître avec ses puffs jetables à saveurs fruitées (Mixed Berries, Fizzy Cherry Cola, Strawberry Watermelon Ice) et propose désormais des formats rechargeables — la suite logique après l’interdiction des puffs jetables en France.',
+    sections: [
+      {
+        title: 'Des puffs jetables aux formats rechargeables',
+        text:
+          'Slim Bar et Glide Pen reprennent les saveurs qui ont fait le succès de la marque, avec une batterie rechargeable et un réservoir à remplir : moins cher à l’usage et conforme à la réglementation française.',
+      },
+      {
+        title: 'Les e-liquides JNR 50 ml',
+        text:
+          'Les mêmes profils fruités givrés existent en e-liquides 50 ml à booster, pour les retrouver dans son propre pod avec son taux de nicotine préféré.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Les puffs jetables JNR sont-elles encore vendues en France ?',
+        a: 'Non : la vente des puffs jetables est interdite en France. Les formats rechargeables de type Slim Bar restent autorisés pour les adultes, et notre guide détaille les alternatives légales.',
+      },
+      {
+        q: 'Quel e-liquide JNR pour retrouver le goût d’une puff ?',
+        a: 'Les recettes 50 ml JNR (Mixed Berries, Fizzy Cherry Cola, Black Dragon Ice) sont conçues sur les mêmes profils de saveurs que les puffs : choisissez un pod MTL 0.8-1.2 ohm pour un rendu proche.',
+      },
+    ],
+  },
+  'marque-freaks': {
+    seoTitle: 'Freaks : Malaisian Bomb, Blue Cloud, Stop It & concentrés DIY',
+    metaDescription:
+      'E-liquides et concentrés Freaks : Malaisian Bomb, Blue Cloud, Stop It, Berry Fresh en 10 ml, 50 ml et DIY 30 ml. Fabriqués en France, expédition 24/48h.',
+    h1: 'E-liquides et concentrés Freaks',
+    intro:
+      'Freaks by Organic Farm est une marque française devenue culte avec Malaisian Bomb (ananas et menthe intense) et Blue Cloud (mangue myrtille framboise). Disponible en 10 ml dosés, 50 ml boostés et concentrés 30 ml pour le DIY.',
+    sections: [
+      {
+        title: 'Malaisian Bomb et Blue Cloud : les incontournables',
+        text:
+          'Malaisian Bomb reste l’une des meilleures ventes historiques du marché français : un ananas explosif rafraîchi par la menthe. Blue Cloud joue sur la douceur mangue-myrtille-framboise.',
+      },
+      {
+        title: 'Les concentrés 30 ml pour le DIY',
+        text:
+          'Chaque grande recette existe en concentré 30 ml : diluez-le dans une base PG/VG avec la calculette DIY du site pour obtenir votre dosage exact de nicotine à prix réduit.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Comment diluer un concentré Freaks 30 ml ?',
+        a: 'Comptez généralement 10 à 15 % de concentré selon la recette, complétés par une base neutre (avec ou sans booster de nicotine). Notre calculette DIY calcule les proportions exactes pour vous.',
+      },
+      {
+        q: 'Quelle est la différence entre Malaisian Bomb 10 ml et 50 ml ?',
+        a: 'Le 10 ml est dosé en nicotine (prêt à vapoter), le 50 ml est en 0 mg à compléter avec un ou plusieurs boosters. Le rendu aromatique est identique.',
+      },
+    ],
+  },
 }
 
 for (const cat of CATEGORIES) {

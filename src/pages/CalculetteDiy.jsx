@@ -60,7 +60,7 @@ export default function CalculetteDiy() {
   return (
     <div className="container-page py-8">
       <Seo
-        title="Calculette DIY & booster de nicotine | THEKLOPE"
+        title="Calculette DIY : calculateur de booster de nicotine | THEKLOPE"
         description="Calculez les proportions idéales de base, boosters et arômes pour vos e-liquides."
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Calculette DIY' }]} />
