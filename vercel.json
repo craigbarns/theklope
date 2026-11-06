@@ -9,9 +9,17 @@
   ],
   "trailingSlash": false,
   "images": {
-    "sizes": [256, 384, 828],
-    "qualities": [70],
-    "formats": ["image/webp"],
+    "sizes": [
+      256,
+      384,
+      828
+    ],
+    "qualities": [
+      70
+    ],
+    "formats": [
+      "image/webp"
+    ],
     "minimumCacheTTL": 2678400,
     "remotePatterns": [
       {
@@ -1193,7 +1201,7 @@
     },
     {
       "source": "/e-liquides-france/244-malaisian-bomb-10-ml-freaks.html",
-      "destination": "produit",
+      "destination": "/produit/malaisian-bomb-1-113",
       "permanent": true
     },
     {
@@ -1213,7 +1221,7 @@
     },
     {
       "source": "/e-liquides-france/226-menthe-fraiche-10-ml-freaks.html",
-      "destination": "produit",
+      "destination": "/produit/menthe-fraiche-1-120",
       "permanent": true
     },
     {
@@ -1278,12 +1286,12 @@
     },
     {
       "source": "/e-liquides-france/248-citron-vert-10-ml-freaks.html",
-      "destination": "repli",
+      "destination": "/produit/citron-cassis-37",
       "permanent": true
     },
     {
       "source": "/kits-complets/384-luxe-q-vaporesso.html",
-      "destination": "repli",
+      "destination": "/produit/luxe-q2-3ml-4pcs-vaporesso-214",
       "permanent": true
     },
     {
@@ -1308,7 +1316,7 @@
     },
     {
       "source": "/e-liquides-france/250-blue-cloud-10-ml-freaks.html",
-      "destination": "produit",
+      "destination": "/produit/blue-cloud-1-20",
       "permanent": true
     },
     {
@@ -1338,7 +1346,7 @@
     },
     {
       "source": "/e-liquides-monde/165-571-tribeca-10-ml-halo.html",
-      "destination": "produit",
+      "destination": "/produit/tribeca-1-175",
       "permanent": true
     },
     {
@@ -1363,7 +1371,7 @@
     },
     {
       "source": "/e-liquides-france/237-199-barbapapa-10-ml-freaks.html",
-      "destination": "produit",
+      "destination": "/produit/barbapapa-1-12",
       "permanent": true
     },
     {
