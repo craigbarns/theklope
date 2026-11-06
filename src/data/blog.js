@@ -1700,6 +1700,97 @@ export const BLOG_POSTS = [
       'cartouches-xros-series-3ml-4pcs-vaporesso-50',
     ],
   }),
+
+  makePost({
+    slug: 'test-geekvape-digi-max-avis',
+    title: 'Avis Geekvape Digi Max : Le Test Complet du Kit 80W à Écran Tactile',
+    description: 'Avis complet sur le kit Geekvape Digi Max 80W : écran tactile, clearomiseur Z Subohm 5.5 ml, autonomie, saveurs et verdict pour quel profil de vapoteur.',
+    date: '6 Nov 2026',
+    isoDate: '2026-11-06T09:00:00+01:00',
+    readTime: '5 min',
+    category: 'Test & Avis',
+    image: '/products/Kit Digi Max - GeekVape.jpg',
+    summary: 'Le Digi Max associe l\'écran tactile le plus complet de Geekvape au clearomiseur Z Subohm : notre test complet après plusieurs semaines d\'utilisation.',
+    intro: 'Geekvape frappe fort avec le Digi Max : un kit 80W doté d\'un grand écran tactile et du célèbre clearomiseur Z Subohm. Nous l\'avons utilisé au quotidien pour vous dire s\'il tient ses promesses.',
+    sections: [
+      {
+        title: 'Prise en main : un écran tactile qui change tout',
+        text: 'Le grand écran tactile du Digi Max rend le réglage immédiat : puissance, profil de chauffe et compteur de bouffées se règlent en deux taps, sans combinaison de boutons. La finition reste fidèle à la réputation de solidité Geekvape.',
+      },
+      {
+        title: 'Puissance 80W et clearomiseur Z Subohm',
+        text: 'Jusqu\'à 80W avec le clearomiseur Z Subohm 5.5 ml, le Digi Max délivre une vape aérienne (RDL) généreuse en vapeur. Avec une résistance Z de 0.2 ohm et un e-liquide à 70 % de VG, le rendu des saveurs reste net même à forte puissance.',
+      },
+      {
+        title: 'Autonomie et recharges',
+        text: 'La batterie intégrée couvre une journée complète à 40-50W pour un usage modéré. La recharge USB-C rapide compense les sessions intensives, et le compteur de bouffées aide à suivre sa consommation.',
+      },
+      {
+        title: 'Pour qui ?',
+        text: 'Le Digi Max s\'adresse aux vapoteurs confirmés qui veulent de la vapeur et du réglage sans complexité. Les débutants préféreraient un pod compact type XROS ; les gros buveurs de VG seront comblés ici.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quelles résistances pour le kit Digi Max ?',
+        a: 'Le clearomiseur Z Subohm accepte les résistances Geekvape Z Series (Zeus) en 0.15, 0.2, 0.25 et 0.4 ohm. Comptez une à deux semaines de durée de vie par résistance selon votre e-liquide.',
+      },
+      {
+        q: 'Quel e-liquide choisir avec le Digi Max ?',
+        a: 'Avec les résistances Z en 0.2-0.4 ohm, privilégiez des e-liquides à 70 % de VG (50 ml boostés ou 100 ml). Les 50/50 sont réservés aux résistances plus hautes si vous en utilisez.',
+      },
+      {
+        q: 'Le Digi Max convient-il aux débutants ?',
+        a: 'Il est simple grâce à son écran tactile, mais sa puissance de 80W et son tirage aérien visent plutôt un public déjà habitué à la vape subohm. Pour un premier kit, un pod MTL reste plus adapté.',
+      },
+    ],
+    relatedProductIds: ['kit-digi-max-geekvape-89', 'cartouches-xros-series-3ml-4pcs-vaporesso-50'],
+  }),
+  makePost({
+    slug: 'test-vaporesso-dojo-blast-15k-avis',
+    title: 'Avis Vaporesso Dojo Blast 15K : Le Test de la Puff Rechargeable',
+    description: 'Avis complet sur le Vaporesso Dojo Blast 15K : 15 000 bouffées, cartouches rechargeables, saveurs disponibles et verdict face aux autres puffs rechargeables.',
+    date: '6 Nov 2026',
+    isoDate: '2026-11-06T10:00:00+01:00',
+    readTime: '4 min',
+    category: 'Test & Avis',
+    image: '/products/kit-apex-vaporesso.webp',
+    summary: 'Le Dojo Blast 15K de Vaporesso promet 15 000 bouffées avec cartouches remplaçables : notre test complet de la puff rechargeable la plus aboutie du marché.',
+    intro: 'Après l\'interdiction des puffs jetables en France, le Dojo Blast 15K de Vaporesso s\'impose comme l\'alternative rechargeable la plus proche de l\'expérience puff. Nous l\'avons testé.',
+    sections: [
+      {
+        title: 'Le format : l\'esprit puff, la mécanique rechargeable',
+        text: 'Le Dojo Blast 15K garde le gabarit compact d\'une puff, mais la batterie se recharge en USB-C et la cartouche se remplace : vous gardez l\'appareil, ce qui divise le coût à l\'usage par cinq environ.',
+      },
+      {
+        title: 'Les cartouches et les saveurs',
+        text: 'Les cartouches Dojo se clipsent aimantées et se remplissent par le haut. Love 66, Cerise, Jus de Cassis, Mr Blue, Triple Mangue : les saveurs reprennent les profils gourmands fruités qui ont fait le succès des puffs.',
+      },
+      {
+        title: 'Autonomie : 15 000 bouffées réalistes ?',
+        text: 'Le compteur intégré affiche les bouffées restantes. Sur notre test, l\'autonomie d\'une cartouche dépend surtout du taux de VG du liquide : avec un 50/50, la resistance tient facilement une à deux semaines.',
+      },
+      {
+        title: 'Verdict',
+        text: 'Pour un fumeur qui veut quitter le tabac avec les codes de la puff (simplicité, tirage serré, saveurs sucrées) sans jetable ni gaspillage, le Dojo Blast 15K est aujourd\'hui la référence du marché.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Le Dojo Blast 15K est-il légal en France ?',
+        a: 'Oui : c\'est un dispositif rechargeable et remplaçable au niveau de la cartouche, conforme à la réglementation française qui interdit les puffs jetables. La vente reste réservée aux majeurs.',
+      },
+      {
+        q: 'Quand changer la cartouche du Dojo Blast ?',
+        a: 'Un goût de brûlé, une baisse de vapeur ou un compteur arrivé à zéro signalent qu\'il faut remplacer la cartouche. En moyenne, comptez une à deux semaines d\'usage quotidien.',
+      },
+      {
+        q: 'Quel e-liquide utiliser dans une cartouche Dojo ?',
+        a: 'Un e-liquide 50/50 PG/VG, avec ou sans nicotine (0 à 20 mg). Les sels de nicotine donnent un hit proche de la puff avec un tirage plus doux.',
+      },
+    ],
+    relatedProductIds: [],
+  }),
 ]
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
