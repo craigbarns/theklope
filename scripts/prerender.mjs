@@ -439,6 +439,19 @@ function buildStaticPageJsonLd(s) {
       operatingSystem: 'All',
       url: abs(path),
       description: s.description,
+    }, {
+      '@type': 'HowTo',
+      name: 'Doser un booster de nicotine dans un e-liquide 0 mg',
+      description:
+        'Ajouter des boosters de nicotine 10 ml à 20 mg/ml dans un e-liquide grand format sans nicotine pour atteindre le taux cible souhaité.',
+      totalTime: 'PT5M',
+      tool: [{ '@type': 'HowToTool', name: 'Calculette DIY THEKLOPE' }],
+      supply: [{ '@type': 'HowToSupply', name: 'Booster de nicotine 10 ml à 20 mg/ml' }],
+      step: [
+        { '@type': 'HowToStep', position: 1, name: 'Indiquer le volume', text: 'Saisissez le volume de votre e-liquide 0 mg (par exemple 50 ml).' },
+        { '@type': 'HowToStep', position: 2, name: 'Choisir le taux cible', text: 'Sélectionnez le taux de nicotine souhaité (3, 6, 12 mg/ml…).' },
+        { '@type': 'HowToStep', position: 3, name: 'Verser les boosters', text: 'La calculette indique le nombre exact de boosters de 10 ml à 20 mg/ml à verser, puis de secouer et laisser reposer.' },
+      ],
     })
   } else if (path === '/configurateur') {
     graph.unshift({
