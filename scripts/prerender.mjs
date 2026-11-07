@@ -56,7 +56,9 @@ const HUB_PRERENDER_CONTENT = {
   '/configurateur': `
     <h1>Configurateur de pack sur mesure</h1>
     <p>Composez votre pack vape en trois étapes : l'appareil (pod ou kit), l'accessoire et l'e-liquide. Le configurateur présente des références fabricant et ne remplace pas la vérification de compatibilité technique : en cas de doute, nos pages <a href="/compatibilite">compatibilité résistances et cartouches</a> et nos <a href="/guides">guides</a> détaillent les correspondances par marque et modèle.</p>
-    <p>Le pack est expédié sous 24/48h depuis Marseille, livraison offerte dès 49 €.</p>`,
+    <p>Le pack est expédié sous 24/48h depuis Marseille, livraison offerte dès 49 €.</p>
+    <h2>Comment fonctionne le configurateur ?</h2>
+    <p>Choisissez d'abord votre appareil : un <a href="/categorie/pods">pod rechargeable</a> pour un usage simple au quotidien, ou un <a href="/categorie/cigarettes-electroniques">kit complet</a> pour plus de puissance et de réglages. Ajoutez ensuite vos <a href="/categorie/cartouches">cartouches</a> ou <a href="/categorie/resistances">résistances</a>, puis l'<a href="/categorie/e-liquides">e-liquide</a> adapté à votre taux de nicotine. La page <a href="/compatibilite">compatibilité</a> détaille les correspondances par marque et les <a href="/guides">guides</a> expliquent chaque étape. Une question reste ouverte ? <a href="/contact">Contactez-nous</a>, nous répondons sous 24h ouvrées depuis Marseille.</p>`,
   '/categories': `
     <h1>Toutes les catégories de la boutique vape THEKLOPE</h1>
     <p>Parcourez l'ensemble des catégories THEKLOPE : cigarettes électroniques et kits, pods rechargeables, cartouches, résistances, e-liquides (10 ml, 50 ml, 100 ml, sels de nicotine, sans nicotine), produits DIY (bases, arômes, boosters) et accessoires (accus, chargeurs, clearomiseurs, pyrex). Chaque catégorie liste les produits en stock avec prix, filtres par marque, taux de nicotine et saveur.</p>
@@ -445,7 +447,7 @@ for (const b of BLOG_POSTS) {
 
 // ---- Pages statiques clés ----
 const STATIC_PAGES = [
-  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.', catalogBootstrap: PRODUCTS },
+  { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.' },
   { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, produits DIY, accessoires et packs débutants.' },
   { path: '/configurateur', title: 'Configurateur de pack sur mesure | THEKLOPE', description: 'Composez votre pack : appareil, accessoire et e-liquide. Vérifiez les références fabricant : le configurateur ne valide pas la compatibilité technique.' },
   { path: '/calculette-diy', title: 'Calculette DIY : calculateur de booster de nicotine | THEKLOPE', description: 'Calculez les proportions exactes de base, boosters et arômes pour fabriquer votre e-liquide maison — calculateur de booster de nicotine THEKLOPE.' },
