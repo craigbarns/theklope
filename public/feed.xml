@@ -5,8 +5,16 @@
     <link>https://www.theklope.com/guides</link>
     <description>Guides, tests et conseils de la boutique THEKLOPE (Marseille) pour les vapoteurs adultes.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Sat, 07 Nov 2026 15:00:41 GMT</lastBuildDate>
+    <lastBuildDate>Sat, 07 Nov 2026 15:23:03 GMT</lastBuildDate>
     <atom:link href="https://www.theklope.com/feed.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Meilleur Pod Rechargeable 2026 : Le Comparatif Complet (Testé)</title>
+      <link>https://www.theklope.com/guides/meilleur-pod-rechargeable-2026-comparatif</link>
+      <guid isPermaLink="true">https://www.theklope.com/guides/meilleur-pod-rechargeable-2026-comparatif</guid>
+      <description>Comparatif des meilleurs pods rechargeables 2026 : XROS 6 Mini, Xlim Pro 3, Dojo Blast 15K, Drag S2. Autonomie, tirage, prix : quel pod choisir selon votre profil.</description>
+      <category>Test &amp; Avis</category>
+      <pubDate>Sat, 07 Nov 2026 09:00:00 GMT</pubDate>
+    </item>
     <item>
       <title>Avis Vaporesso Dojo Blast 15K : Le Test de la Puff Rechargeable</title>
       <link>https://www.theklope.com/guides/test-vaporesso-dojo-blast-15k-avis</link>
@@ -158,14 +166,6 @@
       <description>Entretien d’un kit classique ou d’une box : nettoyage du clearomiseur, joints, pas de vis 510 et stockage de la batterie.</description>
       <category>Entretien</category>
       <pubDate>Thu, 23 Jul 2026 06:00:00 GMT</pubDate>
-    </item>
-    <item>
-      <title>Comment choisir sa résistance de cigarette électronique ?</title>
-      <link>https://www.theklope.com/guides/comment-choisir-sa-resistance</link>
-      <guid isPermaLink="true">https://www.theklope.com/guides/comment-choisir-sa-resistance</guid>
-      <description>Guide pour choisir sa résistance : valeur en ohm, plage de watts, tirage serré ou aérien et compatibilité avec le matériel.</description>
-      <category>Matériel</category>
-      <pubDate>Tue, 21 Jul 2026 06:00:00 GMT</pubDate>
     </item>
   </channel>
 </rss>

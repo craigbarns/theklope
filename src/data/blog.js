@@ -1791,7 +1791,66 @@ export const BLOG_POSTS = [
     ],
     relatedProductIds: [],
   }),
+  makePost({
+    slug: 'meilleur-pod-rechargeable-2026-comparatif',
+    title: 'Meilleur Pod Rechargeable 2026 : Le Comparatif Complet (Testé)',
+    description: 'Comparatif des meilleurs pods rechargeables 2026 : XROS 6 Mini, Xlim Pro 3, Dojo Blast 15K, Drag S2. Autonomie, tirage, prix : quel pod choisir selon votre profil.',
+    date: '7 Nov 2026',
+    isoDate: '2026-11-07T10:00:00+01:00',
+    readTime: '6 min',
+    category: 'Test & Avis',
+    image: '/products/kit-xros-pro-2_1.webp',
+    summary: 'XROS 6 Mini, Xlim Pro 3, Dojo Blast 15K ou Drag S2 : nous comparons les 4 meilleurs pods rechargeables de 2026, avec tableau, prix et verdict par profil.',
+    intro: 'Depuis l’interdiction des puffs jetables, le pod rechargeable est devenu le format roi en France. Nous comparons les quatre modèles que nous vendons et utilisons le plus au comptoir : Vaporesso XROS 6 Mini, Oxva Xlim Pro 3, Vaporesso Dojo Blast 15K et Voopoo Drag S2.',
+    sections: [
+      {
+        title: 'Tableau comparatif des meilleurs pods rechargeables 2026',
+        html: '<table><caption>Comparatif pods rechargeables 2026</caption><thead><tr><th>Pod</th><th>Batterie</th><th>Cartouche</th><th>Tirage</th><th>Pour qui</th><th>Prix indicatif</th></tr></thead><tbody>'
+          + '<tr><td>Vaporesso XROS 6 Mini</td><td>1 000 mAh</td><td>XROS 2 ml Corex</td><td>MTL serré</td><td>Débutants et transition depuis la puff</td><td>~20 €</td></tr>'
+          + '<tr><td>Oxva Xlim Pro 3</td><td>1 100 mAh</td><td>Xlim 3 ml</td><td>MTL/RDL réglable</td><td>Polyvalent, meilleur rapport qualité-prix</td><td>~22 €</td></tr>'
+          + '<tr><td>Vaporesso Dojo Blast 15K</td><td>Rechargeable</td><td>Dojo (remplaçable)</td><td>MTL serré</td><td>Anciens fumeurs de puffs qui veulent garder les codes</td><td>~15 € + cartouches</td></tr>'
+          + '<tr><td>Voopoo Drag S2</td><td>2 500 mAh</td><td>PnP-X 5 ml</td><td>RDL</td><td>Confirmés qui veulent de la vapeur</td><td>~35 €</td></tr>'
+          + '</tbody></table>',
+      },
+      {
+        title: 'XROS 6 Mini : le pod le plus simple',
+        text: 'Tirage automatique, cartouches Corex très durables et format de poche : le XROS 6 Mini reste le choix le plus sûr pour un premier pod. Sa rétrocompatibilité avec toutes les cartouches XROS rend les recharges faciles à trouver partout.',
+      },
+      {
+        title: 'Xlim Pro 3 : le meilleur rapport qualité-prix',
+        text: 'Écran, réglage d’airflow et cartouches de 3 ml : le Xlim Pro 3 offre plus de réglages que le XROS pour un prix proche. C’est notre recommandation par défaut au comptoir pour un utilisateur qui veut évoluer.',
+      },
+      {
+        title: 'Dojo Blast 15K : la transition puff parfaite',
+        text: 'Pour celui qui quitte les puffs jetables et veut garder le même geste : format compact, saveurs gourmandes et cartouches remplaçables. Coût à l’usage divisé par cinq par rapport à une jetable.',
+      },
+      {
+        title: 'Drag S2 : la vapeur avant tout',
+        text: 'Batterie 2 500 mAh, réservoir 5 ml et résistances PnP-X : le Drag S2 s’adresse aux vapoteurs confirmés qui cherchent une vape aérienne et dense, pas un substitut de puff.',
+      },
+    ],
+    faq: [
+      {
+        q: 'Quel est le meilleur pod rechargeable pour débuter en 2026 ?',
+        a: 'Le Vaporesso XROS 6 Mini : tirage automatique sans réglage, cartouches durables et un prix proche de 20 €. Pour un budget équivalent avec plus de réglages, l’Oxva Xlim Pro 3 est l’alternative.',
+      },
+      {
+        q: 'Un pod rechargeable coûte-t-il moins cher qu’une puff jetable ?',
+        a: 'Oui, nettement : le coût à l’usage d’un pod avec des cartouches ou un e-liquide 10 ml revient en moyenne trois à cinq fois moins cher qu’une puff jetable à consommation égale.',
+      },
+      {
+        q: 'Quel e-liquide mettre dans un pod rechargeable ?',
+        a: 'Un e-liquide 50/50 PG/VG ou un sel de nicotine, avec des résistances de 0.8 à 1.2 ohm. Les liquides très VG (70/30) sont réservés aux pods à résistances basses comme le Drag S2.',
+      },
+      {
+        q: 'Les pods rechargeables sont-ils légaux en France ?',
+        a: 'Oui : seules les puffs jetables sont interdites. Les dispositifs rechargeables avec cartouche remplaçable restent autorisés et sont réservés aux personnes majeures.',
+      },
+    ],
+    relatedProductIds: ['cartouches-xros-series-3ml-4pcs-vaporesso-50', 'kit-digi-max-geekvape-89'],
+  }),
 ]
+
 
 export const getBlogPost = (slug) => BLOG_POSTS.find((p) => p.slug === slug)
 
