@@ -18,6 +18,46 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { loadProducts } from './load-catalog.mjs'
 import { isProductOrderable } from '../src/lib/variantStock.js'
+// Pages hub sans template « information » : contenu answer-first visible par
+// les crawlers sans JS. Le client React remplace ce bloc au chargement.
+const HUB_PRERENDER_CONTENT = {
+  '/a-propos': `
+    <h1>Une nouvelle façon de vivre la vape — THEKLOPE, boutique vape à Marseille</h1>
+    <p>THEKLOPE est une boutique de cigarettes électroniques et e-liquides basée à Marseille, avec un magasin au 188 rue de Rome (13006) et une seconde adresse au 49 rue de Rome (13001). La boutique vend des pods rechargeables, kits, résistances, cartouches, e-liquides français et produits DIY, réservés aux personnes majeures. Commandes expédiées sous 24/48h en France métropolitaine, livraison offerte dès 49 € et coursier le jour même à Marseille.</p>
+    <h2>THEKLOPE en bref</h2>
+    <ul>
+      <li>Adresse : 188 rue de Rome, 13006 Marseille (et 49 rue de Rome, 13001)</li>
+      <li>Note : 4,7/5 sur 412 avis clients Google</li>
+      <li>Paiement sécurisé Mollie (CB, Visa, Mastercard, Apple Pay, 3D Secure)</li>
+      <li>Retours sous 14 jours — <a href="/legal/retour">conditions de retour</a></li>
+    </ul>
+    <h2>Nos engagements</h2>
+    <p>Une sélection exigeante de produits fiables et testés, un design soigné et une vape responsable : la boutique est strictement réservée aux majeurs, avec un conseil d'expert en magasin et par e-mail.</p>
+    <p>Besoin d'aide pour choisir ? Consultez les <a href="/guides">guides vape</a>, la <a href="/compatibilite">compatibilité des résistances et cartouches</a>, ou parcourez <a href="/boutique">la boutique</a>.</p>`,
+  '/calculette-diy': `
+    <h1>Calculette DIY : calculateur de booster de nicotine</h1>
+    <p>La calculette DIY THEKLOPE calcule instantanément le nombre exact de boosters de nicotine (10 ml à 20 mg/ml) à ajouter à un e-liquide sans nicotine pour atteindre le taux cible, ainsi que les proportions base PG/VG et arôme pour un DIY complet.</p>
+    <h2>Comment doser un booster de nicotine ?</h2>
+    <ol>
+      <li>Indiquez le volume de votre e-liquide 0 mg (par exemple 50 ml).</li>
+      <li>Choisissez votre taux de nicotine cible (3, 6 ou 12 mg/ml).</li>
+      <li>Verser le nombre de boosters indiqué, secouez et laissez reposer 24 à 72 h.</li>
+    </ol>
+    <p>Repères : 3 mg/ml pour une consommation légère, 6 mg/ml pour l'inhalation directe, 12 mg/ml et plus réservé aux pods en tirage serré. En savoir plus : <a href="/guides/comment-faire-son-eliquide-diy">faire son e-liquide DIY</a>, <a href="/guides/choisir-taux-nicotine-e-liquide">choisir son taux de nicotine</a>, <a href="/categorie/diy-boosters">boosters de nicotine</a>, <a href="/categorie/diy-bases">bases neutres</a>.</p>`,
+  '/contact': `
+    <h1>Contact — service client THEKLOPE</h1>
+    <p>Une question sur un produit, une commande ou un conseil vape ? Le service client THEKLOPE répond sous 24h ouvrées par e-mail à contact@theklope.com, par formulaire ci-dessous, ou directement en boutique au 188 rue de Rome, 13006 Marseille.</p>
+    <p>Réponses rapides aux questions fréquentes : délais et <a href="/livraison-retours">livraison</a>, <a href="/legal/retour">retours sous 14 jours</a>, <a href="/conformite-vape">conformité et vente aux majeurs</a>, <a href="/faq">FAQ complète</a>.</p>`,
+  '/configurateur': `
+    <h1>Configurateur de pack sur mesure</h1>
+    <p>Composez votre pack vape en trois étapes : l'appareil (pod ou kit), l'accessoire et l'e-liquide. Le configurateur présente des références fabricant et ne remplace pas la vérification de compatibilité technique : en cas de doute, nos pages <a href="/compatibilite">compatibilité résistances et cartouches</a> et nos <a href="/guides">guides</a> détaillent les correspondances par marque et modèle.</p>
+    <p>Le pack est expédié sous 24/48h depuis Marseille, livraison offerte dès 49 €.</p>`,
+  '/categories': `
+    <h1>Toutes les catégories de la boutique vape THEKLOPE</h1>
+    <p>Parcourez l'ensemble des catégories THEKLOPE : cigarettes électroniques et kits, pods rechargeables, cartouches, résistances, e-liquides (10 ml, 50 ml, 100 ml, sels de nicotine, sans nicotine), produits DIY (bases, arômes, boosters) et accessoires (accus, chargeurs, clearomiseurs, pyrex). Chaque catégorie liste les produits en stock avec prix, filtres par marque, taux de nicotine et saveur.</p>
+    <p>Vous ne savez pas par où commencer ? Les <a href="/guides">guides</a> et le <a href="/configurateur">configurateur de pack</a> aident à choisir son premier matériel.</p>`,
+}
+
 import { renderInformationPages } from './render-information.mjs'
 import { verifyInformationHtml } from './verify-information.mjs'
 
@@ -507,7 +547,12 @@ for (const page of STATIC_PAGES) {
   const shopNav = s.path === '/boutique'
     ? allProductsNav(PRODUCTS, 'Tout le catalogue THEKLOPE', 'Tous les produits de la boutique')
     : ''
-  const content = information?.html || `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
+  // Pages hub sans template information : contenu answer-first visible par
+  // les crawlers sans JS (les moteurs generatifs ne rendent pas le React).
+  const hubContent = HUB_PRERENDER_CONTENT[s.path]
+  const content = information?.html
+    || (hubContent ? hubContent + shopNav : null)
+    || `<h1>${esc(s.title.split(' | ')[0].split(' — ')[0])}</h1><p>${esc(s.description)}</p>${shopNav}`
   const jsonLd = buildStaticPageJsonLd(s)
   writePage(s.path, buildPage({
     title: s.title,
