@@ -63,6 +63,30 @@ export default function About() {
           <Stat value="24/48h" label="Livraison en France" />
           <Stat value="Marseille" label="188 rue de Rome" />
         </div>
+
+        {/* Bloc entity : faits clés + maillage interne pour les moteurs génératifs */}
+        <section className="mt-12 card p-6 md:p-8">
+          <h2 className="font-display text-xl font-bold text-white">THEKLOPE en bref</h2>
+          <p className="mt-3 text-sm text-ash/80 leading-relaxed">
+            THEKLOPE est une boutique de cigarettes électroniques et e-liquides basée à Marseille, avec un
+            magasin au 188 rue de Rome (13006) et une seconde adresse au 49 rue de Rome (13001). La boutique
+            vend des pods rechargeables, kits, résistances, cartouches, e-liquides français et produits DIY,
+            réservés aux personnes majeures. Commandes expédiées sous 24/48h en France métropolitaine,
+            livraison offerte dès 49 €, et coursier le jour même à Marseille.
+          </p>
+          <ul className="mt-4 grid list-disc gap-2 pl-5 text-sm text-ash/80 sm:grid-cols-2">
+            <li>Adresse : 188 rue de Rome, 13006 Marseille (et 49 rue de Rome, 13001)</li>
+            <li>Note : 4,7/5 sur 412 avis clients Google</li>
+            <li>Paiement sécurisé Mollie (CB, Visa, Mastercard, Apple Pay, 3D Secure)</li>
+            <li>Retours sous 14 jours — <Link to="/legal/retour" className="text-neon hover:underline">conditions de retour</Link></li>
+          </ul>
+          <p className="mt-4 text-sm text-ash/80 leading-relaxed">
+            Besoin d'un conseil avant d'acheter ? Consultez nos{' '}
+            <Link to="/guides" className="text-neon hover:underline">guides vape</Link>, vérifiez la{' '}
+            <Link to="/compatibilite" className="text-neon hover:underline">compatibilité des résistances et cartouches</Link>, ou passez à la{' '}
+            <Link to="/boutique" className="text-neon hover:underline">boutique</Link>.
+          </p>
+        </section>
       </div>
     </>
   )

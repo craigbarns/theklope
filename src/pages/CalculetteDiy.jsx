@@ -61,7 +61,22 @@ export default function CalculetteDiy() {
     <div className="container-page py-8">
       <Seo
         title="Calculette DIY : calculateur de booster de nicotine | THEKLOPE"
-        description="Calculez les proportions idéales de base, boosters et arômes pour vos e-liquides."
+        description="Calculez les proportions exactes de base, boosters et arômes pour fabriquer votre e-liquide maison. Calculateur de booster de nicotine simple et gratuit."
+        schema={{
+          '@context': 'https://schema.org',
+          '@type': 'HowTo',
+          name: 'Doser un booster de nicotine dans un e-liquide 0 mg',
+          description:
+            'Ajouter des boosters de nicotine 10 ml à 20 mg/ml dans un e-liquide grand format sans nicotine pour atteindre le taux cible souhaité.',
+          totalTime: 'PT5M',
+          tool: [{ '@type': 'HowToTool', name: 'Calculette DIY THEKLOPE' }],
+          supply: [{ '@type': 'HowToSupply', name: 'Booster de nicotine 10 ml à 20 mg/ml' }],
+          step: [
+            { '@type': 'HowToStep', position: 1, name: 'Indiquer le volume', text: 'Saisissez le volume de votre e-liquide 0 mg (par exemple 50 ml).' },
+            { '@type': 'HowToStep', position: 2, name: 'Choisir le taux cible', text: 'Sélectionnez le taux de nicotine souhaité (3, 6, 12 mg/ml…).' },
+            { '@type': 'HowToStep', position: 3, name: 'Verser les boosters', text: 'La calculette indique le nombre exact de boosters de 10 ml à 20 mg/ml à verser, puis de secouer et laisser reposer.' },
+          ],
+        }}
       />
       <Breadcrumbs items={[{ label: 'Boutique', to: '/boutique' }, { label: 'Calculette DIY' }]} />
 
@@ -392,6 +407,30 @@ export default function CalculetteDiy() {
           </div>
         </aside>
       </div>
+
+      {/* Bloc savoir — réponse directe pour l'extraction par les moteurs génératifs */}
+      <section className="mt-12 card p-6 md:p-8">
+        <h2 className="font-display text-xl font-bold text-white">Comment doser un booster de nicotine ?</h2>
+        <p className="mt-3 text-sm text-ash/80 leading-relaxed">
+          Pour passer un e-liquide 0 mg à un taux cible, on ajoute des boosters de nicotine dosés à 20 mg/ml :
+          un flacon de 50 ml passé à 3 mg/ml reçoit 3 boosters de 10 ml (30 ml ajoutés), à 6 mg/ml il en reçoit 6.
+          La règle générale : nombre de boosters = (taux cible × volume final) ÷ (20 mg × 10 ml). La calculette
+          ci-dessus fait ce calcul instantanément, y compris pour le DIY complet (base PG/VG, arômes concentrés).
+        </p>
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-ash/80 leading-relaxed">
+          <li><strong className="text-white">3 mg/ml</strong> : fumeur léger ou faible consommation (moins de 10 cigarettes/jour équivalent).</li>
+          <li><strong className="text-white">6 mg/ml</strong> : le taux intermédiaire le plus courant en inhalation directe.</li>
+          <li><strong className="text-white">12 mg/ml et plus</strong> : réservé aux petits formats et aux pods en tirage serré (MTL).</li>
+        </ul>
+        <p className="mt-4 text-sm text-ash/80 leading-relaxed">
+          Après ajout des boosters, secouez le flacon et laissez reposer (steep) 24 à 72 h pour que les saveurs
+          s'harmonisent. Nos guides détaillent les <Link to="/guides/comment-faire-son-eliquide-diy" className="text-neon hover:underline">étapes complètes du DIY</Link> et le{' '}
+          <Link to="/guides/choisir-taux-nicotine-e-liquide" className="text-neon hover:underline">choix du taux de nicotine</Link>. Retrouvez les{' '}
+          <Link to="/categorie/diy-bases" className="text-neon hover:underline">bases neutres</Link>, les{' '}
+          <Link to="/categorie/diy-aromes" className="text-neon hover:underline">arômes concentrés</Link> et les{' '}
+          <Link to="/categorie/diy-boosters" className="text-neon hover:underline">boosters de nicotine</Link> en boutique.
+        </p>
+      </section>
     </div>
   )
 }

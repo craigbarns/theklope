@@ -114,7 +114,7 @@ export default function Blog() {
               <div className="relative aspect-video w-full md:w-48 shrink-0 bg-carbon overflow-hidden">
                 <img
                   src={post.image}
-                  alt=""
+                  alt={`Illustration : ${post.title}`}
                   width={640}
                   height={360}
                   loading={index < 2 ? 'eager' : 'lazy'}
