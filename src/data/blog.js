@@ -1486,8 +1486,14 @@ export const BLOG_POSTS = [
         text: 'La capacité en mAh indique l’autonomie (ex: 3000 mAh). Le Courant de Décharge Maximal (CDM en Ampères) indique la puissance maximale que l’accu peut fournir sans surchauffer. Pour une vape puissante (Subohm), privilégiez un CDM élevé (25A+).',
       },
       {
-        title: 'Notre sélection des meilleurs accus 18650',
-        text: '1. Ucell 18650 3000 mAh : parfait compromis autonomie/stabilité pour vape quotidienne. 2. Sony / Murata VTC6 : une référence pour l’autonomie. 3. Samsung 25R : idéal pour les fortes puissances.',
+        title: 'Notre sélection des meilleurs accus 18650 (2026)',
+        html: '<table><caption>Comparatif des accus 18650</caption><thead><tr><th>Accu</th><th>Capacité</th><th>CDM</th><th>Profil</th></tr></thead><tbody>'
+          + '<tr><td>Ucell 18650</td><td>3 000 mAh</td><td>30 A</td><td>Meilleur compromis autonomie/puissance pour un usage quotidien</td></tr>'
+          + '<tr><td>Sony Murata VTC6</td><td>3 000 mAh</td><td>30 A</td><td>Référence historique pour l\'autonomie, très stable</td></tr>'
+          + '<tr><td>Samsung 25R</td><td>2 500 mAh</td><td>20 A</td><td>Ideal pour les fortes puissances en subohm</td></tr>'
+          + '<tr><td>Samsung 30Q</td><td>3 000 mAh</td><td>15-20 A</td><td>Polyvalent, bon en vape modérée</td></tr>'
+          + '</tbody></table>'
+          + '<p>Nous ne vendons que des accus de marques officielles, stockés et testés à réception. Un accu ne se choisit jamais sur son seul prix : un faux VTC6 à 3 € est un risque réel.</p>',
       },
       {
         title: 'Règles de sécurité indispensables',
@@ -1726,6 +1732,14 @@ export const BLOG_POSTS = [
         text: 'La batterie intégrée couvre une journée complète à 40-50W pour un usage modéré. La recharge USB-C rapide compense les sessions intensives, et le compteur de bouffées aide à suivre sa consommation.',
       },
       {
+        title: 'Face à ses concurrents',
+        html: '<table><caption>Digi Max vs box 80W équivalentes</caption><thead><tr><th>Kit</th><th>Puissance</th><th>Écran</th><th>Réservoir</th><th>Point fort</th></tr></thead><tbody>'
+          + '<tr><td>Geekvape Digi Max</td><td>80 W</td><td>Tactile</td><td>Z Subohm 5.5 ml</td><td>Réglage tactile + robustesse IP68</td></tr>'
+          + '<tr><td>Geekvape Aegis Max 2</td><td>100 W</td><td>Classique</td><td>Zeus Subohm 5.5 ml</td><td>Puissance et autonomie 18650/21700</td></tr>'
+          + '<tr><td>Vaporesso Armour S</td><td>100 W</td><td>Classique</td><td>iTank 2 5 ml</td><td>GTi mesh, restitution des saveurs</td></tr>'
+          + '</tbody></table>',
+      },
+      {
         title: 'Pour qui ?',
         text: 'Le Digi Max s\'adresse aux vapoteurs confirmés qui veulent de la vapeur et du réglage sans complexité. Les débutants préféreraient un pod compact type XROS ; les gros buveurs de VG seront comblés ici.',
       },
@@ -1769,6 +1783,14 @@ export const BLOG_POSTS = [
       {
         title: 'Autonomie : 15 000 bouffées réalistes ?',
         text: 'Le compteur intégré affiche les bouffées restantes. Sur notre test, l\'autonomie d\'une cartouche dépend surtout du taux de VG du liquide : avec un 50/50, la resistance tient facilement une à deux semaines.',
+      },
+      {
+        title: 'Dojo Blast 15K vs les autres alternatives aux puffs',
+        html: '<table><caption>Comparatif formats rechargeables pour ex-fumeurs de puffs</caption><thead><tr><th>Produit</th><th>Format</th><th>Recharge</th><th>Atout</th></tr></thead><tbody>'
+          + '<tr><td>Vaporesso Dojo Blast 15K</td><td>Puff rechargeable</td><td>USB-C + cartouche</td><td>Le geste et les saveurs des puffs, sans jetable</td></tr>'
+          + '<tr><td>Vaporesso XROS 6 Mini</td><td>Pod classique</td><td>Cartouche XROS</td><td>Le plus simple et le plus discret</td></tr>'
+          + '<tr><td>Oxva Xlim Pro 3</td><td>Pod à écran</td><td>Cartouche 3 ml</td><td>Réglable pour évoluer</td></tr>'
+          + '</tbody></table>',
       },
       {
         title: 'Verdict',

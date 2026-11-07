@@ -32,7 +32,7 @@ export const STATIC_SEO_PAGES = {
       {
         title: 'Quartiers desservis et expédition France entière',
         text:
-          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban), Marseille 1er (Vieux-Port, Noailles, Canebière), Marseille 8e (Prado, Périer) et Marseille 5e (Timone, Baille). Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 49 €.',
+          'Idéalement situés, nous accueillons les vapoteurs de Marseille 6e (Castellane, Préfecture, Vauban, Rouet), Marseille 1er (Vieux-Port, Noailles, Canebière, Saint-Victor), Marseille 8e (Prado, Michelet, Périer, Bonneveine), Marseille 5e (Timone, Baille, Blancarde) et Marseille 2e (Joliette). Dans tous ces quartiers, notre coursier livre votre commande le jour même, et la boutique du 188 rue de Rome est à 10 minutes à pied de la station Castellane. Hors de Marseille, vos commandes sont expédiées sous 24h/48h en Mondial Relay ou Colissimo, avec livraison offerte dès 49 €.',
       },
     ],
     stores: ['theklope', 'clope-and-clope-marseille'],

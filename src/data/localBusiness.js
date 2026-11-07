@@ -13,6 +13,12 @@
 // S'il est vidé un jour, il est omis partout plutôt qu'émis faux.
 export const STORE_PHONE = '+33491555555'
 
+// Note moyenne et volume d'avis Google de la boutique THEKLOPE : source
+// unique src/data/reviews.js (même chiffre que le bandeau du site et la fiche
+// Google Business). Émis dans le schéma LocalBusiness/Store en aggregateRating
+// — c'est le signal qui alimente l'étoile jaune dans les résultats locaux.
+import { STORE_REVIEW_SUMMARY } from './reviews.js'
+
 export const STORE = {
   name: 'THEKLOPE',
   url: 'https://www.theklope.com',
@@ -58,6 +64,21 @@ function openingHoursSpecification() {
   }))
 }
 
+// aggregateRating émis uniquement si les données d'avis sont complètes :
+// un rating sans count (ou l'inverse) est invalide pour Google.
+function aggregateRatingSchema() {
+  const { rating, count } = STORE_REVIEW_SUMMARY
+  if (!Number.isFinite(rating) || !Number.isFinite(count) || count <= 0) return undefined
+  return {
+    '@type': 'AggregateRating',
+    ratingValue: rating,
+    reviewCount: count,
+    bestRating: 5,
+    worstRating: 1,
+
+  }
+}
+
 // Construit l'objet LocalBusiness (schema.org) à partir des données ci-dessus.
 export function buildLocalBusinessSchema() {
   const schema = {
@@ -89,6 +110,8 @@ export function buildLocalBusinessSchema() {
   const hours = openingHoursSpecification()
   if (hours) schema.openingHoursSpecification = hours
   if (STORE_SAME_AS.length) schema.sameAs = STORE_SAME_AS
+  const aggregateRating = aggregateRatingSchema()
+  if (aggregateRating) schema.aggregateRating = aggregateRating
 
   return schema
 }
