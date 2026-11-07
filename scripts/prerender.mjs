@@ -33,7 +33,9 @@ const HUB_PRERENDER_CONTENT = {
     </ul>
     <h2>Nos engagements</h2>
     <p>Une sélection exigeante de produits fiables et testés, un design soigné et une vape responsable : la boutique est strictement réservée aux majeurs, avec un conseil d'expert en magasin et par e-mail.</p>
-    <p>Besoin d'aide pour choisir ? Consultez les <a href="/guides">guides vape</a>, la <a href="/compatibilite">compatibilité des résistances et cartouches</a>, ou parcourez <a href="/boutique">la boutique</a>.</p>`,
+    <p>Besoin d'aide pour choisir ? Consultez les <a href="/guides">guides vape</a>, la <a href="/compatibilite">compatibilité des résistances et cartouches</a>, ou parcourez <a href="/boutique">la boutique</a>.</p>
+    <h2>Notre sélection en quelques mots</h2>
+    <p>Nous référençons les grandes marques officielles du marché — Vaporesso, Voopoo, Geekvape, Aspire, Oxva, Innokin — ainsi que des e-liquides fabriqués en France (Pulp, Alfaliquid, Liquidarom, Liquideo, Freaks, Le Petit Nuage). Chaque référence est vérifiée à la réception, les stocks affichés sur le site sont réels et la préparation part de Marseille sous 24/48h. Les <a href="/categorie/meilleures-ventes">meilleures ventes</a> et les <a href="/categorie/nouveautes">nouveautés</a> sont mises à jour chaque semaine.</p>`,
   '/calculette-diy': `
     <h1>Calculette DIY : calculateur de booster de nicotine</h1>
     <p>La calculette DIY THEKLOPE calcule instantanément le nombre exact de boosters de nicotine (10 ml à 20 mg/ml) à ajouter à un e-liquide sans nicotine pour atteindre le taux cible, ainsi que les proportions base PG/VG et arôme pour un DIY complet.</p>
@@ -43,11 +45,14 @@ const HUB_PRERENDER_CONTENT = {
       <li>Choisissez votre taux de nicotine cible (3, 6 ou 12 mg/ml).</li>
       <li>Verser le nombre de boosters indiqué, secouez et laissez reposer 24 à 72 h.</li>
     </ol>
-    <p>Repères : 3 mg/ml pour une consommation légère, 6 mg/ml pour l'inhalation directe, 12 mg/ml et plus réservé aux pods en tirage serré. En savoir plus : <a href="/guides/comment-faire-son-eliquide-diy">faire son e-liquide DIY</a>, <a href="/guides/choisir-taux-nicotine-e-liquide">choisir son taux de nicotine</a>, <a href="/categorie/diy-boosters">boosters de nicotine</a>, <a href="/categorie/diy-bases">bases neutres</a>.</p>`,
-  '/contact': `
-    <h1>Contact — service client THEKLOPE</h1>
-    <p>Une question sur un produit, une commande ou un conseil vape ? Le service client THEKLOPE répond sous 24h ouvrées par e-mail à contact@theklope.com, par formulaire ci-dessous, ou directement en boutique au 188 rue de Rome, 13006 Marseille.</p>
-    <p>Réponses rapides aux questions fréquentes : délais et <a href="/livraison-retours">livraison</a>, <a href="/legal/retour">retours sous 14 jours</a>, <a href="/conformite-vape">conformité et vente aux majeurs</a>, <a href="/faq">FAQ complète</a>.</p>`,
+    <p>Repères : 3 mg/ml pour une consommation légère, 6 mg/ml pour l'inhalation directe, 12 mg/ml et plus réservé aux pods en tirage serré. En savoir plus : <a href="/guides/comment-faire-son-eliquide-diy">faire son e-liquide DIY</a>, <a href="/guides/choisir-taux-nicotine-e-liquide">choisir son taux de nicotine</a>, <a href="/categorie/diy-boosters">boosters de nicotine</a>, <a href="/categorie/diy-bases">bases neutres</a>.</p>
+    <h2>Repères de dosage</h2>
+    <ul>
+      <li><strong>3 mg/ml</strong> : consommation légère, e-liquides grand format en inhalation directe.</li>
+      <li><strong>6 mg/ml</strong> : le taux intermédiaire le plus courant.</li>
+      <li><strong>12 mg/ml et plus</strong> : réservé aux petits formats et aux pods en tirage serré (MTL).</li>
+    </ul>
+    <p>Après ajout des boosters, secouez le flacon et laissez reposer (steep) 24 à 72 h pour que les saveurs s'harmonisent. En savoir plus : <a href="/guides/comment-faire-son-eliquide-diy">faire son e-liquide DIY</a>, <a href="/guides/choisir-taux-nicotine-e-liquide">choisir son taux de nicotine</a>, <a href="/guides/quand-changer-resistance">quand changer sa résistance</a>. Les ingrédients se commandent en boutique : <a href="/categorie/diy-boosters">boosters de nicotine</a>, <a href="/categorie/diy-bases">bases neutres</a>, <a href="/categorie/diy-aromes">arômes concentrés</a>, ou composez un pack complet via le <a href="/configurateur">configurateur</a>.</p>`,
   '/configurateur': `
     <h1>Configurateur de pack sur mesure</h1>
     <p>Composez votre pack vape en trois étapes : l'appareil (pod ou kit), l'accessoire et l'e-liquide. Le configurateur présente des références fabricant et ne remplace pas la vérification de compatibilité technique : en cas de doute, nos pages <a href="/compatibilite">compatibilité résistances et cartouches</a> et nos <a href="/guides">guides</a> détaillent les correspondances par marque et modèle.</p>
@@ -55,7 +60,9 @@ const HUB_PRERENDER_CONTENT = {
   '/categories': `
     <h1>Toutes les catégories de la boutique vape THEKLOPE</h1>
     <p>Parcourez l'ensemble des catégories THEKLOPE : cigarettes électroniques et kits, pods rechargeables, cartouches, résistances, e-liquides (10 ml, 50 ml, 100 ml, sels de nicotine, sans nicotine), produits DIY (bases, arômes, boosters) et accessoires (accus, chargeurs, clearomiseurs, pyrex). Chaque catégorie liste les produits en stock avec prix, filtres par marque, taux de nicotine et saveur.</p>
-    <p>Vous ne savez pas par où commencer ? Les <a href="/guides">guides</a> et le <a href="/configurateur">configurateur de pack</a> aident à choisir son premier matériel.</p>`,
+    <p>Vous ne savez pas par où commencer ? Les <a href="/guides">guides</a> et le <a href="/configurateur">configurateur de pack</a> aident à choisir son premier matériel.</p>
+    <h2>Choisir selon son profil</h2>
+    <p>Pour un premier achat, les <a href="/categorie/packs-debutants">packs débutants</a> regroupent matériel et e-liquide compatibles. Pour remplacer une puff jetable, direction les <a href="/categorie/pods">pods rechargeables</a> et les <a href="/puff-marseille">alternatives légales aux puffs</a>. Les vapoteurs confirmés trouveront leur bonheur côté <a href="/categorie/cigarettes-electroniques">kits et box</a>, <a href="/categorie/resistances">résistances</a> et <a href="/categorie/e-liquides">e-liquides</a>. En cas de doute, l'équipe répond par e-mail sous 24h ouvrées via la page <a href="/contact">contact</a>.</p>`,
 }
 
 import { renderInformationPages } from './render-information.mjs'
@@ -440,7 +447,7 @@ for (const b of BLOG_POSTS) {
 const STATIC_PAGES = [
   { path: '/boutique', title: 'Boutique vape en ligne | THEKLOPE', description: 'Boutique vape THEKLOPE : cigarettes électroniques, pods rechargeables, e-liquides, produits DIY, résistances et accessoires pour adultes. Livraison France.', catalogBootstrap: PRODUCTS },
   { path: '/categories', title: 'Catégories | THEKLOPE', description: 'Parcourez les catégories THEKLOPE : cigarettes électroniques, pods, e-liquides, produits DIY, accessoires et packs débutants.' },
-  { path: '/configurateur', title: 'Configurateur de pack sur mesure | THEKLOPE', description: 'Composez votre pack : appareil, accessoire et e-liquide. Vérifiez les références fabricant : le configurateur ne valide pas la compatibilité technique.', catalogBootstrap: PRODUCTS },
+  { path: '/configurateur', title: 'Configurateur de pack sur mesure | THEKLOPE', description: 'Composez votre pack : appareil, accessoire et e-liquide. Vérifiez les références fabricant : le configurateur ne valide pas la compatibilité technique.' },
   { path: '/calculette-diy', title: 'Calculette DIY : calculateur de booster de nicotine | THEKLOPE', description: 'Calculez les proportions exactes de base, boosters et arômes pour fabriquer votre e-liquide maison — calculateur de booster de nicotine THEKLOPE.' },
   { path: '/guides', title: 'Guides vape responsables | THEKLOPE', description: 'Guides THEKLOPE pour choisir une cigarette électronique, un e-liquide, une résistance ou un pod avec des conseils responsables pour adultes.' },
   { path: '/a-propos', title: 'À propos | THEKLOPE', description: 'THEKLOPE, boutique de vape née à Marseille (188 rue de Rome). Une sélection premium, un conseil d’expert et une expérience simple et élégante.' },
