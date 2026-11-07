@@ -71,7 +71,9 @@ export default function Contact() {
       <Breadcrumbs items={[{ label: 'Contact' }]} />
       <h1 className="mt-4 font-display text-3xl font-bold text-white">Contact</h1>
       <p className="mt-2 max-w-xl text-muted">
-        Une question sur un produit, une commande ou un conseil ? Notre équipe vous répond rapidement.
+        Une question sur un produit, une commande ou un conseil ? Notre équipe vous répond rapidement, sous 24h ouvrées.
+
+        Pour aller plus vite : les délais de <Link to="/livraison-retours">livraison</Link> et de <Link to="/legal/retour">retour</Link> sont détaillés sur leurs pages dédiées, la <Link to="/compatibilite">compatibilité des résistances et cartouches</Link> est documentée marque par marque, et nos <Link to="/guides">guides vape</Link> couvrent le choix du matériel, du e-liquide et du taux de nicotine.
       </p>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px]">
