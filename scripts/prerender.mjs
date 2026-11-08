@@ -17,6 +17,9 @@ import { writeFileSync, mkdirSync, readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { loadProducts } from './load-catalog.mjs'
+// Avis produits réels (statut published) pour prérendre aggregateRating/review
+// des fiches : les crawlers sans JS ne voyaient les étoiles qu'après hydratation.
+import { loadReviewData, buildProductReviewSchema } from './load-review-data.mjs'
 import { isProductOrderable } from '../src/lib/variantStock.js'
 // Pages hub sans template « information » : contenu answer-first visible par
 // les crawlers sans JS. Le client React remplace ce bloc au chargement.
@@ -104,6 +107,9 @@ const { optimizedImageAttrs } = await import(resolve(root, 'src/lib/imageUrl.js'
 
 const template = readFileSync(resolve(dist, 'index.html'), 'utf8')
 const informationPages = await renderInformationPages()
+// Notes/avis réels publiés : chargés une fois pour tout le catalogue (maps vides
+// sans Supabase → le prerender émet juste un schema sans aggregateRating).
+const { statsByProduct, reviewsByProduct } = await loadReviewData()
 
 const esc = (s) =>
   String(s ?? '')
@@ -244,6 +250,13 @@ for (const p of PRODUCTS) {
   const title = buildProductSeoTitle(p)
   const description = buildProductSeoDescription(p)
   const path = `/produit/${p.id}`
+  // aggregateRating/review UNIQUEMENT sur avis réels publiés (>= 3, note > 0) :
+  // même garde et même forme que Product.jsx pour que HTML prérendu et appli
+  // hydratée annoncent exactement les mêmes étoiles.
+  const reviewNodes = buildProductReviewSchema(
+    statsByProduct.get(p.id),
+    reviewsByProduct.get(p.id),
+  )
   const jsonLd = {
     '@context': 'https://schema.org',
     '@graph': [
@@ -254,6 +267,9 @@ for (const p of PRODUCTS) {
         description: p.long || p.short || p.name,
         sku: buildMerchantSku(p.id),
         brand: { '@type': 'Brand', name: p.brand || 'THEKLOPE' },
+        // Catégorie libellée (comme la version client, Product.jsx) : champ
+        // merchant utile au classement des fiches par type de produit.
+        category: catLabel,
         offers: {
           '@type': 'Offer',
           url: abs(path),
@@ -263,7 +279,8 @@ for (const p of PRODUCTS) {
           priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
           itemCondition: 'https://schema.org/NewCondition',
           availability: isProductOrderable(p) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-          seller: { '@type': 'Organization', name: 'THEKLOPE' },
+          // url du vendeur : champ attendu par Google Merchant, déjà émis côté client.
+          seller: { '@type': 'Organization', name: 'THEKLOPE', url: BASE_URL },
           shippingDetails: {
             '@type': 'OfferShippingDetails',
             shippingDestination: { '@type': 'DefinedRegion', addressCountry: 'FR' },
@@ -285,6 +302,7 @@ for (const p of PRODUCTS) {
             returnFees: 'https://schema.org/ReturnFeesCustomerResponsibility',
           },
         },
+        ...reviewNodes,
       },
       {
         '@type': 'BreadcrumbList',
