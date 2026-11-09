@@ -206,7 +206,7 @@ function buildPage({
           <div class="border-b border-white/10 bg-anthracite"><p class="container-page py-2 text-center text-[11px] font-bold sm:text-xs">Site réservé aux adultes (+18)</p></div>
           <header class="border-b border-white/10"><nav aria-label="Informations" class="container-page flex min-h-16 flex-wrap items-center gap-5">
             <a href="/" class="inline-flex min-h-11 items-center font-display font-bold text-white">THEKLOPE</a>
-            <a href="/guides" class="inline-flex min-h-11 items-center">Guides</a><a href="/faq" class="inline-flex min-h-11 items-center">FAQ</a><a href="/contact" class="inline-flex min-h-11 items-center">Contact</a>
+            <a href="/guides" class="inline-flex min-h-11 items-center">Guides</a><a href="/a-propos" class="inline-flex min-h-11 items-center">À propos</a><a href="/faq" class="inline-flex min-h-11 items-center">FAQ</a><a href="/contact" class="inline-flex min-h-11 items-center">Contact</a>
           </nav></header>
           <main id="contenu" tabindex="-1" class="flex-1"><div data-prerender="seo" data-prerender-kind="component" data-prerender-path="${esc(canonicalPath || '')}">${content}</div></main>
           <footer class="mt-10 border-t border-white/10"><div class="container-page py-8 text-sm text-muted">
@@ -799,7 +799,7 @@ const homeContent = `
   
   <h2>Boutique de vape physique à Marseille</h2>
   <p>Retrouvez-nous également dans notre boutique physique au 188 rue de Rome, 13006 Marseille.</p>
-  <p><a href="/boutique-vape-marseille">En savoir plus sur notre boutique de Marseille</a></p>
+  <p><a href="/boutique-vape-marseille">En savoir plus sur notre boutique de Marseille</a> · <a href="/a-propos">Notre histoire</a></p>
   
   <h2>Guides & Conseils Vape</h2>
   <ul>
