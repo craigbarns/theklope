@@ -529,6 +529,16 @@ export const BLOG_POSTS = [
           'Les liquides très sucrés, les puissances trop élevées et les enchaînements de bouffées sans pause peuvent fatiguer plus vite le coton et le fil résistif.',
       },
       {
+        title: 'Durée de vie moyenne : le tableau',
+        html: '<table><caption>Durée de vie d\'une résistance selon l\'usage</caption><thead><tr><th>Usage</th><th>Liquide</th><th>Durée moyenne</th></tr></thead><tbody>'
+          + '<tr><td>Pod MTL modéré (10-15 W)</td><td>50/50 ou sel de nicotine</td><td>2 à 3 semaines</td></tr>'
+          + '<tr><td>Clearomiseur polyvalent (20-40 W)</td><td>50/50 ou 70/30</td><td>1 à 2 semaines</td></tr>'
+          + '<tr><td>Subohm intensif (60-80 W)</td><td>70/30 ou 80/20 VG</td><td>4 à 10 jours</td></tr>'
+          + '<tr><td>Quel que soit le matériel</td><td>Liquide très sucré (gourmand)</td><td>Diviser la durée par 2 environ</td></tr>'
+          + '</tbody></table>'
+          + '<p>Ces durées supposent un amorçage correct (5 à 10 minutes après remplissage) et des puissances dans la plage indiquée sur la résistance. Un goût de brûlé dès la première bouffée vient presque toujours d\'un amorçage trop court.</p>',
+      },
+      {
         title: 'Changer avec la bonne référence',
         text:
           'La valeur en ohm et la série de résistance doivent correspondre au réservoir. Une référence proche visuellement peut être incompatible.',
@@ -696,6 +706,20 @@ export const BLOG_POSTS = [
           'Même sans nicotine, un e-liquide est destiné à être vaporisé avec du matériel adapté. Il doit être conservé hors de portée des enfants et utilisé par des adultes.',
       },
       {
+        title: '10 ml, 50 ml ou 100 ml : quel format sans nicotine choisir ?',
+        html: '<table><caption>Comparatif des formats de e-liquide 0 mg</caption><thead><tr><th>Format</th><th>Prix indicatif</th><th>Pour qui</th><th>Matériel conseillé</th></tr></thead><tbody>'
+          + '<tr><td>10 ml (0 mg)</td><td>~5 €</td><td>Tester une saveur, petites consommations</td><td>Tous les pods et clearomiseurs</td></tr>'
+          + '<tr><td>50 ml (0 mg, prêt à booster)</td><td>~12-15 €</td><td>Consommation régulière, dosage au booster</td><td>Clearomiseurs et pods à résistance basse</td></tr>'
+          + '<tr><td>100 ml (0 mg, prêt à booster)</td><td>~18-22 €</td><td>Gros vapoteurs, meilleure prix au ml</td><td>Kits subohm, box + clearo 4-5 ml</td></tr>'
+          + '</tbody></table>'
+          + '<p>À volume égal, le 100 ml 0 mg revient environ deux fois moins cher au millilitre que le 10 ml : c’est le format le plus économique pour vapoter sans nicotine au quotidien.</p>',
+      },
+      {
+        title: 'Peut-on ajouter de la nicotine à un e-liquide 0 mg ?',
+        text:
+          'Oui : les grands formats 0 mg sont conçus pour recevoir des boosters de nicotine (10 ml à 20 mg/ml). La <a href="/calculette-diy" class="text-neon hover:underline">calculette DIY THEKLOPE</a> calcule le nombre exact de boosters pour atteindre votre taux cible (3, 6 ou 12 mg/ml), et nos <a href="/categorie/diy-boosters" class="text-neon hover:underline">boosters</a> sont disponibles en boutique.',
+      },
+      {
         title: 'Formats et compatibilité',
         text:
           'Les grands formats sont souvent proposés en 0 mg/ml. Le ratio PG/VG reste essentiel pour éviter fuites ou mauvaise alimentation de la résistance. Retrouvez tous les <a href="/categorie/e-liquides-sans-nicotine" class="text-neon hover:underline">e-liquides disponibles sans nicotine</a> : 10 ml au taux 0 mg, <a href="/categorie/e-liquides-50ml" class="text-neon hover:underline">50 ml</a> et <a href="/categorie/e-liquides-100ml" class="text-neon hover:underline">100 ml</a>.',
@@ -715,7 +739,19 @@ export const BLOG_POSTS = [
         q: 'Peut-on ajouter de la nicotine dans un grand format ?',
         a: 'Certains formats sont prévus pour recevoir des boosters, dans le respect de la réglementation. Consultez la fiche produit.',
       },
-    ],
+    
+      {
+        q: 'Un e-liquide sans nicotine fait-il tousser ?',
+        a: 'La toux vient souvent du propylène glycol (PG), pas de la nicotine. Un liquide avec plus de VG, une puissance plus faible ou une résistance plus haute (1 ohm et plus) réduit généralement cette sensation.',
+      },
+      {
+        q: 'Peut-on vapoter du 0 mg sans être fumeur ?',
+        a: 'Le vapotage reste réservé aux adultes et déconseillé aux non-fumeurs : les saveurs créent une habitude de geste et l’impact à long terme de l’inhalation d’arômes n’est pas documenté. Les produits de vapotage ne sont jamais totalement sans risque.',
+      },
+      {
+        q: 'Le e-liquide sans nicotine a-t-il un goût différent ?',
+        a: 'Sans nicotine, les saveurs paraissent souvent plus nettes : la nicotine apporte un léger hit et une amertume qui atténuent les arômes. Un 0 mg bien dosé en PG/VG reste savoureux, surtout en tirage serré.',
+      },],
     relatedProductIds: ['caffe-latte-29', 'eclats-de-noisettes-50ml-0mg-243'],
   }),
   makePost({
