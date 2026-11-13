@@ -182,6 +182,7 @@ export default function Product() {
             "validFrom": priceValidFrom,
             "priceValidUntil": priceValidUntil,
             "itemCondition": "https://schema.org/NewCondition",
+            "identifier_exists": false,
             "availability": isProductOrderable(product) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
             "seller": {
               "@type": "Organization",

@@ -278,6 +278,9 @@ for (const p of PRODUCTS) {
           validFrom: (p.created_at ? new Date(p.created_at) : new Date()).toISOString().split('T')[0],
           priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
           itemCondition: 'https://schema.org/NewCondition',
+          // Pas de GTIN/EAN dans le catalogue : on le déclare explicitement,
+          // sinon Google dégrade l'éligibilité des extraits produits.
+          identifier_exists: false,
           availability: isProductOrderable(p) ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
           // url du vendeur : champ attendu par Google Merchant, déjà émis côté client.
           seller: { '@type': 'Organization', name: 'THEKLOPE', url: BASE_URL },
